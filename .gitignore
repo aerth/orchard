@@ -1,0 +1,12 @@
+NOTES.md
+__debug*
+.env
+data
+!pytools/data
+*.log
+tmp
+.history
+*.mp4
+/bin
+/documents
+TODO.md
