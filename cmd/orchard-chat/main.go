@@ -113,18 +113,24 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 	//	prompts = []string{"use the 'foo' tool function (nonce 42)"}
 	//	usermsg := prompts[rand.Intn(len(prompts))]
 	//
+	store := dbstore.NewFromEnv()
 	for ctx.Err() == nil {
 		var newmsg *chatmessages.ChatMessage
 		if err := stdinmsg(conf, &newmsg); err != nil {
 			return stackerr.Errorf("%w", err)
 		}
 		if newmsg.Content[0] == '/' {
-			if err := handleCommand(newmsg); err != nil {
+			add, err := handleCommand(newmsg)
+			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %+v\n", err)
+			}
+			for i := range add {
+				if err := store.Add(ctx, conf.GetThreadID(), &add[i]); err != nil {
+					return stackerr.Errorf("%w", err)
+				}
 			}
 			continue
 		}
-		store := dbstore.NewFromEnv()
 		if err := store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
 			return stackerr.Errorf("%w", err)
 		}
@@ -159,21 +165,6 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 			continue
 		}
 
-	}
-	return nil
-}
-
-func handleCommand(newmsg *chatmessages.ChatMessage) error {
-	fields := strings.Fields(newmsg.Content)
-	switch strings.TrimPrefix(fields[0], "/") {
-	case "help":
-	case "model":
-		_ = os.Setenv("OLLAMA_MODEL", fields[1])
-	case "think":
-		_ = os.Setenv("OLLAMA_THINK", fields[1])
-	case "system":
-	default:
-		return fmt.Errorf("unknown command")
 	}
 	return nil
 }

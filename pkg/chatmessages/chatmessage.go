@@ -145,6 +145,8 @@ func (cm ChatMessages) Clone() ChatMessages {
 	return slices.Clone(cm)
 }
 
+type A = ChatMessages
+
 func (cm ChatMessages) Raw() llm.Messages {
 	a := make(llm.Messages, 0, len(cm))
 	for i := range cm {
