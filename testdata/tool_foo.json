@@ -1,0 +1,10 @@
+{
+  "name": "foo",
+  "$schema": "./schematool.txt",
+  "type": "function",
+  "function": {
+  "name": "foo",
+  "description": "runs foo test",
+  "parameters": {"type": "object", "required": ["some_nonce"], "properties": {"some_nonce": {"type": "integer", "description": "does not need to be unique" }}}
+  }
+}
