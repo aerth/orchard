@@ -4,7 +4,9 @@ package llm
 import (
 	"bytes"
 	"context"
+	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -179,6 +181,34 @@ type (
 	ToolCalls []json.RawMessage
 )
 
+// Value implements the driver.Valuer interface (for Writing to DB)
+func (tc ToolCalls) Value() (driver.Value, error) {
+	if tc == nil {
+		return nil, nil
+	}
+	return json.Marshal(tc)
+}
+
+// Scan implements the sql.Scanner interface (for Reading from DB)
+func (tc *ToolCalls) Scan(value interface{}) error {
+	if value == nil {
+		*tc = nil
+		return nil
+	}
+
+	bytes, ok := value.([]byte)
+	if !ok {
+		// In some drivers/versions, it might come as []uint8
+		uBytes, ok := value.([]uint8)
+		if !ok {
+			return errors.New("type assertion to []byte failed")
+		}
+		bytes = uBytes
+	}
+
+	return json.Unmarshal(bytes, tc)
+}
+
 func toolCallsEqual(a, b ToolCalls) bool {
 	if len(a) == 0 && len(b) == 0 {
 		return true
@@ -288,9 +318,15 @@ func NewChatRequest() *ChatRequest {
 	if strings.HasPrefix(model, "gemma") {
 		temp = 1.0
 	}
-	think := os.Getenv("OLLAMA_THINK")
+	var think any = os.Getenv("OLLAMA_THINK")
 	if think == "" {
 		think = DefaultThink
+	}
+	if think == "false" {
+		think = false
+	}
+	if think == "true" {
+		think = true
 	}
 	return &ChatRequest{
 		Model:     model,

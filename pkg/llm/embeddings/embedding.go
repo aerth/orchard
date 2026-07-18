@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
 	"m/pkg/vector256"
 
+	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -23,8 +25,8 @@ var defaultEclient *llm.Client
 
 const MinLength = 4
 
-func BestEffort(ctx context.Context, s string) *vector256.Vector256 {
-	v, err := Embed(ctx, nil, s)
+func BestEffort(ctx context.Context, s string, isQueryOrQuestion bool) *vector256.Vector256 {
+	v, err := Embed(ctx, nil, s, isQueryOrQuestion)
 	if err != nil {
 		slog.Error("best-effort giving up", "err", err)
 	}
@@ -34,17 +36,32 @@ func BestEffort(ctx context.Context, s string) *vector256.Vector256 {
 	return &v
 }
 
-func Embed(ctx context.Context, client *llm.Client, s string) (vector256.Vector256, error) {
+func GetEmbeddingEndpoint() string {
+	if x := os.Getenv("OLLAMA_EMBED_URL"); x != "" {
+		return x
+	}
+	return "http://127.0.0.1:11434"
+}
+
+func Embed(ctx context.Context, client *llm.Client, s string, isQueryOrQuestion bool) (vector256.Vector256, error) {
 	if len(s) < MinLength {
 		return nil, nil
 	}
+	if strings.Count(s, " ") > 1024 {
+		return nil, fmt.Errorf("chunk too big")
+	}
 	if client == nil && defaultEclient == nil {
-		defaultEclient = llm.NewClient(&url.URL{Host: "127.0.0.1:11434", Scheme: "http"}, http.DefaultClient)
+		u, err := url.Parse(GetEmbeddingEndpoint())
+		if err != nil {
+			return nil, stackerr.Errorf("%w", err)
+		}
+		defaultEclient = llm.NewClient(u, http.DefaultClient)
+		//	defaultEclient = llm.NewClient(&url.URL{Host: "127.0.0.1:11434", Scheme: "http"}, http.DefaultClient)
 	}
 	if client == nil {
 		client = defaultEclient
 	}
-	ereq := GetEmbeddingRequestQuery(s)
+	ereq := NomicEmbed(s, isQueryOrQuestion)
 	got, err := client.Embed(ctx, &ereq)
 	if err != nil {
 		return nil, err
@@ -127,32 +144,40 @@ from config_sentence_transforms.json:
 	}
 */
 
-func GetEmbeddingEndpoint() string {
-	return os.Getenv("OLLAMA_EMBED_URL")
+// NomicEmbed ...
+// From docs: "Important! The text prompt must include a task instruction prefix, instructing the model which task is being performed."
+// "Please use search_query: before your queries/questions, and search_document: before your documents."
+func NomicEmbed(text string, isQueryOrQuestion bool) llm.EmbedRequest {
+	if isQueryOrQuestion {
+		return GetNomicEmbeddingRequestQuery(text)
+	}
+	return GetNomicEmbeddingRequestSearchDocument(text)
 }
 
-func GetEmbeddingRequestQuery(s string) llm.EmbedRequest {
+var DefaultEmbedOptions map[string]any
+
+//	Options: map[string]any{
+//			"embedding_dim": 256,
+//		},
+
+func GetNomicEmbeddingRequestQuery(s string) llm.EmbedRequest {
 	reqBody := llm.EmbedRequest{
-		Model: model,
-		Input: []string{fmt.Sprintf("search_query: %s", s)},
-		// Options: map[string]any{
-		//		"embedding_dim": 256,
-		//	},
+		Model:      model,
+		Input:      []string{fmt.Sprintf("search_query: %s", s)},
+		Options:    DefaultEmbedOptions,
 		Truncate:   new(true),
 		Dimensions: 256,
 	}
 	return reqBody
 }
 
-func GetEmbeddingRequestSearchDocument(s string) llm.EmbedRequest {
+func GetNomicEmbeddingRequestSearchDocument(s string) llm.EmbedRequest {
 	reqBody := llm.EmbedRequest{
 		Model:      model,
 		Input:      []string{fmt.Sprintf("search_document: %s", s)},
 		Truncate:   new(true),
 		Dimensions: 256,
-		//	Options: map[string]any{
-		//		"embedding_dim": 256,
-		//	},
+		Options:    DefaultEmbedOptions,
 	}
 	return reqBody
 }

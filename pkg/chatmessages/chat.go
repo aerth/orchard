@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"m/pkg/debugging"
 	"m/pkg/llm"
@@ -54,11 +55,16 @@ func ChatFromDB(ctx context.Context, threadID uuid.UUID, newmsg ChatMessage, e E
 	if e.Store == nil {
 		return nil, fmt.Errorf("no db store to load messages")
 	}
+	if len(e.Prepend) == 0 {
+		return nil, stackerr.Errorf("no prepend msgs")
+	}
 	msgs, err := e.Store.LoadThread(ctx, threadID, 100)
 	if err != nil {
 		return nil, stackerr.Errorf("%w", err)
 	}
-	msgs = append(msgs, newmsg)
+	if newmsg.Content != "" {
+		msgs = append(msgs, newmsg)
+	}
 	return Chat(ctx, threadID, msgs, e)
 }
 
@@ -69,12 +75,19 @@ func SetClient(x *llm.Client) {
 }
 
 func Chat(ctx context.Context, threadID uuid.UUID, msgs ChatMessages, e Ext) (*ChatMessage, error) {
+	if len(e.Tools) == 0 {
+		return nil, fmt.Errorf("no tools")
+	}
+	if len(e.Prepend) == 0 {
+		return nil, stackerr.Errorf("no prepend msgs")
+	}
 	creq := llm.NewChatRequest()
-	creq.Messages = append(e.Prepend, msgs.RemoveThoughts().Raw()...)
 	creq.Tools = e.Tools
+	creq.Messages = append(e.Prepend, msgs.RemoveThoughts().Raw()...)
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
 	}
+	_ = json.NewEncoder(os.Stderr).Encode(creq.Messages)
 
 	// make new pending
 	pending := New(llm.Message{})

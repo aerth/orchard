@@ -1,3 +1,4 @@
+// Package postgres for running migrate
 package postgres
 
 import (
@@ -12,18 +13,15 @@ import (
 
 // PostgresDBStore implements Store using PostgreSQL.
 type PostgresDBStore struct {
-	//	db  *sql.DB
 	db *gorm.DB
 }
 
 func (s *PostgresDBStore) DB() *gorm.DB {
 	if s.db == nil {
-		panic("no db")
+		panic("no underlying db")
 	}
 	return s.db
 }
-
-var DropAll = false
 
 func UnscopedDB[T any](db *gorm.DB) gorm.ChainInterface[T] {
 	return gorm.G[T](db).Scopes(func(tx *gorm.Statement) { tx.Unscoped = true })
@@ -46,11 +44,6 @@ func NewPostgres(additionalMigrateTypes ...any) (*PostgresDBStore, error) {
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("ping db: %w", err)
 	}
-	/*	_, err = db.Exec("CREATE EXTENSION IF NOT EXISTS \"pgcrypto\";")
-		if err != nil {
-			log.Fatal("Failed to enable uuid-ossp extension:", err)
-		}*/
-
 	if len(additionalMigrateTypes) == 0 {
 		return &PostgresDBStore{db: gdb}, nil
 	}

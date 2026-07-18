@@ -1,3 +1,4 @@
+// Package dbstore for storing/loading message threads from DB
 package dbstore
 
 import (
@@ -17,11 +18,6 @@ import (
 )
 
 var ErrClosed = errors.New("closed")
-
-var (
-	TestThreadID             = uuid.MustParse("dc41d7d4-a64b-4613-9ed5-4997ec33b0ab")
-	SingleThreadID uuid.UUID = TestThreadID
-)
 
 func New(db *postgres.PostgresDBStore) *PostgresDBStore {
 	return &PostgresDBStore{

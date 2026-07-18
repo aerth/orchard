@@ -179,9 +179,9 @@ var Writer io.Writer = os.Stderr
 //
 // Init().Set(slog.LevelInfo) or use ptr for flag etc
 func Init(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
-	if loglevel != nil {
-		return loglevel
-	}
+	//if loglevel != nil {
+	//	return loglevel
+	//}
 	if len(loglevel1) == 1 {
 		loglevel = loglevel1[0]
 	} else {

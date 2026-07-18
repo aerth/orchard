@@ -115,12 +115,18 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.Parse()
 }
 
+var (
+	TestThreadID   = uuid.MustParse("dc41d7d4-a64b-4613-9ed5-4997ec33b0ab")
+	SingleThreadID = TestThreadID
+)
+
 func DefaultConfigInput() ConfigInput {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err.Error())
 	}
-	threadID := uuid.Nil // nostore
+	//threadID := uuid.Nil // nostore
+	threadID := SingleThreadID // dummy testing
 	if x := os.Getenv("ORCHARD_THREAD"); x != "" {
 		if err := threadID.UnmarshalText([]byte(x)); err != nil {
 			panic(err.Error())

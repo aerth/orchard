@@ -1,6 +1,7 @@
 package chatmessages
 
 import (
+	"encoding/json"
 	"fmt"
 	"slices"
 	"time"
@@ -29,9 +30,34 @@ type ChatMessage struct {
 	MessageOptions `gorm:"-" json:"-"`
 }
 
+func (cm *ChatMessage) ContentOrToolCall() string {
+	if cm.Content != "" {
+		return cm.Content
+	}
+	if len(cm.ToolCalls) == 1 {
+		js, err := json.Marshal(cm.ToolCalls[0])
+		if err != nil {
+			return "(error)"
+		}
+		return "Tool Call: " + string(js)
+	}
+	if len(cm.ToolCalls) != 0 {
+		js, err := json.Marshal(cm.ToolCalls)
+		if err != nil {
+			return "(error)"
+		}
+		return "Tool Calls: " + string(js)
+	}
+	return "(empty)"
+}
+
 func New(m llm.Message) *ChatMessage {
 	t := time.Now().UTC()
 	return &ChatMessage{Message: m, CreatedAt: t, MessageID: uuid.New(), UpdatedAt: t}
+}
+
+func NewChatMessage(role string, content string) *ChatMessage {
+	return New(llm.Message{Role: role, Content: content})
 }
 
 func NewFrom(from string, m llm.Message) *ChatMessage {
