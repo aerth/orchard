@@ -15,7 +15,7 @@ func NewData() map[string]any {
 func GetSystemBase(data any) string {
 	tpl, err := template.New("").ParseFiles("SYSTEM.md")
 	if err != nil {
-		panic(err.Error())
+		panic("template SYSTEM.md failed: " + err.Error())
 	}
 	var buf strings.Builder
 	pre := ""
