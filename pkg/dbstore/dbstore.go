@@ -212,8 +212,11 @@ func GormIter[T Identifiable](db *gorm.DB, o *IterOptions) iter.Seq[T] {
 			if lastID != 0 {
 				query = query.Where("id "+cmp+" ?", lastID)
 			}
-			if err := query.Find(&batch).Error; err != nil || len(batch) == 0 {
+			if err := query.Find(&batch).Error; err != nil {
 				slog.Error("done finding", "err", err, "n", len(batch))
+				return
+			}
+			if len(batch) == 0 {
 				return
 			}
 			for _, item := range batch {
