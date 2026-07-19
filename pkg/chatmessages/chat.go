@@ -76,6 +76,11 @@ func SetClient(x *llm.Client) {
 	client = x
 }
 
+func FormatRoles[T interface{ llm.Message | ChatMessage }](v []T) []string {
+	a := make([]string, len(v))
+	return a
+}
+
 func PrintMessages(creq *llm.ChatRequest, pending *ChatMessage) error {
 	println("MESSAGES", len(creq.Messages), FormatRoles(creq.Messages))
 	_ = json.NewEncoder(os.Stderr).Encode(creq.Messages)
