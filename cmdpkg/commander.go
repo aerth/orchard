@@ -14,6 +14,7 @@ import (
 )
 
 func HandleCommand(newmsg *chatmessages.ChatMessage, conf *global.Conf, e *chatmessages.Ext) (chatmessages.A, error) {
+	slog.Info("commander")
 	fields := strings.Fields(newmsg.Content)
 	switch strings.TrimPrefix(fields[0], "/") {
 	case "help":
