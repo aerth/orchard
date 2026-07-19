@@ -13,7 +13,7 @@ func NewData() map[string]any {
 }
 
 func GetSystemBase(data any) string {
-	tpl, err := template.New("SYSTEM.md").ParseFiles("SYSTEM.md")
+	tpl, err := template.New("").ParseFiles("SYSTEM.md")
 	if err != nil {
 		panic(err.Error())
 	}
