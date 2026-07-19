@@ -3,6 +3,7 @@ package chatmessages
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"slices"
 	"time"
 
@@ -151,8 +152,11 @@ func (cm ChatMessages) Raw() llm.Messages {
 	a := make(llm.Messages, 0, len(cm))
 	for i := range cm {
 		if cm[i].Aux != nil || cm[i].IsEmpty() {
+			slog.Warn("skipping raw()", "i", i)
 			continue
 		}
+
+		slog.Warn("got raw", "i", i, "msg", cm[i].Message)
 		a = append(a, cm[i].Message)
 	}
 	return a

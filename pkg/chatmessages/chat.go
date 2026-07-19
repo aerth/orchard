@@ -14,6 +14,7 @@ import (
 )
 
 type Ext struct {
+	From    string
 	Prepend []llm.Message
 	Append  []llm.Message
 	Tools   []json.Marshaler
@@ -74,6 +75,7 @@ func SetClient(x *llm.Client) {
 	client = x
 }
 
+// Chat uses 'e'
 func Chat(ctx context.Context, threadID uuid.UUID, msgs ChatMessages, e Ext) (*ChatMessage, error) {
 	if len(e.Tools) == 0 {
 		return nil, fmt.Errorf("no tools")
@@ -83,14 +85,15 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs ChatMessages, e Ext) (*C
 	}
 	creq := llm.NewChatRequest()
 	creq.Tools = e.Tools
-	creq.Messages = append(e.Prepend, msgs.RemoveThoughts().Raw()...)
+	creq.Messages = append(e.Prepend, msgs.Raw()...)
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
 	}
+	println("MESSAGES", len(creq.Messages))
 	_ = json.NewEncoder(os.Stderr).Encode(creq.Messages)
 
 	// make new pending
-	pending := New(llm.Message{})
+	pending := NewFrom(e.From, llm.Message{Role: "assistant"})
 	cl := debugging.NewConsoleLogger()
 
 	// generate
@@ -101,8 +104,10 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs ChatMessages, e Ext) (*C
 	if err != nil {
 		return pending, stackerr.Errorf("%w", err)
 	}
-	if err := e.Store.Add(ctx, threadID, pending); err != nil {
-		return pending, stackerr.Errorf("%w", err)
+	if e.Store != nil {
+		if err := e.Store.Add(ctx, threadID, pending); err != nil {
+			return pending, stackerr.Errorf("%w", err)
+		}
 	}
 	return pending, nil
 }

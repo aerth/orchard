@@ -114,17 +114,19 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 	//	usermsg := prompts[rand.Intn(len(prompts))]
 	//
 	store := dbstore.NewFromEnv()
+	var stack chatmessages.ChatMessages
+	e := chatmessages.Ext{Tools: tools.ToMarshaler(), Store: store, Prepend: []llm.Message{{Role: "system", Content: global.GetSystemBase(global.NewData())}}}
 	for ctx.Err() == nil {
 		var newmsg *chatmessages.ChatMessage
 		if err := stdinmsg(conf, &newmsg); err != nil {
 			return stackerr.Errorf("%w", err)
 		}
 		if newmsg.Content[0] == '/' {
-			add, err := handleCommand(newmsg)
+			add, err := handleCommand(newmsg, conf, &e)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %+v\n", err)
 			}
-			for i := range add {
+			for i := range add { // if /system , for example, there are some new ephemeral messages to add to this round
 				if err := store.Add(ctx, conf.GetThreadID(), &add[i]); err != nil {
 					return stackerr.Errorf("%w", err)
 				}
@@ -139,13 +141,15 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 				return stackerr.Errorf("%w", err)
 			}
 		}
-
-		sysmsg := llm.Message{Role: "system", Content: global.GetSystemBase(global.NewData())}
-		got, err := chatmessages.ChatFromDB(ctx, conf.GetThreadID(), *newmsg, chatmessages.Ext{Tools: tools.ToMarshaler(), Store: store, Prepend: []llm.Message{sysmsg}})
+		stack = append(stack, *newmsg)
+		//	got, err := chatmessages.ChatFromDB(ctx, conf.GetThreadID(), nil, chatmessages.Ext{Tools: tools.ToMarshaler(), Store: store, Prepend: []llm.Message{sysmsg}})
+		got, err := chatmessages.Chat(ctx, conf.GetThreadID(), stack, e)
 		if err != nil {
 			return stackerr.Errorf("%w", err)
 		}
+		stack = append(stack, *got)
 		_, _ = fmt.Fprintf(os.Stdout, "BOT> %s\n", got.ContentOrToolCall())
+
 		if len(got.ToolCalls) != 0 {
 			toolouts, err := runtools(ctx, conf, tools, got.Message)
 			if WrapToolErrors && err != nil {
@@ -161,7 +165,7 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 			if err := store.Add(ctx, conf.GetThreadID(), chatmessages.Ptrs(toolouts)...); err != nil {
 				return stackerr.Errorf("adding tool output to db: %w", err)
 			}
-			newmsg = &chatmessages.ChatMessage{}
+			stack = append(stack, toolouts...)
 			continue
 		}
 
