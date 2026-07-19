@@ -19,11 +19,13 @@ func GetSystemBase(data any) string {
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		panic("template SYSTEM.md failed: " + err.Error())
 	}
+	if err != nil {
+		return "You are a helpful assistant who speaks only nadsat hacker slang. Keep it simple and quick replies only."
+	}
 	var buf strings.Builder
 	pre := ""
 	if err := tpl.ExecuteTemplate(&buf, "SYSTEM.md", NewData()); err != nil {
 		slog.Error("error executing template", "err", err)
-		pre = "You are a helpful assistant who speaks nadsat slang. Keep it simple and quick replies only."
 	}
 	return strings.Join([]string{buf.String(), pre}, "\n")
 }
