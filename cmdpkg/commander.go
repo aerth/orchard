@@ -14,9 +14,10 @@ import (
 )
 
 func HandleCommand(newmsg *chatmessages.ChatMessage, conf *global.Conf, e *chatmessages.Ext) (chatmessages.A, error) {
-	slog.Info("commander")
 	fields := strings.Fields(newmsg.Content)
-	switch strings.TrimPrefix(fields[0], "/") {
+	cmd := strings.TrimPrefix(fields[0], "/")
+	slog.Info("commander", "cmd", cmd)
+	switch cmd {
 	case "help":
 		println("help mode soon")
 	case "debug":
