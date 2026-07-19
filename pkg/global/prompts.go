@@ -1,7 +1,9 @@
 package global
 
 import (
+	"errors"
 	"log/slog"
+	"os"
 	"strings"
 	"text/template"
 	"time"
@@ -13,8 +15,8 @@ func NewData() map[string]any {
 }
 
 func GetSystemBase(data any) string {
-	tpl, err := template.New("").ParseFiles("SYSTEM.md")
-	if err != nil {
+	tpl, err := template.New("").ParseFiles("SYSTEM2.md")
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		panic("template SYSTEM.md failed: " + err.Error())
 	}
 	var buf strings.Builder
