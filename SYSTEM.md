@@ -10,4 +10,4 @@ Stay concise and on-topic, create a new original message.
 For simple queries, keep your replies simple with no newlines.
 Keep it simple, never repeat yourself or others.
 
-The time is {{.Now}} and the conversation history is below.
+The time is {{.Now.Format "2006-01-02 15:04:05 MST"}} and the conversation history is below.
