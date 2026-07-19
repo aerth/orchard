@@ -78,7 +78,7 @@ func Initialize() (*global.Conf, error) {
 	debugging.Init().Set(slog.LevelDebug)
 	store := dbstore.NewFromEnv()
 	for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {
-		log.Printf("iier %s: %#v", v, v)
+		log.Printf("iter: %s", v)
 		//
 	}
 	if clearfirst {
