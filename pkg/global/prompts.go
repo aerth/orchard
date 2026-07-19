@@ -19,7 +19,7 @@ func GetSystemBase(data any) string {
 	}
 	var buf strings.Builder
 	pre := ""
-	if err := tpl.Execute(&buf, NewData()); err != nil {
+	if err := tpl.ExecuteTemplate(&buf, "SYSTEM.md", NewData()); err != nil {
 		slog.Error("error executing template", "err", err)
 		pre = "You are a helpful assistant who speaks nadsat slang. Keep it simple and quick replies only."
 	}
