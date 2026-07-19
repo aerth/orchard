@@ -179,11 +179,11 @@ type Message struct {
 }
 
 func title(in string) string {
-	k := cases.Caser
+	var k cases.Caser
 	if in == "" {
 		return in
 	}
-	return
+	return k.String(in)
 }
 
 func (m Message) String() string {
