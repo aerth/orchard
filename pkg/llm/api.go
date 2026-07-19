@@ -16,6 +16,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"unicode"
 
 	"m/pkg/global"
 
@@ -177,7 +178,13 @@ type Message struct {
 	ToolCallID string    `json:"tool_call_id,omitempty" gorm:"null"`
 }
 
-var title = strings.Title
+func title(in string) string {
+	k := unicode.TitleCase
+	if in == "" {
+		return in
+	}
+	return title
+}
 
 func (m Message) String() string {
 	if len(m.ToolCalls) != 0 {
