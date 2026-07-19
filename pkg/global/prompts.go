@@ -18,9 +18,10 @@ func GetSystemBase(data any) string {
 		panic(err.Error())
 	}
 	var buf strings.Builder
+	pre := ""
 	if err := tpl.Execute(&buf, NewData()); err != nil {
 		slog.Error("error executing template", "err", err)
+		pre = "You are a helpful assistant who speaks nadsat slang. Keep it simple and quick replies only."
 	}
-	pre := "You are a helpful assistant who speaks nadsat slang. Keep it simple and quick replies only."
 	return strings.Join([]string{buf.String(), pre}, "\n")
 }
