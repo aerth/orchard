@@ -182,7 +182,7 @@ func (m Message) String() string {
 		return fmt.Sprintf("%s tool calls: %s", m.Role, m.ToolCalls)
 	}
 	if m.Content == "" {
-		return fmt.Sprintf("%s: %s", m.Role, m.Thinking)
+		return fmt.Sprintf("%s: (thinking) %s", m.Role, m.Thinking)
 	}
 	return fmt.Sprintf("%s: %s", m.Role, m.Content)
 }
