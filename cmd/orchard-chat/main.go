@@ -18,6 +18,7 @@ import (
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/otool"
+	"m/pkg/toolrunner"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/joho/godotenv"
@@ -29,37 +30,41 @@ var (
 	buildtime = ""
 )
 
+/*
+	os.Exit(2)
+*/
+// orchard CLI infinite loop
 func main() {
-	conf, err := initialize()
-	if err != nil {
-		global.Close()
-		log.Printf("Fatal: %+v", err)
-		os.Exit(1)
-	}
-	ctx := context.TODO()
-	toolsraw, err := ScanTools("./testdata", "tool_*.json")
-	if err != nil {
-		global.Close()
-		log.Printf("Fatal: %+v", err)
-		os.Exit(1)
-	}
-	//json.NewEncoder(os.Stderr).Encode(tools)
-	var tools otool.Tools
-	if err := tools.FromMarshalers(toolsraw); err != nil {
-		global.Close()
-		log.Printf("Fatal: %+v", err)
-		os.Exit(1)
-
-	}
-	activateTools(tools)
-	err = runmain(ctx, conf, tools)
-	if err != nil {
+	ctx := context.Background()
+	if err := main1(ctx); err != nil {
 		global.Close()
 		debugging.Writer = os.Stderr
 		debugging.Init()
-		log.Printf("Fatal: %+v", err)
-		os.Exit(2)
+		log.Fatalf("Fatal: %+v", err)
 	}
+}
+
+func main1(ctx context.Context) error {
+	conf, err := initialize()
+	if err != nil {
+		return stackerr.Errorf("initialize: %w", err)
+	}
+	toolsraw, err := ScanTools("./testdata", "tool_*.json")
+	if err != nil {
+		return stackerr.Errorf("ScanTools: %w", err)
+	}
+	var tools otool.Tools
+	if err := tools.FromMarshalers(toolsraw); err != nil {
+		return stackerr.Errorf("tool convert: %w", err)
+	}
+	if err := activateTools(tools); err != nil {
+		return stackerr.Errorf("activateTools: %w", err)
+	}
+	err = runmain(ctx, conf, tools)
+	if err != nil {
+		return stackerr.Errorf("runmain: %w", err)
+	}
+	return nil
 }
 
 func activateTools(tools otool.Tools) error {
@@ -68,15 +73,17 @@ func activateTools(tools otool.Tools) error {
 			tools[i].SetExec(
 				func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 					var call struct {
-						ID        string `json:"id"`
-						Arguments struct {
-							Nonce uint `json:"some_nonce"`
-						} `json:"arguments"`
+						ID       string `json:"id"`
+						Function struct {
+							Arguments struct {
+								Nonce uint `json:"some_nonce"`
+							} `json:"arguments"`
+						} `json:"function"`
 					}
 					if err := json.Unmarshal(caller.ToolCalls[i], &call); err != nil {
 						return nil, err
 					}
-					return chatmessages.ChatMessages{*chatmessages.NewFrom("", llm.Message{Role: "tool", ToolName: "foo", ToolCallID: call.ID, Content: fmt.Sprintf("foo has completed (the nonce this tool received was '%d')", call.Arguments.Nonce)})}, nil
+					return chatmessages.ChatMessages{*chatmessages.NewFrom("", llm.Message{Role: "tool", ToolName: "foo", ToolCallID: call.ID, Content: fmt.Sprintf("foo has completed (the nonce this tool received was '%d')", call.Function.Arguments.Nonce)})}, nil
 				},
 			)
 		} else {
@@ -88,24 +95,43 @@ func activateTools(tools otool.Tools) error {
 
 func stdinmsg(conf *global.Conf, newmsg **chatmessages.ChatMessage) error {
 	var x string
+	defer func() {
+		slog.Info("captured input", "text", fmt.Sprintf("%q", x))
+	}()
+	buf := make([]byte, 2048)
 	for x == "" {
 		_, _ = fmt.Fprintf(os.Stderr, "USER> ")
-		buf := make([]byte, 2048)
 		n, err := os.Stdin.Read(buf)
 		if err != nil && !errors.Is(err, io.EOF) {
 			return stackerr.Errorf("%w", err)
 		}
 		x = strings.TrimSpace(string(buf[:n]))
-		*newmsg = chatmessages.NewFrom(conf.GetUsername(), llm.Message{
-			Role:    "user",
-			Content: x,
-		})
 	}
+	*newmsg = chatmessages.NewFrom(conf.GetUsername(), llm.Message{
+		Role:    "user",
+		Content: x,
+	})
 	if (*newmsg).Content == "exit" {
 		slog.Info("goodbye")
 		return nil
 	}
 	return nil
+}
+
+func getInput(_ context.Context, conf *global.Conf, e *chatmessages.Ext, newmsg **chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
+	if err := stdinmsg(conf, newmsg); err != nil {
+		return nil, stackerr.Errorf("%w", err)
+	}
+	if (*newmsg).Content[0] == '/' {
+		add, err := handleCommand(*newmsg, conf, e)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %+v\n", err)
+		}
+		cmdmsg := **newmsg
+		*newmsg = nil
+		return append(chatmessages.ChatMessages{cmdmsg}, add...), nil
+	}
+	return nil, nil
 }
 
 func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
@@ -115,31 +141,31 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 	//
 	store := dbstore.NewFromEnv()
 	var stack chatmessages.ChatMessages
-	e := chatmessages.Ext{Tools: tools.ToMarshaler(), Store: store, Prepend: []llm.Message{{Role: "system", Content: global.GetSystemBase(global.NewData())}}}
+	e := chatmessages.Ext{
+		//		PreFunc: chatmessages.PrintMessages,
+		Tools: tools.ToMarshaler(), Store: store, Prepend: []llm.Message{{Role: "system", Content: global.GetSystemBase(global.NewData())}},
+	}
 	for ctx.Err() == nil {
-		var newmsg *chatmessages.ChatMessage
-		if err := stdinmsg(conf, &newmsg); err != nil {
+		// foo
+		if len(stack) != 0 { // not first iter
+			slog.Info("generating another round...")
+		}
+		newmsg := new(chatmessages.ChatMessage)
+		newmsgs, err := getInput(ctx, conf, &e, &newmsg)
+		if err != nil {
 			return stackerr.Errorf("%w", err)
 		}
-		if newmsg.Content[0] == '/' {
-			add, err := handleCommand(newmsg, conf, &e)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error: %+v\n", err)
+		if len(newmsgs) != 0 {
+			stack = append(stack, newmsgs...)
+			for i := range newmsgs {
+				_, _ = fmt.Fprintf(os.Stdout, "%s> %s\n", newmsgs[i].Role, newmsgs[i].ContentOrToolCall())
 			}
-			for i := range add { // if /system , for example, there are some new ephemeral messages to add to this round
-				if err := store.Add(ctx, conf.GetThreadID(), &add[i]); err != nil {
-					return stackerr.Errorf("%w", err)
-				}
-			}
+		}
+		if newmsg == nil || newmsg.Content == "" {
 			continue
 		}
 		if err := store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
 			return stackerr.Errorf("%w", err)
-		}
-		if newmsg.Content == "" {
-			if err := stdinmsg(conf, &newmsg); err != nil {
-				return stackerr.Errorf("%w", err)
-			}
 		}
 		stack = append(stack, *newmsg)
 		//	got, err := chatmessages.ChatFromDB(ctx, conf.GetThreadID(), nil, chatmessages.Ext{Tools: tools.ToMarshaler(), Store: store, Prepend: []llm.Message{sysmsg}})
@@ -151,7 +177,7 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 		_, _ = fmt.Fprintf(os.Stdout, "BOT> %s\n", got.ContentOrToolCall())
 
 		if len(got.ToolCalls) != 0 {
-			toolouts, err := runtools(ctx, conf, tools, got.Message)
+			toolouts, err := toolrunner.Runtools(ctx, conf, tools, *got)
 			if WrapToolErrors && err != nil {
 				toolouts = append(toolouts, WrapToolError(err)...)
 				err = nil
@@ -177,40 +203,6 @@ var WrapToolErrors = true
 
 func WrapToolError(err error) chatmessages.ChatMessages {
 	return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", fmt.Sprintf("Error running tool: %+v", err))}
-}
-
-func runtools(ctx context.Context, conf *global.Conf, tools otool.Tools, caller llm.Message) (chatmessages.ChatMessages, error) {
-	var toolouts chatmessages.ChatMessages
-	toolCalls := caller.ToolCalls
-	for toolCallIndex := range toolCalls {
-		var call struct {
-			Function struct {
-				Name string `json:"name"`
-			} `json:"function"`
-		}
-		if err := json.Unmarshal(toolCalls[toolCallIndex], &call); err != nil {
-			return toolouts, stackerr.Errorf("%w", err)
-		}
-		var tool otool.Tool
-		for _, t := range tools {
-			if t.Name == call.Function.Name {
-				tool = t
-				break
-			}
-		}
-		if tool.Name != call.Function.Name {
-			slog.Warn("Not Running tools...", "i", toolCallIndex, "call", call)
-			return toolouts, stackerr.Errorf("cant find tool named %s", call.Function.Name)
-		}
-		slog.Info("Running tools...", "i", toolCallIndex, "call", call)
-		x, err := tool.Exec(ctx, caller, toolCallIndex)
-		toolouts = append(toolouts, x...)
-		if err != nil {
-			return toolouts, err
-		}
-
-	}
-	return toolouts, nil
 }
 
 func loadInit(clearfirst *bool) (*global.Conf, error) {

@@ -14,6 +14,7 @@ import (
 )
 
 type Ext struct {
+	PreFunc func(creq *llm.ChatRequest, pending *ChatMessage) error
 	From    string
 	Prepend []llm.Message
 	Append  []llm.Message
@@ -75,12 +76,18 @@ func SetClient(x *llm.Client) {
 	client = x
 }
 
-// Chat uses 'e'
+func PrintMessages(creq *llm.ChatRequest, pending *ChatMessage) error {
+	println("MESSAGES", len(creq.Messages))
+	_ = json.NewEncoder(os.Stderr).Encode(creq.Messages)
+	return nil
+}
+
+// Chat uses 'e' for building a temporary {"messages": []} array
 func Chat(ctx context.Context, threadID uuid.UUID, msgs ChatMessages, e Ext) (*ChatMessage, error) {
-	if len(e.Tools) == 0 {
+	if len(e.Tools) == 0 && len(msgs) != 0 {
 		return nil, fmt.Errorf("no tools")
 	}
-	if len(e.Prepend) == 0 {
+	if len(e.Prepend) == 0 && len(msgs) != 0 {
 		return nil, stackerr.Errorf("no prepend msgs")
 	}
 	creq := llm.NewChatRequest()
@@ -89,11 +96,13 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs ChatMessages, e Ext) (*C
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
 	}
-	println("MESSAGES", len(creq.Messages))
-	_ = json.NewEncoder(os.Stderr).Encode(creq.Messages)
-
 	// make new pending
 	pending := NewFrom(e.From, llm.Message{Role: "assistant"})
+	if e.PreFunc != nil {
+		if err := e.PreFunc(creq, pending); err != nil {
+			return nil, err
+		}
+	}
 	cl := debugging.NewConsoleLogger()
 
 	// generate
