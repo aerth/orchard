@@ -45,6 +45,9 @@ func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
 	if len(ww) == 1 {
 		w = ww[0]
 	}
+	if w == nil {
+		w = io.Discard
+	}
 	return &ConsoleLogger{w: w, pre: ""}
 }
 
@@ -130,7 +133,7 @@ func (c *ConsoleLogger) PrintMessage(w io.Writer, m llm.Message) {
 		}
 		_, _ = fmt.Fprintf(w, "%s", m.Content)
 	}
-	if len(m.ToolCalls) != 0 {
+	if len(m.ToolCalls) != 0 { // ollama api returns a full, parsed tool call(s). TODO: future: reimplement chat template for streaming the building of the tool call
 		type namewrap struct {
 			Function struct {
 				Name      string          `json:"name"`
