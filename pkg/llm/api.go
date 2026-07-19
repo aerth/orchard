@@ -16,11 +16,11 @@ import (
 	"runtime"
 	"strings"
 	"time"
-	"unicode"
 
 	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
+	"golang.org/x/text/cases"
 )
 
 type Client struct {
@@ -179,11 +179,11 @@ type Message struct {
 }
 
 func title(in string) string {
-	k := unicode.TitleCase
+	k := cases.Caser
 	if in == "" {
 		return in
 	}
-	return title
+	return
 }
 
 func (m Message) String() string {
