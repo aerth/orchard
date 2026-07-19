@@ -21,6 +21,7 @@ import (
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type Client struct {
@@ -178,12 +179,13 @@ type Message struct {
 	ToolCallID string    `json:"tool_call_id,omitempty" gorm:"null"`
 }
 
+var caser = cases.Title(language.AmericanEnglish)
+
 func title(in string) string {
-	var k cases.Caser
 	if in == "" {
 		return in
 	}
-	return k.String(in)
+	return caser.String(in)
 }
 
 func (m Message) String() string {
