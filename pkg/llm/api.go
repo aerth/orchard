@@ -189,13 +189,14 @@ func title(in string) string {
 }
 
 func (m Message) String() string {
+	from := title(m.Role)
 	if len(m.ToolCalls) != 0 {
-		return fmt.Sprintf("%s tool calls: %s", title(m.Role), m.ToolCalls)
+		return fmt.Sprintf("%s tool calls: %s", from, m.ToolCalls)
 	}
 	if m.Content == "" {
-		return fmt.Sprintf("%s: (thinking) %s", title(m.Role), m.Thinking)
+		return fmt.Sprintf("%s: (thinking) %s", from, m.Thinking)
 	}
-	return fmt.Sprintf("%s: %s", m.Role, m.Content)
+	return fmt.Sprintf("%s: %s", from, m.Content)
 }
 
 type (
