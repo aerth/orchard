@@ -179,7 +179,7 @@ type Message struct {
 
 func (m Message) String() string {
 	if len(m.ToolCalls) != 0 {
-		return fmt.Sprintf("%s: tool calls: %s", m.Role, m.ToolCalls)
+		return fmt.Sprintf("%s tool calls: %s", m.Role, m.ToolCalls)
 	}
 	if m.Content == "" {
 		return fmt.Sprintf("%s: %s", m.Role, m.Thinking)
