@@ -77,7 +77,7 @@ func SetClient(x *llm.Client) {
 }
 
 func PrintMessages(creq *llm.ChatRequest, pending *ChatMessage) error {
-	println("MESSAGES", len(creq.Messages), creq.Messages.FormatRoles())
+	println("MESSAGES", len(creq.Messages), FormatRoles(creq.Messages))
 	_ = json.NewEncoder(os.Stderr).Encode(creq.Messages)
 	return nil
 }
