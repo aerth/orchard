@@ -107,7 +107,7 @@ func (cm ChatMessage) IsEmpty() bool {
 }
 
 func (cm ChatMessage) String() string {
-	return "thr_" + cm.ThreadID.String()[:8] + "_msg_" + cm.ThreadID.String()[:8] + "_" + cm.Message.String()
+	return "thr_" + cm.ThreadID.String()[:8] + "_msg_" + cm.MessageID.String()[:8] + "_" + cm.Message.String()
 }
 
 type ChatMessages []ChatMessage
