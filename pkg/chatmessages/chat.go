@@ -76,9 +76,10 @@ func SetClient(x *llm.Client) {
 	client = x
 }
 
-func FormatRoles[T interface{ llm.Message | ChatMessage }](in []T) []string {
+func FormatRoles(in []llm.Message) []string {
 	a := make([]string, len(in))
-	for i, v := range in {
+	for i := range in {
+		a[i] = in[i].Role
 	}
 	return a
 }
