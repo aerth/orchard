@@ -1,6 +1,7 @@
 package chatmessages
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -16,6 +17,37 @@ import (
 
 func (cm ChatMessage) GetID() uint {
 	return cm.DBID
+}
+
+type (
+	RawCall     = Call[json.RawMessage]
+	Call[T any] struct {
+		ID       string `json:"id"`
+		Function struct {
+			Name      string `json:"name"`
+			Arguments T      `json:"arguments,omitempty"`
+		} `json:"function"`
+	}
+)
+
+type IsToolArgument interface{ IsToolArgument() }
+
+// ReadToolCall may return an error message
+func ReadToolCall[T IsToolArgument](ctx context.Context, caller llm.Message, toolCallIndex int) (Call[T], error) {
+	var call Call[T]
+	if err := json.Unmarshal([]byte(caller.ToolCalls[toolCallIndex]), &call); err != nil {
+		return call, err
+	}
+	if call.Function.Name == "" {
+		return call, fmt.Errorf("could not parse")
+	}
+	return call, nil
+}
+
+func NewErrorMessage(role string, content string) ChatMessages {
+	return ChatMessages{
+		*New(llm.Message{Role: "tool", Content: "Error parsing args"}),
+	}
 }
 
 type ChatMessage struct {
@@ -126,6 +158,9 @@ func (cm ChatMessages) TopN(n int) ChatMessages {
 
 func (cm ChatMessages) Top() ChatMessage {
 	l := len(cm)
+	if l == 0 {
+		return ChatMessage{}
+	}
 	return cm[l-1]
 }
 

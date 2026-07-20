@@ -1,4 +1,5 @@
-package main
+// Package testing for testing
+package testing
 
 import (
 	"encoding/json"
@@ -8,8 +9,7 @@ import (
 	"github.com/aerth/mostly/stackerr"
 )
 
-// dummy tools
-
+// ScanTools dummy tools from spec (no exec)
 func ScanTools(dir string, glob string) ([]json.Marshaler, error) {
 	got, err := filepath.Glob(filepath.Join(dir, glob))
 	if err != nil {

@@ -9,7 +9,6 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"runtime/debug"
 	"strings"
 	"syscall"
 	"time"
@@ -28,6 +27,8 @@ import (
 	"m/pkg/toolrunner"
 
 	"github.com/aerth/mostly/stackerr"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // set in makefile
@@ -47,10 +48,6 @@ func Sig() {
 }
 
 var builtinTools otool.Tools
-
-func noop(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-	return nil, nil
-}
 
 // orchard CLI infinite loop, simple stdin stdout, minimal stderr.
 // debug logs to log file or null
@@ -123,32 +120,51 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 		//	PreFunc: chat.PrintMessages,
 		Tools: tools.ToMarshaler(), Store: store,
 	}
+
+	stack, err := store.LoadThread(ctx, conf.GetThreadID(), 4)
+	if err != nil {
+		return err
+	}
+	startsize := len(stack)
+	empties := 0
 	for ctx.Err() == nil {
-		var err error
-		var stack chatmessages.ChatMessages
-		stack, err = store.LoadThread(ctx, conf.GetThreadID(), 4)
-		if err != nil {
-			return err
-		}
-		if len(stack) != 0 && stack.Top().Role == "tool" {
+		if len(stack)-startsize != 0 && stack.Top().Role == "tool" {
 			slog.Info("generating another round...")
 		} else {
 			newmsg := new(chatmessages.ChatMessage)
 			newmsg.From = conf.GetUsername()
 			sctx := global.NewCancel(ctx)
-			altnewmsgs, err := getInput(sctx, conf, &e, &newmsg)
+			_, err := getInput(sctx, conf, &e, &newmsg)
 			if err != nil {
 				return stackerr.Errorf("%w", err)
 			}
-			if len(altnewmsgs) != 0 {
-				stack = append(stack, altnewmsgs...)
-				for _, v := range altnewmsgs {
-					_, _ = fmt.Fprintf(os.Stdout, "%s> %s\n", v.Role, v.ContentOrToolCall())
+			{
+				if newmsg != nil && cmdpkg.IsCommand(newmsg.Content) {
+					add, err := cmdpkg.HandleCommand(newmsg, conf, &e, &stack)
+					// dont have caller generate
+					cmdmsg := *newmsg
+					newmsg = nil
+					if cmdmsg.Content != "/clear" {
+						stack = append(stack, cmdmsg)
+					}
+					if err != nil {
+						return err
+					}
+					for _, v := range add {
+						_, _ = fmt.Fprintf(os.Stdout, "%s> %s\n", v.Role, v.ContentOrToolCall())
+					}
+					stack = append(stack, add...)
+					continue
 				}
 			}
 			if newmsg == nil || newmsg.Content == "" {
+				empties++
+				if empties > 4 {
+					break
+				}
 				continue
 			}
+			empties = 0
 			if err := store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
 				return stackerr.Errorf("%w", err)
 			}
@@ -184,6 +200,7 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 			if err := store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
 				return stackerr.Errorf("adding tool output to db: %w", err)
 			}
+			stack = append(stack, toolouts...)
 			continue
 		}
 
@@ -191,68 +208,81 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 	return nil
 }
 
-func stdinmsg(ctx context.Context, conf *global.Conf, newmsg **chatmessages.ChatMessage) error {
-	var x string
-	defer func() {
-		slog.Info("captured input", "text", x)
-	}()
-	buf := make([]byte, 10000)
+var titlecaser = cases.Title(language.AmericanEnglish)
 
-	for lineno := 1; ctx.Err() == nil && (strings.TrimSpace(x) == "" || strings.HasSuffix(x, "\n")); lineno++ {
-		if strings.TrimSpace(x) == "" {
-			_, _ = fmt.Fprintf(os.Stderr, "\nUSER> ")
-		}
-		n, err := os.Stdin.Read(buf)
-		if err != nil && !errors.Is(err, io.EOF) {
-			return stackerr.Errorf("%w", err)
-		}
-		if lineno == 2 && n == 1 && buf[0] == '\n' {
-			break
-		}
-		if n == 1 && buf[0] == '\n' && strings.TrimSpace(x) == "" {
-			slog.Warn("loop", "lineno", lineno, "x", x)
-			continue
-		}
-		x += string(buf[:n])
-		if err == io.EOF {
-			break
-		}
-		if x == "crash\n" {
-			debug.PrintStack()
-			return stackerr.Errorf("cowabunga")
-		}
-		if x == "exit\n" {
-			return stackerr.Errorf("exit successfully")
-		}
-		slog.Info("going again", "new", string(buf[:n]), "total", x)
+func ReadMessage(r io.Reader, from, role string, newmsg **chatmessages.ChatMessage) error {
+	var x string
+	var err error
+	defer func() { slog.Info("captured input", "text", x, "err", err) }()
+	// prompt
+	_, _ = fmt.Fprintf(os.Stderr, "\n%s: ", titlecaser.String(from)) // eg: Chief:
+	// read stdin until EOF
+	var buf []byte
+	buf, err = io.ReadAll(r)
+	x = string(buf)
+	if x != "" && errors.Is(err, io.EOF) {
+		err = nil
 	}
-	x = strings.TrimSpace(x)
+	if err != nil {
+		return err
+	}
+
+	//
+	if *newmsg == nil {
+		*newmsg = chatmessages.New(llm.Message{})
+	}
+	if (*newmsg).From != from {
+		(*newmsg).From = from
+	}
+	if (*newmsg).Role != role {
+		(*newmsg).Role = role
+	}
+
+	(*newmsg).Content = strings.TrimSpace(x)
+	return nil
+}
+
+func stdinmsg(ctx context.Context, conf *global.Conf, newmsg **chatmessages.ChatMessage) error {
+	if true {
+		return ReadMessage(os.Stdin, conf.GetUsername(), "user", newmsg)
+	}
+	var x string
+	var err error
+	defer func() { slog.Info("captured input", "text", x, "err", err) }()
+	_, err = fmt.Fprintf(os.Stderr, "\nUser: ")
+	if err != nil {
+		return err
+	}
+	buf, err := io.ReadAll(os.Stdin)
+
+	x = strings.TrimSpace(string(buf))
+	if x == "" && errors.Is(err, io.EOF) {
+		return err
+	}
 	if x == "" {
+		slog.Info("nil message")
+		*newmsg = nil
 		return nil
+	}
+	if ctx.Err() != nil {
+		return ctx.Err()
 	}
 	*newmsg = chatmessages.NewFrom(conf.GetUsername(), llm.Message{
 		Role:    "user",
 		Content: x,
 	})
-	if (*newmsg).Content == "exit" {
+	if strings.TrimSpace((*newmsg).Content) == "exit" {
 		slog.Info("goodbye")
 		return nil
 	}
+	slog.Info("got message", "text", x)
 	return nil
 }
 
 func getInput(ctx context.Context, conf *global.Conf, e *chat.Ext, newmsg **chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
+	slog.Info("getting input")
 	if err := stdinmsg(ctx, conf, newmsg); err != nil {
 		return nil, stackerr.Errorf("%w", err)
 	}
-	if *newmsg != nil && cmdpkg.IsCommand((*newmsg).Content) {
-		add, err := cmdpkg.HandleCommand(*newmsg, conf, e)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %+v\n", err)
-		}
-		cmdmsg := **newmsg
-		*newmsg = nil
-		return append(chatmessages.ChatMessages{cmdmsg}, add...), nil
-	}
-	return nil, nil
+	return nil, ctx.Err()
 }

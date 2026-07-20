@@ -46,7 +46,7 @@ func NewCleanEnviron() []string {
 	if !slices.ContainsFunc(env, func(e string) bool {
 		return strings.HasPrefix(e, "REQUESTS_CA_BUNDLE")
 	}) {
-		slog.Warn("WTF")
+		slog.Warn("adding REQUESTS_CA_BUNDLE env")
 		env = append(env, "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt")
 	}
 	//for i := range env {

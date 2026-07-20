@@ -12,22 +12,26 @@ import (
 	"m/pkg/dbstore"
 	"m/pkg/global"
 	"m/pkg/llm"
+
+	"github.com/aerth/mostly/stackerr"
 )
 
 func IsCommand(content string) bool {
 	if len(content) < 2 {
 		return false
 	}
-	return content[0] == '/' && content[1] != '/'
+	return (content[0] == '/' && content[1] != '/') || strings.Count(content, " ") == 0 && content == "exit"
 }
 
-func HandleCommand(newmsg *chatmessages.ChatMessage, conf *global.Conf, e *chat.Ext) (chatmessages.A, error) {
+func HandleCommand(newmsg *chatmessages.ChatMessage, conf *global.Conf, e *chat.Ext, stack *chatmessages.ChatMessages) (chatmessages.A, error) {
 	fields := strings.Fields(newmsg.Content)
 	cmd := strings.TrimPrefix(fields[0], "/")
 	slog.Info("commander", "cmd", cmd)
 	switch cmd {
 	case "help":
 		println("help mode soon")
+	case "exit":
+		return nil, stackerr.Errorf("exit request")
 	case "debug":
 		if e.PreFunc == nil {
 			slog.Info("adding prefunc")
@@ -39,6 +43,7 @@ func HandleCommand(newmsg *chatmessages.ChatMessage, conf *global.Conf, e *chat.
 		return nil, nil
 	case "clear":
 		err := e.Store.(*dbstore.PostgresDBStore).DeleteThread(context.TODO(), conf.GetThreadID())
+		*stack = nil
 		return nil, err
 	case "model":
 		return nil, os.Setenv("OLLAMA_MODEL", fields[1])

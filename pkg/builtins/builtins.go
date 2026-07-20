@@ -2,6 +2,7 @@
 package builtins
 
 import (
+	"context"
 	"embed"
 	"encoding/json"
 	"fmt"
@@ -9,11 +10,17 @@ import (
 	"log/slog"
 	"path/filepath"
 
+	"m/pkg/chatmessages"
+	"m/pkg/llm"
 	"m/pkg/otool"
 )
 
 //go:embed *.json
 var Embedded embed.FS
+
+func Noop(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+	return nil, nil
+}
 
 // LoadTools reads all .json files from the embedded FS and initializes Tool objects.
 // You pass in a map of actual Go functions to bind them.

@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"os"
 )
 
 func AddCloser(closer func() error) {
@@ -14,9 +15,14 @@ func AddCloser(closer func() error) {
 var closers []func() error
 
 func Close() {
+	if len(closers) == 0 && len(cancels) == 0 {
+		return
+	}
 	Cancel(fmt.Errorf("shutdown"))
-	for i := range closers {
-		if err := closers[i](); err != nil {
+	cl := closers
+	closers = nil
+	for i := range cl {
+		if err := cl[i](); err != nil {
 			slog.Error("closing error", "n", i, "err", err)
 		}
 	}
@@ -31,12 +37,24 @@ func NewCancel(ctx context.Context) context.Context {
 }
 
 func AddCancel(c context.CancelCauseFunc) {
+	shouldClose = 0
 	cancels = append(cancels, c)
 }
+
+var shouldClose = 0
 
 func Cancel(err error) {
 	x := cancels
 	cancels = nil
+	if len(x) == 0 {
+		shouldClose++
+		if shouldClose > 3 {
+			Close()
+			os.Exit(1)
+		}
+		return
+	}
+	shouldClose = 0
 	for i := range x {
 		x[i](err)
 	}

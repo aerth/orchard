@@ -8,10 +8,12 @@ import (
 	"os"
 	"strings"
 	"text/template"
+
+	"m/pkg/loaders/mdloaders"
 )
 
 func GetSystemBase(data any) string {
-	tpl, err := template.New("").ParseFiles("SYSTEM.md")
+	tpl, err := template.New("").Funcs(mdloaders.FuncMap()).ParseFiles("SYSTEM.md")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		panic("template SYSTEM.md failed: " + err.Error())
 	}

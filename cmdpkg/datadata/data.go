@@ -11,6 +11,8 @@ import (
 	"github.com/aerth/mostly/stackerr"
 )
 
+const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3; scc`
+
 // NewData for now
 func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
 	l := len(recentMessages)
@@ -32,6 +34,7 @@ func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
 		}
 	}
 	fastfetch, _ := runFastfetch()
+	repoinfo, _ := runBashInfo()
 	return map[string]any{
 		"OrchardVersion": global.GetVersion(), "Now": time.Now(),
 		//
@@ -43,11 +46,17 @@ func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
 		"Messages":      recentMessages,
 		"SinceRecent":   time.Since(recentMessage.CreatedAt),
 		"RecentFrom":    recentMessage.From,
+		"RepoInfo":      repoinfo,
 	}
 }
 
 func runUname() (string, error) {
 	out, err := exec.Command("uname", "-a").Output()
+	return string(out), err
+}
+
+func runBashInfo() (string, error) {
+	out, err := exec.Command("bash", "-c", projectget).Output()
 	return string(out), err
 }
 
