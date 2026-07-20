@@ -1,0 +1,39 @@
+[
+  {
+    "name": "read_file",
+    "description": "Reads the contents of a file from the local filesystem.",
+    "parameters": {
+      "path": "string"
+    }
+  },
+  {
+    "name": "write_file",
+    "description": "Writes content to a specified file path, creating it if it doesn't exist.",
+    "parameters": {
+      "path": "string",
+      "content": "string"
+    }
+  },
+  {
+    "name": "run_go_command",
+    "description": "Executes a Go command in the current terminal context (e.g., go build, go test).",
+    "parameters": {
+      "command": "string",
+      "args": ["string"]
+    }
+  },
+  {
+    "name": "list_directory",
+    "description": "Lists files and directories in a given path.",
+    "parameters": {
+      "path": "string"
+    }
+  },
+  {
+    "name": "get_package_info",
+    "description": "Retrieves information about a specific Go module or package version.",
+    "parameters": {
+      "module_path": "string"
+    }
+  }
+]

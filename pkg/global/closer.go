@@ -24,6 +24,12 @@ func Close() {
 
 var cancels []context.CancelCauseFunc
 
+func NewCancel(ctx context.Context) context.Context {
+	ctx, cancel := context.WithCancelCause(ctx)
+	AddCancel(cancel)
+	return ctx
+}
+
 func AddCancel(c context.CancelCauseFunc) {
 	cancels = append(cancels, c)
 }

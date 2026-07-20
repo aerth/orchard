@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
@@ -13,17 +14,31 @@ import (
 
 type Tools []Tool
 
+// ToMarshaler for api requests
 func (t Tools) ToMarshaler() []json.Marshaler {
 	a := make([]json.Marshaler, len(t))
 	for i := range t {
 		a[i] = t[i]
+		slog.Info("tool", "name", t[i].Name)
 	}
+	slog.Info("tools", "n", len(a))
 	return a
 }
 
+// FromMarshalers is not from random type it is from Tools
 func (t *Tools) FromMarshalers(a []json.Marshaler) error {
 	x := make(Tools, len(a))
 	for i := range a {
+		xx, ok := a[i].(Tool)
+		if ok {
+			x[i] = xx
+			slog.Info("got tool", "name", xx.Name)
+			continue
+		}
+		tn := fmt.Sprintf("%T", a[i])
+		if tn != "main.ToolDummy" {
+			slog.Error("weird tool", "x", tn)
+		}
 		b, err := a[i].MarshalJSON()
 		if err != nil {
 			return stackerr.Errorf("%w", err)

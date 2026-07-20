@@ -108,10 +108,11 @@ func (s *PostgresDBStore) SaveThread(ctx context.Context, threadID uuid.UUID, ms
 func (s *PostgresDBStore) LoadThread(ctx context.Context, threadID uuid.UUID, limit int) (chatmessages.ChatMessages, error) {
 	msgs, err := gorm.G[chatmessages.ChatMessage](s.db.DB()).
 		//.Omit("embedding")
-		Where("role is NOT NULL and thread_id = ?", threadID).Order("id asc").Limit(limit).Find(ctx)
+		Where("role is NOT NULL and thread_id = ?", threadID).Order("id desc").Limit(limit).Find(ctx)
 	if err != nil {
 		return nil, err
 	}
+	slices.Reverse(msgs)
 	slog.Info("loaded messages from db", "threadID", threadID, "n", len(msgs), "roles", chatmessages.ChatMessages(msgs).FormatRoles())
 	for i := range msgs {
 		//	if msgs[i].Role == "" {

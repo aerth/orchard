@@ -2,6 +2,7 @@ package global
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -24,11 +25,15 @@ func (c *Conf) GetUsername() string {
 
 var version string
 
-func SetVersion(s string) {
+func SetVersion(s string, mode string) {
 	version = s
+	omode = mode
 }
 
-var buildtime time.Time
+var (
+	omode     string
+	buildtime time.Time
+)
 
 func BuildTime() time.Time {
 	return buildtime
@@ -50,6 +55,13 @@ func SetBuildTime(s string) {
 
 func GetVersion() string {
 	return version
+}
+
+func GetVersionString() string {
+	if omode == "" {
+		omode = "testing"
+	}
+	return fmt.Sprintf("Orchard %s (%s) (%s)\n", version, buildtime, omode)
 }
 
 func (c Conf) GetTreeDir() string {

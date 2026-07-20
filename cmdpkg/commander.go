@@ -7,13 +7,21 @@ import (
 	"os"
 	"strings"
 
+	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/dbstore"
 	"m/pkg/global"
 	"m/pkg/llm"
 )
 
-func HandleCommand(newmsg *chatmessages.ChatMessage, conf *global.Conf, e *chatmessages.Ext) (chatmessages.A, error) {
+func IsCommand(content string) bool {
+	if len(content) < 2 {
+		return false
+	}
+	return content[0] == '/' && content[1] != '/'
+}
+
+func HandleCommand(newmsg *chatmessages.ChatMessage, conf *global.Conf, e *chat.Ext) (chatmessages.A, error) {
 	fields := strings.Fields(newmsg.Content)
 	cmd := strings.TrimPrefix(fields[0], "/")
 	slog.Info("commander", "cmd", cmd)
@@ -23,7 +31,7 @@ func HandleCommand(newmsg *chatmessages.ChatMessage, conf *global.Conf, e *chatm
 	case "debug":
 		if e.PreFunc == nil {
 			slog.Info("adding prefunc")
-			e.PreFunc = chatmessages.PrintMessages
+			e.PreFunc = chat.PrintMessages
 		} else {
 			slog.Info("removing prefunc")
 			e.PreFunc = nil

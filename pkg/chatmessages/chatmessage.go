@@ -61,6 +61,10 @@ func NewChatMessage(role string, content string) *ChatMessage {
 	return New(llm.Message{Role: role, Content: content})
 }
 
+func NewFromRole(from, role, content string) *ChatMessage {
+	return NewFrom(from, llm.Message{Role: role, Content: content})
+}
+
 func NewFrom(from string, m llm.Message) *ChatMessage {
 	t := time.Now().UTC()
 	return &ChatMessage{From: from, Message: m, CreatedAt: t, MessageID: uuid.New(), UpdatedAt: t}
@@ -111,6 +115,19 @@ func (cm ChatMessage) String() string {
 }
 
 type ChatMessages []ChatMessage
+
+func (cm ChatMessages) TopN(n int) ChatMessages {
+	l := len(cm)
+	if l < n {
+		return cm
+	}
+	return cm[l-n:]
+}
+
+func (cm ChatMessages) Top() ChatMessage {
+	l := len(cm)
+	return cm[l-1]
+}
 
 func (cm ChatMessages) RemoveThoughts() ChatMessages {
 	a := cm.Clone()

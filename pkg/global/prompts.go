@@ -2,20 +2,16 @@ package global
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"strings"
 	"text/template"
-	"time"
 )
 
-// NewData for now
-func NewData() map[string]any {
-	return map[string]any{"OrchardVersion": GetVersion(), "Now": time.Now()}
-}
-
 func GetSystemBase(data any) string {
-	tpl, err := template.New("").ParseFiles("SYSTEM2.md")
+	tpl, err := template.New("").ParseFiles("SYSTEM.md")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		panic("template SYSTEM.md failed: " + err.Error())
 	}
@@ -24,8 +20,11 @@ func GetSystemBase(data any) string {
 	}
 	var buf strings.Builder
 	pre := ""
-	if err := tpl.ExecuteTemplate(&buf, "SYSTEM.md", NewData()); err != nil {
+	if err := tpl.ExecuteTemplate(&buf, "SYSTEM.md", data); err != nil {
 		slog.Error("error executing template", "err", err)
 	}
-	return strings.Join([]string{buf.String(), pre}, "\n")
+	got := strings.Join([]string{buf.String(), pre}, "\n")
+	slog.Info("system message complete")
+	_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
+	return got
 }
