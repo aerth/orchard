@@ -1,3 +1,4 @@
+// Command orchard-chat - stdio
 package main
 
 import (
@@ -133,8 +134,7 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 		} else {
 			newmsg := new(chatmessages.ChatMessage)
 			newmsg.From = conf.GetUsername()
-			sctx := global.NewCancel(ctx)
-			_, err := getInput(sctx, conf, &e, &newmsg)
+			err := ReadMessage(os.Stdin, conf.GetUsername(), "user", &newmsg)
 			if err != nil {
 				return stackerr.Errorf("%w", err)
 			}
@@ -240,49 +240,4 @@ func ReadMessage(r io.Reader, from, role string, newmsg **chatmessages.ChatMessa
 
 	(*newmsg).Content = strings.TrimSpace(x)
 	return nil
-}
-
-func stdinmsg(ctx context.Context, conf *global.Conf, newmsg **chatmessages.ChatMessage) error {
-	if true {
-		return ReadMessage(os.Stdin, conf.GetUsername(), "user", newmsg)
-	}
-	var x string
-	var err error
-	defer func() { slog.Info("captured input", "text", x, "err", err) }()
-	_, err = fmt.Fprintf(os.Stderr, "\nUser: ")
-	if err != nil {
-		return err
-	}
-	buf, err := io.ReadAll(os.Stdin)
-
-	x = strings.TrimSpace(string(buf))
-	if x == "" && errors.Is(err, io.EOF) {
-		return err
-	}
-	if x == "" {
-		slog.Info("nil message")
-		*newmsg = nil
-		return nil
-	}
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
-	*newmsg = chatmessages.NewFrom(conf.GetUsername(), llm.Message{
-		Role:    "user",
-		Content: x,
-	})
-	if strings.TrimSpace((*newmsg).Content) == "exit" {
-		slog.Info("goodbye")
-		return nil
-	}
-	slog.Info("got message", "text", x)
-	return nil
-}
-
-func getInput(ctx context.Context, conf *global.Conf, e *chat.Ext, newmsg **chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
-	slog.Info("getting input")
-	if err := stdinmsg(ctx, conf, newmsg); err != nil {
-		return nil, stackerr.Errorf("%w", err)
-	}
-	return nil, ctx.Err()
 }
