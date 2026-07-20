@@ -5,9 +5,12 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
+	"m/pkg/chat"
 	"m/pkg/chatmessages"
+	"m/pkg/global"
 	"m/pkg/llm"
 )
 
@@ -23,7 +26,7 @@ func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	// 1. Extract args from the specific tool call in the message history
 	// This assumes your Message struct allows access to the raw ToolCalls string slice
 	// var args fileArgs
-	call, err := chatmessages.ReadToolCall[fileArgs](ctx, caller, toolCallIndex)
+	call, err := chat.ReadToolCall[fileArgs](ctx, caller, toolCallIndex)
 	if err != nil {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: fmt.Sprintf("Error parsing args: %+v", err)})
 		return chatmessages.ChatMessages{msg}, nil
@@ -46,7 +49,7 @@ func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 }
 
 func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-	call, err := chatmessages.ReadToolCall[fileArgs](ctx, caller, toolCallIndex)
+	call, err := chat.ReadToolCall[fileArgs](ctx, caller, toolCallIndex)
 	if err != nil {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: fmt.Sprintf("Error parsing args: %+v", err)})
 		return chatmessages.ChatMessages{msg}, nil
@@ -55,6 +58,11 @@ func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'path', check the tool call and try again."})
 		return chatmessages.ChatMessages{msg}, nil
 	}
+	rel, err := filepath.Rel(global.Dir(), call.Function.Arguments.Path)
+	if err != nil {
+		return nil, err
+	}
+	call.Function.Arguments.Path = rel
 	if strings.Contains(call.Function.Arguments.Path, "..") {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error Invalid file path. Please select a file within the permitted folder."})
 		return chatmessages.ChatMessages{msg}, nil
