@@ -32,6 +32,10 @@ func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'path', check the tool call and try again."})
 		return chatmessages.ChatMessages{msg}, nil
 	}
+	if strings.Contains(call.Function.Arguments.Path, "..") {
+		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error Invalid file path. Please select a file within the permitted folder."})
+		return chatmessages.ChatMessages{msg}, nil
+	}
 	args := call.Function.Arguments
 	data, err := os.ReadFile(args.Path)
 	if err != nil {
@@ -51,7 +55,6 @@ func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'path', check the tool call and try again."})
 		return chatmessages.ChatMessages{msg}, nil
 	}
-
 	if strings.Contains(call.Function.Arguments.Path, "..") {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error Invalid file path. Please select a file within the permitted folder."})
 		return chatmessages.ChatMessages{msg}, nil
