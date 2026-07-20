@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"path/filepath"
 
 	"m/pkg/otool"
@@ -47,7 +48,8 @@ func LoadTools(execs map[string]otool.ExecFunc) (otool.Tools, error) {
 					tool.SetExec(fn)
 					tools = append(tools, tool)
 				} else {
-					return fmt.Errorf("no implementation found for tool: %s", tool.Name)
+					//				return fmt.Errorf("no implementation found for tool: %s", tool.Name)
+					slog.Warn("no implementation found for tool, skipping", "tool", tool.Name)
 				}
 			}
 		}

@@ -17,6 +17,7 @@ import (
 	"m/cmdpkg"
 	"m/cmdpkg/datadata"
 	"m/pkg/builtins"
+	"m/pkg/builtins/implv1"
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/dbstore"
@@ -57,11 +58,11 @@ func main() {
 	global.SetVersion(version, "stdio")
 	var err error
 	builtinTools, err = builtins.LoadTools(map[string]otool.ExecFunc{
-		"read_file":        noop,
-		"write_file":       noop,
-		"run_go_command":   noop,
-		"list_directory":   noop,
-		"get_package_info": noop,
+		"read_file": implv1.ReadFile,
+		//	"write_file":       noop,
+		//	"run_go_command":   noop,
+		"list_directory": implv1.ListDirectory,
+		//	"get_package_info": noop,
 	})
 	if err != nil {
 		log.Fatalf("could not load builtin tools: %+v", err)
@@ -92,17 +93,18 @@ func main1(ctx context.Context) error {
 	if err != nil {
 		return stackerr.Errorf("initialize: %w", err)
 	}
-	toolsraw, err := ScanTools("./testdata", "tool_*.json")
-	if err != nil {
-		return stackerr.Errorf("ScanTools: %w", err)
-	}
 	var tools otool.Tools
-	if err := tools.FromMarshalers(toolsraw); err != nil {
-		return stackerr.Errorf("tool convert: %w", err)
-	}
-	if err := cmdpkg.ActivateTools(tools); err != nil {
-		return stackerr.Errorf("activateTools: %w", err)
-	}
+	/*
+		toolsraw, err := ScanTools("./testdata", "tool_*.json")
+		if err != nil {
+			return stackerr.Errorf("ScanTools: %w", err)
+		}
+		if err := tools.FromMarshalers(toolsraw); err != nil {
+			return stackerr.Errorf("tool convert: %w", err)
+		}
+		if err := cmdpkg.ActivateTools(tools); err != nil {
+			return stackerr.Errorf("activateTools: %w", err)
+		}*/
 	tools = append(tools, builtinTools...)
 	err = runmain(ctx, conf, tools)
 	if err != nil {
@@ -117,17 +119,17 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 	//	usermsg := prompts[rand.Intn(len(prompts))]
 	//
 	store := dbstore.NewFromEnv()
-	var stack chatmessages.ChatMessages
 	e := chat.Ext{
 		//	PreFunc: chat.PrintMessages,
 		Tools: tools.ToMarshaler(), Store: store,
 	}
-	var err error
-	stack, err = store.LoadThread(ctx, conf.GetThreadID(), 4)
-	if err != nil {
-		return err
-	}
 	for ctx.Err() == nil {
+		var err error
+		var stack chatmessages.ChatMessages
+		stack, err = store.LoadThread(ctx, conf.GetThreadID(), 4)
+		if err != nil {
+			return err
+		}
 		if len(stack) != 0 && stack.Top().Role == "tool" {
 			slog.Info("generating another round...")
 		} else {
@@ -156,6 +158,7 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 
 		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(datadata.NewData(stack))}}
 		sctx := global.NewCancel(ctx)
+		e.Tools = tools.ToMarshaler()
 		got, err := chat.Chat(sctx, conf.GetThreadID(), stack, e)
 		if err != nil {
 			return stackerr.Errorf("%w", err)
@@ -172,13 +175,15 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 			if err != nil {
 				return stackerr.Errorf("running tools: %w", err)
 			}
+			if len(toolouts) == 0 {
+				toolouts = append(toolouts, cmdpkg.WrapToolError(fmt.Errorf("no output"))...)
+			}
 			for i := range toolouts {
 				_, _ = fmt.Fprintf(os.Stdout, "TOOL> %s\n", toolouts[i].ContentOrToolCall())
 			}
 			if err := store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
 				return stackerr.Errorf("adding tool output to db: %w", err)
 			}
-			stack = append(stack, toolouts...)
 			continue
 		}
 

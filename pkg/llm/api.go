@@ -313,6 +313,13 @@ func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatSt
 	if len(callbacks) == 0 {
 		return fmt.Errorf("no callbacks")
 	}
+	if len(creq.Tools) == 0 {
+		return fmt.Errorf("no tools?")
+	}
+	StreamPreFunc = func(bts []byte) error {
+		_, _ = fmt.Fprintf(log.Writer(), "SENDING %s\n", string(bts))
+		return nil
+	}
 	return c.stream(ctx, http.MethodPost, "/api/chat", creq, func(bts []byte) error {
 		if len(bts) == 0 || !isFirstCharJSON(bts[0]) {
 			return stackerr.Errorf("server replied not with json object: %s", string(bts))

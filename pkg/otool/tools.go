@@ -71,7 +71,11 @@ func (t Tool) Exec(ctx context.Context, caller llm.Message, toolCallIndex int) (
 type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
 
 func (t Tool) MarshalJSON() ([]byte, error) {
-	return t.Spec, nil
+	b, err := json.Marshal(map[string]any{"type": "function", "function": t.Spec})
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
 func (t *Tool) UnmarshalJSON(b []byte) error {
