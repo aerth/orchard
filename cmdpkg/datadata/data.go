@@ -11,7 +11,8 @@ import (
 	"github.com/aerth/mostly/stackerr"
 )
 
-const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3; scc`
+// const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3; scc`
+const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3;`
 
 // NewData for now
 func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
