@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
@@ -48,6 +49,11 @@ func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (
 	}
 	if call.Function.Arguments.Path == "" {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'path', check the tool call and try again."})
+		return chatmessages.ChatMessages{msg}, nil
+	}
+
+	if strings.Contains(call.Function.Arguments.Path, "..") {
+		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error Invalid file path. Please select a file within the permitted folder."})
 		return chatmessages.ChatMessages{msg}, nil
 	}
 	args := call.Function.Arguments
