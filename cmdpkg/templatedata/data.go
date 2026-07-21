@@ -1,4 +1,4 @@
-package datadata
+package templatedata
 
 import (
 	"os"
@@ -10,9 +10,6 @@ import (
 
 	"github.com/aerth/mostly/stackerr"
 )
-
-// const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3; scc`
-const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3;`
 
 // NewData for now
 func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
@@ -38,9 +35,9 @@ func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
 	repoinfo, _ := runBashInfo()
 	return map[string]any{
 		"OrchardVersion": global.GetVersion(), "Now": time.Now(),
-		//
-		"Model": os.Getenv("OLLAMA_MODEL"), "uname": uname,
-
+		"Model":         os.Getenv("OLLAMA_MODEL"),
+		"Think":         os.Getenv("OLLAMA_THINK"),
+		"uname":         uname,
 		"Env":           cleanenv,
 		"FastFetch":     fastfetch,
 		"RecentMessage": recentMessage,
@@ -57,6 +54,8 @@ func runUname() (string, error) {
 }
 
 func runBashInfo() (string, error) {
+	// const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3; scc`
+	const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3;`
 	out, err := exec.Command("bash", "-c", projectget).Output()
 	return string(out), err
 }

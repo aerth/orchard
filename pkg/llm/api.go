@@ -349,10 +349,10 @@ func NewChatRequest() *ChatRequest {
 	if model == "" {
 		model = DefaultModel
 	}
-	temp := 0.1
-	if strings.HasPrefix(model, "gemma") {
-		temp = 1.0
-	}
+	//temp := 0.1
+	//if strings.HasPrefix(model, "gemma") {
+	//	temp = 1.0
+	//}
 	var think any = os.Getenv("OLLAMA_THINK")
 	if think == "" {
 		think = DefaultThink
@@ -370,6 +370,6 @@ func NewChatRequest() *ChatRequest {
 		KeepAlive: -1,
 		//	DebugRenderOnly: os.Getenv("OLLAMA_DEBUG_RENDER") == "1",
 		//	TopLogprobs:     0,
-		Options: map[string]any{"temperature": temp}, // "num_ctx": numCtx},
+		//	Options: map[string]any{"temperature": temp}, // "num_ctx": numCtx},
 	}
 }

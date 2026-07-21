@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"m/cmdpkg"
-	"m/cmdpkg/datadata"
+	"m/cmdpkg/templatedata"
 	"m/pkg/builtins"
 	"m/pkg/builtins/implv1"
 	"m/pkg/chat"
@@ -91,20 +91,7 @@ func main1(ctx context.Context) error {
 	if err != nil {
 		return stackerr.Errorf("initialize: %w", err)
 	}
-	var tools otool.Tools
-	/*
-		toolsraw, err := ScanTools("./testdata", "tool_*.json")
-		if err != nil {
-			return stackerr.Errorf("ScanTools: %w", err)
-		}
-		if err := tools.FromMarshalers(toolsraw); err != nil {
-			return stackerr.Errorf("tool convert: %w", err)
-		}
-		if err := cmdpkg.ActivateTools(tools); err != nil {
-			return stackerr.Errorf("activateTools: %w", err)
-		}*/
-	tools = append(tools, builtinTools...)
-	err = runmain(ctx, conf, tools)
+	err = runmain(ctx, conf, builtinTools)
 	if err != nil {
 		return stackerr.Errorf("runmain: %w", err)
 	}
@@ -115,7 +102,6 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 	//	prompts := []string{"tell a short story.", "tell a joke.", "write a short song", "write a short poem", "use the 'foo' tool function"}
 	//	prompts = []string{"use the 'foo' tool function (nonce 42)"}
 	//	usermsg := prompts[rand.Intn(len(prompts))]
-	//
 	store := dbstore.NewFromEnv()
 	e := chat.Ext{
 		//	PreFunc: chat.PrintMessages,
@@ -126,36 +112,31 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 	if err != nil {
 		return err
 	}
-	startsize := len(stack)
 	empties := 0
 	for ctx.Err() == nil {
-		if len(stack)-startsize != 0 && stack.Top().Role == "tool" {
-			slog.Info("generating another round...")
-		} else {
-			newmsg := new(chatmessages.ChatMessage)
-			newmsg.From = conf.GetUsername()
-			err := ReadMessage(os.Stdin, conf.GetUsername(), "user", &newmsg)
-			if err != nil {
-				return stackerr.Errorf("%w", err)
-			}
-			{
-				if newmsg != nil && cmdpkg.IsCommand(newmsg.Content) {
-					add, err := cmdpkg.HandleCommand(newmsg, conf, &e, &stack)
-					// dont have caller generate
-					cmdmsg := *newmsg
-					newmsg = nil
-					if cmdmsg.Content != "/clear" {
-						stack = append(stack, cmdmsg)
-					}
-					if err != nil {
-						return err
-					}
-					for _, v := range add {
-						_, _ = fmt.Fprintf(os.Stdout, "%s> %s\n", v.Role, v.ContentOrToolCall())
-					}
-					stack = append(stack, add...)
-					continue
+		newmsg := new(chatmessages.ChatMessage)
+		newmsg.From = conf.GetUsername()
+		err := ReadMessage(os.Stdin, conf.GetUsername(), "user", &newmsg)
+		if err != nil {
+			return stackerr.Errorf("ReadMessage: %w", err)
+		}
+		{
+			if newmsg != nil && cmdpkg.IsCommand(newmsg.Content) {
+				add, err := cmdpkg.HandleCommand(newmsg, conf, &e, &stack)
+				// dont have caller generate
+				cmdmsg := *newmsg
+				newmsg = nil
+				if cmdmsg.Content != "/clear" {
+					stack = append(stack, cmdmsg)
 				}
+				stack = append(stack, add...)
+				for _, v := range add {
+					_, _ = fmt.Fprintf(os.Stdout, "%s> %s\n", v.Role, v.ContentOrToolCall())
+				}
+				if err != nil {
+					return stackerr.Errorf("HandleCommand: %w", err)
+				}
+				continue
 			}
 			if newmsg == nil || newmsg.Content == "" {
 				empties++
@@ -170,14 +151,23 @@ func runmain(ctx context.Context, conf *global.Conf, tools otool.Tools) error {
 			}
 			stack = append(stack, *newmsg)
 		}
-		//	got, err := chatmessages.ChatFromDB(ctx, conf.GetThreadID(), nil, chatmessages.Ext{Tools: tools.ToMarshaler(), Store: store, Prepend: []llm.Message{sysmsg}})
-
-		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(datadata.NewData(stack))}}
+		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 		sctx := global.NewCancel(ctx)
 		e.Tools = tools.ToMarshaler()
-		got, err := chat.Chat(sctx, conf.GetThreadID(), stack, e)
+
+		cl := debugging.NewConsoleLogger()
+		got := chatmessages.NewFromRole(e.From, "assistant", "")
+		e.Handlers = []llm.ChatStreamHandlerFunc{cl.HandleChatResponse, got.GatherChatResponse}
+		slog.Info("Chatting")
+		_, err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 		if err != nil {
 			return stackerr.Errorf("%w", err)
+		}
+
+		if e.Store != nil {
+			if err := e.Store.Add(context.WithoutCancel(ctx), conf.GetThreadID(), got); err != nil {
+				return stackerr.Errorf("%w", err)
+			}
 		}
 		stack = append(stack, *got)
 		_, _ = fmt.Fprintf(os.Stdout, "BOT> %s\n", got.ContentOrToolCall())
