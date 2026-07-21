@@ -1,11 +1,11 @@
 package chatmessages
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"slices"
+	"strings"
 	"time"
 
 	"m/pkg/llm"
@@ -30,26 +30,6 @@ type (
 	}
 )
 
-type IsToolArgument interface{ IsToolArgument() }
-
-// ReadToolCall may return an error message
-func ReadToolCall[T IsToolArgument](ctx context.Context, caller llm.Message, toolCallIndex int) (Call[T], error) {
-	var call Call[T]
-	if err := json.Unmarshal([]byte(caller.ToolCalls[toolCallIndex]), &call); err != nil {
-		return call, err
-	}
-	if call.Function.Name == "" {
-		return call, fmt.Errorf("could not parse")
-	}
-	return call, nil
-}
-
-func NewErrorMessage(role string, content string) ChatMessages {
-	return ChatMessages{
-		*New(llm.Message{Role: "tool", Content: "Error parsing args"}),
-	}
-}
-
 type ChatMessage struct {
 	DBID           uint            `gorm:"primarykey;column:id" json:"id,omitempty"`                                       // The MESSAGE DATABASE ID INTERNAL UNUSED ORDERED
 	MessageID      uuid.UUID       `gorm:"type:uuid;primaryKey;notnull;" json:"message_id,omitempty"`                      // MessageID is unique identifier for each message
@@ -61,6 +41,26 @@ type ChatMessage struct {
 	Embedding      *vector256.Vector256 `gorm:"type:vector(256);null" json:"-"`
 	From           string               `json:"from,omitempty"` // name of assistant
 	MessageOptions `gorm:"-" json:"-"`
+}
+
+// FormatText in dialogue text format with no newline ending
+func (cm ChatMessage) FormatText(username string, botname string) string {
+	from := cm.FromName(username, botname)
+	return fmt.Sprintf("%s: %s", from, cm.Content)
+}
+
+func (cm ChatMessage) FromName(username string, botname string) string {
+	from := cm.From
+	if from != "" {
+		return from
+	}
+	from = cm.Role
+	if cm.Role == "user" && username != "" {
+		from = username
+	} else if cm.Role == "assistant" && botname != "" {
+		from = botname
+	}
+	return from
 }
 
 func (cm *ChatMessage) ContentOrToolCall() string {
@@ -85,12 +85,11 @@ func (cm *ChatMessage) ContentOrToolCall() string {
 }
 
 func New(m llm.Message) *ChatMessage {
-	t := time.Now().UTC()
-	return &ChatMessage{Message: m, CreatedAt: t, MessageID: uuid.New(), UpdatedAt: t}
+	return NewFrom("", m)
 }
 
 func NewChatMessage(role string, content string) *ChatMessage {
-	return New(llm.Message{Role: role, Content: content})
+	return NewFrom("", llm.Message{Role: role, Content: content})
 }
 
 func NewFromRole(from, role, content string) *ChatMessage {
@@ -105,6 +104,27 @@ func NewFrom(from string, m llm.Message) *ChatMessage {
 func NewFromEphemeral(from string, m llm.Message) *ChatMessage {
 	t := time.Now().UTC()
 	return &ChatMessage{From: from, Message: m, CreatedAt: t, MessageID: uuid.New(), UpdatedAt: t, MessageOptions: MessageOptions{Ephemeral: true}}
+}
+
+func NewSystemEphemeral(content string) *ChatMessage {
+	return NewFromEphemeral("", llm.Message{Role: "system", Content: content})
+}
+
+// NewToolReply with matching Call ID and ToolName for the given i index.
+func NewToolReply(caller ChatMessage, i int, content string) *ChatMessage {
+	var call Call[json.RawMessage]
+	err := json.Unmarshal(caller.ToolCalls[i], &call)
+	if err != nil {
+		slog.Error("unmarshal tool call", "err", err)
+		return nil
+	}
+	toolmsg := llm.Message{
+		Role:       "tool",
+		ToolCallID: call.ID,
+		ToolName:   call.Function.Name,
+		Content:    content,
+	}
+	return NewFrom(caller.From, toolmsg)
 }
 
 type MessageOptions struct {
@@ -147,6 +167,24 @@ func (cm ChatMessage) String() string {
 }
 
 type ChatMessages []ChatMessage
+
+func (cm ChatMessages) FormatText(username, botname string) string {
+	var str strings.Builder
+	for _, v := range cm {
+		str.WriteString(v.FormatText(username, botname))
+	}
+	return str.String()
+}
+
+func (cm ChatMessages) TopAssistant() ChatMessage {
+	l := len(cm)
+	for i := range cm {
+		if cm[l-i].Role == "assistant" {
+			return cm[l-i]
+		}
+	}
+	return ChatMessage{}
+}
 
 func (cm ChatMessages) TopN(n int) ChatMessages {
 	l := len(cm)
