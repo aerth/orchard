@@ -11,6 +11,14 @@ import (
 	"github.com/google/uuid"
 )
 
+func Dir() string {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err.Error())
+	}
+	return wd
+}
+
 type Conf struct {
 	i ConfigInput
 }
