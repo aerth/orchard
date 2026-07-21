@@ -47,6 +47,7 @@ func SplitStack(from string, stack chatmessages.ChatMessages) []chatmessages.Cha
 
 const PMFROM = "project_manager"
 
+// ProjectManagerStart TODO: tests
 func ProjectManagerStart(ctx context.Context, stack chatmessages.ChatMessages) (chatmessages.ChatMessages, error) {
 	ss := SplitStack(PMFROM, stack)
 	convo := ss[0]
