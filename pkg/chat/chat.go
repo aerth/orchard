@@ -48,6 +48,26 @@ func Vals[T any, A ~[]*T](o A) []T {
 	return a
 }
 
+type IsToolArgument interface{ IsToolArgument() }
+
+// ReadToolCall may return an error message
+func ReadToolCall[T IsToolArgument](ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.Call[T], error) {
+	var call chatmessages.Call[T]
+	if err := json.Unmarshal([]byte(caller.ToolCalls[toolCallIndex]), &call); err != nil {
+		return call, stackerr.Errorf("unmarshal json arguments into call[%T]: %w", call.Function.Arguments, err)
+	}
+	if call.Function.Name == "" {
+		return call, stackerr.Errorf("could not decode json arguments into call[%T]", call.Function.Arguments)
+	}
+	return call, nil
+}
+
+func NewErrorMessage(role string, content string) chatmessages.ChatMessages {
+	return chatmessages.ChatMessages{
+		*chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args"}),
+	}
+}
+
 type (
 	MP  *chatmessages.ChatMessage
 	MPS []*chatmessages.ChatMessage
