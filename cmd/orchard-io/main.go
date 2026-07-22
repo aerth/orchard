@@ -167,6 +167,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	if ss := rege.FindImagePaths(newmsg.Content); len(ss) != 0 {
 		newmsg.Attachments = ss
+		slog.Info("Attached", "names", ss)
 	}
 	if err := store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
 		return stackerr.Errorf("%w", err)
