@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"m/cmdpkg"
+	"m/cmdpkg/rege"
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/builtins"
@@ -162,6 +163,10 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 	if newmsg == nil || newmsg.Content == "" {
 		return nil
+	}
+
+	if ss := rege.FindImagePaths(newmsg.Content); len(ss) != 0 {
+		newmsg.Attachments = ss
 	}
 	if err := store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
 		return stackerr.Errorf("%w", err)
