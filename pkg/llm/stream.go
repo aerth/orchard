@@ -46,8 +46,10 @@ func (c *Client) stream(ctx context.Context, method, path string, data any, fn f
 		if err != nil {
 			return stackerr.Errorf("json marshal request body: %w", err)
 		}
-		if err := StreamPreFunc(bts); err != nil {
-			return stackerr.Errorf("stream prefunc: %w", err)
+		if StreamPreFunc != nil {
+			if err := StreamPreFunc(bts); err != nil {
+				return stackerr.Errorf("stream prefunc: %w", err)
+			}
 		}
 		buf = bytes.NewBuffer(bts)
 	}

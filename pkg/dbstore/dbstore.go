@@ -112,7 +112,7 @@ func (s *PostgresDBStore) LoadThread(ctx context.Context, threadID uuid.UUID, li
 	if err != nil {
 		return nil, err
 	}
-	slices.Reverse(msgs)
+	slices.Reverse(msgs) // reverse dbid desc for limit back to chronological
 	slog.Info("loaded messages from db", "threadID", threadID, "n", len(msgs), "roles", chatmessages.ChatMessages(msgs).FormatRoles())
 	for i := range msgs {
 		//	if msgs[i].Role == "" {

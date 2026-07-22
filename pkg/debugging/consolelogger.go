@@ -13,11 +13,12 @@ import (
 )
 
 type ConsoleLogger struct {
-	HideThinking bool
-	emode        modeT
-	buf          string
-	pre          string
-	w            io.Writer
+	HideThinking  bool
+	HideToolCalls bool
+	emode         modeT
+	buf           string
+	pre           string
+	w             io.Writer
 }
 type modeT int
 
@@ -164,9 +165,15 @@ func (c *ConsoleLogger) PrintChat(w io.Writer, cr llm.ChatResponse) {
 	//if cr.DebugInfo != nil {
 	//	fmt.Fprintf(os.Stderr, "%s", cr.DebugInfo.RenderedTemplate)
 	//}
-	c.PrintMessage(w, cr.Message)
+	if !c.HideToolCalls || len(cr.Message.ToolCalls) == 0 {
+		c.PrintMessage(w, cr.Message)
+	}
 	if cr.Done {
-		_, _ = fmt.Fprintf(w, "%s\n", ColorReset)
+		_, _ = fmt.Fprintf(w, "%s", ColorReset)
+		//		if !c.HideToolCalls || len(cr.Message.ToolCalls) == 0 {
+		//			_, _ = fmt.Fprintf(w, "\n")
+		//		}
+
 		//if !noSummaries && !llm.DisableLog {
 		//	cr.Summary()
 		//}

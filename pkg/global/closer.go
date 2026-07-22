@@ -41,14 +41,26 @@ func AddCancel(c context.CancelCauseFunc) {
 	cancels = append(cancels, c)
 }
 
+func Reset() int {
+	x := MAX - shouldClose
+	shouldClose = 0
+	return x
+}
+
+func Remaining() int {
+	return MAX - shouldClose
+}
+
 var shouldClose = 0
+
+const MAX = 4
 
 func Cancel(err error) {
 	x := cancels
 	cancels = nil
 	if len(x) == 0 {
 		shouldClose++
-		if shouldClose > 3 {
+		if shouldClose >= MAX {
 			Close()
 			os.Exit(1)
 		}

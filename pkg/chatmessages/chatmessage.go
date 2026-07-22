@@ -168,6 +168,16 @@ func (cm ChatMessage) String() string {
 
 type ChatMessages []ChatMessage
 
+func (cm ChatMessages) TopRole(role string) ChatMessage {
+	l := len(cm)
+	for i := range cm {
+		if cm[l-i].Role == role {
+			return cm[l-i]
+		}
+	}
+	return ChatMessage{}
+}
+
 func (cm ChatMessages) FormatText(username, botname string) string {
 	var str strings.Builder
 	for _, v := range cm {
@@ -177,13 +187,7 @@ func (cm ChatMessages) FormatText(username, botname string) string {
 }
 
 func (cm ChatMessages) TopAssistant() ChatMessage {
-	l := len(cm)
-	for i := range cm {
-		if cm[l-i].Role == "assistant" {
-			return cm[l-i]
-		}
-	}
-	return ChatMessage{}
+	return cm.TopRole("assistant")
 }
 
 func (cm ChatMessages) TopN(n int) ChatMessages {
@@ -246,7 +250,7 @@ func (cm ChatMessages) Raw() llm.Messages {
 			continue
 		}
 
-		slog.Warn("got raw", "i", i, "msg", cm[i].Message)
+		//	slog.Warn("got raw", "i", i, "msg", cm[i].Message)
 		a = append(a, cm[i].Message)
 	}
 	return a

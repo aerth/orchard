@@ -23,6 +23,14 @@ type Conf struct {
 	i ConfigInput
 }
 
+func (c *Conf) IsHideToolOuts() bool {
+	return !c.i.ShowToolOuts
+}
+
+func (c *Conf) IsHideToolCalls() bool {
+	return c.i.HideToolCalls
+}
+
 func (c Conf) Get() ConfigInput {
 	return c.i
 }
@@ -100,13 +108,15 @@ func envor(s, d string) string {
 }
 
 type ConfigInput struct {
-	Username    string
-	Botname     string
-	Treedir     string
-	Tooldir     string
-	Logfilename string
-	ThreadID    uuid.UUID
-	Dir         string
+	Username      string
+	Botname       string
+	Treedir       string
+	Tooldir       string
+	Logfilename   string
+	ThreadID      uuid.UUID
+	HideToolCalls bool
+	ShowToolOuts  bool
+	Dir           string
 }
 type cfginput = ConfigInput
 
@@ -126,6 +136,8 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.StringVar(&cfg.Botname, "bot", cfg.Botname, "username like Alice or project_manager")
 	flag.StringVar(&cfg.Treedir, "tree", cfg.Treedir, "tree for markdown files for system messages (employee descriptions and task templates)")
 	flag.StringVar(&cfg.Tooldir, "tool", cfg.Tooldir, "dir for python/bash tools (should contain toolbox directories of python and bash scripts)")
+	flag.BoolVar(&cfg.HideToolCalls, "q", cfg.HideToolCalls, "hide tool call json chunks")
+	flag.BoolVar(&cfg.ShowToolOuts, "show-toolouts", cfg.ShowToolOuts, "show tool output chunks")
 	flag.StringVar(&cfg.Logfilename, "logfile", cfg.Logfilename, "path to log file")
 	flag.Func("thread", "uuid", func(s string) error {
 		return cfg.ThreadID.UnmarshalText([]byte(s))
