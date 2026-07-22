@@ -167,6 +167,16 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	if ss := rege.FindImagePaths(newmsg.Content); len(ss) != 0 {
 		newmsg.Attachments = ss
+		for _, filename := range ss {
+			img, err := os.ReadFile(filename)
+			if err != nil {
+				slog.Error("attaching file", "err", err, "filename", filename)
+				err = stackerr.Errorf("Error attaching %q: %w", filename, err)
+				newmsg.Content += "\n" + err.Error()
+				continue
+			}
+			newmsg.Images = append(newmsg.Images, img)
+		}
 		slog.Info("Attached", "names", ss)
 	} else {
 		slog.Info("no attachments found in message", "txt", newmsg.Content)

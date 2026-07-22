@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"os"
 
 	"m/pkg/chatmessages"
@@ -24,7 +23,7 @@ type (
 		Append   []llm.Message
 		Tools    []json.Marshaler
 		Store    StoreI
-		Images   [][]byte
+		// Images   [][]byte
 	}
 )
 
@@ -125,23 +124,19 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
 	}
-	if e.Images != nil {
-		creq.Images = e.Images
-	}
-	if len(creq.Images) == 0 {
+	/*
 		if at := msgs.TopAttachment().Attachments; len(at) != 0 {
 			slog.Info("found attachments", "names", at)
 			for _, filename := range at { // TODO: once
-				b, err := os.ReadFile(filename)
+				imagedata, err := os.ReadFile(filename)
 				if err == nil {
-					creq.Images = append(creq.Images, b)
-					slog.Info("attached", "n", len(creq.Images), "size", len(b))
+					//creq.Images = append(creq.Images, imagedata)
+					slog.Info("attached", "n", len(creq.Images), "size", len(imagedata))
 				} else {
 					slog.Error("could not attach", "err", err)
 				}
 			}
-		}
-	}
+		}*/
 	// make new pending
 	// pending := chatmessages.NewFromRole(e.From, "assistant", "")
 	//if e.PreFunc != nil {

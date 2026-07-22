@@ -178,6 +178,7 @@ type Message struct {
 	ToolCalls  ToolCalls `json:"tool_calls,omitempty" gorm:"type:jsonb;null"`
 	ToolName   string    `json:"tool_name,omitempty" gorm:"null"`
 	ToolCallID string    `json:"tool_call_id,omitempty" gorm:"null"`
+	Images     [][]byte  `json:"images,omitempty" gorm:"-"`
 }
 
 var caser = cases.Title(language.AmericanEnglish)
@@ -299,7 +300,6 @@ type ChatRequest struct {
 	Think     any              `json:"think,omitempty"`
 	Stream    *bool            `json:"stream,omitempty"`
 	Messages  []Message        `json:"messages"`
-	Images    [][]byte         `json:"images,omitempty"`
 	Tools     []json.Marshaler `json:"tools,omitempty"`
 	KeepAlive int              `json:"keep_alive"`
 	Options   map[string]any   `json:"options"`
