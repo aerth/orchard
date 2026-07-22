@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -298,6 +299,7 @@ type ChatRequest struct {
 	Think     any              `json:"think,omitempty"`
 	Stream    *bool            `json:"stream,omitempty"`
 	Messages  []Message        `json:"messages"`
+	Images    [][]byte         `json:"images,omitempty"`
 	Tools     []json.Marshaler `json:"tools,omitempty"`
 	KeepAlive int              `json:"keep_alive"`
 	Options   map[string]any   `json:"options"`
@@ -320,6 +322,7 @@ func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatSt
 	if len(creq.Tools) == 0 {
 		return fmt.Errorf("no tools?")
 	}
+	slog.Info("chatting")
 	return c.stream(ctx, http.MethodPost, "/api/chat", creq, func(bts []byte) error {
 		if len(bts) == 0 || !isFirstCharJSON(bts[0]) {
 			return stackerr.Errorf("server replied not with json object: %s", string(bts))
