@@ -126,7 +126,7 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	}
 	if len(creq.Images) == 0 {
 		if at := msgs.TopAttachment().Attachments; len(at) != 0 {
-			slog.Info("found attachments")
+			slog.Info("found attachments", "names", at)
 			for _, filename := range at { // TODO: once
 				b, err := os.ReadFile(filename)
 				if err == nil {
