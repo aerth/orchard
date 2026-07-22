@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"m/cmdpkg"
-	"m/cmdpkg/rege"
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/builtins"
@@ -264,8 +263,5 @@ func ReadMessage(r io.Reader, from, role string, newmsg **chatmessages.ChatMessa
 	}
 
 	(*newmsg).Content = strings.TrimSpace(x)
-	if ss := rege.FindImagePaths((*newmsg).Content); len(ss) != 0 {
-		(*newmsg).Attachments = ss
-	}
 	return nil
 }
