@@ -3,6 +3,6 @@ NOW := $(shell date +%s)
 build:
 	go build -v -ldflags '-X main.version=${VERSION} -X main.buildtime=${NOW} -X main.ollamahost=${OLLAMA_HOST} -X main.ollamamodel=${OLLAMA_MODEL} -X main.ollamathink=${OLLAMA_THINK}' -o ./bin/ ./cmd/...
 run: build
-	./bin/orchard-chat <<<'summarize cmd/orchard-io/main.go' 
+	./bin/orchard-io <<<'summarize the code in this image [documents/code.png]' 
 runclear: build
-	./bin/orchard-chat -clear
+	./bin/orchard-io -clear
