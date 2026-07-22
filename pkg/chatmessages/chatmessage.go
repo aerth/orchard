@@ -128,8 +128,9 @@ func NewToolReply(caller ChatMessage, i int, content string) *ChatMessage {
 }
 
 type MessageOptions struct {
-	Aux       any
-	Ephemeral bool
+	Aux         any
+	Attachments []string // Attachments filenames
+	Ephemeral   bool
 }
 
 func (cm ChatMessage) TableName() string {
@@ -168,8 +169,18 @@ func (cm ChatMessage) String() string {
 
 type ChatMessages []ChatMessage
 
+func (cm ChatMessages) TopAttachment() ChatMessage {
+	l := len(cm) - 1
+	for i := range cm {
+		if len(cm[l-i].Attachments) != 0 {
+			return cm[l-i]
+		}
+	}
+	return ChatMessage{}
+}
+
 func (cm ChatMessages) TopRole(role string) ChatMessage {
-	l := len(cm)
+	l := len(cm) - 1
 	for i := range cm {
 		if cm[l-i].Role == role {
 			return cm[l-i]
@@ -191,7 +202,7 @@ func (cm ChatMessages) TopAssistant() ChatMessage {
 }
 
 func (cm ChatMessages) TopN(n int) ChatMessages {
-	l := len(cm)
+	l := len(cm) - 1
 	if l < n {
 		return cm
 	}
@@ -199,7 +210,7 @@ func (cm ChatMessages) TopN(n int) ChatMessages {
 }
 
 func (cm ChatMessages) Top() ChatMessage {
-	l := len(cm)
+	l := len(cm) - 1
 	if l == 0 {
 		return ChatMessage{}
 	}
