@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"m/cmdpkg"
+	"m/cmdpkg/rege"
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/builtins"
@@ -61,7 +62,6 @@ var builtinTools otool.Tools
 // orchard CLI infinite loop, simple stdin stdout, minimal stderr.
 // debug logs to log file or null
 func main() {
-	global.SetVersion(version, "stdio")
 	var err error
 	builtinTools, err = builtins.LoadTools(map[string]otool.ExecFunc{
 		"read_file": implv1.ReadFile,
@@ -74,16 +74,17 @@ func main() {
 		log.Fatalf("could not load builtin tools: %+v", err)
 	}
 	if len(builtinTools) == 0 {
-		slog.Error("could not")
-		log.Fatalf("o")
+		panic("no builtin tools")
 	}
+	//
+	global.SetVersion(version, "stdio")
 	if buildtime != "" {
 		global.SetBuildTime(buildtime)
 		buildtime = global.BuildTime().UTC().Format(time.ANSIC)
 	} else {
 		buildtime = "dev"
 	}
-	fmt.Fprintf(os.Stderr, "Press ctrl+d to end each message, press ctrl+c to cancel generation.\n")
+
 	ctx := context.Background()
 	go Sig()
 	if err := main1(ctx); err != nil {
@@ -108,6 +109,10 @@ func main1(ctx context.Context) error {
 
 func runmain(ctx context.Context, conf *global.Conf) error {
 	showChar := false
+
+	if showChar {
+		fmt.Fprintf(os.Stderr, "Press ctrl+d to end each message, press ctrl+c to cancel generation.\n")
+	}
 	//	prompts := []string{"tell a short story.", "tell a joke.", "write a short song", "write a short poem", "use the 'foo' tool function"}
 	//	prompts = []string{"use the 'foo' tool function (nonce 42)"}
 	//	usermsg := prompts[rand.Intn(len(prompts))]
@@ -259,5 +264,8 @@ func ReadMessage(r io.Reader, from, role string, newmsg **chatmessages.ChatMessa
 	}
 
 	(*newmsg).Content = strings.TrimSpace(x)
+	if ss := rege.FindImagePaths((*newmsg).Content); len(ss) != 0 {
+		(*newmsg).Attachments = ss
+	}
 	return nil
 }
