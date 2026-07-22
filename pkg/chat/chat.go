@@ -24,6 +24,7 @@ type (
 		Append   []llm.Message
 		Tools    []json.Marshaler
 		Store    StoreI
+		Images   [][]byte
 	}
 )
 
@@ -123,6 +124,9 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	creq.Messages = append(e.Prepend, msgs.Raw()...)
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
+	}
+	if e.Images != nil {
+		creq.Images = e.Images
 	}
 	if len(creq.Images) == 0 {
 		if at := msgs.TopAttachment().Attachments; len(at) != 0 {
