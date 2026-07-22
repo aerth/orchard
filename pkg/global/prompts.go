@@ -2,8 +2,6 @@ package global
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"log/slog"
 	"os"
 	"strings"
@@ -27,6 +25,6 @@ func GetSystemBase(data any) string {
 	}
 	got := strings.Join([]string{buf.String(), pre}, "\n")
 	slog.Info("system message complete")
-	_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
+	//_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
 	return got
 }
