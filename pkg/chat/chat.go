@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"m/pkg/chatmessages"
@@ -122,6 +123,20 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	creq.Messages = append(e.Prepend, msgs.Raw()...)
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
+	}
+	if len(creq.Images) == 0 {
+		if at := msgs.TopAttachment().Attachments; len(at) != 0 {
+			slog.Info("found attachments")
+			for _, filename := range at { // TODO: once
+				b, err := os.ReadFile(filename)
+				if err == nil {
+					creq.Images = append(creq.Images, b)
+					slog.Info("attached", "n", len(creq.Images), "size", len(b))
+				} else {
+					slog.Error("could not attach", "err", err)
+				}
+			}
+		}
 	}
 	// make new pending
 	// pending := chatmessages.NewFromRole(e.From, "assistant", "")
