@@ -142,6 +142,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.StringVar(&cfg.Treedir, "tree", cfg.Treedir, "tree for markdown files for system messages (employee descriptions and task templates)")
 	flag.StringVar(&cfg.Tooldir, "tool", cfg.Tooldir, "dir for python/bash tools (should contain toolbox directories of python and bash scripts)")
 	flag.BoolVar(&cfg.HideToolCalls, "q", cfg.HideToolCalls, "hide tool call json chunks")
+	flag.BoolVar(&cfg.ShowRequests, "v", cfg.ShowRequests, "show requests in log")
 	flag.BoolVar(&cfg.ShowToolOuts, "show-toolouts", cfg.ShowToolOuts, "show tool output chunks")
 	flag.StringVar(&cfg.Logfilename, "logfile", cfg.Logfilename, "path to log file")
 	flag.Func("thread", "uuid", func(s string) error {
