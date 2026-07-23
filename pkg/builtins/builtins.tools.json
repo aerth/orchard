@@ -4,7 +4,7 @@
     "description": "Reads the contents of a file from the local filesystem.",
 	"required": ["path"],
     "parameters": {
-      "path": {"type": "string"}
+      "path": {"type": "string", "description": "relative path to file to read"}
     }
   },
   {
