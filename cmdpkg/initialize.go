@@ -81,10 +81,10 @@ func Initialize() (*global.Conf, error) {
 	}
 	debugging.Init().Set(slog.LevelDebug)
 	store := dbstore.NewFromEnv()
-	var threads []uuid.UUID
+	threads := map[uuid.UUID]bool{}
 	for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {
 		log.Printf("iter: %s", v.String())
-		threads = append(threads, v.ThreadID)
+		threads[v.ThreadID] = true
 		//
 	}
 	if clearfirst {
