@@ -6,7 +6,8 @@ run: build
 	./bin/orchard-io <<<'summarize the code in this image [documents/code.png]' 
 runclear: build
 	./bin/orchard-io -clear
-install: bin/
-	mv -nvi bin/* ~/bin/
+install: build
+	mv -v bin/* ~/bin/
+	rmdir bin
 
 
