@@ -8,6 +8,6 @@ run: build
 runclear: build
 	./bin/orchard-io -clear
 install: bin/
-	mv -nv bin/* ~/bin/
+	mv -nvi bin/* ~/bin/
 
 
