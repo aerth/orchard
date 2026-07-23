@@ -12,8 +12,6 @@ import (
 	"m/pkg/chatmessages"
 	"m/pkg/global"
 	"m/pkg/llm"
-
-	"github.com/aerth/mostly/stackerr"
 )
 
 type fileArgs struct {
