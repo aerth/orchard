@@ -34,7 +34,7 @@ func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, newmsg *chat
 		e.PreFunc = chat.PrintMessages
 	}
 	if newmsg != nil && IsCommand(newmsg.Content) {
-		add, err := HandleCommand(newmsg, conf, &e, &stack)
+		add, err := HandleCommand(newmsg, &e, &stack)
 		// dont have caller generate
 		cmdmsg := *newmsg
 		newmsg = nil
