@@ -3,7 +3,7 @@
 // For example,
 //
 // ```bash
-// bin/orchard-chat -clear <<<"summarize Makefile, then summarize cmd/orchard-chat/main.go" 2>/dev/null
+// orchard-io -q -clear <<<"summarize Makefile, then summarize cmd/orchard-chat/main.go" 2>/dev/null
 // ```
 package main
 
