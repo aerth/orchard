@@ -88,9 +88,14 @@ func Initialize() (*global.Conf, error) {
 		//
 	}
 	if clearfirst {
+		for thread := range threads {
+			if err := store.DeleteThread(context.TODO(), thread); err != nil {
+				return conf, err
+			}
+		}
 		slog.Info("clearing db for thread")
 		if err := store.DeleteThread(context.TODO(), conf.GetThreadID()); err != nil {
-			return conf, nil
+			return conf, err
 		}
 	}
 	return conf, nil
