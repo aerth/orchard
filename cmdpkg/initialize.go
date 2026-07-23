@@ -97,7 +97,6 @@ func Initialize() (*global.Conf, error) {
 				}
 			}
 		}
-		slog.Info("clearing db for thread")
 		if err := store.DeleteThread(context.TODO(), conf.GetThreadID()); err != nil {
 			return conf, err
 		}
