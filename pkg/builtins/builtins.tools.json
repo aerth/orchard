@@ -18,8 +18,11 @@
     "description": "Writes content to a specified file path, creating it if it doesn't exist.",
     "required": ["path", "content"],
     "parameters": {
-      "path": { "type": "string" },
-      "content": { "type": "string" }
+      "type": "object",
+      "properties": {
+        "path": { "type": "string" },
+        "content": { "type": "string" }
+      }
     }
   },
   {
