@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+
 	"m/cmdpkg/rege"
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
@@ -17,7 +19,6 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -103,6 +104,7 @@ Chat:
 	got := chatmessages.NewFromRole(e.From, "assistant", "")
 	top := stack.Top()
 	if top.Role == "assistant" {
+		slog.Warn("already is assistant")
 		return nil
 	}
 	slog.Info("Chatting", "after", top)
