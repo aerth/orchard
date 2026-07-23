@@ -3,13 +3,10 @@ package yoke
 
 import (
 	"cmp"
-	"context"
 	"encoding/json"
 	"fmt"
 	"math/rand/v2"
-	"strings"
 
-	api "m/pkg/llm"
 	"m/pkg/orderedmap"
 	//	"m/pkg/ollama/api/orderedmap"
 )
@@ -191,30 +188,31 @@ func New() *YR {
 	return &YR{Type: "object", Properties: NewPropertiesMap(), Required: nil}
 }
 
-func (y *YR) AskYesNo(ctx context.Context, msgs api.Messages, question string) (*bool, error) {
-	if y.Properties.Len() == 0 {
-		y.Properties.Set("value", NewBoolEnum())
-	}
-	msgs = append(msgs, api.Message{Role: "system", Content: question})
-	a, err := y.Run(ctx, msgs...)
-	if err != nil {
-		return nil, err
-	}
-	wrap := struct {
-		Value *bool `json:"value"`
-	}{}
-	if strings.HasPrefix(a.Content, "{") {
-		if err := json.Unmarshal([]byte(a.Content), &wrap); err != nil {
+/*
+	func (y *YR) AskYesNo(ctx context.Context, msgs api.Messages, question string) (*bool, error) {
+		if y.Properties.Len() == 0 {
+			y.Properties.Set("value", NewBoolEnum())
+		}
+		msgs = append(msgs, api.Message{Role: "system", Content: question})
+		a, err := y.Run(ctx, msgs...)
+		if err != nil {
 			return nil, err
 		}
-	} else {
-		if err := json.Unmarshal([]byte(a.Content), &wrap.Value); err != nil {
-			return nil, err
+		wrap := struct {
+			Value *bool `json:"value"`
+		}{}
+		if strings.HasPrefix(a.Content, "{") {
+			if err := json.Unmarshal([]byte(a.Content), &wrap); err != nil {
+				return nil, err
+			}
+		} else {
+			if err := json.Unmarshal([]byte(a.Content), &wrap.Value); err != nil {
+				return nil, err
+			}
 		}
+		return wrap.Value, nil
 	}
-	return wrap.Value, nil
-}
-
+*/
 func (y *YR) WithMap(x PropertiesMap) *YR {
 	for k, v := range x.All() {
 		y.Properties.Set(k, v)
