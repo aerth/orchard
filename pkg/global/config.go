@@ -24,7 +24,7 @@ type Conf struct {
 }
 
 func (c *Conf) GetVerbose() bool {
-	return true
+	return c.i.ShowRequests
 }
 
 func (c *Conf) IsHideToolOuts() bool {
@@ -120,6 +120,7 @@ type ConfigInput struct {
 	ThreadID      uuid.UUID
 	HideToolCalls bool
 	ShowToolOuts  bool
+	ShowRequests  bool
 	Dir           string
 }
 type cfginput = ConfigInput
