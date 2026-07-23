@@ -289,6 +289,15 @@ var (
 	ShowToolOutputs = true
 )
 
+func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botname string) string {
+	got, err := cm.FormatMarkdown(renderfunc, username, botname)
+	if err != nil {
+		slog.Error("error formating markdown msg", "err", err)
+		return got + " (ERROR: formatting markdown failed)"
+	}
+	return got
+}
+
 func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, username string, botname string) error {
 	var got string
 	var err error
