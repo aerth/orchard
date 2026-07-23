@@ -122,6 +122,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		// Tools: builtinTools.ToMarshaler(),
 		Store: store,
 	}
+	if conf.GetVerbose() {
+		e.PreFunc = chat.PrintMessages
+	}
 
 	stack, err := store.LoadThread(ctx, conf.GetThreadID(), 4)
 	if err != nil {
