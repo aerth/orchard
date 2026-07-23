@@ -102,7 +102,7 @@ Chat:
 	slog.Info("Chatting", "after", stack.Top())
 	spin := spinner.Start(sctx)
 	e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
-	_, err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
+	err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 	_ = spin.HandleChatResponse(llm.ChatResponse{})
 	if err != nil && !errors.Is(err, context.Canceled) {
 		return stackerr.Errorf("%w", err)
