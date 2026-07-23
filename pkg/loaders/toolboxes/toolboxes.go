@@ -177,6 +177,22 @@ func (t Toolbox) ByName(name string) AnyTool {
 	return x
 }
 
+func GetBashFileEnvironKeys(b []byte) ([]string, error) {
+	// Matches: export KEY="val", KEY='val', or KEY=val
+	re := regexp.MustCompile(`(?m)^\s*(?:export\s+)?([A-Z_][A-Z0-9_]*)\s*=`)
+	matches := re.FindAllStringSubmatch(string(b), -1)
+
+	keys := make([]string, 0, len(matches))
+	seen := make(map[string]bool)
+	for _, m := range matches {
+		if !seen[m[1]] {
+			keys = append(keys, m[1])
+			seen[m[1]] = true
+		}
+	}
+	return keys, nil
+}
+
 func GetPythonFileEnvironKeys(b []byte) ([]string, error) {
 	// Matches words inside quotes inside .get( or getenv(
 	re := regexp.MustCompile(`(?:environ\.get|getenv)\s*\(\s*['"]([^'"]+)['"]`)
@@ -399,10 +415,16 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 				log.Printf("found %d params for %q", len(params), toolName)
 			}
 
-			envs, err := GetPythonFileEnvironKeys(contentBytes)
+			var envs []string
+			if strings.HasSuffix(scriptFilename, ".py") {
+				envs, err = GetPythonFileEnvironKeys(contentBytes)
+			} else {
+				envs, err = GetBashFileEnvironKeys(contentBytes)
+			}
 			if err != nil {
 				slog.Error("env detect", "err", err)
 			}
+			// doInputEnv
 			doInputEnv := slices.Contains(envs, "INPUT_FILE")
 			execFn := makeExecFn(toolName, params, doInputEnv, pyFilePath)
 			//		orchTool := MakeAPITool1(toolName, description, execFn, params...)
