@@ -84,8 +84,9 @@ func ChatWith(ctx context.Context, conf *global.Conf, stack chatmessages.ChatMes
 	}
 	if conf.Get().JsonOutput {
 		out = io.Discard
+		enc := json.NewEncoder(os.Stdout).Encode
 		jsonout = func(v chatmessages.ChatMessage) error {
-			return json.NewEncoder(os.Stdout).Encode(v)
+			return enc(v)
 		}
 	}
 	cl := debugging.NewConsoleLogger(out, os.Stderr)
@@ -116,7 +117,7 @@ Chat:
 	}
 	stack = append(stack, *got)
 	if jsonout != nil {
-		if err := jsonout(got); err != nil {
+		if err := jsonout(*got); err != nil {
 			return stackerr.Errorf("%w", err)
 		}
 	}
