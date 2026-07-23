@@ -149,6 +149,9 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	if client == nil {
 		client = llm.New()
 	}
+	if e.PreFunc != nil {
+		_ = e.PreFunc(creq, nil)
+	}
 	err := client.Chat(ctx, creq, e.Handlers...)
 	if err != nil {
 		return nil, stackerr.Errorf("%w", err)
