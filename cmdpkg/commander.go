@@ -10,7 +10,6 @@ import (
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/dbstore"
-	"m/pkg/global"
 	"m/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
@@ -23,7 +22,7 @@ func IsCommand(content string) bool {
 	return (content[0] == '/' && content[1] != '/') || strings.Count(content, " ") == 0 && content == "exit"
 }
 
-func HandleCommand(newmsg *chatmessages.ChatMessage, conf *global.Conf, e *chat.Ext, stack *chatmessages.ChatMessages) (chatmessages.A, error) {
+func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmessages.ChatMessages) (chatmessages.A, error) {
 	fields := strings.Fields(newmsg.Content)
 	cmd := strings.TrimPrefix(fields[0], "/")
 	slog.Info("commander", "cmd", cmd)
