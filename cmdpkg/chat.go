@@ -102,6 +102,9 @@ Chat:
 	cl.Reset()
 	got := chatmessages.NewFromRole(e.From, "assistant", "")
 	top := stack.Top()
+	if top.Role == "assistant" {
+		return nil
+	}
 	slog.Info("Chatting", "after", top)
 
 	{
