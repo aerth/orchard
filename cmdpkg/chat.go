@@ -102,10 +102,12 @@ Chat:
 	cl.Reset()
 	got := chatmessages.NewFromRole(e.From, "assistant", "")
 	slog.Info("Chatting", "after", stack.Top())
-	spin := spinner.Start(sctx)
-	e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
-	err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
-	_ = spin.HandleChatResponse(llm.ChatResponse{})
+	{
+		spin := spinner.Start(sctx)
+		e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
+		err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
+		_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure stopped
+	}
 	if err != nil && !errors.Is(err, context.Canceled) {
 		return stackerr.Errorf("%w", err)
 	}
