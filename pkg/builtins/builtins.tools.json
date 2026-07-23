@@ -30,7 +30,7 @@
     "description": "Lists files and directories in a given path.",
 	"required": ["path"],
     "parameters": {
-      "path": {"type": "string"}
+      "path": {"type": "string", "description": "relative path to dir, or single dot"}
     }
   },
   {
