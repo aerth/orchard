@@ -280,3 +280,5 @@ func (cm ChatMessages) ContainsID(id uuid.UUID) bool {
 		return v.MessageID == id
 	})
 }
+
+type RendererFunc = func(v ChatMessage) string
