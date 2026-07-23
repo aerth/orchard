@@ -4,6 +4,7 @@ package implv1
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -121,6 +122,11 @@ func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chat
 	}
 
 	relPath, err := NormalizePath(call.Function.Arguments.Path)
+	if err != nil {
+		slog.Warn("got path err", "err", err)
+		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "NormalizePath Error: " + err.Error()})
+		return chatmessages.ChatMessages{msg}, nil
+	}
 	err = os.WriteFile(relPath, []byte(call.Function.Arguments.Content), 0o600)
 	if err != nil {
 		return NewResponse(call, fmt.Sprintf("WriteFile error: %v", err)), nil
