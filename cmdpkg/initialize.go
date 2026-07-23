@@ -82,7 +82,11 @@ func Initialize() (*global.Conf, error) {
 	}
 	debugging.Init().Set(slog.LevelDebug)
 	threads := map[uuid.UUID]bool{}
-	store := global.GetStore()
+	store := global.GetStore[*dbstore.PostgresDBStore]()
+	if store == nil {
+		store = dbstore.NewFromEnv()
+		global.SetStore(store)
+	}
 	if store != nil {
 		if false {
 			for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {
