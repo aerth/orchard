@@ -11,6 +11,7 @@
         "description": "relative path to file to read"
       }
     }
+	}
   },
   {
     "name": "write_file",
