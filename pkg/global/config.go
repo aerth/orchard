@@ -23,6 +23,10 @@ type Conf struct {
 	i ConfigInput
 }
 
+func (c *Conf) GetVerbose() bool {
+	return true
+}
+
 func (c *Conf) IsHideToolOuts() bool {
 	return !c.i.ShowToolOuts
 }
