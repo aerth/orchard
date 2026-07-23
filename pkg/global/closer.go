@@ -42,6 +42,12 @@ func GetTools[T any]() []T {
 	return x
 }
 
+func SetConf(conf Conf) {
+	gconf = conf
+}
+
+var gconf Conf
+
 func SetTools[T any](v []T) {
 	tools = v
 }
