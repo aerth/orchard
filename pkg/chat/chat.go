@@ -105,7 +105,7 @@ func FormatRoles(in []llm.Message) []string {
 	return a
 }
 
-func PrintMessages(creq *llm.ChatRequest, pending *chatmessages.ChatMessage) error {
+func PrintMessages(creq *llm.ChatRequest) error {
 	slog.Info("showing messages")
 	fmt.Fprintf(os.Stderr, "MESSAGES: %d (%q)\n", len(creq.Messages), FormatRoles(creq.Messages))
 	_ = json.NewEncoder(os.Stderr).Encode(creq.Messages)
