@@ -18,6 +18,7 @@ import (
 type (
 	ChatHandler = func(llm.ChatResponse) error
 	Ext         struct {
+		ThreadID uuid.UUID
 		PreFunc  func(creq *llm.ChatRequest) error
 		Handlers []ChatHandler
 		From     string
