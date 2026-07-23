@@ -190,6 +190,7 @@ func DefaultConfigInput() ConfigInput {
 		}
 	}
 	username := envor("ORCHARD_USERNAME", "Chief")
+	botname := envor("ORCHARD_BOTNAME", "project_manager")
 	treedir := envor("ORCHARD_TREE", filepath.Join(wd, "../otree"))
 	tooldir := envor("ORCHARD_TOOLDIR", filepath.Join(wd, "../otools"))
 	//
