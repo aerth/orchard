@@ -106,6 +106,7 @@ func Initialize() (*global.Conf, error) {
 			return nil, stackerr.Errorf("%w", err)
 		}
 		Writer = f
+		global.LogWriter = f
 	}
 	Init().Set(slog.LevelDebug)
 	threads := map[uuid.UUID]bool{}
