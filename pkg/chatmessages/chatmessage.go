@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
