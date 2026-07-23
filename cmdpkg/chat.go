@@ -174,6 +174,7 @@ Chat:
 			return stackerr.Errorf("running tools: %w", err)
 		}
 		stack = append(stack, toolouts...)
+		slog.Info("added toolouts", "n", len(toolouts))
 		goto Chat
 	}
 
