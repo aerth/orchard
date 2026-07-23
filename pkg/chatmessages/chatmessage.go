@@ -274,3 +274,9 @@ func (cm ChatMessages) FormatRoles() []string {
 	}
 	return a
 }
+
+func (cm ChatMessages) ContainsID(id uuid.UUID) bool {
+	return slices.ContainsFunc(cm, func(v ChatMessage) bool {
+		return v.MessageID == id
+	})
+}
