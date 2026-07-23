@@ -281,4 +281,4 @@ func (cm ChatMessages) ContainsID(id uuid.UUID) bool {
 	})
 }
 
-type RendererFunc = func(v ChatMessage) string
+type RendererFunc = func(in string, style int) (string, error)
