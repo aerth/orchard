@@ -1,71 +1,70 @@
 [
   {
-    "name": "write_file",
-    "description": "Writes content to a specified file path, creating it if it doesn't exist.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "path": {
-          "type": "string"
-        },
-        "content": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "path",
-        "content"
-      ]
-    }
-  },
-  {
-    "name": "run_go_command",
-    "description": "Executes a Go command in the current terminal context (e.g., go build, go test).",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "args": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Arguments to pass to the Go command."
-        }
-      },
-      "required": [
-        "args"
-      ]
-    }
-  },
-  {
-    "name": "list_directory",
-    "description": "Lists files and directories in a given path.",
+    "name": "read_file",
+    "description": "Reads the contents of a file from the local filesystem.",
+    "required": ["path"],
     "parameters": {
       "type": "object",
       "properties": {
         "path": {
           "type": "string",
-          "description": "relative path to dir, or single dot"
+          "description": "relative path to file to read"
         }
-      },
-      "required": [
-        "path"
-      ]
+      }
+    }
+  },
+  {
+    "name": "read_file",
+    "description": "Reads the contents of a file from the local filesystem.",
+    "required": ["path"],
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "relative path to file to read"
+        }
+      }
+    }
+  },
+  {
+    "name": "write_file",
+    "description": "Writes content to a specified file path, creating it if it doesn't exist.",
+    "required": ["path", "content"],
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string" },
+        "content": { "type": "string" }
+      }
+    }
+  },
+  {
+    "name": "run_go_command",
+    "description": "Executes a Go command in the current terminal context (e.g., go build, go test).",
+    "required": ["args"],
+    "parameters": {
+      "command": "string",
+      "args": ["string"]
+    }
+  },
+  {
+    "name": "list_directory",
+    "description": "Lists files and directories in a given path.",
+    "required": ["path"],
+    "parameters": {
+      "path": {
+        "type": "string",
+        "description": "relative path to dir, or single dot"
+      }
     }
   },
   {
     "name": "get_package_info",
     "description": "Retrieves information about a specific Go module or package version.",
+    "required": ["module_path"],
     "parameters": {
-      "type": "object",
-      "properties": {
-        "module_path": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "module_path"
-      ]
+      "module_path": "string"
     }
   }
 ]
