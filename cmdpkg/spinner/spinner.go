@@ -38,7 +38,7 @@ func Start(ctx context.Context) *Spinner {
 		for {
 			select {
 			case <-ctx.Done():
-				go s.quit()
+				s.quit()
 				return
 			case <-s.stopChan:
 				// When we receive a signal on this channel, stop the loop
