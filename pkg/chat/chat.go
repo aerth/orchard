@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"m/pkg/chatmessages"
@@ -105,6 +106,7 @@ func FormatRoles(in []llm.Message) []string {
 }
 
 func PrintMessages(creq *llm.ChatRequest, pending *chatmessages.ChatMessage) error {
+	slog.Info("showing messages")
 	fmt.Fprintf(os.Stderr, "MESSAGES: %d (%q)\n", len(creq.Messages), FormatRoles(creq.Messages))
 	_ = json.NewEncoder(os.Stderr).Encode(creq.Messages)
 	return nil
