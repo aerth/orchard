@@ -53,8 +53,7 @@ func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	call, err := chat.ReadToolCall[fileArgs](ctx, caller, toolCallIndex)
 	if err != nil {
-		msg := *chatmessages.New(llm.Message{Role: "tool", Content: fmt.Sprintf("Error parsing args: %+v", err)})
-		return chatmessages.ChatMessages{msg}, nil
+		return NewResponse(call, fmt.Sprintf("Error parsing args: %+v", err)), nil
 	}
 	if call.Function.Arguments.Path == "" {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'path', check the tool call and try again."})
