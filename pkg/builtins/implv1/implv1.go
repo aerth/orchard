@@ -66,8 +66,7 @@ func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (
 		call.Function.Arguments.Path = rel
 	}
 	if strings.Contains(call.Function.Arguments.Path, "..") {
-		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error Invalid file path. Please select a file within the permitted folder."})
-		return chatmessages.ChatMessages{msg}, nil
+		return NewResponse(call, "Error Invalid file path. Please select a file within the permitted folder."), nil
 	}
 	args := call.Function.Arguments
 	entries, err := os.ReadDir(args.Path)
