@@ -324,7 +324,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = strings.Join([]string{italicMarkdown(cm.Thinking), content}, "\n\n")
 	}
 	if len(cm.ToolCalls) != 0 {
-		content += fmt.Sprintf("\n```json\n%s\n```\n", commoner.ToJSONIndent(cm.ToolCalls))
+		content += fmt.Sprintf("\n```json\n%s\n```\n", toJSONIndent(cm.ToolCalls))
 	}
 	content = strings.TrimSpace(content)
 	if cm.Role == "tool" {
@@ -345,6 +345,16 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		return err
 	}
 	return nil
+}
+
+func (cm ChatMessage) GetMessageStyle() int {
+	if cm.Aux != nil {
+		return 1
+	}
+	if cm.Content == "" && len(cm.ToolCalls) == 0 {
+		return 1
+	}
+	return 0
 }
 
 func (cm ChatMessage) GetName(username, botname string) string {
