@@ -47,7 +47,7 @@ func NewPostgres(additionalMigrateTypes ...any) (*PostgresDBStore, error) {
 	if len(additionalMigrateTypes) == 0 {
 		return &PostgresDBStore{db: gdb}, nil
 	}
-	slog.Debug("automigrations...", "types", fmt.Sprintf("%T", additionalMigrateTypes))
+	slog.Debug("automigrations...", "types", typenames(additionalMigrateTypes...))
 	err = gdb.Migrator().AutoMigrate(additionalMigrateTypes...)
 	if err != nil {
 		return nil, err
