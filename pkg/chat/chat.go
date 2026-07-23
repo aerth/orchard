@@ -129,12 +129,12 @@ func PrintMessages(creq *llm.ChatRequest) error {
 }
 
 // Chat uses 'e' for building a temporary {"messages": []} array, returning a single new message
-func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages, e Ext) (*chatmessages.ChatMessage, error) {
+func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages, e Ext) error {
 	if len(e.Tools) == 0 && len(msgs) != 0 {
-		return nil, fmt.Errorf("no tools")
+		return fmt.Errorf("no tools")
 	}
 	if len(e.Prepend) == 0 && len(msgs) != 0 {
-		return nil, stackerr.Errorf("no prepend msgs")
+		return stackerr.Errorf("no prepend msgs")
 	}
 	creq := llm.NewChatRequest()
 	creq.Tools = e.Tools
