@@ -76,7 +76,7 @@ func ChatWith(ctx context.Context, conf *global.Conf, stack chatmessages.ChatMes
 	}
 	stack = append(stack, *newmsg)
 	var out io.Writer = os.Stdout
-	var jsonout *json.Encoder
+	var jsonout EncoderFunc
 	if conf.Get().JsonOutput {
 		out = io.Discard
 		jsonout = json.NewEncoder(os.Stdout).Encode
@@ -109,7 +109,7 @@ Chat:
 	}
 	stack = append(stack, *got)
 	if jsonout != nil {
-		if err := jsonout.Encode(got); err != nil {
+		if err := jsonout(got); err != nil {
 			return stackerr.Errorf("%w", err)
 		}
 	}
