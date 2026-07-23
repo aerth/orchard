@@ -347,6 +347,14 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	return nil
 }
 
+func toJSONIndent(v any) string {
+	b, err := json.MarshalIndent(v, "", " ")
+	if err != nil {
+		panic(err.Error())
+	}
+	return string(b)
+}
+
 func (cm ChatMessage) GetMessageStyle() int {
 	if cm.Aux != nil {
 		return 1
