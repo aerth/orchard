@@ -3,6 +3,7 @@ package chatmessages
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log/slog"
 	"slices"
 	"strings"
@@ -282,3 +283,66 @@ func (cm ChatMessages) ContainsID(id uuid.UUID) bool {
 }
 
 type RendererFunc = func(in string, style int) (string, error)
+
+var (
+	ShowThoughts    = true
+	ShowToolOutputs = true
+)
+
+func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, username string, botname string) error {
+	var got string
+	var err error
+	var content string
+	switch {
+	case cm.Aux != nil:
+		switch v := cm.Aux.(type) {
+		case error:
+			content = fmt.Sprintf("<span style=\"color:red\">⚠️ Error: %s</span>\n", v.Error())
+		case string: // e.g., Notes
+			content = fmt.Sprintf("\n\n*Note: %s*\n", v)
+		}
+	case strings.HasPrefix(cm.Content, "```json\n"):
+		//	slog.Info("detected json", "msg", cm.Content)
+		content = cm.Content + "\n\n(JSON ACTUAL FENCED)\n"
+	case cm.Content != "" && cm.Content[0] == '{':
+		//	slog.Info("detected json", "msg", cm.Content)
+		content = cm.Content + "\n\n(JSON ACTUAL)\n"
+	case cm.Content != "":
+		content = cm.Content
+	case ShowThoughts && cm.Content == "" && cm.Thinking != "":
+		content = ""
+	case cm.Role == "tool" && ShowToolOutputs:
+		content = "```\n" + content + "\n```\n"
+	case cm.Role == "tool":
+		content = "[tool call output]\n"
+	case cm.Content == "" && !ShowThoughts && len(cm.ToolCalls) != 0:
+		content = ""
+	default:
+		content = ""
+	}
+	if ShowThoughts && cm.Thinking != "" {
+		content = strings.Join([]string{italicMarkdown(cm.Thinking), content}, "\n\n")
+	}
+	if len(cm.ToolCalls) != 0 {
+		content += fmt.Sprintf("\n```json\n%s\n```\n", commoner.ToJSONIndent(cm.ToolCalls))
+	}
+	content = strings.TrimSpace(content)
+	if cm.Role == "tool" {
+	}
+	got = content
+	if content != "" && renderfunc != nil {
+		content += "\n\n---\n"
+		got, err = renderfunc(content, cm.GetMessageStyle())
+		if err != nil {
+			return err
+		}
+	}
+	if !strings.HasSuffix(got, "\n") {
+		got += "\n"
+	}
+	_, err = fmt.Fprintf(w, "%s: %s", cm.GetName(username, botname), got)
+	if err != nil {
+		return err
+	}
+	return nil
+}
