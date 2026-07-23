@@ -21,7 +21,7 @@ func TestFoo(t *testing.T) {
 	usermsg := chatmessages.NewFromRole("Chief", "user", prompt)
 	stack := chatmessages.A{*usermsg}
 	threadID := uuid.UUID{}
-	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{})
+	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{Handlers: chat.Handlers{}})
 	if err != nil {
 		t.Fatal(err)
 	}
