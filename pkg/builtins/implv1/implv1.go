@@ -134,3 +134,7 @@ func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chat
 	x := NewResponse(call, "The file was modified.")
 	return x, nil
 }
+
+func NormalizePath(generated string) (string, error) {
+	return generated, nil
+}
