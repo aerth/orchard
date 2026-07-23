@@ -47,13 +47,12 @@ var (
 )
 
 func Sig() {
-	//ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM)
 	ch := make(chan os.Signal, 1000)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM)
 	for sig := range ch {
 		slog.Info("received signal", "sig", sig)
 		global.Cancel(stackerr.Errorf("received signal %s", sig))
-		_, _ = fmt.Fprintf(os.Stderr, " %d more times to quit\n", global.Remaining())
+		//	_, _ = fmt.Fprintf(os.Stderr, " %d more times to quit\n", global.Remaining())
 	}
 }
 
@@ -62,20 +61,6 @@ var builtinTools otool.Tools
 // orchard CLI infinite loop, simple stdin stdout, minimal stderr.
 // debug logs to log file or null
 func main() {
-	var err error
-	builtinTools, err = builtins.LoadTools(map[string]otool.ExecFunc{
-		"read_file": implv1.ReadFile,
-		//	"write_file":       noop,
-		//	"run_go_command":   noop,
-		"list_directory": implv1.ListDirectory,
-		//	"get_package_info": noop,
-	})
-	if err != nil {
-		log.Fatalf("could not load builtin tools: %+v", err)
-	}
-	if len(builtinTools) == 0 {
-		panic("no builtin tools")
-	}
 	//
 	global.SetVersion(version, "stdio")
 	if buildtime != "" {
@@ -91,7 +76,11 @@ func main() {
 		global.Close()
 		debugging.Writer = os.Stderr
 		debugging.Init()
-		log.Fatalf("Fatal: %+v", err)
+		if errors.Is(err, context.Canceled) {
+			println("(cancelled)")
+		} else {
+			log.Fatalf("Fatal: %+v", err)
+		}
 	}
 }
 
@@ -107,24 +96,32 @@ func main1(ctx context.Context) error {
 	return nil
 }
 
-func runmain(ctx context.Context, conf *global.Conf) error {
-	showChar := false
+const showChar = false
 
+// rumain already initialized
+func runmain(ctx context.Context, conf *global.Conf) error {
 	if showChar {
-		fmt.Fprintf(os.Stderr, "Press ctrl+d to end each message, press ctrl+c to cancel generation.\n")
+		fmt.Fprintf(os.Stderr, "Press ctrl+d to send your message, press ctrl+c to cancel generation. slash commands are supported, see '/help'.\n")
 	}
-	//	prompts := []string{"tell a short story.", "tell a joke.", "write a short song", "write a short poem", "use the 'foo' tool function"}
-	//	prompts = []string{"use the 'foo' tool function (nonce 42)"}
-	//	usermsg := prompts[rand.Intn(len(prompts))]
-	store := dbstore.NewFromEnv()
-	e := chat.Ext{
-		//	PreFunc: chat.PrintMessages,
-		// Tools: builtinTools.ToMarshaler(),
-		Store: store,
-	}
+	store := global.GetStore[*dbstore.PostgresDBStore]()
+	e := chat.Ext{Store: store}
 	if conf.GetVerbose() {
-		slog.Info("adding prefunc")
 		e.PreFunc = chat.PrintMessages
+	}
+
+	var err error
+	builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
+		"read_file":  implv1.ReadFile,
+		"write_file": implv1.WriteFile,
+		//	"run_go_command":   noop,
+		"list_directory": implv1.ListDirectory,
+		//	"get_package_info": noop,
+	})
+	if err != nil {
+		log.Fatalf("could not load builtin tools: %+v", err)
+	}
+	if len(builtinTools) == 0 {
+		panic("no builtin tools")
 	}
 
 	stack, err := store.LoadThread(ctx, conf.GetThreadID(), 4)
@@ -202,6 +199,11 @@ Chat:
 	e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
 	_, err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 	_ = spin.HandleChatResponse(llm.ChatResponse{})
+	if errors.Is(err, context.Canceled) {
+		got.Content += " (this reply was cancelled by user before it finished)"
+		stack = append(stack, *got)
+		goto Chat
+	}
 	if err != nil {
 		return stackerr.Errorf("%w", err)
 	}
