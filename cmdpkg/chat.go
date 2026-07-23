@@ -25,7 +25,9 @@ import (
 
 type EncoderFunc = func(v *chatmessages.ChatMessage) error
 
-var JsonOut EncoderFunc
+var JsonOut EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
+//	return nil
+//}
 
 func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, newmsg *chatmessages.ChatMessage, tools otool.Tools, e chat.Ext) error {
 	showChar := false
