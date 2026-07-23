@@ -3,6 +3,7 @@ package global
 import (
 	"flag"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -79,6 +80,14 @@ func GetVersion() string {
 
 func SetStore(store any) {
 	gstore = store
+}
+
+func GetStore[T any]() T {
+	x, ok := gstore.(T)
+	if !ok && gstore != nil {
+		slog.Warn(fmt.Sprintf("not a %T, is %T", new(T), gstore))
+	}
+	return x
 }
 
 var gstore any
