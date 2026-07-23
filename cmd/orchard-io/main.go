@@ -123,6 +123,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		Store: store,
 	}
 	if conf.GetVerbose() {
+		slog.Info("adding prefunc")
 		e.PreFunc = chat.PrintMessages
 	}
 
