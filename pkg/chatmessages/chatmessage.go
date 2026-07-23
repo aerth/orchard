@@ -346,3 +346,17 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	}
 	return nil
 }
+
+func (cm ChatMessage) GetName(username, botname string) string {
+	name := strings.ToUpper(cm.Role)
+	if cm.From != "" {
+		name = cm.From
+	}
+	if cm.Role == "user" && username != "" {
+		name = username
+	}
+	if cm.Role == "assistant" && botname != "" {
+		name = botname
+	}
+	return name
+}
