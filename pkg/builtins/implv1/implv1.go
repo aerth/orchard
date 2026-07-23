@@ -137,6 +137,16 @@ func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chat
 	return x, nil
 }
 
-func NormalizePath(generated string) (string, error) {
-	return generated, nil
+func NormalizePath(input string) (string, error) {
+	absPath, err := filepath.Abs(input)
+	if err != nil {
+		return "", fmt.Errorf("path resolution error: %w", err)
+	}
+
+	relPath, err := filepath.Rel(global.Dir(), absPath)
+	if err != nil || strings.HasPrefix(relPath, "..") || relPath == ".." {
+		return "", fmt.Errorf("access denied: path must be within the current working directory")
+	}
+
+	return relPath, nil
 }
