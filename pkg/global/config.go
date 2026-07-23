@@ -77,6 +77,12 @@ func GetVersion() string {
 	return version
 }
 
+func SetStore(store any) {
+	gstore = store
+}
+
+var gstore any
+
 func GetVersionString() string {
 	if omode == "" {
 		omode = "testing"
