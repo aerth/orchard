@@ -12,6 +12,8 @@ import (
 	"m/pkg/chatmessages"
 	"m/pkg/global"
 	"m/pkg/llm"
+
+	"github.com/aerth/mostly/stackerr"
 )
 
 type fileArgs struct {
@@ -60,7 +62,7 @@ func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (
 	}
 	rel, err := filepath.Rel(global.Dir(), call.Function.Arguments.Path)
 	if err != nil {
-		return nil, err
+		return nil, stackerr.Errorf("make rel: %w", err)
 	}
 	call.Function.Arguments.Path = rel
 	if strings.Contains(call.Function.Arguments.Path, "..") {
