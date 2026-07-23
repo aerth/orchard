@@ -145,7 +145,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		return nil
 	}
 	e := chat.Ext{Store: global.GetStore[*dbstore.PostgresDBStore]()}
-	err = cmdpkg.ChatWith(ctx, stack, newmsg, builtinTools, e)
+	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
 		return stackerr.Errorf("%w", err)
 	}
