@@ -6,13 +6,12 @@ import (
 	"log/slog"
 
 	"m/pkg/chatmessages"
-	"m/pkg/global"
 	"m/pkg/otool"
 
 	"github.com/aerth/mostly/stackerr"
 )
 
-func Runtools(ctx context.Context, conf *global.Conf, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
+func Runtools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	var toolouts chatmessages.ChatMessages
 	for toolCallIndex := range caller.ToolCalls {
 		var call struct {
