@@ -17,7 +17,7 @@ import (
 type (
 	ChatHandler = func(llm.ChatResponse) error
 	Ext         struct {
-		PreFunc  func(creq *llm.ChatRequest, pending *chatmessages.ChatMessage) error
+		PreFunc  func(creq *llm.ChatRequest) error
 		Handlers []ChatHandler
 		From     string
 		Prepend  []llm.Message
@@ -127,7 +127,7 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 		creq.Messages = append(creq.Messages, e.Append...)
 	}
 	if e.PreFunc != nil {
-		if err := e.PreFunc(creq, pending); err != nil {
+		if err := e.PreFunc(creq); err != nil {
 			return nil, err
 		}
 	}
@@ -135,9 +135,6 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	// generate
 	if client == nil {
 		client = llm.New()
-	}
-	if e.PreFunc != nil {
-		_ = e.PreFunc(creq, nil)
 	}
 	err := client.Chat(ctx, creq, e.Handlers...)
 	if err != nil {
