@@ -4,7 +4,7 @@
     "description": "Reads the contents of a file from the local filesystem.",
 	"required": ["path"],
     "parameters": {
-      "path": "string"
+      "path": {"type": "string"}
     }
   },
   {
@@ -12,8 +12,8 @@
     "description": "Writes content to a specified file path, creating it if it doesn't exist.",
 	"required": ["path", "content"],
     "parameters": {
-      "path": "string",
-      "content": "string"
+      "path": {"type": "string"},
+      "content": {"type": "string"}
     }
   },
   {
@@ -30,7 +30,7 @@
     "description": "Lists files and directories in a given path.",
 	"required": ["path"],
     "parameters": {
-      "path": "string"
+      "path": {"type": "string"}
     }
   },
   {
