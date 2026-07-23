@@ -37,12 +37,17 @@ func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'path', check the tool call and try again."})
 		return chatmessages.ChatMessages{msg}, nil
 	}
-	if strings.Contains(call.Function.Arguments.Path, "..") {
-		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error Invalid file path. Please select a file within the permitted folder."})
-		return chatmessages.ChatMessages{msg}, nil
+
+	absPath, err := filepath.Abs(call.Function.Arguments.Path)
+	if err != nil {
+		return NewResponse(call, fmt.Sprintf("ReadFile error (path resolution): %v", err)), nil
 	}
-	args := call.Function.Arguments
-	data, err := os.ReadFile(args.Path)
+	relPath, err := filepath.Rel(global.Dir(), absPath)
+	if err != nil || strings.HasPrefix(relPath, "..") {
+		return NewResponse(call, "Error: Access denied. File must be within the current working directory."), nil
+	}
+
+	data, err := os.ReadFile(absPath)
 	if err != nil {
 		return NewResponse(call, fmt.Sprintf("ReadFile error: %v", err)), nil
 	}
@@ -58,18 +63,17 @@ func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (
 	if call.Function.Arguments.Path == "" {
 		return NewResponse(call, "Error parsing args: missing required 'path', check the tool call and try again."), nil
 	}
-	if filepath.IsAbs(call.Function.Arguments.Path) {
-		rel, err := filepath.Rel(global.Dir(), call.Function.Arguments.Path)
-		if err != nil {
-			return nil, stackerr.Errorf("make rel: %w", err)
-		}
-		call.Function.Arguments.Path = rel
+
+	absPath, err := filepath.Abs(call.Function.Arguments.Path)
+	if err != nil {
+		return NewResponse(call, fmt.Sprintf("ListDirectory error (path resolution): %v", err)), nil
 	}
-	if strings.Contains(call.Function.Arguments.Path, "..") {
-		return NewResponse(call, "Error Invalid file path. Please select a file within the permitted folder."), nil
+	relPath, err := filepath.Rel(global.Dir(), absPath)
+	if err != nil || strings.HasPrefix(relPath, "..") {
+		return NewResponse(call, "Error: Access denied. Directory must be within the current working directory."), nil
 	}
-	args := call.Function.Arguments
-	entries, err := os.ReadDir(args.Path)
+
+	entries, err := os.ReadDir(absPath)
 	if err != nil {
 		return NewResponse(call, fmt.Sprintf("ListDirectory error: %v", err)), nil
 	}
@@ -103,7 +107,7 @@ func (w writefileArgs) IsToolArgument() {}
 func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	// 1. Extract args from the specific tool call in the message history
 	// This assumes your Message struct allows access to the raw ToolCalls string slice
-	// var args fileArgs
+	// var args writefileArgs
 	call, err := chat.ReadToolCall[writefileArgs](ctx, caller, toolCallIndex)
 	if err != nil {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: fmt.Sprintf("Error parsing args: %+v", err)})
@@ -117,17 +121,17 @@ func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chat
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'content', check the tool call and try again."})
 		return chatmessages.ChatMessages{msg}, nil
 	}
-	if strings.Contains(call.Function.Arguments.Path, "..") {
-		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error Invalid file path. Please select a file within the permitted folder."})
-		return chatmessages.ChatMessages{msg}, nil
-	}
-	args := call.Function.Arguments
-	args.Path, err = NormalizePath(args.Path)
+
+	absPath, err := filepath.Abs(call.Function.Arguments.Path)
 	if err != nil {
-		return NewResponse(call, fmt.Sprintf("NormalizePath error: %v", err)), nil
+		return NewResponse(call, fmt.Sprintf("WriteFile error (path resolution): %v", err)), nil
+	}
+	relPath, err := filepath.Rel(global.Dir(), absPath)
+	if err != nil || strings.HasPrefix(relPath, "..") {
+		return NewResponse(call, "Error: Access denied. File must be within the current working directory."), nil
 	}
 
-	err = os.WriteFile(args.Path, []byte(args.Content), 0o600)
+	err = os.WriteFile(absPath, []byte(call.Function.Arguments.Content), 0o600)
 	if err != nil {
 		return NewResponse(call, fmt.Sprintf("WriteFile error: %v", err)), nil
 	}
