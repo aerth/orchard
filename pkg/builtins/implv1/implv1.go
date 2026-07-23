@@ -56,8 +56,7 @@ func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (
 		return NewResponse(call, fmt.Sprintf("Error parsing args: %+v", err)), nil
 	}
 	if call.Function.Arguments.Path == "" {
-		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'path', check the tool call and try again."})
-		return chatmessages.ChatMessages{msg}, nil
+		return NewResponse(call, "Error parsing args: missing required 'path', check the tool call and try again."), nil
 	}
 	rel, err := filepath.Rel(global.Dir(), call.Function.Arguments.Path)
 	if err != nil {
