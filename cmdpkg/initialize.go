@@ -56,7 +56,7 @@ func WrapToolError(err error) chatmessages.ChatMessages {
 
 var ENVFILE = os.ExpandEnv("$HOME/.config/orchard/env")
 
-func loadInit(clearfirst *bool) (*global.Conf, error) {
+func loadInitFlagsEnv(clearfirst *bool) (*global.Conf, error) {
 	slog.Info("loading env", "file", ENVFILE)
 	if err := godotenv.Load(ENVFILE); err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
@@ -64,10 +64,10 @@ func loadInit(clearfirst *bool) (*global.Conf, error) {
 	return global.NewConfigFlags(clearfirst), nil
 }
 
-func Initialize(store *dbstore.PostgresDBStore) (*global.Conf, error) {
+func Initialize() (*global.Conf, error) {
 	//store := dbstore.NewFromEnv()
 	var clearfirst bool
-	conf, err := loadInit(&clearfirst)
+	conf, err := loadInitFlagsEnv(&clearfirst)
 	if err != nil {
 		return nil, stackerr.Errorf("%w", err)
 	}
