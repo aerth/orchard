@@ -21,10 +21,10 @@ func GetSystemBase(data any) string {
 		return "You are a helpful assistant who speaks only nadsat hacker slang. Keep it simple and quick replies only."
 	}
 	var buf strings.Builder
-	pre := ""
 	if err := tpl.ExecuteTemplate(&buf, "SYSTEM.md", data); err != nil {
 		slog.Error("error executing template", "err", err)
 	}
+	pre := ""
 	got := strings.Join([]string{buf.String(), pre}, "\n")
 	slog.Info("system message complete")
 	//_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
