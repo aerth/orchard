@@ -10,7 +10,6 @@ import (
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/dbstore"
-	"m/pkg/global"
 	"m/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
@@ -42,7 +41,7 @@ func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmes
 		}
 		return nil, nil
 	case "clear":
-		err := e.Store.(*dbstore.PostgresDBStore).DeleteThread(context.TODO(), global.SingleThreadID)
+		err := e.Store.(*dbstore.PostgresDBStore).DeleteThread(context.TODO(), e.ThreadID)
 		*stack = nil
 		return nil, err
 	case "model":
