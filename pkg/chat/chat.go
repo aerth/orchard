@@ -145,10 +145,10 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	return ChatReq(ctx, creq, e)
 }
 
-func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) (*chatmessages.ChatMessage, error) {
+func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	if e.PreFunc != nil {
 		if err := e.PreFunc(creq); err != nil {
-			return nil, err
+			return err
 		}
 	}
 	//var pending *chatmessages.ChatMessage
@@ -158,9 +158,9 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) (*chatmessages.C
 	}
 	err := client.Chat(ctx, creq, e.Handlers...)
 	if err != nil {
-		return nil, stackerr.Errorf("%w", err)
+		return stackerr.Errorf("%w", err)
 	}
-	return nil, nil
+	return nil
 }
 
 // FromA (internal) combines variadic Exts into one
