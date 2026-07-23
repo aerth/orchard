@@ -9,14 +9,9 @@ import (
 	"math/rand/v2"
 	"strings"
 
-	"m/pkg/chat"
 	api "m/pkg/llm"
 	"m/pkg/orderedmap"
-
 	//	"m/pkg/ollama/api/orderedmap"
-	messages "m/pkg/chatmessages"
-
-	"github.com/aerth/mostly/stackerr"
 )
 
 type PropertyType []string
@@ -126,41 +121,43 @@ func (y *YR) ShuffleEnums() *YR {
 	return y
 }
 
-func (y *YR) Run(ctx context.Context, msgs ...api.Message) (api.Message, error) {
-	if len(msgs) == 0 {
-		msgs = api.Messages{{Role: "system"}}
-	}
-	creq := api.NewChatRequest()
-	creq.Messages = msgs
-	creq.Format = y.JSON()
-	got := new(messages.ChatMessage)
-	err := chat.ChatReq(ctx, creq, chat.Ext{Handlers: []chat.ChatHandler{got.GatherChatResponse}})
-	if err != nil {
-		return got.Message, stackerr.Errorf("%w", err)
-	}
-	if got.Content == "" {
-		return got.Message, stackerr.Errorf("yoke: no output")
-	}
-	if y.Properties.Len() == 0 {
+/*
+	func (y *YR) Run(ctx context.Context, msgs ...api.Message) (api.Message, error) {
+		if len(msgs) == 0 {
+			msgs = api.Messages{{Role: "system"}}
+		}
+		creq := api.NewChatRequest()
+		creq.Messages = msgs
+		creq.Format = y.JSON()
+		got := new(messages.ChatMessage)
+
+		err := chat.ChatReq(ctx, creq, chat.Ext{Handlers: []chat.ChatHandler{got.GatherChatResponse}})
+		if err != nil {
+			return got.Message, stackerr.Errorf("%w", err)
+		}
+		if got.Content == "" {
+			return got.Message, stackerr.Errorf("yoke: no output")
+		}
+		if y.Properties.Len() == 0 {
+			return got.Message, nil
+		}
+		if y.Properties.Len() > 1 {
+			return got.Message, nil // json direct
+		}
+		// extract the single param into the raw Content
+		m := map[string]json.RawMessage{}
+		if err := json.Unmarshal([]byte(got.Content), &m); err != nil {
+			return got.Message, stackerr.Errorf("%w", err)
+		}
+		if len(m) != 1 {
+			return got.Message, stackerr.Errorf("not 1 but %d", len(m))
+		}
+		for _, s := range m {
+			got.Content = string(s)
+		}
 		return got.Message, nil
 	}
-	if y.Properties.Len() > 1 {
-		return got.Message, nil // json direct
-	}
-	// extract the single param into the raw Content
-	m := map[string]json.RawMessage{}
-	if err := json.Unmarshal([]byte(got.Content), &m); err != nil {
-		return got.Message, stackerr.Errorf("%w", err)
-	}
-	if len(m) != 1 {
-		return got.Message, stackerr.Errorf("not 1 but %d", len(m))
-	}
-	for _, s := range m {
-		got.Content = string(s)
-	}
-	return got.Message, nil
-}
-
+*/
 func (y *YR) WithProperty(name string, property Property) *YR {
 	y.Properties.Set(name, property)
 	y.Required = append(y.Required, name)
