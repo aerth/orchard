@@ -133,10 +133,8 @@ func (y *YR) Run(ctx context.Context, msgs ...api.Message) (api.Message, error) 
 	creq := api.NewChatRequest()
 	creq.Messages = msgs
 	creq.Format = y.JSON()
+	got := new(messages.ChatMessage)
 	err := chat.ChatReq(ctx, creq, chat.Ext{})
-	if got == nil {
-		got = new(messages.ChatMessage)
-	}
 	if err != nil {
 		return got.Message, stackerr.Errorf("%w", err)
 	}
