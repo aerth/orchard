@@ -7,12 +7,16 @@ import (
 	"log/slog"
 
 	"m/pkg/chatmessages"
+	"m/pkg/global"
 	"m/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
 )
 
-type Tools []Tool
+type (
+	ToolRunnerFunc = func(ctx context.Context, conf *global.Conf, tools Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error)
+	Tools          []Tool
+)
 
 // ToMarshaler for api requests
 func (t Tools) ToMarshaler() []json.Marshaler {
