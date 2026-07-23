@@ -56,6 +56,7 @@ func WrapToolError(err error) chatmessages.ChatMessages {
 var ENVFILE = os.ExpandEnv("$HOME/.config/orchard/env")
 
 func loadInit(clearfirst *bool) (*global.Conf, error) {
+	slog.Info("loading env", "file", ENVFILE)
 	if err := godotenv.Load(ENVFILE); err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	}
