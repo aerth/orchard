@@ -84,7 +84,9 @@ func ChatWith(ctx context.Context, conf *global.Conf, stack chatmessages.ChatMes
 	}
 	if conf.Get().JsonOutput {
 		out = io.Discard
-		jsonout = json.NewEncoder(os.Stdout).Encode
+		jsonout = func(v chatmessages.ChatMessage) error {
+			return json.NewEncoder(os.Stdout).Encode(v)
+		}
 	}
 	cl := debugging.NewConsoleLogger(out, os.Stderr)
 	cl.HideToolCalls = conf.IsHideToolCalls()
