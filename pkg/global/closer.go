@@ -48,6 +48,10 @@ func SetConf(conf Conf) {
 
 var gconf Conf
 
+func Get() Conf {
+	return gconf
+}
+
 func SetTools[T any](v []T) {
 	tools = v
 }
