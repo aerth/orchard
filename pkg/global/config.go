@@ -172,7 +172,7 @@ func DefaultConfigInput() ConfigInput {
 	//
 	logfilename := os.Getenv("ORCHARD_LOGFILE")
 	if logfilename == "" {
-		logfilename = filepath.Join(wd, "../orchard.log")
+		logfilename = filepath.Join(wd, "/tmp/orchard.log")
 	}
 	//
 	treedir, _ = filepath.Abs(os.ExpandEnv(treedir))
