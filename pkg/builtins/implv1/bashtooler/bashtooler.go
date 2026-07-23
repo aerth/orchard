@@ -29,6 +29,17 @@ func RunBash(ctx context.Context, wd string, filename string, args ...string) (s
 	return RunBashScript(ctx, stdin, RunParams{WorkingDir: wd, Args: append([]string{"/dev/stdin"}, args...)})
 }
 
+func RunPy(ctx context.Context, wd string, filename string, args ...string) (string, error) {
+	stdin, err := os.Open(filename)
+	if err != nil {
+		return "", err
+	}
+	defer func() {
+		_ = stdin.Close()
+	}()
+	return RunPyStdin(ctx, stdin, RunParams{WorkingDir: wd, Args: args})
+}
+
 var okenvs = map[string]bool{
 	"INPUT_FILE":          true,
 	"LANG":                true,
@@ -177,4 +188,45 @@ func ValidateCommand(command string) error {
 		}
 	}
 	return nil
+}
+
+var EchoPython = false
+
+// RunPyStdin runs a script (stdin reader) using a specific venv python path and returns stdout as a string
+func RunPyStdin(ctx context.Context, stdin io.Reader, params RunParams) (string, error) {
+	args := params.Args
+	args = append([]string{"-"}, args...)
+	const python3Executable = ".venv/bin/python3"
+	abs, err := os.Readlink(python3Executable)
+	if err != nil {
+		slog.Warn("uhoh ", "err", err)
+		return "", fmt.Errorf("finding python failed: %w", err)
+	}
+	cmd := exec.CommandContext(ctx, abs, args...)
+	var buf bytes.Buffer
+	if params.WorkingDir == "" {
+		params.WorkingDir = "."
+	}
+	var mw io.Writer = &buf
+	if EchoPython {
+		mw = io.MultiWriter(cmdpkg.Writer, &buf)
+	}
+	cmd.Dir = params.WorkingDir
+	cmd.Stderr = mw
+	cmd.Stdout = mw
+	cmd.Stdin = stdin
+	cmd.Env = append(NewCleanEnviron(), params.AddEnviron...)
+	if err := cmd.Run(); err != nil {
+		//		wd, _ := os.Getwd()
+		if errors.Is(err, context.Canceled) {
+			return strings.TrimSpace(buf.String()) + " (canceled)", err
+		}
+		slog.Error(fmt.Sprintf("got err running cmd from %s: %s", params.WorkingDir, buf.String()))
+		err = errors.Join(err, fmt.Errorf("%s", buf.String()))
+		return strings.TrimSpace(buf.String()), err
+	}
+	if EchoPython {
+		println(buf.String())
+	}
+	return strings.TrimSpace(buf.String()), nil
 }
