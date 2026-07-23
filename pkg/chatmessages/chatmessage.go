@@ -13,6 +13,7 @@ import (
 	"m/pkg/vector256"
 
 	"github.com/google/uuid"
+	"github.com/ollama/ollama/api"
 	"gorm.io/gorm"
 )
 
@@ -296,6 +297,19 @@ func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botna
 		return got + " (ERROR: formatting markdown failed)"
 	}
 	return got
+}
+
+func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname string) (string, error) {
+	if cm.Aux == nil && cm.Equals(api.Message{}) {
+		return "", nil
+	}
+	//slog.Info("formatting", "msg", len(cm.String()))
+	var str strings.Builder
+	err := cm.FormatMarkdownTo(&str, renderfunc, username, botname)
+	if err != nil {
+		return str.String(), err
+	}
+	return str.String(), nil
 }
 
 func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, username string, botname string) error {
