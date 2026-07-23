@@ -22,9 +22,9 @@ func Noop(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessa
 	return nil, nil
 }
 
-// LoadTools reads all .json files from the embedded FS and initializes Tool objects.
+// LoadBuiltinTools reads all .json files from the embedded FS and initializes Tool objects.
 // You pass in a map of actual Go functions to bind them.
-func LoadTools(execs map[string]otool.ExecFunc) (otool.Tools, error) {
+func LoadBuiltinTools(execs map[string]otool.ExecFunc) (otool.Tools, error) {
 	var tools otool.Tools
 
 	err := fs.WalkDir(Embedded, ".", func(path string, d fs.DirEntry, err error) error {
