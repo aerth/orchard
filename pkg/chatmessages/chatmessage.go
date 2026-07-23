@@ -357,7 +357,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	content = strings.TrimSpace(content)
 	got = content
 	if cm.Role == "tool" {
-		got = "\n```\n" + got + "\n```\n"
+		got = "\n```markdown\n" + got + "\n```\n"
 	}
 	if content != "" && renderfunc != nil {
 		content += "\n\n---\n"
