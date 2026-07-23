@@ -58,9 +58,11 @@ func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (
 	if call.Function.Arguments.Path == "" {
 		return NewResponse(call, "Error parsing args: missing required 'path', check the tool call and try again."), nil
 	}
-	rel, err := filepath.Rel(global.Dir(), call.Function.Arguments.Path)
-	if err != nil {
-		return nil, stackerr.Errorf("make rel: %w", err)
+	if filepath.IsAbs(call.Function.Arguments.Path) {
+		rel, err := filepath.Rel(global.Dir(), call.Function.Arguments.Path)
+		if err != nil {
+			return nil, stackerr.Errorf("make rel: %w", err)
+		}
 	}
 	call.Function.Arguments.Path = rel
 	if strings.Contains(call.Function.Arguments.Path, "..") {
