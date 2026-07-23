@@ -86,7 +86,7 @@ func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, newmsg *chat
 	} else if conf.Get().JsonOutput {
 		out = io.Discard
 		enc := json.NewEncoder(os.Stdout).Encode
-		jsonout = func(v chatmessages.ChatMessage) error {
+		jsonout = func(v *chatmessages.ChatMessage) error {
 			return enc(v)
 		}
 	}
