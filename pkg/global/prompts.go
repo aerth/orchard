@@ -7,11 +7,13 @@ import (
 	"strings"
 	"text/template"
 
+	orchard "m"
+
 	"m/pkg/loaders/mdloaders"
 )
 
 func GetSystemBase(data any) string {
-	tpl, err := template.New("").Funcs(mdloaders.FuncMap()).ParseFiles("SYSTEM.md")
+	tpl, err := template.New("").Funcs(mdloaders.FuncMap()).ParseFS(orchard.Embedded, "SYSTEM.md")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		panic("template SYSTEM.md failed: " + err.Error())
 	}
