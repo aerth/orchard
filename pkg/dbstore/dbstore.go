@@ -232,7 +232,7 @@ func GormIter[T Identifiable](db *gorm.DB, o *IterOptions) iter.Seq[T] {
 				}
 			}
 			if len(batch) < pageSize {
-				slog.Info("done finding", "n", len(batch), "pageSize", pageSize)
+				//slog.Info("done finding", "n", len(batch), "pageSize", pageSize)
 				break
 			}
 		}
