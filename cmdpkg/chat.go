@@ -101,7 +101,9 @@ Chat:
 	e.Tools = tools.ToMarshaler()
 	cl.Reset()
 	got := chatmessages.NewFromRole(e.From, "assistant", "")
-	slog.Info("Chatting", "after", stack.Top())
+	top := stack.Top()
+	slog.Info("Chatting", "after", top)
+
 	{
 		spin := spinner.Start(sctx)
 		e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
