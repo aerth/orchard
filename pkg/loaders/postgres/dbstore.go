@@ -35,8 +35,6 @@ func NewPostgres(additionalMigrateTypes ...any) (*PostgresDBStore, error) {
 		slog.Error("opening postgres db", "err", err)
 		return nil, err
 	}
-	slog.Info("opening postgres db")
-
 	db, err := gdb.DB() //sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("open db: %w", err)
