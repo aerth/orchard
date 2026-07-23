@@ -4,6 +4,7 @@ package global
 import (
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 )
@@ -13,6 +14,8 @@ func AddCloser(closer func() error) {
 }
 
 var closers []func() error
+
+var LogWriter io.Writer
 
 func Close() {
 	if len(closers) == 0 && len(cancels) == 0 {
