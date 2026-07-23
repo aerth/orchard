@@ -145,7 +145,11 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		return nil
 	}
 	e := chat.Ext{Store: global.GetStore[*dbstore.PostgresDBStore]()}
-	return cmdpkg.ChatWith(ctx, stack, newmsg, builtinTools, e)
+	err = cmdpkg.ChatWith(ctx, stack, newmsg, builtinTools, e)
+	if err != nil {
+		return stackerr.Errorf("%w", err)
+	}
+	return nil
 }
 
 var titlecaser = cases.Title(language.AmericanEnglish)
