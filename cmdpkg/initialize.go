@@ -53,8 +53,10 @@ func WrapToolError(err error) chatmessages.ChatMessages {
 	return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", fmt.Sprintf("Error running tool: %+v", err))}
 }
 
+var ENVFILE = os.ExpandEnv("$HOME/.config/orchard/env")
+
 func loadInit(clearfirst *bool) (*global.Conf, error) {
-	if err := godotenv.Load(); err != nil && !errors.Is(err, os.ErrNotExist) {
+	if err := godotenv.Load(ENVFILE); err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	}
 	return global.NewConfigFlags(clearfirst), nil
