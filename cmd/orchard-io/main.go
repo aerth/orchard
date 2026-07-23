@@ -106,10 +106,6 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		fmt.Fprintf(os.Stderr, "Press ctrl+d to send your message, press ctrl+c to cancel generation. slash commands are supported, see '/help'.\n")
 	}
 	store := global.GetStore[*dbstore.PostgresDBStore]()
-	e := chat.Ext{Store: store}
-	if conf.GetVerbose() {
-		e.PreFunc = chat.PrintMessages
-	}
 
 	var err error
 	builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
@@ -141,8 +137,8 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 	newmsg := new(chatmessages.ChatMessage)
 	newmsg.From = conf.GetUsername()
-	if _, e := os.Stdin.Read(nil); e != nil {
-		return e
+	if _, err := os.Stdin.Read(nil); err != nil {
+		return err
 	}
 	if showChar {
 		_, _ = fmt.Fprintf(os.Stderr, "%s: ", titlecaser.String(conf.GetUsername())) // eg: Chief:
@@ -153,6 +149,14 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 	if newmsg == nil || newmsg.Content == "" {
 		return nil
+	}
+	e := chat.Ext{Store: global.GetStore[*dbstore.PostgresDBStore]()}
+	return ChatWith(ctx, conf, stack, newmsg, e)
+}
+
+func ChatWith(ctx context.Context, conf *global.Conf, stack chatmessages.ChatMessages, newmsg *chatmessages.ChatMessage, e chat.Ext) error {
+	if conf.GetVerbose() {
+		e.PreFunc = chat.PrintMessages
 	}
 	if newmsg != nil && cmdpkg.IsCommand(newmsg.Content) {
 		add, err := cmdpkg.HandleCommand(newmsg, conf, &e, &stack)
@@ -193,8 +197,10 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	} else {
 		slog.Info("no attachments found in message", "txt", newmsg.Content)
 	}
-	if err := store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
-		return stackerr.Errorf("%w", err)
+	if e.Store != nil {
+		if err := e.Store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
+			return stackerr.Errorf("%w", err)
+		}
 	}
 	stack = append(stack, *newmsg)
 	var out io.Writer = os.Stdout
@@ -205,6 +211,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 	cl := debugging.NewConsoleLogger(out, os.Stderr)
 	cl.HideToolCalls = conf.IsHideToolCalls()
+	var err error
 Chat:
 	e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 	sctx := global.NewCancel(ctx)
@@ -256,8 +263,10 @@ Chat:
 		if len(toolouts) == 0 {
 			toolouts = append(toolouts, cmdpkg.WrapToolError(fmt.Errorf("no output"))...)
 		}
-		if err := store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
-			return stackerr.Errorf("adding tool output to db: %w", err)
+		if e.Store != nil {
+			if err := e.Store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
+				return stackerr.Errorf("adding tool output to db: %w", err)
+			}
 		}
 		if !conf.IsHideToolOuts() {
 			if jsonout != nil {

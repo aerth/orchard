@@ -28,7 +28,25 @@ func Close() {
 	}
 }
 
-var cancels []context.CancelCauseFunc
+func GetTools[T any]() []T {
+	if tools == nil {
+		return nil
+	}
+	x, ok := tools.([]T)
+	if !ok && tools != nil {
+		slog.Warn("invalid type given")
+	}
+	return x
+}
+
+func SetTools[T any](v []T) {
+	tools = v
+}
+
+var (
+	tools   any
+	cancels []context.CancelCauseFunc
+)
 
 func NewCancel(ctx context.Context) context.Context {
 	ctx, cancel := context.WithCancelCause(ctx)

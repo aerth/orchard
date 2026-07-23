@@ -13,7 +13,6 @@ import (
 	"m/pkg/vector256"
 
 	"github.com/google/uuid"
-	"github.com/ollama/ollama/api"
 	"gorm.io/gorm"
 )
 
@@ -290,6 +289,12 @@ var (
 	ShowToolOutputs = true
 )
 
+func NewAux(aux any) *ChatMessage {
+	x := New(llm.Message{})
+	x.Aux = aux
+	return x
+}
+
 func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botname string) string {
 	got, err := cm.FormatMarkdown(renderfunc, username, botname)
 	if err != nil {
@@ -300,7 +305,7 @@ func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botna
 }
 
 func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname string) (string, error) {
-	if cm.Aux == nil && cm.Equals(api.Message{}) {
+	if cm.Aux == nil && cm.Equals(llm.Message{}) {
 		return "", nil
 	}
 	//slog.Info("formatting", "msg", len(cm.String()))
