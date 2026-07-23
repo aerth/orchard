@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
-
 	"m/cmdpkg/rege"
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
@@ -19,6 +17,7 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"os"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -29,12 +28,13 @@ var JsonOut EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
 //	return nil
 //}
 
-func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, newmsg *chatmessages.ChatMessage, tools otool.Tools, e chat.Ext) error {
+func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
 	showChar := false
 	conf := global.Get()
 	if conf.GetVerbose() {
 		e.PreFunc = chat.PrintMessages
 	}
+	newmsg := &stack[len(stack)-1]
 	if newmsg != nil && IsCommand(newmsg.Content) {
 		add, err := HandleCommand(newmsg, &e, &stack)
 		// dont have caller generate
