@@ -23,7 +23,7 @@ import (
 	"github.com/aerth/mostly/stackerr"
 )
 
-type EncoderFunc = func(v any) error
+type EncoderFunc = func(v chatmessages.ChatMessage) error
 
 var JsonOut EncoderFunc
 
