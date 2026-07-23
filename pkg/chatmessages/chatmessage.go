@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -354,9 +355,10 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content += fmt.Sprintf("\n```json\n%s\n```\n", toJSONIndent(cm.ToolCalls))
 	}
 	content = strings.TrimSpace(content)
-	if cm.Role == "tool" {
-	}
 	got = content
+	if cm.Role == "tool" {
+		got = "\n```\n" + got + "\n```\n"
+	}
 	if content != "" && renderfunc != nil {
 		content += "\n\n---\n"
 		got, err = renderfunc(content, cm.GetMessageStyle())
