@@ -79,7 +79,7 @@ func ChatWith(ctx context.Context, conf *global.Conf, stack chatmessages.ChatMes
 	var jsonout *json.Encoder
 	if conf.Get().JsonOutput {
 		out = io.Discard
-		jsonout = json.NewEncoder(os.Stdout)
+		jsonout = json.NewEncoder(os.Stdout).Encode
 	}
 	cl := debugging.NewConsoleLogger(out, os.Stderr)
 	cl.HideToolCalls = conf.IsHideToolCalls()
