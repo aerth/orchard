@@ -54,3 +54,11 @@ func NewPostgres(additionalMigrateTypes ...any) (*PostgresDBStore, error) {
 	}
 	return &PostgresDBStore{db: gdb}, nil
 }
+
+func typenames(v ...any) []string {
+	a := make([]string, len(v))
+	for i := range v {
+		a[i] = fmt.Sprintf("%T", v[i])
+	}
+	return a
+}
