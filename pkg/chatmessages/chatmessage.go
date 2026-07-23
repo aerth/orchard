@@ -31,11 +31,11 @@ type (
 )
 
 type ChatMessage struct {
-	DBID           uint            `gorm:"primarykey;column:id" json:"id,omitempty"`                                       // The MESSAGE DATABASE ID INTERNAL UNUSED ORDERED
-	MessageID      uuid.UUID       `gorm:"type:uuid;primaryKey;notnull;" json:"message_id,omitempty"`                      // MessageID is unique identifier for each message
+	DBID           uint            `gorm:"primarykey;column:id" json:"dbid,omitempty"`                                     // The MESSAGE DATABASE ID INTERNAL UNUSED ORDERED
 	ThreadID       uuid.UUID       `gorm:"type:uuid;not null;index:idx_thread_time,priority:1" json:"thread_id,omitempty"` // ThreadID for storing in DB
+	MessageID      uuid.UUID       `gorm:"type:uuid;primaryKey;notnull;" json:"message_id,omitempty"`                      // MessageID is unique identifier for each message
 	CreatedAt      time.Time       `json:"time"`
-	UpdatedAt      time.Time       `json:"modified_time"`
+	UpdatedAt      time.Time       `json:"-"`
 	DeletedAt      *gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 	llm.Message    `gorm:"embedded" json:"message"`
 	Embedding      *vector256.Vector256 `gorm:"type:vector(256);null" json:"-"`

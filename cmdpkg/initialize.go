@@ -6,13 +6,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"log/slog"
 	"os"
+	"strings"
 
 	"m/pkg/chatmessages"
 	"m/pkg/dbstore"
-	"m/pkg/debugging"
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/otool"
@@ -20,12 +21,13 @@ import (
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	"github.com/lmittmann/tint"
 )
 
 func ActivateTools(tools otool.Tools) error {
 	for i := range tools {
 		if tools[i].Name == "foo" {
-			tools[i].SetExec(
+			tools[i] = tools[i].WithExec(
 				func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 					var call struct {
 						ID       string `json:"id"`
@@ -56,9 +58,34 @@ func WrapToolError(err error) chatmessages.ChatMessages {
 
 var ENVFILE = os.ExpandEnv("$HOME/.config/orchard/env")
 
-func loadInitFlagsEnv(clearfirst *bool) (*global.Conf, error) {
+func LOADENV() error {
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	ENVFILE = strings.Replace(ENVFILE, "~", homedir, 1)
+	if os.Getenv("HOME") == "" {
+		return fmt.Errorf("no HOME")
+	}
 	slog.Info("loading env", "file", ENVFILE)
 	if err := godotenv.Load(ENVFILE); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+
+	// support tilde in paths in case shell did not expand
+	if x := os.Getenv("ORCHARD_TREE"); x != "" {
+		x = strings.Replace(x, "~", homedir, 1)
+		_ = os.Setenv("ORCHARD_TREE", x)
+	}
+	if x := os.Getenv("ORCHARD_TOOLS"); x != "" {
+		x = strings.Replace(x, "~", homedir, 1)
+		_ = os.Setenv("ORCHARD_TOOLS", x)
+	}
+	return nil
+}
+
+func loadInitFlagsEnv(clearfirst *bool) (*global.Conf, error) {
+	if err := LOADENV(); err != nil {
 		return nil, err
 	}
 	return global.NewConfigFlags(clearfirst), nil
@@ -78,9 +105,9 @@ func Initialize() (*global.Conf, error) {
 		if err != nil {
 			return nil, stackerr.Errorf("%w", err)
 		}
-		debugging.Writer = f
+		Writer = f
 	}
-	debugging.Init().Set(slog.LevelDebug)
+	Init().Set(slog.LevelDebug)
 	threads := map[uuid.UUID]bool{}
 	store := global.GetStore[*dbstore.PostgresDBStore]()
 	if store == nil {
@@ -109,4 +136,32 @@ func Initialize() (*global.Conf, error) {
 		}
 	}
 	return conf, nil
+}
+
+var loglevel *slog.LevelVar
+
+var Writer io.Writer = os.Stderr
+
+// Init color slog
+//
+// Init().Set(slog.LevelInfo) or use ptr for flag etc
+func Init(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
+	//if loglevel != nil {
+	//	return loglevel
+	//}
+	if len(loglevel1) == 1 {
+		loglevel = loglevel1[0]
+	} else {
+		loglevel = &slog.LevelVar{}
+		loglevel.Set(slog.LevelDebug)
+	}
+	if Writer == nil {
+		Writer = os.Stderr
+	}
+	//slog.SetLogLoggerLevel(slog.LevelDebug) // for now to use less
+	x := tint.NewHandler(Writer, &tint.Options{AddSource: true, Level: loglevel, TimeFormat: "ORCHARD"})
+	slog.SetDefault(
+		slog.New(x),
+	)
+	return loglevel
 }

@@ -300,6 +300,7 @@ type ChatRequest struct {
 	Think     any              `json:"think,omitempty"`
 	Stream    *bool            `json:"stream,omitempty"`
 	Messages  []Message        `json:"messages"`
+	Format    json.RawMessage  `json:"format,omitempty"`
 	Tools     []json.Marshaler `json:"tools,omitempty"`
 	KeepAlive int              `json:"keep_alive"`
 	Options   map[string]any   `json:"options"`

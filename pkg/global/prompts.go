@@ -27,7 +27,13 @@ func GetSystemBase(data any) string {
 	pre := ""
 	orchardfile, err := os.ReadFile("ORCHARD.md")
 	if err == nil {
-		pre = string(orchardfile)
+		pre = string("## Project-level ORCHARD.md file contents\n" + string(orchardfile))
+	}
+	if errors.Is(err, os.ErrNotExist) {
+		orchardfile, err = os.ReadFile("AGENTS.md")
+		if err == nil {
+			pre = string("## Project-level AGENTS.md file contents\n" + string(orchardfile))
+		}
 	}
 	got := strings.Join([]string{buf.String(), pre}, "\n")
 	slog.Info("system message complete")

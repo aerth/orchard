@@ -9,6 +9,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -32,6 +33,7 @@ import (
 	"m/pkg/debugging"
 	"m/pkg/global"
 	"m/pkg/llm"
+	"m/pkg/loaders/toolboxes"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
 
@@ -74,8 +76,8 @@ func main() {
 	go Sig()
 	if err := main1(ctx); err != nil {
 		global.Close()
-		debugging.Writer = os.Stderr
-		debugging.Init()
+		cmdpkg.Writer = os.Stderr
+		cmdpkg.Init()
 		if errors.Is(err, context.Canceled) {
 			println("(cancelled)")
 		} else {
@@ -122,6 +124,15 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 	if len(builtinTools) == 0 {
 		panic("no builtin tools")
+	}
+	if true {
+		builtinTools = nil
+		box, err := toolboxes.New("")
+		if err != nil {
+			return err
+		}
+		tools := box.AllTools()
+		builtinTools = append(builtinTools, tools...)
 	}
 
 	stack, err := store.LoadThread(ctx, conf.GetThreadID(), 4)
@@ -186,7 +197,13 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		return stackerr.Errorf("%w", err)
 	}
 	stack = append(stack, *newmsg)
-	cl := debugging.NewConsoleLogger(os.Stdout)
+	var out io.Writer = os.Stdout
+	var jsonout *json.Encoder
+	if conf.Get().JsonOutput {
+		out = io.Discard
+		jsonout = json.NewEncoder(os.Stdout)
+	}
+	cl := debugging.NewConsoleLogger(out, os.Stderr)
 	cl.HideToolCalls = conf.IsHideToolCalls()
 Chat:
 	e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
@@ -199,21 +216,24 @@ Chat:
 	e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
 	_, err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 	_ = spin.HandleChatResponse(llm.ChatResponse{})
-	if errors.Is(err, context.Canceled) {
-		got.Content += " (this reply was cancelled by user before it finished)"
-		stack = append(stack, *got)
-		goto Chat
-	}
-	if err != nil {
+	if err != nil && !errors.Is(err, context.Canceled) {
 		return stackerr.Errorf("%w", err)
 	}
 
+	if errors.Is(err, context.Canceled) {
+		got.Content += " (this reply was cancelled by user before it finished)"
+	}
 	if e.Store != nil {
 		if err := e.Store.Add(context.WithoutCancel(ctx), conf.GetThreadID(), got); err != nil {
 			return stackerr.Errorf("%w", err)
 		}
 	}
 	stack = append(stack, *got)
+	if jsonout != nil {
+		if err := jsonout.Encode(got); err != nil {
+			return stackerr.Errorf("%w", err)
+		}
+	}
 
 	/*
 		// show output
@@ -236,19 +256,28 @@ Chat:
 		if len(toolouts) == 0 {
 			toolouts = append(toolouts, cmdpkg.WrapToolError(fmt.Errorf("no output"))...)
 		}
+		if err := store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
+			return stackerr.Errorf("adding tool output to db: %w", err)
+		}
 		if !conf.IsHideToolOuts() {
-			for i := range toolouts {
-				if showChar {
-					_, _ = fmt.Fprintf(os.Stderr, "TOOL> ")
+			if jsonout != nil {
+				for i := range toolouts {
+					if err := jsonout.Encode(toolouts[i]); err != nil {
+						return stackerr.Errorf("%w", err)
+					}
 				}
-				_, _ = fmt.Fprintf(os.Stderr, "\n```\n%s\n```\n", toolouts[i].ContentOrToolCall())
+			}
+			if jsonout == nil {
+				for i := range toolouts {
+					if showChar {
+						_, _ = fmt.Fprintf(os.Stderr, "TOOL> ")
+					}
+					_, _ = fmt.Fprintf(os.Stderr, "\n```\n%s\n```\n", toolouts[i].ContentOrToolCall())
+				}
 			}
 		}
 		if err != nil {
 			return stackerr.Errorf("running tools: %w", err)
-		}
-		if err := store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
-			return stackerr.Errorf("adding tool output to db: %w", err)
 		}
 		stack = append(stack, toolouts...)
 		goto Chat

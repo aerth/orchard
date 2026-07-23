@@ -52,7 +52,7 @@ func LoadBuiltinTools(execs map[string]otool.ExecFunc) (otool.Tools, error) {
 			// Bind the actual Go function based on the name found in JSON
 			for _, tool := range newtools {
 				if fn, ok := execs[tool.Name]; ok {
-					tool.SetExec(fn)
+					tool = tool.WithExec(fn)
 					tools = append(tools, tool)
 				} else {
 					//				return fmt.Errorf("no implementation found for tool: %s", tool.Name)

@@ -141,6 +141,10 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
 	}
+	return ChatReq(ctx, creq, e)
+}
+
+func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) (*chatmessages.ChatMessage, error) {
 	if e.PreFunc != nil {
 		if err := e.PreFunc(creq); err != nil {
 			return nil, err

@@ -6,9 +6,13 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
+	"slices"
 	"strings"
 
+	"m/pkg/builtins/implv1/bashtooler"
 	"m/pkg/chatmessages"
+	"m/pkg/llm"
 )
 
 type (
@@ -32,9 +36,13 @@ func (p Params) Names() []string {
 	return a
 }
 
-type CallerT struct {
-	Name      string
-	Arguments JSONObject
+type Call struct {
+	ID       string `json:"id"`
+	Function struct {
+		Index     int        `json:"index"`
+		Name      string     `json:"name"`
+		Arguments JSONObject `json:"arguments"`
+	} `json:"function"`
 }
 type JSONObject map[string]json.RawMessage
 
@@ -74,21 +82,65 @@ func argsGet(args map[string]json.RawMessage, name string) (any, bool) {
 	return x, true
 }
 
+// Manager holds tools by name, all with exec funcs attached
+// type Manager map[string]Tool
+
+//func (t Tool) MarshalJSON() ([]byte, error) {
+//	type Alias Tool
+//	return json.Marshal(Alias(t))
+//}
+
+func New(toolboxdir string) (*ToolboxManager, error) {
+	if toolboxdir == "" {
+		toolboxdir = os.ExpandEnv(os.Getenv("ORCHARD_TOOLS"))
+		if toolboxdir == "" {
+			return nil, fmt.Errorf("no ORCHARD_TOOLS dir")
+		}
+		toolboxdir = filepath.Join(toolboxdir, "toolboxes")
+	}
+	got, err := NewToolboxFS(toolboxdir)
+	return got, err
+}
+
+const ToolboxManagerName = "toolbox_open"
+
+type ToolboxManager struct {
+	Toolboxes       Toolboxes
+	Toolbox         *Toolbox
+	AdditionalTools Tools
+	dir             string
+}
+
+func (t *ToolboxManager) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Toolbox.ToolSpecs())
+}
+
+type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
+
 // [orch.OrchTool.Exec]
-func makeExecFn(toolName string, params Params, doInputEnv bool, pyFilePath string) func(ctx context.Context, caller CallerT) (chatmessages.ChatMessages, error) {
-	execFn := func(ctx context.Context, caller CallerT) (chatmessages.ChatMessages, error) {
+func makeExecFn(toolName string, params OrchParams, doInputEnv bool, pyFilePath string) ExecFunc {
+	_ = toolName
+	execFn := func(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}
-		args := caller.Arguments
+		var caller chatmessages.Call[map[string]json.RawMessage]
+		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
+		if err != nil {
+			return nil, err
+		}
+		args := caller.Function.Arguments
 		var execArgs []string
 		var inputFile string
 		for i, param := range params {
+			if param.Name == "" {
+				return nil, fmt.Errorf("param has no name")
+			}
 			val, ok := argsGet(args, param.Name)
 			//		if !ok {
 			//			val, ok = args.GetStringCaseInsensitive(param.Name)
 			//		}
-			if !ok && param.IsRequired {
+			if !ok && slices.Contains(param.Required, param.Name) {
 				panic("is required")
 				//			return nil, fmt.Errorf("missing required param %q for tool %q (case-sensitive) - Available params: %q - Received bad param name: %q", param.Name,
 				//				toolName, params.Names(), slices.Collect(maps.Keys(args.ToMap())))
@@ -120,13 +172,13 @@ func makeExecFn(toolName string, params Params, doInputEnv bool, pyFilePath stri
 		}
 		_ = os.Setenv("INPUT_FILE", inputfilename)
 		var outputMessage string
-		var err error
 		if strings.HasSuffix(pyFilePath, ".py") {
 			slog.Info("executing python", "file", pyFilePath, "args", execArgs)
+			return nil, fmt.Errorf("uhoh, we disabled python")
 			//		outputMessage, err = pytooler.RunPy(ctx, ".", pyFilePath, execArgs...)
 		} else if strings.HasSuffix(pyFilePath, ".bash") {
 			slog.Info("executing bash", "file", pyFilePath, "args", execArgs)
-			//		outputMessage, err = bashtooler.RunBash(ctx, ".", pyFilePath, execArgs...)
+			outputMessage, err = bashtooler.RunBash(ctx, ".", pyFilePath, execArgs...)
 		}
 		if err != nil {
 			return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", fmt.Sprintf("Error running tool script %q: %s", pyFilePath, err.Error()))}, nil
@@ -134,4 +186,30 @@ func makeExecFn(toolName string, params Params, doInputEnv bool, pyFilePath stri
 		return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", outputMessage)}, nil
 	}
 	return execFn
+}
+
+func (t *ToolboxManager) AllTools() Tools {
+	var a Tools
+	for i := range t.Toolboxes {
+		a = append(a, t.Toolboxes[i].ToolSpecs()...)
+	}
+	a = append(a, t.AdditionalTools...)
+	a = append(a, t.ToolSpec())
+	return a
+}
+
+func (t *ToolboxManager) CountAllTools() int {
+	n := 0
+	for i := range t.Toolboxes {
+		n += len(t.Toolboxes[i].Tools)
+	}
+	return n
+}
+
+func (t *ToolboxManager) GetName() string {
+	return ToolboxManagerName
+}
+
+func (t *ToolboxManager) GetDescription() string {
+	return "Open a toolbox that contains more tools."
 }

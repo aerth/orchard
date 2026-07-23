@@ -52,13 +52,26 @@ func (t *Tools) FromMarshalers(a []json.Marshaler) error {
 }
 
 type Tool struct {
-	Name string          `json:"name"`
-	Spec json.RawMessage // spec also contains name
+	Name string          `json:"name"`     // spec also contains name
+	Spec json.RawMessage `json:"function"` // spec also contains name
 	exec ExecFunc
 }
 
-func (t *Tool) SetExec(fn ExecFunc) {
-	t.exec = fn
+func (t Tool) GetName() string {
+	return t.Name
+}
+
+func (t Tool) WithExec(execFn ExecFunc) Tool {
+	t.exec = execFn
+	return t
+}
+
+func (t Tool) GetDescription() string {
+	dd := struct {
+		Description string `json:"description"`
+	}{}
+	_ = json.Unmarshal(t.Spec, &dd)
+	return dd.Description
 }
 
 func (t Tool) Exec(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {

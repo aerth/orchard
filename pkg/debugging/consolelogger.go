@@ -7,9 +7,8 @@ import (
 	"log/slog"
 	"os"
 
+	"m/cmdpkg"
 	"m/pkg/llm"
-
-	"github.com/lmittmann/tint"
 )
 
 type ConsoleLogger struct {
@@ -18,7 +17,7 @@ type ConsoleLogger struct {
 	emode         modeT
 	buf           string
 	pre           string
-	w             io.Writer
+	w, tw         io.Writer
 }
 type modeT int
 
@@ -33,23 +32,36 @@ const (
 	ColorGray  = "\033[90m"
 	ColorGreen = "\033[32m"
 	ColorCyan  = "\033[34m"
-	ColorReset = "\033[0m"
 )
 
 var (
+	ColorReset   = "\033[0m"
 	Colorcomment = ColorGray
 	Colorcontent = ColorGreen
 )
 
 func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
-	w := Writer
+	if os.Getenv("NO_COLOR") == "1" {
+		Colorcomment = ""
+		Colorcontent = ""
+		ColorReset = ""
+	}
+	w := cmdpkg.Writer
+	tw := w
 	if len(ww) == 1 {
 		w = ww[0]
+		tw = ww[0]
 	}
+	if len(ww) == 2 {
+		w = ww[0]
+		tw = ww[1]
+
+	}
+
 	if w == nil {
 		w = io.Discard
 	}
-	return &ConsoleLogger{w: w, pre: ""}
+	return &ConsoleLogger{w: w, tw: tw, pre: ""}
 }
 
 func (c ConsoleLogger) WithPrefix(prefix string) ConsoleLogger {
@@ -65,7 +77,7 @@ func (c ConsoleLogger) Writer() io.Writer {
 //
 
 func (c *ConsoleLogger) HandleChatResponse(cr llm.ChatResponse) error {
-	c.PrintChat(c.w, cr)
+	c.PrintChat(c.w, c.tw, cr)
 	return nil
 }
 
@@ -82,7 +94,15 @@ func (c *ConsoleLogger) Mode() int {
 	return int(c.emode)
 }
 
-func (c *ConsoleLogger) PrintMessage(w io.Writer, m llm.Message) {
+func fflush(w io.Writer) {
+	if flusher, ok := w.(interface{ Flush() error }); ok {
+		if err := flusher.Flush(); err != nil {
+			panic(err.Error())
+		}
+	}
+}
+
+func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 	defer func() {
 		if flusher, ok := w.(interface{ Flush() error }); ok {
 			if err := flusher.Flush(); err != nil {
@@ -122,13 +142,14 @@ func (c *ConsoleLogger) PrintMessage(w io.Writer, m llm.Message) {
 		}
 	}
 	if c.emode != 0 && len(m.Thinking) != 0 && !c.HideThinking {
-		_, _ = fmt.Fprintf(w, "%s", m.Thinking)
+		_, _ = fmt.Fprintf(tw, "%s", m.Thinking)
+		fflush(tw)
 	}
 	if m.Content != "" {
 		if c.emode != xCONTENT {
 			c.emode = xCONTENT
 			if !c.HideThinking {
-				_, _ = fmt.Fprintf(w, "\n")
+				_, _ = fmt.Fprintf(tw, "\n")
 			}
 			_, _ = fmt.Fprintf(w, "%s%s", Colorcontent, c.pre)
 		}
@@ -158,7 +179,7 @@ func (c *ConsoleLogger) Reset() {
 
 var noSummaries = os.Getenv("LLM_SUMMARY") != "1"
 
-func (c *ConsoleLogger) PrintChat(w io.Writer, cr llm.ChatResponse) {
+func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) {
 	if cr.Done {
 		c.emode = xDONE
 	}
@@ -166,10 +187,14 @@ func (c *ConsoleLogger) PrintChat(w io.Writer, cr llm.ChatResponse) {
 	//	fmt.Fprintf(os.Stderr, "%s", cr.DebugInfo.RenderedTemplate)
 	//}
 	if !c.HideToolCalls || len(cr.Message.ToolCalls) == 0 {
-		c.PrintMessage(w, cr.Message)
+		c.PrintMessage(w, tw, cr.Message)
 	}
 	if cr.Done {
 		_, _ = fmt.Fprintf(w, "%s", ColorReset)
+		if tw != w {
+			_, _ = fmt.Fprintf(tw, "%s", ColorReset)
+		}
+
 		//		if !c.HideToolCalls || len(cr.Message.ToolCalls) == 0 {
 		//			_, _ = fmt.Fprintf(w, "\n")
 		//		}
@@ -179,32 +204,4 @@ func (c *ConsoleLogger) PrintChat(w io.Writer, cr llm.ChatResponse) {
 		//}
 		c.Reset()
 	}
-}
-
-var loglevel *slog.LevelVar
-
-var Writer io.Writer = os.Stderr
-
-// Init color slog
-//
-// Init().Set(slog.LevelInfo) or use ptr for flag etc
-func Init(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
-	//if loglevel != nil {
-	//	return loglevel
-	//}
-	if len(loglevel1) == 1 {
-		loglevel = loglevel1[0]
-	} else {
-		loglevel = &slog.LevelVar{}
-		loglevel.Set(slog.LevelDebug)
-	}
-	if Writer == nil {
-		Writer = os.Stderr
-	}
-	//slog.SetLogLoggerLevel(slog.LevelDebug) // for now to use less
-	x := tint.NewHandler(Writer, &tint.Options{AddSource: true, Level: loglevel, TimeFormat: "ORCHARD"})
-	slog.SetDefault(
-		slog.New(x),
-	)
-	return loglevel
 }

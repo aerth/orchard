@@ -136,6 +136,7 @@ type ConfigInput struct {
 	HideToolCalls bool
 	ShowToolOuts  bool
 	ShowRequests  bool
+	JsonOutput    bool
 	Dir           string
 }
 type cfginput = ConfigInput
@@ -160,6 +161,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.ShowRequests, "v", cfg.ShowRequests, "show requests in log")
 	flag.BoolVar(&cfg.ShowToolOuts, "show-toolouts", cfg.ShowToolOuts, "show tool output chunks")
 	flag.StringVar(&cfg.Logfilename, "logfile", cfg.Logfilename, "path to log file")
+	flag.BoolVar(&cfg.JsonOutput, "json", cfg.JsonOutput, "json output")
 	flag.Func("thread", "uuid", func(s string) error {
 		return cfg.ThreadID.UnmarshalText([]byte(s))
 	})
