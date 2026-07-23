@@ -54,8 +54,8 @@ func runUname() (string, error) {
 }
 
 func runBashInfo() (string, error) {
+	const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3; echo end of 'git log -n 3'; echo; echo end of project info`
 	// const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3; scc`
-	const projectget = `echo "Current Project Info"; date; set -x; tree -L2; find ./pytools ./pkg ./cmd -name '*.py' -or -name '*.go' ; bat --style=+header --style=+header-filename --decorations=always --paging=never --wrap=never --terminal-width=60  README.md; git log -n 3;`
 	out, err := exec.Command("bash", "-c", projectget).Output()
 	return string(out), err
 }
