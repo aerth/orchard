@@ -125,7 +125,7 @@ Chat:
 	*/
 	// handle tools
 	if len(got.ToolCalls) != 0 {
-		toolouts, err := toolrunner.Runtools(ctx, conf, tools, *got)
+		toolouts, err := toolrunner.Runtools(ctx, tools, *got)
 		if WrapToolErrors && err != nil {
 			toolouts = append(toolouts, WrapToolError(err)...)
 			err = nil
