@@ -148,7 +148,7 @@ Chat:
 		if !conf.IsHideToolOuts() {
 			if jsonout != nil {
 				for i := range toolouts {
-					if err := jsonout.Encode(toolouts[i]); err != nil {
+					if err := jsonout(toolouts[i]); err != nil {
 						return stackerr.Errorf("%w", err)
 					}
 				}
