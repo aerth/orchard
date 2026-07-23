@@ -29,7 +29,7 @@ type (
 		// Images   [][]byte
 	}
 )
-type ChatHandlers = []ChatHandler
+type Handlers = []ChatHandler
 
 type StoreI interface {
 	LoadThread(context.Context, uuid.UUID, int) (chatmessages.ChatMessages, error)
