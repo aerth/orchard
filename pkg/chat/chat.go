@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
@@ -105,10 +106,24 @@ func FormatRoles(in []llm.Message) []string {
 	return a
 }
 
+var DebugTrimImages = true
+
 func PrintMessages(creq *llm.ChatRequest) error {
-	slog.Info("showing messages")
+	slog.Info("showing messages", "n", len(creq.Messages), "roles", FormatRoles(creq.Messages))
 	fmt.Fprintf(os.Stderr, "MESSAGES: %d (%q)\n", len(creq.Messages), FormatRoles(creq.Messages))
-	_ = json.NewEncoder(os.Stderr).Encode(creq.Messages)
+	msg := slices.Clone(creq.Messages)
+	if DebugTrimImages {
+		for i := range msg {
+			if len(msg[i].Images) != 0 {
+				msg[i].Images = nil
+			}
+		}
+	}
+
+	enc := json.NewEncoder(os.Stderr)
+	enc.SetIndent("", " ")
+	enc.SetEscapeHTML(true)
+	_ = enc.Encode(msg)
 	return nil
 }
 
