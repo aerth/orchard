@@ -25,6 +25,8 @@ import (
 
 type EncoderFunc = func(v any) error
 
+var JsonOut EncoderFunc
+
 func ChatWith(ctx context.Context, conf *global.Conf, stack chatmessages.ChatMessages, newmsg *chatmessages.ChatMessage, tools otool.Tools, e chat.Ext) error {
 	showChar := false
 	if conf.GetVerbose() {
