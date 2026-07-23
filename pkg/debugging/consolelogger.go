@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"os"
 
-	"m/cmdpkg"
 	"m/pkg/llm"
 )
 
@@ -46,7 +45,7 @@ func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
 		Colorcontent = ""
 		ColorReset = ""
 	}
-	w := cmdpkg.Writer
+	w := io.Writer(os.Stderr)
 	tw := w
 	if len(ww) == 1 {
 		w = ww[0]
