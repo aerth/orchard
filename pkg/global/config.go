@@ -208,6 +208,7 @@ func DefaultConfigInput() ConfigInput {
 		ThreadID:    threadID,
 		Logfilename: logfilename,
 		Username:    username,
+		Botname:     botname,
 		Dir:         dir,
 		Treedir:     treedir,
 		Tooldir:     tooldir,
