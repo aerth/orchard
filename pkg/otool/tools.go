@@ -61,6 +61,14 @@ func (t Tool) GetName() string {
 	return t.Name
 }
 
+func (t Tools) Names() []string {
+	a := make([]string, len(t))
+	for i := range t {
+		a[i] = t[i].Name
+	}
+	return a
+}
+
 func (t Tool) WithExec(execFn ExecFunc) Tool {
 	t.exec = execFn
 	return t
