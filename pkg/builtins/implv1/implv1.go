@@ -92,3 +92,44 @@ func NewResponse[T any](call chatmessages.Call[T], resp string) chatmessages.Cha
 	}
 	return x
 }
+
+type writefileArgs struct {
+	Path    string `json:"path"`
+	Content string `json:"content"`
+}
+
+func (w writefileArgs) IsToolArgument() {}
+
+func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+	// 1. Extract args from the specific tool call in the message history
+	// This assumes your Message struct allows access to the raw ToolCalls string slice
+	// var args fileArgs
+	call, err := chat.ReadToolCall[writefileArgs](ctx, caller, toolCallIndex)
+	if err != nil {
+		msg := *chatmessages.New(llm.Message{Role: "tool", Content: fmt.Sprintf("Error parsing args: %+v", err)})
+		return chatmessages.ChatMessages{msg}, nil
+	}
+	if call.Function.Arguments.Path == "" {
+		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'path', check the tool call and try again."})
+		return chatmessages.ChatMessages{msg}, nil
+	}
+	if call.Function.Arguments.Content == "" {
+		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'content', check the tool call and try again."})
+		return chatmessages.ChatMessages{msg}, nil
+	}
+	if strings.Contains(call.Function.Arguments.Path, "..") {
+		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error Invalid file path. Please select a file within the permitted folder."})
+		return chatmessages.ChatMessages{msg}, nil
+	}
+	args := call.Function.Arguments
+	/*data, err := os.ReadFile(args.Path)
+	if err != nil {
+		return NewResponse(call, fmt.Sprintf("ReadFile error: %v", err)), nil
+	}*/
+	err = os.WriteFile(args.Path, []byte(args.Content), 0o600)
+	if err != nil {
+		return NewResponse(call, fmt.Sprintf("WriteFile error: %v", err)), nil
+	}
+	x := NewResponse(call, "The file was modified.")
+	return x, nil
+}
