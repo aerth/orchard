@@ -120,16 +120,8 @@ func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chat
 		return chatmessages.ChatMessages{msg}, nil
 	}
 
-	absPath, err := filepath.Abs(call.Function.Arguments.Path)
-	if err != nil {
-		return NewResponse(call, fmt.Sprintf("WriteFile error (path resolution): %v", err)), nil
-	}
-	relPath, err := filepath.Rel(global.Dir(), absPath)
-	if err != nil || strings.HasPrefix(relPath, "..") {
-		return NewResponse(call, "Error: Access denied. File must be within the current working directory."), nil
-	}
-
-	err = os.WriteFile(absPath, []byte(call.Function.Arguments.Content), 0o600)
+	relPath, err := NormalizePath(call.Function.Arguments.Path)
+	err = os.WriteFile(relPath, []byte(call.Function.Arguments.Content), 0o600)
 	if err != nil {
 		return NewResponse(call, fmt.Sprintf("WriteFile error: %v", err)), nil
 	}
