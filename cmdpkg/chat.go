@@ -27,8 +27,9 @@ type EncoderFunc = func(v chatmessages.ChatMessage) error
 
 var JsonOut EncoderFunc
 
-func ChatWith(ctx context.Context, conf *global.Conf, stack chatmessages.ChatMessages, newmsg *chatmessages.ChatMessage, tools otool.Tools, e chat.Ext) error {
+func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, newmsg *chatmessages.ChatMessage, tools otool.Tools, e chat.Ext) error {
 	showChar := false
+	conf := global.Get()
 	if conf.GetVerbose() {
 		e.PreFunc = chat.PrintMessages
 	}
