@@ -196,7 +196,7 @@ Chat:
 	e.Tools = builtinTools.ToMarshaler()
 	cl.Reset()
 	got := chatmessages.NewFromRole(e.From, "assistant", "")
-	slog.Info("Chatting")
+	slog.Info("Chatting", "after", stack.Top())
 	spin := spinner.Start(sctx)
 	e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
 	_, err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
