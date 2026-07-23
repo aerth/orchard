@@ -63,8 +63,8 @@ func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (
 		if err != nil {
 			return nil, stackerr.Errorf("make rel: %w", err)
 		}
+		call.Function.Arguments.Path = rel
 	}
-	call.Function.Arguments.Path = rel
 	if strings.Contains(call.Function.Arguments.Path, "..") {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error Invalid file path. Please select a file within the permitted folder."})
 		return chatmessages.ChatMessages{msg}, nil
