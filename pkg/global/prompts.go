@@ -25,6 +25,10 @@ func GetSystemBase(data any) string {
 		slog.Error("error executing template", "err", err)
 	}
 	pre := ""
+	orchardfile, err := os.ReadFile("ORCHARD.md")
+	if err == nil {
+		pre = string(orchardfile)
+	}
 	got := strings.Join([]string{buf.String(), pre}, "\n")
 	slog.Info("system message complete")
 	//_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
