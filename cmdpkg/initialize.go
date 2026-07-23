@@ -64,7 +64,8 @@ func loadInit(clearfirst *bool) (*global.Conf, error) {
 	return global.NewConfigFlags(clearfirst), nil
 }
 
-func Initialize() (*global.Conf, error) {
+func Initialize(store *dbstore.PostgresDBStore) (*global.Conf, error) {
+	//store := dbstore.NewFromEnv()
 	var clearfirst bool
 	conf, err := loadInit(&clearfirst)
 	if err != nil {
@@ -80,7 +81,6 @@ func Initialize() (*global.Conf, error) {
 		debugging.Writer = f
 	}
 	debugging.Init().Set(slog.LevelDebug)
-	store := dbstore.NewFromEnv()
 	threads := map[uuid.UUID]bool{}
 	if false {
 		for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {
