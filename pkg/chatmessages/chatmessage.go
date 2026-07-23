@@ -359,9 +359,9 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	if cm.Role == "tool" {
 		got = "\n```markdown\n" + got + "\n```\n"
 	}
-	if content != "" && renderfunc != nil {
-		content += "\n\n---\n"
-		got, err = renderfunc(content, cm.GetMessageStyle())
+	if got != "" && renderfunc != nil {
+		got += "\n\n---\n"
+		got, err = renderfunc(got, cm.GetMessageStyle())
 		if err != nil {
 			return err
 		}
