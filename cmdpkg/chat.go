@@ -90,7 +90,7 @@ func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, newmsg *chat
 			return enc(v)
 		}
 	}
-	cl := debugging.NewConsoleLogger(out, os.Stderr)
+	cl := debugging.NewConsoleLogger(out, global.LogWriter)
 	cl.HideToolCalls = conf.IsHideToolCalls()
 	var err error
 Chat:
