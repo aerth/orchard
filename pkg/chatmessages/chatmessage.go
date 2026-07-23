@@ -347,6 +347,26 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	return nil
 }
 
+func italicMarkdown(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	// Split the input into individual lines
+	lines := strings.Split(s, "\n")
+
+	// Process each line
+	for i, line := range lines {
+		// Only italicize if the line actually contains text
+		if strings.TrimSpace(line) != "" {
+			lines[i] = "*" + line + "*"
+		}
+	}
+
+	// Rejoin the lines back with newlines
+	return strings.Join(lines, "\n")
+}
+
 func toJSONIndent(v any) string {
 	b, err := json.MarshalIndent(v, "", " ")
 	if err != nil {
