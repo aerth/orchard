@@ -174,8 +174,8 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, pyFilePath 
 		var outputMessage string
 		if strings.HasSuffix(pyFilePath, ".py") {
 			slog.Info("executing python", "file", pyFilePath, "args", execArgs)
-			return nil, fmt.Errorf("uhoh, we disabled python")
-			//		outputMessage, err = pytooler.RunPy(ctx, ".", pyFilePath, execArgs...)
+			//		return nil, fmt.Errorf("uhoh, we disabled python")
+			outputMessage, err = bashtooler.RunPy(ctx, ".", pyFilePath, execArgs...)
 		} else if strings.HasSuffix(pyFilePath, ".bash") {
 			slog.Info("executing bash", "file", pyFilePath, "args", execArgs)
 			outputMessage, err = bashtooler.RunBash(ctx, ".", pyFilePath, execArgs...)
