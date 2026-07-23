@@ -126,26 +126,11 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
 	}
-	/*
-		if at := msgs.TopAttachment().Attachments; len(at) != 0 {
-			slog.Info("found attachments", "names", at)
-			for _, filename := range at { // TODO: once
-				imagedata, err := os.ReadFile(filename)
-				if err == nil {
-					//creq.Images = append(creq.Images, imagedata)
-					slog.Info("attached", "n", len(creq.Images), "size", len(imagedata))
-				} else {
-					slog.Error("could not attach", "err", err)
-				}
-			}
-		}*/
-	// make new pending
-	// pending := chatmessages.NewFromRole(e.From, "assistant", "")
-	//if e.PreFunc != nil {
-	//	if err := e.PreFunc(creq, pending); err != nil {
-	//		return nil, err
-	//	}
-	//}
+	if e.PreFunc != nil {
+		if err := e.PreFunc(creq, pending); err != nil {
+			return nil, err
+		}
+	}
 	//var pending *chatmessages.ChatMessage
 	// generate
 	if client == nil {
