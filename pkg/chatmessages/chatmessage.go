@@ -304,8 +304,8 @@ func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botna
 }
 
 func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname string) (string, error) {
-	if cm.Aux == nil && cm.Equals(llm.Message{}) {
-		return "", nil
+	if cm.Equals(llm.Message{}) {
+		return fmt.Sprint(cm.Aux), nil
 	}
 	//slog.Info("formatting", "msg", len(cm.String()))
 	var str strings.Builder
