@@ -123,6 +123,9 @@ func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chat
 	}
 	args := call.Function.Arguments
 	args.Path, err = NormalizePath(args.Path)
+	if err != nil {
+		return NewResponse(call, fmt.Sprintf("NormalizePath error: %v", err)), nil
+	}
 
 	err = os.WriteFile(args.Path, []byte(args.Content), 0o600)
 	if err != nil {
