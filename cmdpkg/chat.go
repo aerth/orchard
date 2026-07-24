@@ -18,6 +18,7 @@ import (
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
 	"os"
+	"time"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -126,6 +127,7 @@ Chat:
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped regardless of output
 		}
+		newgenerated.GenDuration = time.Since(newgenerated.CreatedAt)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("%w", err)
 		}
