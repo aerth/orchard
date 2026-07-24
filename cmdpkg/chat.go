@@ -160,14 +160,14 @@ Chat:
 				return stackerr.Errorf("adding tool output to db: %w", err)
 			}
 		}
-		if !conf.IsHideToolOuts() {
-			if jsonout != nil {
-				for i := range toolouts {
-					if err := jsonout(&toolouts[i]); err != nil {
-						return stackerr.Errorf("%w", err)
-					}
+		if jsonout != nil {
+			for i := range toolouts {
+				if err := jsonout(&toolouts[i]); err != nil {
+					return stackerr.Errorf("%w", err)
 				}
 			}
+		}
+		if !conf.IsHideToolOuts() {
 			if jsonout == nil {
 				for i := range toolouts {
 					if showChar {
