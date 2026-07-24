@@ -378,6 +378,7 @@ func (cm Messages) FormatRoles() []string {
 //		_, _ = fmt.Fprintf(log.Writer(), "StreamPreFunc %s\n", string(bts))
 //		return nil
 //	}
+
 func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatStreamHandlerFunc) error {
 	if len(callbacks) == 0 {
 		return fmt.Errorf("no callbacks")
