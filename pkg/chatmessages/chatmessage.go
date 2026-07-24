@@ -132,6 +132,7 @@ type MessageOptions struct {
 	Aux         any
 	Attachments []string // Attachments filenames
 	Ephemeral   bool
+	GenDuration time.Duration
 }
 
 func (cm ChatMessage) TableName() string {
