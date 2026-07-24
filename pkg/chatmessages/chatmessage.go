@@ -211,7 +211,7 @@ func (cm ChatMessages) TopN(n int) ChatMessages {
 }
 
 func (cm ChatMessages) Top() ChatMessage {
-	l := len(cm) - 1
+	l := len(cm)
 	if l == 0 {
 		return ChatMessage{}
 	}
