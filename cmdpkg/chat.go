@@ -124,7 +124,7 @@ Chat:
 			spin := spinner.Start(sctx)
 			e.Handlers = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newgenerated.GatherChatResponse}, e.Handlers...)
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
-			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure stopped
+			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped regardless of output
 		}
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("%w", err)
