@@ -26,10 +26,14 @@ func repair(caller chatmessages.ChatMessage, chatMessage *chatmessages.ChatMessa
 	if chatMessage.Role == "" {
 		chatMessage.Role = "tool"
 	}
+	if chatMessage.ToolName == "" {
+	}
+	if chatMessage.ToolCallID == "" {
+	}
 }
 
 func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
-	var toolouts chatmessages.ChatMessages
+	var finishedtoolouts chatmessages.ChatMessages
 	for toolCallIndex := range caller.ToolCalls {
 		var call struct {
 			ID       string `json:"id"`
@@ -38,13 +42,13 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 			} `json:"function"`
 		}
 		if err := json.Unmarshal(caller.ToolCalls[toolCallIndex], &call); err != nil {
-			return toolouts, stackerr.Errorf("%w", err)
+			return finishedtoolouts, stackerr.Errorf("%w", err)
 		}
 		if call.ID == "" {
-			return toolouts, stackerr.Errorf("call is missing ID")
+			return finishedtoolouts, stackerr.Errorf("call is missing ID")
 		}
 		if call.Function.Name == "" {
-			return toolouts, stackerr.Errorf("call is missing call.function.name")
+			return finishedtoolouts, stackerr.Errorf("call is missing call.function.name")
 		}
 		var tool otool.Tool
 		for _, t := range tools {
@@ -55,7 +59,7 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 		}
 		if tool.Name != call.Function.Name {
 			slog.Warn("Not Running tools...", "i", toolCallIndex, "call", call)
-			return toolouts, stackerr.Errorf("cant find tool named %s", call.Function.Name)
+			return finishedtoolouts, stackerr.Errorf("cant find tool named %s", call.Function.Name)
 		}
 		slog.Info("Running tools...", "caller", caller.String(), "i", toolCallIndex, "call", call)
 		x, err := tool.Exec(ctx, caller.Message, toolCallIndex)
@@ -70,7 +74,7 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 				x[i].ToolCallID = call.ID
 			}
 		}
-		toolouts = append(toolouts, x...)
+		finishedtoolouts = append(finishedtoolouts, x...)
 		if err != nil {
 			return toolouts, err
 		}
