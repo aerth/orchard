@@ -309,7 +309,7 @@ type ChatResponse struct {
 	// if requested via the Logprobs parameter.
 	// Logprobs []Logprob `json:"logprobs,omitempty"`
 
-	Metrics `json:"-"`
+	Metrics
 }
 
 type Metrics struct {
