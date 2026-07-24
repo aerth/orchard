@@ -3,6 +3,7 @@ package global
 import (
 	"flag"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -172,6 +173,11 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		flag.BoolVar(clearfirst, "clear", *clearfirst, "clear thread from DB first")
 	}
 	flag.Parse()
+	if cfg.Dir != "." && cfg.Dir != "" {
+		if err := os.Chdir(cfg.Dir); err != nil {
+			log.Fatalf("Fatal: %v", err)
+		}
+	}
 }
 
 var (
