@@ -1,6 +1,7 @@
 package chatmessages
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -165,9 +166,9 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	if cr.Message.Content == " (END)" {
 		return fmt.Errorf("broken")
 	}
-	if cr.Summary != nil {
-		cm.Summary = cr
-	}
+	var buf bytes.Buffer
+	cr.Summary(&buf)
+	cm.Summary = buf.String()
 	return nil
 }
 
