@@ -134,7 +134,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 			m.Thinking = c.buf
 			c.emode = xGO
 			if !c.HideThinking && !c.NoColor {
-				_, _ = fmt.Fprintf(w, "%s%s", Colorcomment, c.pre)
+				_, _ = fmt.Fprintf(tw, "%s", Colorcomment) // start colorize
 			}
 		}
 	}
