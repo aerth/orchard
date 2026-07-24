@@ -158,7 +158,7 @@ Chat:
 		slog.Info("finished running tool calls",
 			"ncalls", len(newgenerated.ToolCalls), "err", err, "nresp", len(toolouts))
 
-		//
+		// option: let the bot handle errors
 		if WrapToolErrors && err != nil {
 			toolouts = append(toolouts, WrapToolError(err)...)
 			err = nil
