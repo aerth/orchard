@@ -165,6 +165,9 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	if cr.Message.Content == " (END)" {
 		return fmt.Errorf("broken")
 	}
+	if cr.Summary != nil {
+		cm.Summary = cr
+	}
 	return nil
 }
 
