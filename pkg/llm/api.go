@@ -196,8 +196,9 @@ func (m Message) RoleTitle() string {
 }
 
 func shorten(s string, n int, x bool) string {
+	s = strings.TrimSpace(s)
 	if x {
-		s = strings.Split(strings.TrimSpace(s), "\n")[0]
+		s = strings.Split(s, "\n")[0]
 	}
 	if len(s) < n {
 		return s
