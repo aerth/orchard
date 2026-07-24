@@ -283,14 +283,6 @@ func (cm ChatMessages) Raw() llm.Messages {
 	return a
 }
 
-func (cm ChatMessages) FormatRoles() []string {
-	a := make([]string, len(cm))
-	for i := range cm {
-		a[i] = cm[i].Role
-	}
-	return a
-}
-
 func (cm ChatMessages) ContainsID(id uuid.UUID) bool {
 	return slices.ContainsFunc(cm, func(v ChatMessage) bool {
 		return v.MessageID == id
