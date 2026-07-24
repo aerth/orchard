@@ -42,7 +42,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	}
 	newmsg := &stack[len(stack)-1]
 	if newmsg.Role != "user" {
-		return fmt.Errorf("expected 'user' role got '%s'", newmsg.Role)
+		return fmt.Errorf("expected 'user' role to generate a reply to, but got '%s'", newmsg.Role)
 	}
 	if IsCommand(newmsg.Content) {
 		slog.Info("detected command", "txt", newmsg.ContentOrToolCall())
