@@ -41,7 +41,7 @@ func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmes
 		}
 		return nil, nil
 	case "clear":
-		err := e.Store.(*dbstore.PostgresDBStore).DeleteThread(context.TODO(), e.ThreadID)
+		err := e.Store.(*dbstore.Store).DeleteThread(context.TODO(), e.ThreadID)
 		*stack = nil
 		return nil, err
 	case "model":
