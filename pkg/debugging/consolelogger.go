@@ -147,7 +147,9 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 			if !c.HideThinking && c.emode == xGO {
 				_, _ = fmt.Fprintf(tw, "\n")
 			}
-			_, _ = fmt.Fprintf(w, "%s%s", Colorcontent, c.pre)
+			if !c.NoColor {
+				_, _ = fmt.Fprintf(w, "%s", Colorcontent)
+			}
 			c.emode = xCONTENT
 		}
 		_, _ = fmt.Fprintf(w, "%s", m.Content)
