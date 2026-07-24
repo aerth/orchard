@@ -196,10 +196,10 @@ func (m Message) RoleTitle() string {
 }
 
 func (m Message) String() string {
-	from := m.RoleTitle()
 	if len(m.ToolCalls) == 0 && m.Content == "" && m.Thinking == "" {
-		return fmt.Sprintf("empty")
+		return "(empty-message)"
 	}
+	from := m.RoleTitle()
 	if len(m.ToolCalls) != 0 {
 		return fmt.Sprintf("%s tool calls: %s", from, m.ToolCalls)
 	}
