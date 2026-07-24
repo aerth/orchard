@@ -344,8 +344,10 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = ""
 	case cm.Content != "":
 		content = cm.Content
+	case len(cm.ToolCalls) == 1:
+		content = "Tool Call"
 	case len(cm.ToolCalls) != 0:
-		content = "Tool Calls"
+		content = fmt.Sprintf("Tool Calls: %d", len(cm.ToolCalls))
 
 	default:
 		content = "UNKNOWN"
