@@ -309,9 +309,45 @@ type ChatResponse struct {
 	// if requested via the Logprobs parameter.
 	// Logprobs []Logprob `json:"logprobs,omitempty"`
 
-	Metrics
+	Metrics `json:"-"`
 }
-type Metrics struct{}
+
+type Metrics struct {
+	TotalDuration      time.Duration `json:"total_duration,omitempty"`
+	LoadDuration       time.Duration `json:"load_duration,omitempty"`
+	PromptEvalCount    int           `json:"prompt_eval_count,omitempty"`
+	PromptEvalDuration time.Duration `json:"prompt_eval_duration,omitempty"`
+	EvalCount          int           `json:"eval_count,omitempty"`
+	EvalDuration       time.Duration `json:"eval_duration,omitempty"`
+}
+
+func (m *Metrics) Summary() {
+	if m.TotalDuration > 0 {
+		fmt.Fprintf(os.Stderr, "total duration:       %v\n", m.TotalDuration)
+	}
+
+	if m.LoadDuration > 0 {
+		fmt.Fprintf(os.Stderr, "load duration:        %v\n", m.LoadDuration)
+	}
+
+	if m.PromptEvalCount > 0 {
+		fmt.Fprintf(os.Stderr, "prompt eval count:    %d token(s)\n", m.PromptEvalCount)
+	}
+
+	if m.PromptEvalDuration > 0 {
+		fmt.Fprintf(os.Stderr, "prompt eval duration: %s\n", m.PromptEvalDuration)
+		fmt.Fprintf(os.Stderr, "prompt eval rate:     %.2f tokens/s\n", float64(m.PromptEvalCount)/m.PromptEvalDuration.Seconds())
+	}
+
+	if m.EvalCount > 0 {
+		fmt.Fprintf(os.Stderr, "eval count:           %d token(s)\n", m.EvalCount)
+	}
+
+	if m.EvalDuration > 0 {
+		fmt.Fprintf(os.Stderr, "eval duration:        %s\n", m.EvalDuration)
+		fmt.Fprintf(os.Stderr, "eval rate:            %.2f tokens/s\n", float64(m.EvalCount)/m.EvalDuration.Seconds())
+	}
+}
 
 type ChatRequest struct {
 	Model     string           `json:"model"`
