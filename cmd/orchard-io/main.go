@@ -100,7 +100,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	if showChar {
 		fmt.Fprintf(os.Stderr, "Press ctrl+d to send your message, press ctrl+c to cancel generation. slash commands are supported, see '/help'.\n")
 	}
-	store := global.GetStore[*dbstore.PostgresDBStore]()
+	store := global.GetStore[*dbstore.Store]()
 
 	var err error
 	builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
@@ -152,7 +152,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			return enc.Encode(v)
 		}
 	}
-	e := chat.Ext{Store: global.GetStore[*dbstore.PostgresDBStore]()}
+	e := chat.Ext{Store: global.GetStore[*dbstore.Store]()}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
 		return stackerr.Errorf("%w", err)
