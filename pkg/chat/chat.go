@@ -152,6 +152,7 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 
 func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	if e.PreFunc != nil {
+		slog.Info("runnign prefunc")
 		if err := e.PreFunc(creq); err != nil {
 			return err
 		}
