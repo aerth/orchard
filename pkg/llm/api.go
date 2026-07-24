@@ -377,7 +377,8 @@ func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatSt
 	if len(creq.Tools) == 0 {
 		return fmt.Errorf("no tools?")
 	}
-	slog.Info("chatting", "n", len(creq.Messages), "tools", len(creq.Tools), "\n\n\n\n\n", "")
+	slog.Info("chatting", "n", len(creq.Messages), "tools", len(creq.Tools))
+	slog.Info("\n\n\n\n")
 	return c.stream(ctx, http.MethodPost, "/api/chat", creq, func(bts []byte) error {
 		if len(bts) == 0 || !isFirstCharJSON(bts[0]) {
 			return stackerr.Errorf("server replied not with json object: %s", string(bts))
