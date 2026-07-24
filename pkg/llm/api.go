@@ -11,14 +11,13 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
 	"runtime"
 	"strings"
 	"time"
-
-	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -220,7 +219,7 @@ func (m Message) String() string {
 	if m.ToolName != "" {
 		return fmt.Sprintf("tool '%s': %s", m.ToolName, shorten(m.Content, 200, true))
 	}
-	return fmt.Sprintf("%s: %s", from, m.Content)
+	return fmt.Sprintf("%s: %s", from, shorten(m.Content, 100, true))
 }
 
 type (
