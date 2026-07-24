@@ -17,6 +17,7 @@ install: build
 clean:
 	rm -rf bin
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat clean
+	@echo all clean
 .PHONY += clean
 
 
