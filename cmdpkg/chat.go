@@ -25,7 +25,7 @@ import (
 
 type EncoderFunc = func(v *chatmessages.ChatMessage) error
 
-var JsonOut EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
+var MasterSend EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
 //	return nil
 //}
 
@@ -93,9 +93,9 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	stack = append(stack, *newmsg)
 	var out io.Writer = os.Stdout
 	var jsonout EncoderFunc
-	if JsonOut != nil {
+	if MasterSend != nil {
 		out = io.Discard
-		jsonout = JsonOut
+		jsonout = MasterSend
 	} else if conf.Get().JsonOutput {
 		out = io.Discard
 		enc := json.NewEncoder(os.Stdout).Encode
@@ -163,7 +163,7 @@ Chat:
 				return stackerr.Errorf("adding tool output to db: %w", err)
 			}
 		}
-		if JsonOut != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
+		if MasterSend != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
 			for i := range toolouts {
 				if err := jsonout(&toolouts[i]); err != nil {
 					return stackerr.Errorf("%w", err)
