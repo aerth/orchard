@@ -86,6 +86,11 @@ func main1(ctx context.Context) error {
 	if err != nil {
 		return stackerr.Errorf("initialize: %w", err)
 	}
+	store, err := NewPostgres(&chatmessages.ChatMessage{})
+	if err != nil {
+		return stackerr.Errorf("db: %w", err)
+	}
+	global.SetStore(store)
 	err = runmain(ctx, conf)
 	if err != nil {
 		return stackerr.Errorf("runmain: %w", err)
