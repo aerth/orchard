@@ -133,7 +133,7 @@ Chat:
 			newgenerated.Content += " (this reply was cancelled by user before it finished)"
 		}
 		if e.Store != nil {
-			if err := e.Store.Add(context.WithoutCancel(ctx), conf.GetThreadID(), got); err != nil {
+			if err := e.Store.Add(context.WithoutCancel(ctx), e.ThreadID, newgenerated); err != nil {
 				return stackerr.Errorf("%w", err)
 			}
 		}
