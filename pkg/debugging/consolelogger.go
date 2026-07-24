@@ -134,12 +134,12 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 			m.Thinking = c.buf
 			c.emode = xGO
 			if !c.HideThinking && !c.NoColor {
-				_, _ = fmt.Fprintf(w, "%s%s", Colorcomment, c.pre)
+				_, _ = fmt.Fprintf(w, "%s", Colorcomment, c.pre)
 			}
 		}
 	}
 	if c.emode != 0 && len(m.Thinking) != 0 && !c.HideThinking {
-		_, _ = fmt.Fprintf(tw, "%s", m.Thinking)
+		_, _ = fmt.Fprintf(tw, "%s%s", c.pre, m.Thinking)
 		fflush(tw)
 	}
 	if m.Content != "" {
