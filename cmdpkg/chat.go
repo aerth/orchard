@@ -37,7 +37,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		e.PreFunc = chat.PrintMessages
 	}
 	if len(stack) == 0 {
-		slog.Warn("noop")
+		slog.Warn("noop convo")
 		return nil
 	}
 	newmsg := &stack[len(stack)-1]
@@ -65,6 +65,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		}
 	}
 	if newmsg == nil || newmsg.Content == "" {
+		slog.Info("noop txt")
 		return nil
 	}
 
