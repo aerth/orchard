@@ -195,6 +195,16 @@ func (m Message) RoleTitle() string {
 	return from
 }
 
+func shorten(s string, n int, x bool) string {
+	if x {
+		s = strings.SplitN(s, "\n", 2)[0]
+	}
+	if len(s) < n {
+		return s
+	}
+	return s[:n]
+}
+
 func (m Message) String() string {
 	if len(m.ToolCalls) == 0 && m.Content == "" && m.Thinking == "" {
 		return "(empty-message)"
