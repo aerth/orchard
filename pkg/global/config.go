@@ -178,6 +178,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 			log.Fatalf("Fatal: %v", err)
 		}
 		slog.Info("now in dir", "dir", cfg.Dir)
+		time.Sleep(time.Second)
 	}
 }
 
