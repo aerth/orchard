@@ -110,6 +110,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	cl := debugging.NewConsoleLogger(out, global.LogWriter)
 	cl.HideToolCalls = conf.IsHideToolCalls()
 	var err error
+	handlers := e.Handlers
 Chat:
 	for ctx.Err() == nil {
 		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
@@ -126,7 +127,7 @@ Chat:
 		newgenerated := chatmessages.NewFromRole(e.From, "assistant", "")
 		{
 			spin := spinner.Start(sctx)
-			e.Handlers = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newgenerated.GatherChatResponse}, e.Handlers...)
+			e.Handlers = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newgenerated.GatherChatResponse}, handlers...)
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped regardless of output
 		}
