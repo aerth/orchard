@@ -29,7 +29,8 @@ var JsonOut EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
 //	return nil
 //}
 
-func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
+func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
+	stack := stackInput
 	showChar := false
 	conf := global.Get()
 	if conf.GetVerbose() {
