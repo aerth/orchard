@@ -16,20 +16,7 @@ var ErrFatalToolResult = errors.New("unrecoverable error")
 
 func Runtools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	toolouts, err := realruntools(ctx, tools, caller)
-	for i := range toolouts {
-		repair(caller, &toolouts[i])
-	}
 	return toolouts, err
-}
-
-func repair(caller chatmessages.ChatMessage, chatMessage *chatmessages.ChatMessage) {
-	if chatMessage.Role == "" {
-		chatMessage.Role = "tool"
-	}
-	if chatMessage.ToolName == "" {
-	}
-	if chatMessage.ToolCallID == "" {
-	}
 }
 
 func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
@@ -73,12 +60,15 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 			if x[i].Role == "tool" && x[i].ToolCallID == "" {
 				x[i].ToolCallID = call.ID
 			}
+			if x[i].ToolName == "" || x[i].ToolCallID == "" {
+				slog.Warn("bad tool repair")
+			}
 		}
 		finishedtoolouts = append(finishedtoolouts, x...)
 		if err != nil {
-			return toolouts, err
+			return finishedtoolouts, err
 		}
 
 	}
-	return toolouts, nil
+	return finishedtoolouts, nil
 }
