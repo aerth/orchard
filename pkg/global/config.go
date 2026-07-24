@@ -177,6 +177,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		if err := os.Chdir(cfg.Dir); err != nil {
 			log.Fatalf("Fatal: %v", err)
 		}
+		slog.Info("now in dir", "dir", cfg.Dir)
 	}
 }
 
