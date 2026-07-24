@@ -11,13 +11,14 @@ import (
 	"io"
 	"log"
 	"log/slog"
-	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
 	"runtime"
 	"strings"
 	"time"
+
+	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -308,8 +309,9 @@ type ChatResponse struct {
 	// if requested via the Logprobs parameter.
 	// Logprobs []Logprob `json:"logprobs,omitempty"`
 
-	// Metrics
+	Metrics
 }
+type Metrics struct{}
 
 type ChatRequest struct {
 	Model     string           `json:"model"`
