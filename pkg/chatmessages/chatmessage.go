@@ -176,6 +176,14 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	return nil
 }
 
+func toJSON(rawMessage json.RawMessage) string {
+	b, err := json.Marshal(rawMessage)
+	if err != nil {
+		panic(err.Error())
+	}
+	return string(b)
+}
+
 func (cm ChatMessage) IsEmpty() bool {
 	return cm.Thinking == "" && cm.Content == "" && len(cm.ToolCalls) == 0
 }
