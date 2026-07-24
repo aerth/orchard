@@ -203,7 +203,7 @@ func shorten(s string, n int, x bool) string {
 	if len(s) < n {
 		return s
 	}
-	return s[:n] + "..."
+	return s[:n]
 }
 
 func (m Message) String() string {
