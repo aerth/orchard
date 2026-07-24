@@ -140,12 +140,13 @@ Chat:
 		}
 		stack = append(stack, *newgenerated)
 		newgenerated = &stack[len(stack)-1] // fix ptr
-		if e.Store != nil {
-			// Add sets initial msg.DBID
-			if err := e.Store.Add(context.WithoutCancel(ctx), e.ThreadID, newgenerated); err != nil {
-				return stackerr.Errorf("%w", err)
-			}
-		}
+		/*
+			if e.Store != nil {
+				// Add sets initial msg.DBID
+				if err := e.Store.Add(context.WithoutCancel(ctx), e.ThreadID, newgenerated); err != nil {
+					return stackerr.Errorf("%w", err)
+				}
+			}*/
 		if jsonout != nil {
 			// jsonout encoder may modify the pointer (TODO: hook for confirmation/cancel)
 			if err := jsonout(&stack[len(stack)-1]); err != nil {
@@ -178,11 +179,12 @@ Chat:
 		if len(toolouts) == 0 {
 			toolouts = append(toolouts, WrapToolError(fmt.Errorf("no output"))...)
 		}
-		if e.Store != nil {
-			if err := e.Store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
-				return stackerr.Errorf("adding tool output to db: %w", err)
-			}
-		}
+		/*
+			if e.Store != nil {
+				if err := e.Store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
+					return stackerr.Errorf("adding tool output to db: %w", err)
+				}
+			}*/
 		if MasterSend != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
 			for i := range toolouts {
 				if err := jsonout(&toolouts[i]); err != nil {
