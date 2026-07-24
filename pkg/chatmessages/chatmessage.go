@@ -318,7 +318,6 @@ func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname 
 }
 
 func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, username string, botname string) error {
-	var got string
 	var err error
 	var content string
 	switch {
@@ -355,9 +354,8 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content += fmt.Sprintf("\n```json\n%s\n```\n", toJSONIndent(cm.ToolCalls))
 	}
 	content = strings.TrimSpace(content)
-	got = content
 	if cm.Role == "tool" {
-		got = "\n```markdown\n" + got + "\n```\n"
+		content = "\n```markdown\n" + content + "\n```\n"
 	}
 	if got != "" && renderfunc != nil {
 		got += "\n\n---\n"
