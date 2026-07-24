@@ -334,8 +334,6 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	case cm.Content != "" && cm.Content[0] == '{':
 		//	slog.Info("detected json", "msg", cm.Content)
 		content = cm.Content + "\n\n(JSON ACTUAL)\n"
-	case cm.Content != "":
-		content = cm.Content
 	case ShowThoughts && cm.Content == "" && cm.Thinking != "":
 		content = ""
 	case cm.Role == "tool" && ShowToolOutputs:
@@ -344,8 +342,10 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = "[tool call output]\n"
 	case cm.Content == "" && !ShowThoughts && len(cm.ToolCalls) != 0:
 		content = ""
+	case cm.Content != "":
+		content = cm.Content
 	default:
-		content = ""
+		content = "UNKNOWN"
 	}
 	if ShowThoughts && cm.Thinking != "" {
 		content = strings.Join([]string{italicMarkdown(cm.Thinking), content}, "\n\n")
@@ -357,17 +357,17 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	//if cm.Role == "tool" {
 	//	content = "\n```markdown\n" + content + "\n```\n"
 	//}
-	if got != "" && renderfunc != nil {
-		got += "\n\n---\n"
-		got, err = renderfunc(got, cm.GetMessageStyle())
+	if content != "" && renderfunc != nil {
+		content += "\n\n---\n"
+		content, err = renderfunc(content, cm.GetMessageStyle())
 		if err != nil {
 			return err
 		}
 	}
-	if !strings.HasSuffix(got, "\n") {
-		got += "\n"
+	if !strings.HasSuffix(content, "\n") {
+		content += "\n"
 	}
-	_, err = fmt.Fprintf(w, "%s: %s", cm.GetName(username, botname), got)
+	_, err = fmt.Fprintf(w, "%s: %s", cm.GetName(username, botname), content)
 	if err != nil {
 		return err
 	}
