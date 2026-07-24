@@ -172,7 +172,7 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	return nil
 }
 
-func typenames(v ...any) []string {
+func typenames(v ...Handler) []string {
 	a := make([]string, len(v))
 	for i := range v {
 		a[i] = fmt.Sprintf("%T", v[i])
