@@ -15,6 +15,14 @@ import (
 var ErrFatalToolResult = errors.New("unrecoverable error")
 
 func Runtools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
+	toolouts, err := realruntools(ctx, tools, caller)
+	for i := range toolouts {
+		repair(caller, &toolouts[i])
+	}
+	return toolouts, err
+}
+
+func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	var toolouts chatmessages.ChatMessages
 	for toolCallIndex := range caller.ToolCalls {
 		var call struct {
