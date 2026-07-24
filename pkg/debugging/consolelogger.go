@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 
+	"m/pkg/global"
 	"m/pkg/llm"
 )
 
@@ -40,7 +41,7 @@ var (
 )
 
 func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
-	if os.Getenv("NO_COLOR") == "1" {
+	if global.Get().Get().NoColor || os.Getenv("NO_COLOR") == "1" {
 		Colorcomment = ""
 		Colorcontent = ""
 		ColorReset = ""
