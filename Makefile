@@ -9,7 +9,7 @@ run: build
 runclear: build
 	./bin/orchard-io -clear
 install: build
-	mv -v bin/* ~/bin/
+	install -v bin/* ~/bin/
 	rmdir bin
 	@test ! -d orchard-chat || echo installing orchard-chat TUI
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat install 1>/dev/null
