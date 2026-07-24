@@ -146,6 +146,7 @@ Chat:
 	*/
 	// handle tools
 	if len(got.ToolCalls) != 0 {
+		slog.Info("detected tool calls", "ncalls", len(got.ToolCalls))
 		toolouts, err := toolrunner.Runtools(ctx, tools, *got)
 		if WrapToolErrors && err != nil {
 			toolouts = append(toolouts, WrapToolError(err)...)
