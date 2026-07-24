@@ -35,8 +35,8 @@ func GetSystemBase(data any) string {
 			pre = string("## Project-level AGENTS.md file contents\n" + string(orchardfile))
 		}
 	}
-	got := strings.Join([]string{buf.String(), pre}, "\n")
-	slog.Info("system message complete")
+	got := strings.TrimSpace(strings.Join([]string{buf.String(), pre}, "\n"))
+	slog.Info("sticky system instruction", "size", len(got))
 	//_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
 	return got
 }
