@@ -9,6 +9,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -143,6 +144,13 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 	if newmsg == nil || newmsg.Content == "" {
 		return nil
+	}
+	stack = append(stack, *newmsg)
+	if conf.Get().JsonOutput {
+		enc := json.NewEncoder(os.Stdout)
+		cmdpkg.MasterSend = func(v *chatmessages.ChatMessage) error {
+			return enc.Encode(v)
+		}
 	}
 	e := chat.Ext{Store: global.GetStore[*dbstore.PostgresDBStore]()}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
