@@ -35,7 +35,7 @@ func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmes
 		if e.PreFunc == nil {
 			slog.Info("adding prefunc")
 			e.PreFunc = chat.PrintMessages
-		} else {
+		} else if e.PreFunc == chat.PrintMessages {
 			slog.Info("removing prefunc")
 			e.PreFunc = nil
 		}
