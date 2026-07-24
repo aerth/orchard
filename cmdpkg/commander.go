@@ -31,15 +31,16 @@ func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmes
 		println("help mode soon")
 	case "exit":
 		return nil, stackerr.Errorf("exit request")
-	case "debug":
-		if e.PreFunc == nil {
-			slog.Info("adding prefunc")
-			e.PreFunc = chat.PrintMessages
-		} else if e.PreFunc == chat.PrintMessages {
-			slog.Info("removing prefunc")
-			e.PreFunc = nil
-		}
-		return nil, nil
+	/*
+		case "debug":
+			if e.PreFunc == nil {
+				slog.Info("adding prefunc")
+				e.PreFunc = chat.PrintMessages
+			} else if e.PreFunc == chat.PrintMessages {
+				slog.Info("removing prefunc")
+				e.PreFunc = nil
+			}
+			return nil, nil*/
 	case "clear":
 		err := e.Store.(*dbstore.Store).DeleteThread(context.TODO(), e.ThreadID)
 		*stack = nil
