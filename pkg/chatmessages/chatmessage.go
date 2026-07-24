@@ -129,6 +129,7 @@ func NewToolReply(caller ChatMessage, i int, content string) *ChatMessage {
 }
 
 type MessageOptions struct {
+	Summary     any
 	Aux         any
 	Attachments []string // Attachments filenames
 	Ephemeral   bool
