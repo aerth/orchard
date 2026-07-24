@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"time"
 
 	"m/pkg/chatmessages"
 	"m/pkg/otool"
@@ -55,6 +56,9 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 		slog.Info("Running tools...", "caller", caller.String(), "i", toolCallIndex, "call", call)
 		x, err := tool.Exec(ctx, caller.Message, toolCallIndex)
 		for i := range x {
+			if x[i].CreatedAt.IsZero() {
+				x[i].CreatedAt = time.Now().UTC()
+			}
 			if x[i].Role == "" {
 				x[i].Role = "tool"
 			}
