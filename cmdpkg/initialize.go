@@ -61,14 +61,16 @@ var ENVFILE = os.ExpandEnv("$HOME/.config/orchard/env")
 func LOADENV() error {
 	homedir, err := os.UserHomeDir()
 	if err != nil {
+		slog.Info("loading env", "file", ENVFILE)
 		return err
 	}
 	ENVFILE = strings.Replace(ENVFILE, "~", homedir, 1)
 	if os.Getenv("HOME") == "" {
+		slog.Info("loading env", "file", ENVFILE)
 		return fmt.Errorf("no HOME")
 	}
-	slog.Info("loading env", "file", ENVFILE)
 	if err := godotenv.Load(ENVFILE); err != nil && !errors.Is(err, os.ErrNotExist) {
+		slog.Info("loading env", "file", ENVFILE)
 		return err
 	}
 
