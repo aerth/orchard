@@ -16,6 +16,9 @@ var ErrFatalToolResult = errors.New("unrecoverable error")
 
 func Runtools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	toolouts, err := realruntools(ctx, tools, caller)
+	for i := range toolouts {
+		toolouts[i].ThreadID = caller.ThreadID
+	}
 	return toolouts, err
 }
 
