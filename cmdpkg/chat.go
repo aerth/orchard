@@ -139,6 +139,7 @@ Chat:
 		}
 		stack = append(stack, *got)
 		if jsonout != nil {
+			// jsonout encoder may modify the pointer
 			if err := jsonout(&stack[len(stack)-1]); err != nil {
 				return stackerr.Errorf("%w", err)
 			}
