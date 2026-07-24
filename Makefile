@@ -14,6 +14,7 @@ install: build
 	install -v bin/* ~/bin/
 	@test ! -d orchard-chat || echo installing orchard-chat TUI
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat install 1>/dev/null
+.PHONY += clean
 clean:
 	rm -rf bin
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat clean
