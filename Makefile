@@ -16,5 +16,7 @@ install: build
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat install 1>/dev/null
 clean:
 	rm -rf bin
+	@test ! -d orchard-chat || ${MAKE} -C orchard-chat clean
+
 
 
