@@ -112,7 +112,6 @@ Chat:
 		sctx := global.NewCancel(ctx)
 		e.Tools = tools.ToMarshaler()
 		cl.Reset()
-		newgenerated := chatmessages.NewFromRole(e.From, "assistant", "")
 		top := stack.Top()
 		if top.Role == "assistant" {
 			slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
@@ -120,6 +119,7 @@ Chat:
 		}
 		slog.Info("Chatting", "after", top)
 
+		newgenerated := chatmessages.NewFromRole(e.From, "assistant", "")
 		{
 			spin := spinner.Start(sctx)
 			e.Handlers = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newgenerated.GatherChatResponse}, e.Handlers...)
