@@ -34,7 +34,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	stack := stackInput
 	showChar := false
 	conf := global.Get()
-	if conf.GetVerbose() {
+	if e.PreFunc == nil && conf.GetVerbose() {
 		e.PreFunc = chat.PrintMessages
 	}
 	if len(stack) == 0 {
