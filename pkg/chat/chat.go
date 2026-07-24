@@ -164,7 +164,7 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	if len(e.Handlers) == 0 {
 		return fmt.Errorf("no handlers")
 	}
-	slog.Info("Chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "handlers", len(e.Handlers))
+	slog.Info("Chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "handlers", len(e.Handlers), "typ", typenames(e.Handlers...))
 	err := client.Chat(ctx, creq, e.Handlers...)
 	if err != nil {
 		return stackerr.Errorf("%w", err)
