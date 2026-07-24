@@ -104,7 +104,7 @@ Chat:
 	got := chatmessages.NewFromRole(e.From, "assistant", "")
 	top := stack.Top()
 	if top.Role == "assistant" {
-		slog.Warn("already is assistant")
+		slog.Error("already is assistant, cant generate")
 		return nil
 	}
 	slog.Info("Chatting", "after", top)
