@@ -321,31 +321,31 @@ type Metrics struct {
 	EvalDuration       time.Duration `json:"eval_duration,omitempty"`
 }
 
-func (m *Metrics) Summary() {
+func (m *Metrics) Summary(w io.Writer) {
 	if m.TotalDuration > 0 {
-		fmt.Fprintf(os.Stderr, "total duration:       %v\n", m.TotalDuration)
+		fmt.Fprintf(w, "total duration:       %v\n", m.TotalDuration)
 	}
 
 	if m.LoadDuration > 0 {
-		fmt.Fprintf(os.Stderr, "load duration:        %v\n", m.LoadDuration)
+		fmt.Fprintf(w, "load duration:        %v\n", m.LoadDuration)
 	}
 
 	if m.PromptEvalCount > 0 {
-		fmt.Fprintf(os.Stderr, "prompt eval count:    %d token(s)\n", m.PromptEvalCount)
+		fmt.Fprintf(w, "prompt eval count:    %d token(s)\n", m.PromptEvalCount)
 	}
 
 	if m.PromptEvalDuration > 0 {
-		fmt.Fprintf(os.Stderr, "prompt eval duration: %s\n", m.PromptEvalDuration)
-		fmt.Fprintf(os.Stderr, "prompt eval rate:     %.2f tokens/s\n", float64(m.PromptEvalCount)/m.PromptEvalDuration.Seconds())
+		fmt.Fprintf(w, "prompt eval duration: %s\n", m.PromptEvalDuration)
+		fmt.Fprintf(w, "prompt eval rate:     %.2f tokens/s\n", float64(m.PromptEvalCount)/m.PromptEvalDuration.Seconds())
 	}
 
 	if m.EvalCount > 0 {
-		fmt.Fprintf(os.Stderr, "eval count:           %d token(s)\n", m.EvalCount)
+		fmt.Fprintf(w, "eval count:           %d token(s)\n", m.EvalCount)
 	}
 
 	if m.EvalDuration > 0 {
-		fmt.Fprintf(os.Stderr, "eval duration:        %s\n", m.EvalDuration)
-		fmt.Fprintf(os.Stderr, "eval rate:            %.2f tokens/s\n", float64(m.EvalCount)/m.EvalDuration.Seconds())
+		fmt.Fprintf(w, "eval duration:        %s\n", m.EvalDuration)
+		fmt.Fprintf(w, "eval rate:            %.2f tokens/s\n", float64(m.EvalCount)/m.EvalDuration.Seconds())
 	}
 }
 
