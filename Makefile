@@ -18,7 +18,14 @@ clean:
 	rm -rf bin
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat clean
 	@echo all clean
-cleaninstall: clean install
+cleaninstall:
+	rm -rf bin
+	@test ! -d orchard-chat || ${MAKE} -C orchard-chat clean
+	@echo all clean
+	${MAKE} ${bin}/orchard-io
+	install -v bin/* ~/bin/
+	@test ! -d orchard-chat || echo installing orchard-chat TUI
+	@test ! -d orchard-chat || ${MAKE} -C orchard-chat install 
 .PHONY += clean cleaninstall
 
 
