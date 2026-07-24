@@ -522,7 +522,7 @@ func (t *ToolboxManager) ToolSpec() Tool {
 	if err != nil {
 		panic(err)
 	}
-	println("SPEC", string(specjs))
+	//println("SPEC", string(specjs))
 	return (Tool{
 		Name: t.GetName(),
 		Spec: specjs,
