@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -341,7 +342,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = ""
 	case cm.Role == "tool" && ShowToolOutputs:
 		content = cm.Content
-		content = "```\n" + content + "\n```\n"
+		content = "[tool call output]\n```\n" + content + "\n```\n"
 	case cm.Role == "tool":
 		content = "[tool call output]\n"
 	case cm.Content == "" && !ShowThoughts && len(cm.ToolCalls) != 0:
