@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -140,6 +139,9 @@ func (cm ChatMessage) TableName() string {
 }
 
 func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
+	if cm == nil {
+		panic("GatherChatResponse for nil")
+	}
 	if cr.Message.Role != "" {
 		cm.Role = cr.Message.Role
 	}
