@@ -108,22 +108,24 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	store := global.GetStore[*dbstore.Store]()
 
 	var err error
-	builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
-		"read_file":  implv1.ReadFile,
-		"write_file": implv1.WriteFile,
-		//	"run_go_command":   noop,
-		"list_directory": implv1.ListDirectory,
-		//	"get_package_info": noop,
-	})
-	if err != nil {
-		log.Fatalf("could not load builtin tools: %+v", err)
+	if false { // builtin go tools
+		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
+			"read_file":  implv1.ReadFile,
+			"write_file": implv1.WriteFile,
+			//	"run_go_command":   noop,
+			"list_directory": implv1.ListDirectory,
+			//	"get_package_info": noop,
+		})
+		if err != nil {
+			log.Fatalf("could not load builtin tools: %+v", err)
+		}
+		if len(builtinTools) == 0 {
+			panic("no builtin tools")
+		}
 	}
-	if len(builtinTools) == 0 {
-		panic("no builtin tools")
-	}
-	if true {
+	if true { // runtime bash/python tools
 		builtinTools = nil
-		box, err := toolboxes.New("")
+		box, err := toolboxes.New("") // use env with toolboxes subdir
 		if err != nil {
 			return err
 		}
@@ -131,26 +133,31 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		builtinTools = append(builtinTools, tools...)
 	}
 
-	stack, err := store.LoadThread(ctx, conf.GetThreadID(), 4)
-	if err != nil {
-		return err
+	var stack chatmessages.A
+	if store != nil {
+		stack, err = store.LoadThread(ctx, conf.GetThreadID(), 4)
+		if err != nil {
+			return err
+		}
 	}
 	newmsg := new(chatmessages.ChatMessage)
 	newmsg.From = conf.GetUsername()
+	stack = append(stack, *newmsg)
+	newmsg = &stack[len(stack)-1] // fix ptr
 	if _, err := os.Stdin.Read(nil); err != nil {
 		return err
 	}
 	if showChar {
 		_, _ = fmt.Fprintf(os.Stderr, "%s: ", titlecaser.String(conf.GetUsername())) // eg: Chief:
 	}
-	err = ReadMessage(os.Stdin, conf.GetUsername(), "user", &newmsg)
+	err = ReadMessage(os.Stdin, conf.GetUsername(), "user", &newmsg) // ptr of ptr
 	if err != nil {
 		return stackerr.Errorf("ReadMessage: %w", err)
 	}
 	if newmsg == nil || newmsg.Content == "" {
 		return nil
 	}
-	stack = append(stack, *newmsg)
+
 	if conf.Get().JsonOutput {
 		enc := json.NewEncoder(os.Stdout)
 		cmdpkg.MasterSend = func(v *chatmessages.ChatMessage) error {
@@ -167,6 +174,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 var titlecaser = cases.Title(language.AmericanEnglish)
 
+// ReadMessage may make newmsg nil
 func ReadMessage(r io.Reader, from, role string, newmsg **chatmessages.ChatMessage) error {
 	var x string
 	var err error
