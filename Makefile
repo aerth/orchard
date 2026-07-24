@@ -1,6 +1,8 @@
 VERSION := $(shell git tag | sort -V | tail -n 1)
 NOW := $(shell date +%s)
-build: *.go */*.go */*/*.go
+bin=./bin
+build: ${bin}/orchard-io
+${bin}/orchard-io:	*.go */*.go */*/*.go
 	go build -v -ldflags '-X main.version=${VERSION} -X main.buildtime=${NOW} -X main.ollamahost=${OLLAMA_HOST} -X main.ollamamodel=${OLLAMA_MODEL} -X main.ollamathink=${OLLAMA_THINK}' -o ./bin/ ./cmd/...
 	@test ! -d orchard-chat || echo building orchard-chat TUI
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat 1>/dev/null
@@ -10,8 +12,9 @@ runclear: build
 	./bin/orchard-io -clear
 install: build
 	install -v bin/* ~/bin/
-	rmdir bin
 	@test ! -d orchard-chat || echo installing orchard-chat TUI
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat install 1>/dev/null
+clean:
+	rm -rf bin
 
 
