@@ -353,7 +353,7 @@ type ChatRequest struct {
 	Model     string           `json:"model"`
 	Think     any              `json:"think,omitempty"`
 	Stream    *bool            `json:"stream,omitempty"`
-	Messages  []Message        `json:"messages"`
+	Messages  Messages         `json:"messages"`
 	Format    json.RawMessage  `json:"format,omitempty"`
 	Tools     []json.Marshaler `json:"tools,omitempty"`
 	KeepAlive int              `json:"keep_alive"`
@@ -365,6 +365,14 @@ func isFirstCharJSON(c byte) bool {
 }
 
 type ChatStreamHandlerFunc = func(ChatResponse) error
+
+func (cm Messages) FormatRoles() []string {
+	a := make([]string, len(cm))
+	for i := range cm {
+		a[i] = cm[i].Role
+	}
+	return a
+}
 
 //	StreamPreFunc = func(bts []byte) error {
 //		_, _ = fmt.Fprintf(log.Writer(), "StreamPreFunc %s\n", string(bts))
