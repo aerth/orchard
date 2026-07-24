@@ -18,7 +18,7 @@ type ConsoleLogger struct {
 	buf           string
 	pre           string
 	w, tw         io.Writer
-	nocolor       bool
+	NoColor       bool
 }
 type modeT int
 
@@ -58,7 +58,7 @@ func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
 	if w == nil {
 		w = io.Discard
 	}
-	return &ConsoleLogger{w: w, tw: tw, pre: "", nocolor: nocolor}
+	return &ConsoleLogger{w: w, tw: tw, pre: "", NoColor: nocolor}
 }
 
 func (c ConsoleLogger) WithPrefix(prefix string) ConsoleLogger {
@@ -133,7 +133,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 		if len(c.buf) > 32 { // got it
 			m.Thinking = c.buf
 			c.emode = xGO
-			if !c.HideThinking {
+			if !c.HideThinking && !c.NoColor {
 				_, _ = fmt.Fprintf(w, "%s%s", Colorcomment, c.pre)
 			}
 		}
