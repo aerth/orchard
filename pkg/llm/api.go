@@ -377,7 +377,7 @@ func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatSt
 	if len(creq.Tools) == 0 {
 		return fmt.Errorf("no tools?")
 	}
-	slog.Info("chatting", "n", len(creq.Messages), "tools", len(creq.Tools))
+	slog.Info("chatting", "n", len(creq.Messages), "tools", len(creq.Tools), "roles", creq.Messages.FormatRoles())
 	slog.Info("\n\n\n\n")
 	return c.stream(ctx, http.MethodPost, "/api/chat", creq, func(bts []byte) error {
 		if len(bts) == 0 || !isFirstCharJSON(bts[0]) {
