@@ -35,6 +35,10 @@ func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, tools otool.
 	if conf.GetVerbose() {
 		e.PreFunc = chat.PrintMessages
 	}
+	if len(stack) == 0 {
+		slog.Warn("noop")
+		return nil
+	}
 	newmsg := &stack[len(stack)-1]
 	if newmsg != nil && IsCommand(newmsg.Content) {
 		add, err := HandleCommand(newmsg, &e, &stack)
