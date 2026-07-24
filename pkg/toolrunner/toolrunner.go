@@ -22,6 +22,12 @@ func Runtools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMe
 	return toolouts, err
 }
 
+func repair(caller chatmessages.ChatMessage, chatMessage *chatmessages.ChatMessage) {
+	if chatMessage.Role == "" {
+		chatMessage.Role = "tool"
+	}
+}
+
 func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	var toolouts chatmessages.ChatMessages
 	for toolCallIndex := range caller.ToolCalls {
