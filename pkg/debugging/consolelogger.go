@@ -18,6 +18,7 @@ type ConsoleLogger struct {
 	buf           string
 	pre           string
 	w, tw         io.Writer
+	nocolor       bool
 }
 type modeT int
 
@@ -41,11 +42,7 @@ var (
 )
 
 func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
-	if global.Get().Get().NoColor || os.Getenv("NO_COLOR") == "1" {
-		Colorcomment = ""
-		Colorcontent = ""
-		ColorReset = ""
-	}
+	nocolor := global.Get().Get().NoColor || os.Getenv("NO_COLOR") == "1"
 	w := io.Writer(os.Stderr)
 	tw := w
 	if len(ww) == 1 {
@@ -61,7 +58,7 @@ func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
 	if w == nil {
 		w = io.Discard
 	}
-	return &ConsoleLogger{w: w, tw: tw, pre: ""}
+	return &ConsoleLogger{w: w, tw: tw, pre: "", nocolor: nocolor}
 }
 
 func (c ConsoleLogger) WithPrefix(prefix string) ConsoleLogger {
