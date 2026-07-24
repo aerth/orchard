@@ -131,7 +131,7 @@ Chat:
 		newgenerated := chatmessages.NewFromRole(e.From, "assistant", "")
 		{
 			spin := spinner.Start(sctx)
-			e.Handlers = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newgenerated.GatherChatResponse}, handlers...)
+			e.Handlers = append(handlers, []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newgenerated.GatherChatResponse}...)
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped regardless of output
 		}
