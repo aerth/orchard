@@ -144,18 +144,6 @@ Chat:
 				return stackerr.Errorf("%w", err)
 			}
 		}
-
-		/*
-			// show output
-			if showChar {
-				fmt.Fprintf(os.Stderr, "\nBOT> ")
-			}
-			w := os.Stdout
-			if len(got.ToolCalls) != 0 {
-				w = os.Stderr
-			}
-			_, _ = fmt.Fprintf(w, "%s\n", got.ContentOrToolCall())
-		*/
 		// handle tools
 		if len(got.ToolCalls) == 0 {
 			return nil
