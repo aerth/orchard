@@ -18,7 +18,8 @@ clean:
 	rm -rf bin
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat clean
 	@echo all clean
-.PHONY += clean
+cleaninstall: clean install
+.PHONY += clean cleaninstall
 
 
 
