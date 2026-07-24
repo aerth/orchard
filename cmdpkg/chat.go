@@ -162,7 +162,7 @@ Chat:
 		if WrapToolErrors &&
 			err != nil &&
 			!errors.Is(err, context.Canceled) &&
-			!errors.Is(err, toolrunner.FatalErrorType) {
+			!errors.Is(err, toolrunner.ErrFatalToolResult) {
 			toolouts = append(toolouts, WrapToolError(err)...)
 			err = nil
 		}
