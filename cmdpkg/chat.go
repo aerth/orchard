@@ -156,46 +156,47 @@ Chat:
 			_, _ = fmt.Fprintf(w, "%s\n", got.ContentOrToolCall())
 		*/
 		// handle tools
-		if len(got.ToolCalls) != 0 {
-			slog.Info("detected tool calls", "ncalls", len(got.ToolCalls))
-			toolouts, err := toolrunner.Runtools(ctx, tools, *got)
-			slog.Info("finished running tool calls", "ncalls", len(got.ToolCalls), "err", err, "nresp", len(toolouts))
-			if WrapToolErrors && err != nil {
-				toolouts = append(toolouts, WrapToolError(err)...)
-				err = nil
-			}
-			if len(toolouts) == 0 {
-				toolouts = append(toolouts, WrapToolError(fmt.Errorf("no output"))...)
-			}
-			if e.Store != nil {
-				if err := e.Store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
-					return stackerr.Errorf("adding tool output to db: %w", err)
-				}
-			}
-			if JsonOut != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
-				for i := range toolouts {
-					if err := jsonout(&toolouts[i]); err != nil {
-						return stackerr.Errorf("%w", err)
-					}
-				}
-			}
-			if !conf.IsHideToolOuts() {
-				if jsonout == nil {
-					for i := range toolouts {
-						if showChar {
-							_, _ = fmt.Fprintf(os.Stderr, "TOOL> ")
-						}
-						_, _ = fmt.Fprintf(os.Stderr, "\n```\n%s\n```\n", toolouts[i].ContentOrToolCall())
-					}
-				}
-			}
-			if err != nil {
-				return stackerr.Errorf("running tools: %w", err)
-			}
-			stack = append(stack, toolouts...)
-			slog.Info("added toolouts", "n", len(toolouts), "ignored", conf.IsHideToolOuts(), "sent", jsonout != nil, "printed", jsonout == nil)
-			continue Chat
+		if len(got.ToolCalls) == 0 {
+			return nil
 		}
+		slog.Info("detected tool calls", "ncalls", len(got.ToolCalls))
+		toolouts, err := toolrunner.Runtools(ctx, tools, *got)
+		slog.Info("finished running tool calls", "ncalls", len(got.ToolCalls), "err", err, "nresp", len(toolouts))
+		if WrapToolErrors && err != nil {
+			toolouts = append(toolouts, WrapToolError(err)...)
+			err = nil
+		}
+		if len(toolouts) == 0 {
+			toolouts = append(toolouts, WrapToolError(fmt.Errorf("no output"))...)
+		}
+		if e.Store != nil {
+			if err := e.Store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
+				return stackerr.Errorf("adding tool output to db: %w", err)
+			}
+		}
+		if JsonOut != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
+			for i := range toolouts {
+				if err := jsonout(&toolouts[i]); err != nil {
+					return stackerr.Errorf("%w", err)
+				}
+			}
+		}
+		if !conf.IsHideToolOuts() {
+			if jsonout == nil {
+				for i := range toolouts {
+					if showChar {
+						_, _ = fmt.Fprintf(os.Stderr, "TOOL> ")
+					}
+					_, _ = fmt.Fprintf(os.Stderr, "\n```\n%s\n```\n", toolouts[i].ContentOrToolCall())
+				}
+			}
+		}
+		if err != nil {
+			return stackerr.Errorf("running tools: %w", err)
+		}
+		stack = append(stack, toolouts...)
+		slog.Info("added toolouts", "n", len(toolouts), "ignored", conf.IsHideToolOuts(), "sent", jsonout != nil, "printed", jsonout == nil)
+		continue Chat
 	}
 
 	return nil
