@@ -185,6 +185,10 @@ func (cm ChatMessage) String() string {
 
 type ChatMessages []ChatMessage
 
+func (cm ChatMessages) FormatRoles() any {
+	llm.Messages{}.FormatRoles()
+}
+
 func (cm ChatMessages) TopAttachment() ChatMessage {
 	l := len(cm) - 1
 	for i := range cm {
