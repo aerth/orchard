@@ -172,6 +172,14 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	return nil
 }
 
+func typenames(v ...any) []string {
+	a := make([]string, len(v))
+	for i := range v {
+		a[i] = fmt.Sprintf("%T", v[i])
+	}
+	return a
+}
+
 // FromA (internal) combines variadic Exts into one
 func (e Ext) FromA(exts ...Ext) Ext {
 	temp := e
