@@ -98,6 +98,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	var out io.Writer = os.Stdout
 	var jsonout EncoderFunc
 	if MasterSend != nil {
+		slog.Info("using MasterSend")
 		out = io.Discard
 		jsonout = MasterSend
 	} else if conf.Get().JsonOutput {
