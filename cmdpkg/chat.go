@@ -160,7 +160,7 @@ Chat:
 				return stackerr.Errorf("adding tool output to db: %w", err)
 			}
 		}
-		if JsonOut != nil || (!conf.IsHideToolOuts() && jsonout != nil) {
+		if JsonOut != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
 			for i := range toolouts {
 				if err := jsonout(&toolouts[i]); err != nil {
 					return stackerr.Errorf("%w", err)
