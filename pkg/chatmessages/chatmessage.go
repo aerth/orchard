@@ -153,6 +153,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	if len(cr.Message.ToolCalls) == 0 {
 		return nil
 	}
+	slog.Info("collecting", "mid", cm.MessageID)
 	if cm.ToolCallID == "" {
 		cm.ToolCallID = cr.Message.ToolCallID
 	}
