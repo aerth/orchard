@@ -159,9 +159,12 @@ Chat:
 			"ncalls", len(newgenerated.ToolCalls), "err", err, "nresp", len(toolouts))
 
 		// option: let the bot handle errors
-		if WrapToolErrors && err != nil {
+		if WrapToolErrors && err != nil && !errors.Is(err, context.Canceled) {
 			toolouts = append(toolouts, WrapToolError(err)...)
 			err = nil
+		}
+		if err != nil {
+			return stackerr.Errorf("%w", err)
 		}
 		if len(toolouts) == 0 {
 			toolouts = append(toolouts, WrapToolError(fmt.Errorf("no output"))...)
