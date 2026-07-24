@@ -132,14 +132,14 @@ Chat:
 		if errors.Is(err, context.Canceled) {
 			newgenerated.Content += " (this reply was cancelled by user before it finished)"
 		}
+		stack = append(stack, *newgenerated)
+		newgenerated = &stack[len(stack)-1] // fix ptr
 		if e.Store != nil {
 			// Add sets initial msg.DBID
 			if err := e.Store.Add(context.WithoutCancel(ctx), e.ThreadID, newgenerated); err != nil {
 				return stackerr.Errorf("%w", err)
 			}
 		}
-		stack = append(stack, *newgenerated)
-		newgenerated = &stack[len(stack)-1] // fix ptr
 		if jsonout != nil {
 			// jsonout encoder may modify the pointer
 			if err := jsonout(&stack[len(stack)-1]); err != nil {
