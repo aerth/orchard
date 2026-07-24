@@ -11,7 +11,6 @@ import (
 	"slices"
 
 	"m/pkg/chatmessages"
-	"m/pkg/loaders/postgres"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -19,13 +18,20 @@ import (
 
 var ErrClosed = errors.New("closed")
 
-func New(db *postgres.PostgresDBStore) *PostgresDBStore {
-	return &PostgresDBStore{
+type (
+	PostgresDBStore = Store
+	Underlying      interface {
+		DB() *gorm.DB
+	}
+)
+
+func New(db Underlying) *Store {
+	return &Store{
 		db: db,
 	}
 }
 
-func (s *PostgresDBStore) DB() *gorm.DB {
+func (s *Store) DB() *gorm.DB {
 	if s == nil {
 		panic("nil store")
 	}
@@ -35,20 +41,11 @@ func (s *PostgresDBStore) DB() *gorm.DB {
 	return s.db.DB()
 }
 
-func NewFromEnv() *PostgresDBStore {
-	db, err := postgres.NewPostgres(&chatmessages.ChatMessage{})
-	if err != nil {
-		log.Fatal(err)
-		return nil
-	}
-	return New(db)
+type Store struct {
+	db Underlying
 }
 
-type PostgresDBStore struct {
-	db *postgres.PostgresDBStore
-}
-
-func (s *PostgresDBStore) Add(ctx context.Context, threadID uuid.UUID, msgs ...*chatmessages.ChatMessage) error {
+func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgs ...*chatmessages.ChatMessage) error {
 	if len(msgs) == 0 {
 		slog.Warn("no messages given to add")
 		return nil
@@ -77,7 +74,7 @@ func (s *PostgresDBStore) Add(ctx context.Context, threadID uuid.UUID, msgs ...*
 	return nil
 }
 
-func (s *PostgresDBStore) SaveThread(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages) error {
+func (s *Store) SaveThread(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages) error {
 	if threadID == uuid.Nil {
 		slog.Debug("not saving thread to db...", "threadID", threadID, "msgs", len(msgs), "msg1", msgs[len(msgs)-1])
 		return nil
@@ -105,7 +102,7 @@ func (s *PostgresDBStore) SaveThread(ctx context.Context, threadID uuid.UUID, ms
 	return nil
 }
 
-func (s *PostgresDBStore) LoadThread(ctx context.Context, threadID uuid.UUID, limit int) (chatmessages.ChatMessages, error) {
+func (s *Store) LoadThread(ctx context.Context, threadID uuid.UUID, limit int) (chatmessages.ChatMessages, error) {
 	msgs, err := gorm.G[chatmessages.ChatMessage](s.db.DB()).
 		//.Omit("embedding")
 		Where("role is NOT NULL and thread_id = ?", threadID).Order("id desc").Limit(limit).Find(ctx)
@@ -125,7 +122,7 @@ func (s *PostgresDBStore) LoadThread(ctx context.Context, threadID uuid.UUID, li
 	return msgs, err
 }
 
-func (s *PostgresDBStore) DeleteThread(ctx context.Context, threadID uuid.UUID) error {
+func (s *Store) DeleteThread(ctx context.Context, threadID uuid.UUID) error {
 	/*
 		db, err := s.db.DB().DB()
 		if err != nil {

@@ -1,5 +1,5 @@
 // Package postgres for running migrate
-package postgres
+package main
 
 import (
 	"fmt"

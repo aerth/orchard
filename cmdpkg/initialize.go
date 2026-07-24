@@ -112,10 +112,11 @@ func Initialize() (*global.Conf, error) {
 	}
 	Init().Set(slog.LevelDebug)
 	threads := map[uuid.UUID]bool{}
-	store := global.GetStore[*dbstore.PostgresDBStore]()
+	store := global.GetStore[*dbstore.Store]()
 	if store == nil {
-		store = dbstore.NewFromEnv()
-		global.SetStore(store)
+		slog.Warn("undefined... no store dunno")
+		//	store = dbstore.NewFromEnv()
+		//	global.SetStore(store)
 	}
 	if store != nil {
 		if false {

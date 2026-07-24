@@ -1,9 +1,10 @@
 VERSION := $(shell git tag | sort -V | tail -n 1)
 NOW := $(shell date +%s)
 bin=./bin
+WD!=pwd
 build: ${bin}/orchard-io
 ${bin}/orchard-io:	*.go */*.go */*/*.go
-	go build -v -ldflags '-X main.version=${VERSION} -X main.buildtime=${NOW} -X main.ollamahost=${OLLAMA_HOST} -X main.ollamamodel=${OLLAMA_MODEL} -X main.ollamathink=${OLLAMA_THINK}' -o ./bin/ ./cmd/...
+	go -C ./cmd/orchard-io build -v -ldflags '-X main.version=${VERSION} -X main.buildtime=${NOW} -X main.ollamahost=${OLLAMA_HOST} -X main.ollamamodel=${OLLAMA_MODEL} -X main.ollamathink=${OLLAMA_THINK}' -o ${WD}/bin/ 
 	@test ! -d orchard-chat || echo building orchard-chat TUI
 	@test ! -d orchard-chat || ${MAKE} -C orchard-chat 1>/dev/null
 run: build
