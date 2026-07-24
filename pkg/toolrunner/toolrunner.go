@@ -18,6 +18,7 @@ func Runtools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMe
 	toolouts, err := realruntools(ctx, tools, caller)
 	for i := range toolouts {
 		toolouts[i].ThreadID = caller.ThreadID
+		toolouts[i].From = caller.From
 	}
 	return toolouts, err
 }
