@@ -162,8 +162,7 @@ Chat:
 			return nil
 		}
 		//
-		slog.Info("detected tool calls",
-			"ncalls", len(newgenerated.ToolCalls))
+		slog.Info("detected tool calls", "ncalls", len(newgenerated.ToolCalls))
 		// run the tool exec funcs
 		toolouts, err := toolrunner.Runtools(ctx, tools, *newgenerated)
 		slog.Info("finished running tool calls",
