@@ -43,7 +43,8 @@ func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, tools otool.
 	if newmsg.Role != "user" {
 		return fmt.Errorf("expected 'user' role got '%s'", newmsg.Role)
 	}
-	if newmsg != nil && IsCommand(newmsg.Content) {
+	if IsCommand(newmsg.Content) {
+		slog.Info("detected command", "txt", newmsg.ContentOrToolCall())
 		add, err := HandleCommand(newmsg, &e, &stack)
 		// dont have caller generate
 		cmdmsg := *newmsg
