@@ -206,6 +206,9 @@ func (m Message) String() string {
 	if m.Content == "" {
 		return fmt.Sprintf("%s: (thinking) %s", from, m.Thinking)
 	}
+	if m.ToolName != "" {
+		return fmt.Sprintf("tool '%s': %s", m.ToolName, shorten(m.Content, 200, true))
+	}
 	return fmt.Sprintf("%s: %s", from, m.Content)
 }
 
