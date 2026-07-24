@@ -105,93 +105,95 @@ func ChatWith(ctx context.Context, stack chatmessages.ChatMessages, tools otool.
 	cl.HideToolCalls = conf.IsHideToolCalls()
 	var err error
 Chat:
-	e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
-	sctx := global.NewCancel(ctx)
-	e.Tools = tools.ToMarshaler()
-	cl.Reset()
-	got := chatmessages.NewFromRole(e.From, "assistant", "")
-	top := stack.Top()
-	if top.Role == "assistant" {
-		slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
-		return nil
-	}
-	slog.Info("Chatting", "after", top)
+	for ctx.Err() == nil {
+		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
+		sctx := global.NewCancel(ctx)
+		e.Tools = tools.ToMarshaler()
+		cl.Reset()
+		got := chatmessages.NewFromRole(e.From, "assistant", "")
+		top := stack.Top()
+		if top.Role == "assistant" {
+			slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
+			return nil
+		}
+		slog.Info("Chatting", "after", top)
 
-	{
-		spin := spinner.Start(sctx)
-		e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
-		err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
-		_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure stopped
-	}
-	if err != nil && !errors.Is(err, context.Canceled) {
-		return stackerr.Errorf("%w", err)
-	}
-	if errors.Is(err, context.Canceled) {
-		got.Content += " (this reply was cancelled by user before it finished)"
-	}
-	if e.Store != nil {
-		if err := e.Store.Add(context.WithoutCancel(ctx), conf.GetThreadID(), got); err != nil {
+		{
+			spin := spinner.Start(sctx)
+			e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
+			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
+			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure stopped
+		}
+		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("%w", err)
 		}
-	}
-	stack = append(stack, *got)
-	if jsonout != nil {
-		if err := jsonout(&stack[len(stack)-1]); err != nil {
-			return stackerr.Errorf("%w", err)
-		}
-	}
-
-	/*
-		// show output
-		if showChar {
-			fmt.Fprintf(os.Stderr, "\nBOT> ")
-		}
-		w := os.Stdout
-		if len(got.ToolCalls) != 0 {
-			w = os.Stderr
-		}
-		_, _ = fmt.Fprintf(w, "%s\n", got.ContentOrToolCall())
-	*/
-	// handle tools
-	if len(got.ToolCalls) != 0 {
-		slog.Info("detected tool calls", "ncalls", len(got.ToolCalls))
-		toolouts, err := toolrunner.Runtools(ctx, tools, *got)
-		slog.Info("finished running tool calls", "ncalls", len(got.ToolCalls), "err", err, "nresp", len(toolouts))
-		if WrapToolErrors && err != nil {
-			toolouts = append(toolouts, WrapToolError(err)...)
-			err = nil
-		}
-		if len(toolouts) == 0 {
-			toolouts = append(toolouts, WrapToolError(fmt.Errorf("no output"))...)
+		if errors.Is(err, context.Canceled) {
+			got.Content += " (this reply was cancelled by user before it finished)"
 		}
 		if e.Store != nil {
-			if err := e.Store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
-				return stackerr.Errorf("adding tool output to db: %w", err)
+			if err := e.Store.Add(context.WithoutCancel(ctx), conf.GetThreadID(), got); err != nil {
+				return stackerr.Errorf("%w", err)
 			}
 		}
-		if JsonOut != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
-			for i := range toolouts {
-				if err := jsonout(&toolouts[i]); err != nil {
-					return stackerr.Errorf("%w", err)
+		stack = append(stack, *got)
+		if jsonout != nil {
+			if err := jsonout(&stack[len(stack)-1]); err != nil {
+				return stackerr.Errorf("%w", err)
+			}
+		}
+
+		/*
+			// show output
+			if showChar {
+				fmt.Fprintf(os.Stderr, "\nBOT> ")
+			}
+			w := os.Stdout
+			if len(got.ToolCalls) != 0 {
+				w = os.Stderr
+			}
+			_, _ = fmt.Fprintf(w, "%s\n", got.ContentOrToolCall())
+		*/
+		// handle tools
+		if len(got.ToolCalls) != 0 {
+			slog.Info("detected tool calls", "ncalls", len(got.ToolCalls))
+			toolouts, err := toolrunner.Runtools(ctx, tools, *got)
+			slog.Info("finished running tool calls", "ncalls", len(got.ToolCalls), "err", err, "nresp", len(toolouts))
+			if WrapToolErrors && err != nil {
+				toolouts = append(toolouts, WrapToolError(err)...)
+				err = nil
+			}
+			if len(toolouts) == 0 {
+				toolouts = append(toolouts, WrapToolError(fmt.Errorf("no output"))...)
+			}
+			if e.Store != nil {
+				if err := e.Store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
+					return stackerr.Errorf("adding tool output to db: %w", err)
 				}
 			}
-		}
-		if !conf.IsHideToolOuts() {
-			if jsonout == nil {
+			if JsonOut != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
 				for i := range toolouts {
-					if showChar {
-						_, _ = fmt.Fprintf(os.Stderr, "TOOL> ")
+					if err := jsonout(&toolouts[i]); err != nil {
+						return stackerr.Errorf("%w", err)
 					}
-					_, _ = fmt.Fprintf(os.Stderr, "\n```\n%s\n```\n", toolouts[i].ContentOrToolCall())
 				}
 			}
+			if !conf.IsHideToolOuts() {
+				if jsonout == nil {
+					for i := range toolouts {
+						if showChar {
+							_, _ = fmt.Fprintf(os.Stderr, "TOOL> ")
+						}
+						_, _ = fmt.Fprintf(os.Stderr, "\n```\n%s\n```\n", toolouts[i].ContentOrToolCall())
+					}
+				}
+			}
+			if err != nil {
+				return stackerr.Errorf("running tools: %w", err)
+			}
+			stack = append(stack, toolouts...)
+			slog.Info("added toolouts", "n", len(toolouts), "ignored", conf.IsHideToolOuts(), "sent", jsonout != nil, "printed", jsonout == nil)
+			continue Chat
 		}
-		if err != nil {
-			return stackerr.Errorf("running tools: %w", err)
-		}
-		stack = append(stack, toolouts...)
-		slog.Info("added toolouts", "n", len(toolouts), "ignored", conf.IsHideToolOuts(), "sent", jsonout != nil, "printed", jsonout == nil)
-		goto Chat
 	}
 
 	return nil
