@@ -150,10 +150,15 @@ Chat:
 		if len(newgenerated.ToolCalls) == 0 {
 			return nil
 		}
-		slog.Info("detected tool calls", "ncalls", len(newgenerated.ToolCalls))
+		//
+		slog.Info("detected tool calls",
+			"ncalls", len(newgenerated.ToolCalls))
+		// run the tool exec funcs
 		toolouts, err := toolrunner.Runtools(ctx, tools, *newgenerated)
 		slog.Info("finished running tool calls",
 			"ncalls", len(newgenerated.ToolCalls), "err", err, "nresp", len(toolouts))
+
+		//
 		if WrapToolErrors && err != nil {
 			toolouts = append(toolouts, WrapToolError(err)...)
 			err = nil
