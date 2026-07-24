@@ -118,7 +118,6 @@ Chat:
 	if err != nil && !errors.Is(err, context.Canceled) {
 		return stackerr.Errorf("%w", err)
 	}
-
 	if errors.Is(err, context.Canceled) {
 		got.Content += " (this reply was cancelled by user before it finished)"
 	}
