@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
-
 	"m/cmdpkg/rege"
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
@@ -19,6 +17,7 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"os"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -44,6 +43,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	if newmsg.Role != "user" {
 		return fmt.Errorf("expected 'user' role to generate a reply to, but got '%s'", newmsg.Role)
 	}
+	slog := slog.With("messageID", newmsg.MessageID)
 	if IsCommand(newmsg.Content) {
 		slog.Info("detected command", "txt", newmsg.ContentOrToolCall())
 		add, err := HandleCommand(newmsg, &e, &stack)
