@@ -112,7 +112,7 @@ Chat:
 		sctx := global.NewCancel(ctx)
 		e.Tools = tools.ToMarshaler()
 		cl.Reset()
-		got := chatmessages.NewFromRole(e.From, "assistant", "")
+		newgenerated := chatmessages.NewFromRole(e.From, "assistant", "")
 		top := stack.Top()
 		if top.Role == "assistant" {
 			slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
@@ -122,7 +122,7 @@ Chat:
 
 		{
 			spin := spinner.Start(sctx)
-			e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, got.GatherChatResponse}
+			e.Handlers = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newgenerated.GatherChatResponse}
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure stopped
 		}
@@ -130,14 +130,15 @@ Chat:
 			return stackerr.Errorf("%w", err)
 		}
 		if errors.Is(err, context.Canceled) {
-			got.Content += " (this reply was cancelled by user before it finished)"
+			newgenerated.Content += " (this reply was cancelled by user before it finished)"
 		}
 		if e.Store != nil {
 			if err := e.Store.Add(context.WithoutCancel(ctx), conf.GetThreadID(), got); err != nil {
 				return stackerr.Errorf("%w", err)
 			}
 		}
-		stack = append(stack, *got)
+		stack = append(stack, *newgenerated)
+		newgenerated = &stack[len(stack)-1] // fix ptr
 		if jsonout != nil {
 			// jsonout encoder may modify the pointer
 			if err := jsonout(&stack[len(stack)-1]); err != nil {
@@ -145,7 +146,7 @@ Chat:
 			}
 		}
 		// handle tools
-		if len(got.ToolCalls) == 0 {
+		if len(newgenerated.ToolCalls) == 0 {
 			return nil
 		}
 		slog.Info("detected tool calls", "ncalls", len(got.ToolCalls))
