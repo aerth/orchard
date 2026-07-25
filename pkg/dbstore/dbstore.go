@@ -8,9 +8,8 @@ import (
 	"iter"
 	"log"
 	"log/slog"
-	"slices"
-
 	"m/pkg/chatmessages"
+	"slices"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -30,6 +29,7 @@ func New(db Underlying) *Store {
 		db: db,
 	}
 }
+func (*Store) IsDB() {}
 
 func (s *Store) DB() *gorm.DB {
 	if s == nil {
