@@ -86,18 +86,19 @@ type (
 	MPS []*chatmessages.ChatMessage
 )
 
-func FromDB(ctx context.Context, threadID uuid.UUID, e Ext) (chatmessages.ChatMessages, error) {
-	// get messages from db
-	if e.Store == nil {
-		return nil, fmt.Errorf("no db store to load messages")
+/*
+	func FromDB(ctx context.Context, threadID uuid.UUID, e Ext) (chatmessages.ChatMessages, error) {
+		// get messages from db
+		if e.Store == nil {
+			return nil, fmt.Errorf("no db store to load messages")
+		}
+		msgs, err := e.Store.LoadThread(ctx, threadID, 10)
+		if err != nil {
+			return nil, stackerr.Errorf("%w", err)
+		}
+		return msgs, nil
 	}
-	msgs, err := e.Store.LoadThread(ctx, threadID, 10)
-	if err != nil {
-		return nil, stackerr.Errorf("%w", err)
-	}
-	return msgs, nil
-}
-
+*/
 var client *llm.Client
 
 func SetClient(x *llm.Client) {
