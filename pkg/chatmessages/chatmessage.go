@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -245,6 +246,9 @@ func (cm ChatMessages) TopAssistant() ChatMessage {
 }
 
 func (cm ChatMessages) TopN(n int) ChatMessages {
+	if n < 0 {
+		panic("n must be 0>")
+	}
 	l := len(cm) - 1
 	if l < n {
 		return cm
