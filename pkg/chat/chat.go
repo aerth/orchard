@@ -20,7 +20,7 @@ type (
 	Ext         struct {
 		ThreadID uuid.UUID                         // will be attached to all messages (generated assistant, tool results, system)
 		PreFunc  func(creq *llm.ChatRequest) error // Called right before llm.Chat call, may be used to cancel
-		Handlers []ChatHandler
+		Handlers []ChatHandler                     // Handlers func (cr ChatResponse) error
 		From     string
 		Prepend  []llm.Message
 		Append   []llm.Message
