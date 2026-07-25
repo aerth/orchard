@@ -176,8 +176,6 @@ func (c *ConsoleLogger) Reset() {
 	c.buf = ""
 }
 
-var noSummaries = false && os.Getenv("LLM_SUMMARY") != "1"
-
 func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) {
 	if cr.Done {
 		c.emode = xDONE
