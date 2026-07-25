@@ -22,9 +22,9 @@ type (
 		PreFunc  func(creq *llm.ChatRequest) error // Called right before llm.Chat call, may be used to cancel
 		Handlers []ChatHandler                     // Handlers func (cr ChatResponse) error
 		From     string                            // From added to assistant/toolouts
-		Prepend  []llm.Message
-		Append   []llm.Message
-		Tools    []json.Marshaler
+		Prepend  []llm.Message                     // prepended to messages (tmp)
+		Append   []llm.Message                     // appended to messages (tmp)
+		Tools    []json.Marshaler                  // Tools available
 		Store    StoreI
 		// Images   [][]byte
 	}
