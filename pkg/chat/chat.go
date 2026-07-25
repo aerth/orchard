@@ -24,8 +24,8 @@ type (
 		From     string                            // From added to assistant/toolouts
 		Prepend  []llm.Message                     // prepended to messages (tmp)
 		Append   []llm.Message                     // appended to messages (tmp)
-		Tools    []json.Marshaler                  // Tools available
-		Store    StoreI
+		Tools    []json.Marshaler                  // Tool specs available
+		Store    StoreI                            // Store unused
 		// Images   [][]byte
 	}
 )
