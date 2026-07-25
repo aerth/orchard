@@ -21,7 +21,7 @@ type (
 		ThreadID uuid.UUID                         // will be attached to all messages (generated assistant, tool results, system)
 		PreFunc  func(creq *llm.ChatRequest) error // Called right before llm.Chat call, may be used to cancel
 		Handlers []ChatHandler                     // Handlers func (cr ChatResponse) error
-		From     string
+		From     string                            // From added to assistant/toolouts
 		Prepend  []llm.Message
 		Append   []llm.Message
 		Tools    []json.Marshaler
