@@ -137,6 +137,7 @@ Chat:
 
 		// this goroutine needs its own chat ptr for GatherChatResponse and then tool calls
 		newcaller := chatmessages.NewFromRole(e.From, "assistant", "")
+		newcaller.ThreadID = e.ThreadID
 		{
 			spin := spinner.Start(sctx)
 			e.Handlers = append(handlers, []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newcaller.GatherChatResponse}...)
