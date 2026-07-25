@@ -7,16 +7,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"log/slog"
-	"m/pkg/chatmessages"
-	"m/pkg/dbstore"
-	"m/pkg/global"
-	"m/pkg/llm"
-	"m/pkg/otool"
 	"os"
 	"slices"
 	"strings"
+
+	"m/pkg/chatmessages"
+	"m/pkg/global"
+	"m/pkg/llm"
+	"m/pkg/otool"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -182,34 +181,6 @@ func Initialize() (*global.Conf, error) {
 		global.LogWriter = f
 	}
 	Init().Set(slog.LevelDebug)
-	threads := map[uuid.UUID]bool{}
-	store := global.GetStore[*dbstore.Store]()
-	if store == nil {
-		slog.Warn("undefined... no store dunno")
-		//	store = dbstore.NewFromEnv()
-		//	global.SetStore(store)
-	}
-	if store != nil {
-		if false {
-			for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {
-				log.Printf("iter: %s", v.String())
-				threads[v.ThreadID] = true
-				//
-			}
-		}
-		if clearfirst {
-			if false {
-				for thread := range threads {
-					if err := store.DeleteThread(context.TODO(), thread); err != nil {
-						return conf, err
-					}
-				}
-			}
-			if err := store.DeleteThread(context.TODO(), conf.GetThreadID()); err != nil {
-				return conf, err
-			}
-		}
-	}
 	return conf, nil
 }
 
