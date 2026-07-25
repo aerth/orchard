@@ -160,10 +160,9 @@ func loadInitFlagsEnv(clearfirst *bool) (*global.Conf, error) {
 	return global.NewConfigFlags(clearfirst), nil
 }
 
-func Initialize() (*global.Conf, error) {
+func Initialize(clearfirst *bool) (*global.Conf, error) {
 	//store := dbstore.NewFromEnv()
-	var clearfirst bool
-	conf, err := loadInitFlagsEnv(&clearfirst)
+	conf, err := loadInitFlagsEnv(clearfirst)
 	if err != nil {
 		return nil, stackerr.Errorf("%w", err)
 	}
