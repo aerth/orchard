@@ -12,7 +12,7 @@ import (
 	"regexp"
 	"strings"
 
-	"m/cmdpkg"
+	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -76,7 +76,7 @@ func RunBashScript(ctx context.Context, stdinReal io.Reader, params RunParams) (
 
 	var mw io.Writer = &buf
 	if EchoBash {
-		mw = io.MultiWriter(cmdpkg.Writer, &buf)
+		mw = io.MultiWriter(global.LogWriter, &buf)
 	}
 	cmd.Dir = params.WorkingDir
 	cmd.Stderr = mw
@@ -173,7 +173,7 @@ func RunPyStdin(ctx context.Context, stdin io.Reader, params RunParams) (string,
 	}
 	var mw io.Writer = &buf
 	if EchoPython {
-		mw = io.MultiWriter(cmdpkg.Writer, &buf)
+		mw = io.MultiWriter(global.LogWriter, &buf)
 	}
 	cmd.Dir = params.WorkingDir
 	cmd.Stderr = mw
