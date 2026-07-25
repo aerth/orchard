@@ -325,28 +325,37 @@ func (m *Metrics) Summary(w io.Writer) {
 	x := false
 	if m.TotalDuration > 0 {
 		fmt.Fprintf(w, "total duration:       %v\n", m.TotalDuration)
+		x = true
 	}
 
 	if m.LoadDuration > 0 {
 		fmt.Fprintf(w, "load duration:        %v\n", m.LoadDuration)
+		x = true
 	}
 
 	if m.PromptEvalCount > 0 {
 		fmt.Fprintf(w, "prompt eval count:    %d token(s)\n", m.PromptEvalCount)
+		x = true
 	}
 
 	if m.PromptEvalDuration > 0 {
+		x = true
 		fmt.Fprintf(w, "prompt eval duration: %s\n", m.PromptEvalDuration)
 		fmt.Fprintf(w, "prompt eval rate:     %.2f tokens/s\n", float64(m.PromptEvalCount)/m.PromptEvalDuration.Seconds())
 	}
 
 	if m.EvalCount > 0 {
+		x = true
 		fmt.Fprintf(w, "eval count:           %d token(s)\n", m.EvalCount)
 	}
 
 	if m.EvalDuration > 0 {
+		x = true
 		fmt.Fprintf(w, "eval duration:        %s\n", m.EvalDuration)
 		fmt.Fprintf(w, "eval rate:            %.2f tokens/s\n", float64(m.EvalCount)/m.EvalDuration.Seconds())
+	}
+	if !x {
+		fmt.Fprintf(w, "no summary available\n")
 	}
 }
 
