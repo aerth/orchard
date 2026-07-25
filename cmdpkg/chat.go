@@ -212,9 +212,6 @@ Chat:
 				}
 			}
 		}
-		if err != nil {
-			return stackerr.Errorf("running tools: %w", err)
-		}
 		stack = append(stack, toolouts...)
 		slog.Info("added toolouts", "n", len(toolouts), "ignored", conf.IsHideToolOuts(), "sent", jsonout != nil, "printed", jsonout == nil)
 		continue Chat
