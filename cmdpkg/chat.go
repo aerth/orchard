@@ -22,6 +22,7 @@ import (
 	"m/pkg/toolrunner"
 
 	"github.com/aerth/mostly/stackerr"
+	"github.com/google/uuid"
 )
 
 type EncoderFunc = func(v *chatmessages.ChatMessage) error
@@ -118,6 +119,11 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	handlers := e.Handlers
 Chat:
 	for ctx.Err() == nil {
+		for i := range stack {
+			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil || stack[i].ThreadID == uuid.Nil {
+				return fmt.Errorf("detected ")
+			}
+		}
 		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 		sctx := global.NewCancel(ctx)
 		e.Tools = tools.ToMarshaler()
