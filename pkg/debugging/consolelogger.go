@@ -108,29 +108,9 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 			}
 		}
 	}()
-	/*
-		if m.Thinking == "" && m.Content == "" && len(m.ToolCalls) == 0 {
-			if len(c.buf) != 0 {
-				got, ok := translation.MaybeRepairOutputRegex(c.buf)
-				if ok && len(got) != 0 {
-					_, _ = fmt.Fprintf(w, "%s", c.buf)
-					c.buf = ""
-					c.emode = 0
-				}
-			}
-			return
-		}
-	*/
-
 	// no content, yes thinking
 	if m.Content == "" && m.Thinking != "" && c.emode == 0 {
 		c.buf += m.Thinking
-		/*
-			if got, ok := translation.MaybeRepairOutputRegex(c.buf); ok && len(got) != 0 {
-				c.buf = ""
-				m.Content += got
-			}
-		*/
 		if len(c.buf) > 32 { // got it
 			m.Thinking = c.buf
 			c.emode = xGO
