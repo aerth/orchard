@@ -10,6 +10,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
 	"runtime"
 
 	"m/pkg/global"
@@ -52,6 +53,10 @@ func (c *Client) stream(ctx context.Context, method, path string, data any, fn f
 			}
 		}
 		buf = bytes.NewBuffer(bts)
+
+		if os.Getenv("SHOW_LLM_REQUEST") == "2" {
+			_, _ = global.LogWriter.Write(bts)
+		}
 	}
 
 	requestURL := c.base.JoinPath(path)
