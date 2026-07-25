@@ -197,6 +197,11 @@ Chat:
 				}
 			}
 		}
+		if e.NonStreamHandler != nil {
+			for i := range toolouts {
+				e.NonStreamHandler(toolouts[i])
+			}
+		}
 		if !conf.IsHideToolOuts() {
 			if jsonout == nil {
 				for i := range toolouts {
