@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+	"time"
+
 	"m/cmdpkg/rege"
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
@@ -17,8 +20,6 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
-	"time"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -128,6 +129,7 @@ Chat:
 		}
 		slog.Info("Chatting", "after", top)
 
+		// this goroutine needs its own chat ptr for GatherChatResponse and then tool calls
 		newcaller := chatmessages.NewFromRole(e.From, "assistant", "")
 		{
 			spin := spinner.Start(sctx)
