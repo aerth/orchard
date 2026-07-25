@@ -21,7 +21,7 @@ type (
 		ThreadID         uuid.UUID                         // will be attached to all messages (generated assistant, tool results, system)
 		PreFunc          func(creq *llm.ChatRequest) error // Called right before llm.Chat call, may be used to cancel
 		PostFunc         func(err error) error             // should return nil
-		Handlers         []ChatHandler                     // Handlers func (cr ChatResponse) error
+		Handlers         []ChatHandler                     // Handlers for streaming, func (cr ChatResponse) error
 		NonStreamHandler func(chatmessages.ChatMessage)    // for toolouts/system (not generated assistant stream)
 		From             string                            // From added to assistant/toolouts
 		Prepend          []llm.Message                     // prepended to messages (tmp)
