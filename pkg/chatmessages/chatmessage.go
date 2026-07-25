@@ -128,8 +128,10 @@ func NewToolReply(caller ChatMessage, i int, content string) *ChatMessage {
 	return NewFrom(caller.From, toolmsg)
 }
 
+// MessageOptions are not saved to DB
 type MessageOptions struct {
 	Summary     any
+	Metrics     llm.Metrics
 	Aux         any
 	Attachments []string // Attachments filenames
 	Ephemeral   bool
