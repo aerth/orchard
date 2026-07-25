@@ -322,6 +322,7 @@ type Metrics struct {
 }
 
 func (m *Metrics) Summary(w io.Writer) {
+	x := false
 	if m.TotalDuration > 0 {
 		fmt.Fprintf(w, "total duration:       %v\n", m.TotalDuration)
 	}
