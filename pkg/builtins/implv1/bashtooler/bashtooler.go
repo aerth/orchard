@@ -17,6 +17,8 @@ import (
 	"github.com/aerth/mostly/stackerr"
 )
 
+var NewCleanEnviron func() []string
+
 func RunBash(ctx context.Context, wd string, filename string, args ...string) (string, error) {
 	stdin, err := os.Open(filename)
 	if err != nil {
