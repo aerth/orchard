@@ -169,8 +169,8 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	err := client.Chat(ctx, creq, e.Handlers...)
 
 	if e.PostFunc != nil {
-		if err := e.PostFunc(err); err != nil {
-			return stackerr.Errorf("%w", err)
+		if e := e.PostFunc(err); e != nil {
+			return stackerr.Errorf("%w %w", err, e)
 		}
 	}
 	if err != nil {
