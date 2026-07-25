@@ -10,6 +10,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 
 	"m/pkg/chatmessages"
@@ -23,6 +24,47 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 )
+
+var okenvs = map[string]bool{
+	"INPUT_FILE":          true,
+	"LANG":                true,
+	"PATH":                true,
+	"HOME":                true,
+	"XDG_CACHE_HOME":      true,
+	"XDG_DATA_HOME":       true,
+	"XDG_CONFIG_DIRS":     true,
+	"XDG_CONFIG_HOME":     true,
+	"XDG_CURRENT_DESKTOP": true,
+	"XDG_RUNTIME_DIR":     true,
+	"XDG_DATA_DIRS":       true,
+	"USER":                true,
+	"SHELL":               true,
+	"REQUESTS_CA_BUNDLE":  true, //=/etc/ssl/certs/ca-certificates.crt"
+	"PWD":                 true,
+	"OLLAMA_HOST":         true,
+	"OLLAMA_MODEL":        true,
+	"OLLAMA_THINK":        true,
+	"TERM":                true,
+	// experiments
+	"DISPLAY":    true,
+	"__MISE_EXE": true,
+}
+
+func NewCleanEnviron() []string {
+	env := slices.DeleteFunc(os.Environ(), func(s string) bool {
+		x := strings.Split(s, "=")[0]
+		return !okenvs[x]
+	})
+	if !slices.ContainsFunc(env, func(e string) bool {
+		return strings.HasPrefix(e, "REQUESTS_CA_BUNDLE")
+	}) {
+		env = append(env, "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt")
+	}
+	//for i := range env {
+	//		log.Printf("using python with env %s", env[i])
+	//	}
+	return env
+}
 
 func ResetEnvClean() {
 	// clear env, then replace with clean env -- this new, cleaned env is passed to tool calls for python/bash tools
