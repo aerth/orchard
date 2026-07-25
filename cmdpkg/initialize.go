@@ -9,15 +9,14 @@ import (
 	"io"
 	"log"
 	"log/slog"
-	"os"
-	"slices"
-	"strings"
-
 	"m/pkg/chatmessages"
 	"m/pkg/dbstore"
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/otool"
+	"os"
+	"slices"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -168,6 +167,9 @@ func Initialize() (*global.Conf, error) {
 	conf, err := loadInitFlagsEnv(&clearfirst)
 	if err != nil {
 		return nil, stackerr.Errorf("%w", err)
+	}
+	if conf.GetThreadID() == uuid.Nil {
+		return nil, stackerr.Errorf("thread id cannot be nil")
 	}
 	// set up logging
 	// log.Printf("Got config: %#v", conf)
