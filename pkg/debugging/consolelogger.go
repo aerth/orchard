@@ -101,6 +101,7 @@ func fflush(w io.Writer) {
 
 func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 	defer func() {
+		// flush required for some writers
 		if flusher, ok := w.(interface{ Flush() error }); ok {
 			if err := flusher.Flush(); err != nil {
 				panic(err.Error())
