@@ -18,7 +18,7 @@ import (
 type (
 	ChatHandler = func(llm.ChatResponse) error
 	Ext         struct {
-		ThreadID uuid.UUID
+		ThreadID uuid.UUID // will be attached to all messages (generated assistant or tool results)
 		PreFunc  func(creq *llm.ChatRequest) error
 		Handlers []ChatHandler
 		From     string
