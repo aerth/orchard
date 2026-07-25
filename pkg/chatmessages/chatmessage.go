@@ -195,7 +195,11 @@ func (cm ChatMessage) String() string {
 }
 
 func (cm ChatMessages) Contents() string {
-	return ""
+	var str strings.Builder
+	for i := range cm {
+		str.WriteString(cm[i].Content)
+	}
+	return str.String()
 }
 
 type ChatMessages []ChatMessage
