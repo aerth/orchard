@@ -79,7 +79,9 @@ func GetVersion() string {
 	return version
 }
 
-func SetStore(store any) {
+type dbstore interface{}
+
+func SetStore[T dbstore](store T) {
 	gstore = store
 }
 
