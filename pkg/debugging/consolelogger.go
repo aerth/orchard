@@ -102,11 +102,8 @@ func fflush(w io.Writer) {
 func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 	defer func() {
 		// flush required for some writers
-		if flusher, ok := w.(interface{ Flush() error }); ok {
-			if err := flusher.Flush(); err != nil {
-				panic(err.Error())
-			}
-		}
+		fflush(w)
+		fflush(tw)
 	}()
 	// no content, yes thinking
 	if m.Content == "" && m.Thinking != "" && c.emode == 0 {
@@ -122,7 +119,6 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 	// thinking actual
 	if c.emode != 0 && len(m.Thinking) != 0 && !c.HideThinking {
 		_, _ = fmt.Fprintf(tw, "%s", m.Thinking)
-		fflush(tw)
 	}
 	if m.Content != "" {
 		if c.emode != xCONTENT {
