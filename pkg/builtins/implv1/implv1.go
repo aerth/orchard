@@ -105,8 +105,6 @@ func (w writefileArgs) IsToolArgument() {}
 
 func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	// 1. Extract args from the specific tool call in the message history
-	// This assumes your Message struct allows access to the raw ToolCalls string slice
-	// var args writefileArgs
 	call, err := chat.ReadToolCall[writefileArgs](ctx, caller, toolCallIndex)
 	if err != nil {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: fmt.Sprintf("Error parsing args: %+v", err)})
