@@ -50,10 +50,20 @@ var okenvs = map[string]bool{
 	"__MISE_EXE": true,
 }
 
+func isbad(s string) bool {
+	if okenvs[s] {
+		return false
+	}
+	if strings.HasPrefix(s, "OLLAMA_") || strings.HasPrefix(s, "ORCHARD_") || strings.HasPrefix(s, "LLM_") {
+		return false
+	}
+	return true
+}
+
 func NewCleanEnviron() []string {
 	env := slices.DeleteFunc(os.Environ(), func(s string) bool {
 		x := strings.Split(s, "=")[0]
-		return !okenvs[x]
+		return isbad(x)
 	})
 	if !slices.ContainsFunc(env, func(e string) bool {
 		return strings.HasPrefix(e, "REQUESTS_CA_BUNDLE")
