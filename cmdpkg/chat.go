@@ -121,7 +121,7 @@ Chat:
 	for ctx.Err() == nil {
 		for i := range stack {
 			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil || stack[i].ThreadID == uuid.Nil {
-				return fmt.Errorf("detected")
+				return fmt.Errorf("detected: %d", i)
 			}
 		}
 		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
