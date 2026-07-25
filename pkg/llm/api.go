@@ -441,7 +441,7 @@ func NewChatRequest() *ChatRequest {
 	if think == "true" {
 		think = true
 	}
-	return &ChatRequest{
+	x := &ChatRequest{
 		Model:     model,
 		Think:     think,
 		Stream:    new(true),
@@ -450,4 +450,5 @@ func NewChatRequest() *ChatRequest {
 		//	TopLogprobs:     0,
 		//	Options: map[string]any{"temperature": temp}, // "num_ctx": numCtx},
 	}
+	return x
 }
