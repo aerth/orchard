@@ -134,11 +134,6 @@ Chat:
 			e.Handlers = append(handlers, []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newcaller.GatherChatResponse}...)
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped regardless of output
-			if e.PostFunc != nil {
-				if err := e.PostFunc(err); err != nil {
-					return stackerr.Errorf("%w", err)
-				}
-			}
 		}
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
 		if err != nil && !errors.Is(err, context.Canceled) {
