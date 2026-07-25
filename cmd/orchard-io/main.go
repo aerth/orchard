@@ -87,13 +87,15 @@ func main1(ctx context.Context) error {
 	if err != nil {
 		return stackerr.Errorf("initialize: %w", err)
 	}
-	store, err := NewPostgres(&chatmessages.ChatMessage{})
+	sql, err := NewPostgres(&chatmessages.ChatMessage{})
 	if err != nil {
 		return stackerr.Errorf("db: %w", err)
 	}
+	store := dbstore.New(sql)
 	if clearfirst {
+		store.DeleteThread(ctx, conf.GetThreadID())
 	}
-	global.SetStore(dbstore.New(store))
+	global.SetStore(store)
 	err = runmain(ctx, conf)
 	if err != nil {
 		return stackerr.Errorf("runmain: %w", err)
