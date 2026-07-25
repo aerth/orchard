@@ -414,7 +414,11 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	if !strings.HasSuffix(content, "\n") {
 		content += "\n"
 	}
-	_, err = fmt.Fprintf(w, "%s: %s", cm.GetName(username, botname), content)
+	name := cm.GetName(username, botname)
+	if name == "" {
+		return nil
+	}
+	_, err = fmt.Fprintf(w, "%s: %s", name, content)
 	if err != nil {
 		return err
 	}
