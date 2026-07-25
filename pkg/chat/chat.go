@@ -25,7 +25,7 @@ type (
 		Prepend  []llm.Message                     // prepended to messages (tmp)
 		Append   []llm.Message                     // appended to messages (tmp)
 		Tools    []json.Marshaler                  // Tool specs available
-		//	Store    StoreI                            // Store unused
+		Store    StoreI                            // Store unused
 		// Images   [][]byte
 	}
 )
