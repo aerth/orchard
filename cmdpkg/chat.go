@@ -88,11 +88,12 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		} else {
 			slog.Info("no attachments found in message", "txt", newmsg.Content)
 		}
-		if e.Store != nil {
-			if err := e.Store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
-				return stackerr.Errorf("%w", err)
-			}
-		}
+		/*
+			if e.Store != nil {
+				if err := e.Store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
+					return stackerr.Errorf("%w", err)
+				}
+			}*/
 	}
 	//stack = append(stack, *newmsg)
 	var out io.Writer = os.Stdout
