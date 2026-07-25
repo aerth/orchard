@@ -194,6 +194,10 @@ func (cm ChatMessage) String() string {
 	return "thr_" + cm.ThreadID.String()[:8] + "_msg_" + cm.MessageID.String()[:8] + "_" + cm.Message.String()
 }
 
+func (cm ChatMessages) Contents() string {
+	return ""
+}
+
 type ChatMessages []ChatMessage
 
 func (cm ChatMessages) FormatRoles() []string {
