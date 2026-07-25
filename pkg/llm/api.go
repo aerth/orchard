@@ -15,6 +15,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -449,6 +450,18 @@ func NewChatRequest() *ChatRequest {
 		//	DebugRenderOnly: os.Getenv("OLLAMA_DEBUG_RENDER") == "1",
 		//	TopLogprobs:     0,
 		//	Options: map[string]any{"temperature": temp}, // "num_ctx": numCtx},
+	}
+	if s := os.Getenv("OLLAMA_NUM_CTX"); s != "" {
+		n, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			slog.Error("could not parse OLLAMA_NUM_CTX")
+		}
+		if n > 0 {
+			if x.Options == nil {
+				x.Options = map[string]any{}
+			}
+			x.Options["num_ctx"] = n
+		}
 	}
 	return x
 }
