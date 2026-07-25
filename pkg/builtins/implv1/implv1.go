@@ -1,4 +1,4 @@
-// Package implv1 tool
+// Package implv1 builtin tools (implemented in Go instead of python/bash)
 package implv1
 
 import (
