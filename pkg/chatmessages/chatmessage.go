@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -172,6 +171,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		var buf bytes.Buffer
 		cr.Summary(&buf)
 		cm.Summary = buf.String()
+		cm.Metrics = cr.Metrics
 	}
 	return nil
 }
