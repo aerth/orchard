@@ -175,6 +175,10 @@ Chat:
 		toolouts, err := toolrunner.Runtools(ctx, tools, *newcaller)
 		slog.Info("finished running tool calls",
 			"ncalls", len(newcaller.ToolCalls), "err", err, "nresp", len(toolouts))
+		for i := range toolouts {
+			toolouts[i].ThreadID = e.ThreadID
+			toolouts[i].From = e.From
+		}
 
 		// option: let the bot handle errors
 		if WrapToolErrors &&
