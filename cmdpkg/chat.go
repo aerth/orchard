@@ -173,26 +173,28 @@ Chat:
 		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls))
 		// run the tool exec funcs
 		toolouts, err := toolrunner.Runtools(ctx, tools, *newcaller)
-		slog.Info("finished running tool calls",
-			"ncalls", len(newcaller.ToolCalls), "err", err, "nresp", len(toolouts))
-		for i := range toolouts {
-			toolouts[i].ThreadID = e.ThreadID
-			toolouts[i].From = e.From
-		}
+		{
+			slog.Info("finished running tool calls",
+				"ncalls", len(newcaller.ToolCalls), "err", err, "nresp", len(toolouts))
 
-		// option: let the bot handle errors
-		if WrapToolErrors &&
-			err != nil &&
-			!errors.Is(err, context.Canceled) &&
-			!errors.Is(err, toolrunner.ErrFatalToolResult) {
-			toolouts = append(toolouts, WrapToolError(err)...)
-			err = nil
-		}
-		if err != nil {
-			return stackerr.Errorf("%w", err)
-		}
-		if len(toolouts) == 0 {
-			toolouts = append(toolouts, WrapToolError(fmt.Errorf("no output"))...)
+			// option: let the bot handle errors
+			if WrapToolErrors &&
+				err != nil &&
+				!errors.Is(err, context.Canceled) &&
+				!errors.Is(err, toolrunner.ErrFatalToolResult) {
+				toolouts = append(toolouts, WrapToolError(err)...)
+				err = nil
+			}
+			if err != nil {
+				return stackerr.Errorf("%w", err)
+			}
+			if len(toolouts) == 0 {
+				toolouts = append(toolouts, WrapToolError(fmt.Errorf("no output"))...)
+			}
+			for i := range toolouts {
+				toolouts[i].ThreadID = e.ThreadID
+				toolouts[i].From = e.From
+			}
 		}
 		/*
 			if e.Store != nil {
@@ -200,20 +202,20 @@ Chat:
 					return stackerr.Errorf("adding tool output to db: %w", err)
 				}
 			}*/
-		if MasterSend != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
-			for i := range toolouts {
-				if err := jsonout(&toolouts[i]); err != nil {
-					return stackerr.Errorf("%w", err)
+		{
+			if MasterSend != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
+				for i := range toolouts {
+					if err := jsonout(&toolouts[i]); err != nil {
+						return stackerr.Errorf("%w", err)
+					}
 				}
 			}
-		}
-		if e.NonStreamHandler != nil {
-			for i := range toolouts {
-				e.NonStreamHandler(toolouts[i])
+			if e.NonStreamHandler != nil {
+				for i := range toolouts {
+					e.NonStreamHandler(toolouts[i])
+				}
 			}
-		}
-		if !conf.IsHideToolOuts() {
-			if jsonout == nil {
+			if !conf.IsHideToolOuts() && jsonout == nil {
 				for i := range toolouts {
 					if showChar {
 						_, _ = fmt.Fprintf(os.Stderr, "TOOL> ")
