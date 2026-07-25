@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -339,6 +340,9 @@ func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botna
 }
 
 func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname string) (string, error) {
+	if cm.Aux != nil {
+		return fmt.Sprintf("%v", cm.Aux), nil
+	}
 	if cm.Equals(llm.Message{}) {
 		return fmt.Sprint(cm.Aux), nil
 	}
