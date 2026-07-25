@@ -11,14 +11,13 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
 	"runtime"
 	"strings"
 	"time"
-
-	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -383,7 +382,7 @@ func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatSt
 	if len(callbacks) == 0 {
 		return fmt.Errorf("no callbacks")
 	}
-	if len(creq.Tools) == 0 {
+	if len(creq.Tools) == 0 { // messages may be empty for preloading an llm model on the server
 		return fmt.Errorf("no tools?")
 	}
 	slog.Info("chatting", "n", len(creq.Messages), "tools", len(creq.Tools), "roles", creq.Messages.FormatRoles())
