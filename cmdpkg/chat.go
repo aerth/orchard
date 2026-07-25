@@ -143,7 +143,7 @@ Chat:
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped regardless of output
 			if summary, ok := newcaller.Summary.(string); ok {
-				global.LogWriter.Write([]byte(summary))
+				global.LogWriter.Write([]byte("\n\n\n" + summary + "\n\n\n"))
 			}
 		}
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
