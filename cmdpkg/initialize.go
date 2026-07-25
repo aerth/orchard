@@ -181,6 +181,8 @@ func Initialize() (*global.Conf, error) {
 		global.LogWriter = f
 	}
 	Init().Set(slog.LevelDebug)
+	//	threads := map[uuid.UUID]bool{}
+	//	for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {
 	return conf, nil
 }
 
