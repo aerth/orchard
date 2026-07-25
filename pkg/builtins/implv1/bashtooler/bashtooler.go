@@ -17,7 +17,7 @@ import (
 	"github.com/aerth/mostly/stackerr"
 )
 
-var NewCleanEnviron func() []string
+var NewCleanEnviron = func() []string { return nil }
 
 func Init(newcleanenv func() []string) {
 	NewCleanEnviron = newcleanenv
