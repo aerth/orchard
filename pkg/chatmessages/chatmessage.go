@@ -343,6 +343,9 @@ func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname 
 	if cm.Aux != nil {
 		return fmt.Sprintf("%v", cm.Aux), nil
 	}
+	if cm.Equals(llm.Message{}) && cm.From != "" {
+		return fmt.Sprintf("(empty from %s)", cm.From), nil
+	}
 	if cm.Equals(llm.Message{}) {
 		return "(empty)", nil
 	}
