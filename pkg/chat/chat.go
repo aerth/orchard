@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"m/pkg/chatmessages"
@@ -170,7 +171,7 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 
 	if e.PostFunc != nil {
 		if e := e.PostFunc(err); e != nil {
-			return stackerr.Errorf("%w %w", err, e)
+			err = errors.Join(err, stackerr.Errorf("%w", e))
 		}
 	}
 	if err != nil {
