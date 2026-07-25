@@ -91,6 +91,8 @@ func main1(ctx context.Context) error {
 	if err != nil {
 		return stackerr.Errorf("db: %w", err)
 	}
+	if clearfirst {
+	}
 	global.SetStore(dbstore.New(store))
 	err = runmain(ctx, conf)
 	if err != nil {
@@ -165,7 +167,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			return enc.Encode(v)
 		}
 	}
-	e := chat.Ext{Store: global.GetStore[*dbstore.Store]()}
+	e := chat.Ext{}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
 		return stackerr.Errorf("%w", err)
