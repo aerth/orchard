@@ -12,7 +12,6 @@ import (
 	"os"
 	"strings"
 
-	"m/pkg/builtins/implv1/bashtooler"
 	"m/pkg/chatmessages"
 	"m/pkg/dbstore"
 	"m/pkg/global"
@@ -28,7 +27,7 @@ import (
 func ResetEnvClean() {
 	// clear env, then replace with clean env -- this new, cleaned env is passed to tool calls for python/bash tools
 	{
-		customEnv := bashtooler.NewCleanEnviron()
+		customEnv := NewCleanEnviron()
 		os.Clearenv()
 		for _, env := range customEnv {
 			before, after, _ := strings.Cut(env, "=")
