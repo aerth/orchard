@@ -19,6 +19,10 @@ import (
 
 var NewCleanEnviron func() []string
 
+func Init(newcleanenv func() []string) {
+	NewCleanEnviron = newcleanenv
+}
+
 func RunBash(ctx context.Context, wd string, filename string, args ...string) (string, error) {
 	stdin, err := os.Open(filename)
 	if err != nil {
