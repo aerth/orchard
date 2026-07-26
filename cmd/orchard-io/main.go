@@ -129,7 +129,6 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	var err error
 	if true { // builtin go tools
-
 		basher := func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 			chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 			got, err := bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
@@ -139,7 +138,8 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 				}
 				got += fmt.Sprintf("Error: %+v", err)
 			}
-			return got, nil
+			gotmsg := chatmessages.NewFromRole("", "tool", got)
+			return chatmessages.ChatMessages{*gotmsg}, nil
 		}
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file": implv1.ReadFile,
