@@ -129,6 +129,9 @@ Chat:
 					return stackerr.Errorf("%w", err)
 				}
 			}*/
+		if err := e.AfterGen(newcaller); err != nil {
+			return err
+		}
 		if jsonout != nil {
 			// jsonout encoder may modify the pointer (TODO: hook for confirmation/cancel)
 			if err := jsonout(&stack[len(stack)-1]); err != nil {
