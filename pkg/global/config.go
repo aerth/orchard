@@ -161,9 +161,7 @@ func NewConfigFlags(clearfirst *bool) *Conf {
 }
 
 func (cfg *ConfigInput) Flags(clearfirst *bool) {
-	if f, ok := os.Stdout.(*os.File); ok {
-		return isatty.IsTerminal(f.Fd())
-	}
+	cfg.NoColor = cfg.NoColor || !isatty.IsTerminal(os.Stdout)
 	flag.StringVar(&cfg.Username, "username", cfg.Username, "username like Bob or Chief")
 	flag.StringVar(&cfg.Botname, "bot", cfg.Botname, "username like Alice or project_manager")
 	flag.StringVar(&cfg.Treedir, "tree", cfg.Treedir, "tree for markdown files for system messages (employee descriptions and task templates)")
