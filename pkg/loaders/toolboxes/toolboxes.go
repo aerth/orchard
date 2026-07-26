@@ -15,6 +15,7 @@ import (
 	"slices"
 	"strings"
 
+	"m/cmdpkg/rege"
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
 	"m/pkg/otool"
@@ -179,8 +180,7 @@ func (t Toolbox) ByName(name string) AnyTool {
 
 func GetBashFileEnvironKeys(b []byte) ([]string, error) {
 	// Matches: export KEY="val", KEY='val', or KEY=val
-	re := regexp.MustCompile(`(?m)^\s*(?:export\s+)?([A-Z_][A-Z0-9_]*)\s*=`)
-	matches := re.FindAllStringSubmatch(string(b), -1)
+	matches := rege.BashEnvironKeys.FindAllStringSubmatch(string(b), -1)
 
 	keys := make([]string, 0, len(matches))
 	seen := make(map[string]bool)
