@@ -220,6 +220,9 @@ func DefaultConfigInput() ConfigInput {
 	if d, err := filepath.Abs(dir); err == nil {
 		dir = d
 	}
+	if threadID == uuid.Nil {
+		panic("nil uuid")
+	}
 	return ConfigInput{
 		ThreadID:    threadID,
 		Logfilename: logfilename,
