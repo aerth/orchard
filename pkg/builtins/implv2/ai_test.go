@@ -181,26 +181,26 @@ func TestAi(t *testing.T) {
 	}
 }
 
-func getlang(s string) (*sitter.Language, error) {
+func getlang(s string) (*sitter.Language, string, error) {
 	if !strings.Contains(s, ".") {
-		return nil, fmt.Errorf("no dot")
+		return nil, "", fmt.Errorf("no dot")
 	}
 	ss := strings.Split(s, ".")
 	ext := ss[len(ss)-1]
 	switch ext {
 	case "go":
-		return golang.GetLanguage(), nil
+		return golang.GetLanguage(), ext, nil
 	case "py":
-		return python.GetLanguage(), nil
+		return python.GetLanguage(), ext, nil
 	case "html":
-		return html.GetLanguage(), nil
+		return html.GetLanguage(), ext, nil
 	case "ts":
-		return typescript.GetLanguage(), nil
+		return typescript.GetLanguage(), ext, nil
 	case "js":
-		return javascript.GetLanguage(), nil
+		return javascript.GetLanguage(), ext, nil
 	case "css":
-		return css.GetLanguage(), nil
+		return css.GetLanguage(), ext, nil
 	default:
-		return nil, fmt.Errorf("not implemented yet")
+		return nil, ext, fmt.Errorf("not implemented yet")
 	}
 }
