@@ -27,7 +27,7 @@ cleaninstall:
 	@echo all clean
 	${MAKE} ${bin}/orchard-io
 	test -x ${bin}/orchard-io
-	install -v ${bin}/* ~/bin/
+	install -v ${bin}/orchard-io ~/bin/
 	@test ! -d $(OCHATDIR) || echo installing $(OCHATDIR) TUI
 	@test ! -d $(OCHATDIR) || ${MAKE} -C $(OCHATDIR) install 
 .PHONY += clean cleaninstall
