@@ -21,12 +21,12 @@ const (
 func OutputParser(content string) ([]Action, error) {
 	// Clean surrounding whitespace and split into fields
 	fields := strings.Fields(content)
-	if fields[0] == "" {
+	if len(fields) == 0 {
 		return nil, errors.New("empty LLM response")
 	}
 
 	// Clean the command operator in case the LLM wrapped it in markdown or punctuation
-	op := strings.ToUpper(fields[0])
+	op := fields[0]
 	op = strings.Trim(op, "`*._:,")
 
 	var actions []Action
