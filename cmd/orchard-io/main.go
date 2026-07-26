@@ -132,7 +132,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 		basher := func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 			chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
-			bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
+			got, err := bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
 		}
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file": implv1.ReadFile,
