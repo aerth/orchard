@@ -207,7 +207,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			return enc.Encode(v)
 		}
 	}
-	e := chat.Ext{}
+	e := chat.Ext{ThreadID: threadID}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
 		return stackerr.Errorf("%w", err)
