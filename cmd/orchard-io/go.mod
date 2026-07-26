@@ -28,6 +28,7 @@ require (
 	github.com/lmittmann/tint v1.2.0 // indirect
 	github.com/mailru/easyjson v0.9.2 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
+	github.com/smacker/go-tree-sitter v0.0.0-20240827094217-dd81d9e9be82 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
