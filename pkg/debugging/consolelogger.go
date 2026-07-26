@@ -39,6 +39,7 @@ const (
 )
 
 func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
+	hidetoolcall := global.Get().Get().HideToolCalls
 	nocolor := global.Get().Get().NoColor || os.Getenv("NO_COLOR") != ""
 	w := io.Writer(os.Stderr)
 	tw := w
@@ -55,7 +56,7 @@ func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
 	if w == nil {
 		w = io.Discard
 	}
-	return &ConsoleLogger{w: w, tw: tw, pre: "", NoColor: nocolor}
+	return &ConsoleLogger{w: w, tw: tw, pre: "", NoColor: nocolor, HideToolCalls: hidetoolcall}
 }
 
 func (c ConsoleLogger) WithPrefix(prefix string) ConsoleLogger {
