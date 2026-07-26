@@ -139,8 +139,14 @@ Chat:
 		newcaller := chatmessages.NewFromRole(e.From, "assistant", "")
 		newcaller.ThreadID = e.ThreadID
 		{
+
+			handl := []llm.ChatStreamHandlerFunc{ cl.HandleChatResponse, newcaller.GatherChatResponse}
+			if spin != nil {
+			handl = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newcaller.GatherChatResponse}
+			}
 			spin := spinner.Start(sctx)
-			e.Handlers = append(handlers, []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newcaller.GatherChatResponse}...)
+			e.Handlers = append(handlers, 
+				...)
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped regardless of output
 			if summary, ok := newcaller.Summary.(string); ok {
