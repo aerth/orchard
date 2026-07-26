@@ -19,6 +19,65 @@ type Session struct {
 	LockEnd   int
 }
 
+func (s Session) SystemMessage() string {
+	// 1. Calculate boundaries for the active viewing chunk window
+	startIdx := max(s.CurrentLine-1, 0)
+	endIdx := min(startIdx+s.ChunkSize, len(s.Lines))
+	// 2. Build the visual representation of the active file chunk
+	var chunkBuilder strings.Builder
+	if s.ActiveFile == "" {
+		chunkBuilder.WriteString("[No file active. Execute SELECT_FILE <filename> to load a workspace]")
+	} else {
+		// Append lines with explicit absolute 1-based indices to anchor LLM awareness
+		for i := startIdx; i < endIdx; i++ {
+			fmt.Fprintf(&chunkBuilder, "%d: %s\n", i+1, s.Lines[i])
+		}
+		if startIdx == 0 && endIdx == 0 {
+			chunkBuilder.WriteString("[Empty File]")
+		}
+	}
+
+	// 3. Format total active system instructions matching your state constraints
+	var lockStatus string
+	if s.LockStart > 0 && s.LockEnd > 0 {
+		lockStatus = fmt.Sprintf("LOCKED FOR EDIT: Lines %d-%d", s.LockStart, s.LockEnd)
+	} else {
+		lockStatus = "READ-ONLY NAVIGATION MODE"
+	}
+
+	return fmt.Sprintf(
+		`Active File: %s
+Status: %s
+Total Lines: %d
+Current Viewport Window: Lines %d to %d
+
+--- CURRENT FILE CHUNK VISIBLE ---
+%s
+----------------------------------
+
+### PROTOCOL INSTRUCTIONS:
+- You must output exactly ONE command keyword.
+- No markdown wrappers (no backticks `+"`"+`, no asterisks **). No chit-chat.
+- Zero leading whitespace allowed. Follow your command with exactly ONE space.
+
+### AVAILABLE PROTOCOL COMMANDS:
+SELECT_FILE <filename> - Open/switch workspace file.
+NEXT_CHUNK            - Scroll view window down by %d lines.
+PREV_CHUNK            - Scroll view window up by %d lines.
+GOTO <string>         - Search target string and center view window around it.
+LOCK <start>-<end>    - Lock target coordinates to start editing.
+CANCEL                - Unlock coordinates and return to search navigation.`,
+		s.ActiveFile,
+		lockStatus,
+		len(s.Lines),
+		s.CurrentLine,
+		endIdx,
+		chunkBuilder.String(),
+		s.ChunkSize,
+		s.ChunkSize,
+	)
+}
+
 // Global integer status codes for clear systemic orchestration
 const (
 	CodeNavigated = 200
