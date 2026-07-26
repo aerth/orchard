@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	sitter "github.com/smacker/go-tree-sitter"
 )
 
 func ValidateFileSyntax(codeContent string, language *sitter.Language) error {
+	slog.Info("validating syntax", "content", codeContent, "lang", fmt.Sprintf("%T", language))
 	parser := sitter.NewParser()
 	parser.SetLanguage(language)
 
