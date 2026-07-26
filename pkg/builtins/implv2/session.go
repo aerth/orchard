@@ -36,7 +36,10 @@ func (s Session) SystemMessage() string {
 	} else {
 		// Append lines with explicit absolute 1-based indices to anchor LLM awareness
 		for i := startIdx; i < endIdx; i++ {
-			fmt.Fprintf(&chunkBuilder, "%d: %s\n", i+1, s.Lines[i])
+			fmt.Fprintf(&chunkBuilder, "%d: %s", i+1, s.Lines[i])
+			if i != endIdx-1 {
+				fmt.Fprintf(&chunkBuilder, "\n")
+			}
 		}
 		if startIdx == 0 && endIdx == 0 {
 			chunkBuilder.WriteString("[Empty File]")
@@ -62,7 +65,7 @@ Current Viewport Window: Lines %d to %d
 
 --- CURRENT FILE CHUNK VISIBLE ---
 %s
-----------------------------------
+----------- END CHUNK ------------
 	Note: line numbers are included only for this view
 
 ### PROTOCOL INSTRUCTIONS:
