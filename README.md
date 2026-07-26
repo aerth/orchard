@@ -1,7 +1,6 @@
 # orchard ai
 
-General, extensible, multi-purpose AI Agent orchestration harness. For tasks.
-
+General, extensible, multi-purpose AI Agent orchestration harness.
 
 ## examples
 
@@ -29,6 +28,6 @@ A user has opened a new Support Ticket. Is this spam? (format: `{"spamminess":{"
 
 ### example: Spam mitigation
 
-Use the check_latest tool to read the latest. For each result, delete_message on any spam.
+Use the check_latest tool to read the latest. For each result, use the delete_message tool on any spam so that it may be removed.
 
 See Also: [./ORCHARD.md]
