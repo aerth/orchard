@@ -133,7 +133,7 @@ func (c *Client) stream(ctx context.Context, method, path string, data any, fn f
 
 		if err := fn(bts); err != nil {
 			slog.Error("ERROR GOT FNERR", "raw", string(err.Error()))
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 		if ctx.Err() != nil {
 			return ctx.Err()
