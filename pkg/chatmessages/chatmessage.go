@@ -168,15 +168,15 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	if len(cm.ToolCalls) == 0 {
 		cm.ToolCalls = nil
 	}
-	if cr.Message.Content == " (END)" {
-		return fmt.Errorf("broken")
-	}
 	if cr.Done {
 		slog.Info("Is Done", "reason", cr.DoneReason, "metrics", cr.Metrics)
 		var buf bytes.Buffer
 		cr.Summary(&buf)
 		cm.Summary = buf.String()
 		cm.Metrics = cr.Metrics
+	}
+	if cr.Message.Content == " (END)" {
+		return fmt.Errorf("broken")
 	}
 	return nil
 }
