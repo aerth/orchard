@@ -50,7 +50,6 @@ func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
 	if len(ww) == 2 {
 		w = ww[0]
 		tw = ww[1]
-
 	}
 
 	if w == nil {
