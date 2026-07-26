@@ -195,9 +195,6 @@ var Writer io.Writer = os.Stderr
 //
 // Init().Set(slog.LevelInfo) or use ptr for flag etc
 func Init(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
-	//if loglevel != nil {
-	//	return loglevel
-	//}
 	if len(loglevel1) == 1 {
 		loglevel = loglevel1[0]
 	} else {
@@ -208,6 +205,7 @@ func Init(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
 		Writer = os.Stderr
 	}
 	slog.SetLogLoggerLevel(slog.LevelWarn) // for now to use less
+	//nolint:staticcheck
 	slog.SetDefault(slog.New(tint.NewHandler(Writer, &tint.Options{AddSource: true, Level: loglevel, TimeFormat: "ORCHARD", NoColor: global.Get().Get().NoColor})))
 	return loglevel
 }
