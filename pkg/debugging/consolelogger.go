@@ -33,12 +33,7 @@ const (
 	ColorGray  = "\033[90m"
 	ColorGreen = "\033[32m"
 	ColorCyan  = "\033[34m"
-)
-
-var (
-	ColorReset   = "\033[0m"
-	Colorcomment = ColorGray
-	Colorcontent = ColorGreen
+	ColorReset = "\033[0m"
 )
 
 func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
@@ -112,7 +107,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 			m.Thinking = c.buf
 			c.emode = xGO
 			if !c.HideThinking && !c.NoColor {
-				_, _ = fmt.Fprintf(tw, "%s", Colorcomment) // start colorize
+				_, _ = fmt.Fprintf(tw, "%s", ColorGreen) // start colorize
 			}
 		}
 	}
@@ -126,7 +121,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 				_, _ = fmt.Fprintf(tw, "newline\n")
 			}
 			if !c.NoColor {
-				_, _ = fmt.Fprintf(w, "%s", Colorcontent)
+				_, _ = fmt.Fprintf(w, "%s", ColorGray)
 			}
 			c.emode = xCONTENT
 		}
