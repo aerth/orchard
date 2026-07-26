@@ -82,7 +82,8 @@ CANCEL                - Unlock coordinates and return to search navigation.`,
 	if isLocked {
 		lockmodetext := fmt.Sprintf(
 			`
-			You are currently in EDITING mode. All output will replace the targeted lines. To return to VIEW mode, begin or end your message with the word: CANCEL
+You are currently in EDITING mode. All output will replace the targeted lines.
+To return to VIEW mode, begin or end your message with the word: CANCEL
 Any LOCKED targeted lines will be replaced by your reply.
 File line numbers are added for your convienence only. Do not prepend lines with numbers.
 Currently locked: %d lines
