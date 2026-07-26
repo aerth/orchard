@@ -76,7 +76,7 @@ func TestAi(t *testing.T) {
 	}
 	for {
 		if creq.Messages[len(creq.Messages)-1].Role == "assistant" {
-			println("[test] test is done")
+			println("[test] test is done (latest message is assistant)")
 			break
 		}
 		generated := chatmessages.NewFromRole("", "assistant", "")
