@@ -47,8 +47,7 @@ func OutputParser(content string) ([]Action, error) {
 		if len(fields) < 2 {
 			return nil, errors.New("LOCK command requires line coordinates")
 		}
-		// Extract the coordinates token and drop any accidental trailing punctuation
-		coordinates := strings.Trim(fields[1], "`*.,")
+		coordinates := fields[1]
 		actions = append(actions, Action{Op: OpLockIn, Content: coordinates})
 
 	default:
