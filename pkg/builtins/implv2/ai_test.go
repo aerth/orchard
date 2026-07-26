@@ -35,13 +35,14 @@ func TestMain(t *testing.M) {
 const SuccessMessage = "Operation successful."
 
 type TC struct {
-	Prompt  string
-	FileIn  string
-	FileOut string
+	Filename string
+	Prompt   string
+	FileIn   string
+	FileOut  string
 }
 
 var tcs = []TC{
-	{Prompt: "", FileIn: "Hello\nw0rld\nThs is a testt.\n\nIt works\n", FileOut: "Hello\nWorld\nThis is a test.\n\nIt works\n"},
+	{Filename: "foo.txt", Prompt: "", FileIn: "Hello\nw0rld\nThs is a testt.\n\nIt works\n", FileOut: "Hello\nWorld\nThis is a test.\n\nIt works\n"},
 }
 
 func TestAi(t *testing.T) {
