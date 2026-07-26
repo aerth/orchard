@@ -23,7 +23,7 @@ func (s Session) Current() []byte {
 	return []byte(strings.Join(s.Lines, "\n"))
 }
 
-var ErrNot = errors.New("not a operator keyword and no LOCK range selected")
+var ErrNot = errors.New("not an operator keyword and no LOCK range selected")
 
 func (s Session) SystemMessage() string {
 	// 1. Calculate boundaries for the active viewing chunk window
@@ -129,6 +129,7 @@ func (s *Session) RunAction(action Action) Result {
 	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
 		return Result{E: ErrNoFilename}
 	}
+
 	switch action.Op {
 	case OpFilename:
 		if s.ActiveFile == action.Content {
