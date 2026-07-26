@@ -37,7 +37,7 @@ const (
 )
 
 func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
-	nocolor := global.Get().Get().NoColor || os.Getenv("NO_COLOR") == "1"
+	nocolor := global.Get().Get().NoColor || os.Getenv("NO_COLOR") != ""
 	w := io.Writer(os.Stderr)
 	tw := w
 	if len(ww) == 1 {
