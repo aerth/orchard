@@ -125,7 +125,6 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file": implv1.ReadFile,
 			//"write_file": implv1.WriteFile,
-
 			"edit_file": implv2.EditTool,
 			//	"run_go_command":   noop,
 			"list_directory": implv1.ListDirectory,
