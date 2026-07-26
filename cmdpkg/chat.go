@@ -10,7 +10,6 @@ import (
 	"os"
 	"time"
 
-	"m/cmdpkg/rege"
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/chat"
@@ -42,61 +41,6 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		slog.Warn("noop convo")
 		return nil
 	}
-	if false {
-		newmsg := &stack[len(stack)-1]
-		if newmsg.Role != "user" {
-			return fmt.Errorf("expected 'user' role to generate a reply to, but got '%s'", newmsg.Role)
-		}
-		slog := slog.With("messageID", newmsg.MessageID)
-		if IsCommand(newmsg.Content) {
-			slog.Info("detected command", "txt", newmsg.ContentOrToolCall())
-			add, err := HandleCommand(newmsg, &e, &stack)
-			// dont have caller generate
-			cmdmsg := *newmsg
-			newmsg = nil
-			if cmdmsg.Content != "/clear" {
-				stack = append(stack, cmdmsg)
-			}
-			stack = append(stack, add...)
-			for _, v := range add {
-				_, _ = fmt.Fprintf(os.Stdout, "%s> %s\n", v.Role, v.ContentOrToolCall())
-			}
-			if err != nil {
-				return stackerr.Errorf("HandleCommand: %w", err)
-			}
-			if add.TopRole("user").Content == "" {
-				return nil
-			}
-		}
-		if newmsg == nil || newmsg.Content == "" {
-			slog.Info("noop txt")
-			return nil
-		}
-
-		if ss := rege.FindImagePaths(newmsg.Content); len(ss) != 0 {
-			newmsg.Attachments = ss
-			for _, filename := range ss {
-				img, err := os.ReadFile(filename)
-				if err != nil {
-					slog.Error("attaching file", "err", err, "filename", filename)
-					err = stackerr.Errorf("Error attaching %q: %w", filename, err)
-					newmsg.Content += "\n" + err.Error()
-					continue
-				}
-				newmsg.Images = append(newmsg.Images, img)
-			}
-			slog.Info("Attached", "names", ss)
-		} else {
-			slog.Info("no attachments found in message", "txt", newmsg.Content)
-		}
-		/*
-			if e.Store != nil {
-				if err := e.Store.Add(ctx, conf.GetThreadID(), newmsg); err != nil {
-					return stackerr.Errorf("%w", err)
-				}
-			}*/
-	}
-	//stack = append(stack, *newmsg)
 	var out io.Writer = os.Stdout
 	tw := global.LogWriter
 	var jsonout EncoderFunc
