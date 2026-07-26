@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
 )
@@ -14,8 +15,12 @@ type haspath struct {
 }
 
 func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-	path := getpath(caller.ToolCalls[toolCallIndex])
 	// begin loop
+
+	call, err := chat.ReadToolCall(ctx, caller, toolCallIndex)
+	if err != nil {
+		return nil, err
+	}
 
 	msg := llm.Message{
 		Role:     "tool",
