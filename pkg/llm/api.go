@@ -395,9 +395,9 @@ func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatSt
 	if len(callbacks) == 0 {
 		return fmt.Errorf("no callbacks")
 	}
-	if len(creq.Tools) == 0 { // messages may be empty for preloading an llm model on the server
-		return fmt.Errorf("no tools?")
-	}
+	//	if len(creq.Tools) == 0 { // messages may be empty for preloading an llm model on the server
+	//		return fmt.Errorf("no tools?")
+	//	}
 	slog.Info("chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "roles", creq.Messages.FormatRoles())
 	return c.stream(ctx, http.MethodPost, "/api/chat", creq, func(bts []byte) error {
 		if len(bts) == 0 || !isFirstCharJSON(bts[0]) {
