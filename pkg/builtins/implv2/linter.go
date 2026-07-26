@@ -33,7 +33,7 @@ func ValidateFileSyntax(codeContent string, langname string, language *sitter.La
 	// Query pattern remains optimized for finding ERROR or MISSING tokens
 	errorQuery, err := sitter.NewQuery([]byte(`
 (ERROR) @syntax_err
-@missing_err (#is-missing? @missing_err)
+_ @missing_err (#is-missing? @missing_err)
 		`), language)
 	if err != nil {
 		return fmt.Errorf("failed to initialize syntax error validation query: %w", err)
@@ -44,23 +44,30 @@ func ValidateFileSyntax(codeContent string, langname string, language *sitter.La
 	cursor.Exec(errorQuery, rootNode)
 	defer cursor.Close()
 	var errMessages []string
-	for match, ok := cursor.NextMatch(); ok; {
-		for _, capture := range match.Captures {
-			if !capture.Node.HasError() {
-				continue
+	errMessages = domatches(cursor, []byte(codeContent))
+	/*
+		for match, ok := cursor.NextMatch(); ok; {
+			slog.Info("match captures", "n", len(match.Captures))
+			for _, capture := range match.Captures {
+				if !capture.Node.HasError() {
+					continue
+				}
+				slog.Info("got match", "cap", capture)
+				node := capture.Node
+				startPoint := node.StartPoint()
+
+				errLine := int(startPoint.Row) + 1
+				errMessages = append(errMessages, fmt.Sprintf(
+					"syntax error found near line %d (type: %s)",
+					errLine, node.Type(),
+				))
+
 			}
-			slog.Info("got match", "cap", capture)
-			node := capture.Node
-			startPoint := node.StartPoint()
-
-			errLine := int(startPoint.Row) + 1
-			errMessages = append(errMessages, fmt.Sprintf(
-				"syntax error found near line %d (type: %s)",
-				errLine, node.Type(),
-			))
+			if len(errMessages) > 0 {
+				break
+			}
 		}
-	}
-
+	*/
 	if len(errMessages) > 0 {
 		if len(errMessages) > 3 {
 			errMessages = append(errMessages[:3], "...and more structural syntax issues")
@@ -69,4 +76,46 @@ func ValidateFileSyntax(codeContent string, langname string, language *sitter.La
 	}
 
 	return nil
+}
+
+func domatches(cursor *sitter.QueryCursor, codeBytes []byte) []string {
+	var errMessages []string
+	for match, ok := cursor.NextMatch(); ok; match, ok = cursor.NextMatch() {
+		for _, capture := range match.Captures {
+			targetNode := capture.Node
+
+			// If the matched node is the global source_file wrapper,
+			// hunt down the actual inner ERROR or MISSING leaf node child
+			if targetNode.Type() == "source_file" {
+				count := int(targetNode.ChildCount())
+				for i := 0; i < count; i++ {
+					child := targetNode.Child(i)
+					if child != nil && (child.IsError() || child.IsMissing() || child.Type() == "ERROR") {
+						targetNode = child
+						break
+					}
+				}
+			}
+
+			startPoint := targetNode.StartPoint()
+			errLine := int(startPoint.Row) + 1
+
+			// Extract the exact broken code characters using byte boundary slicing
+			startByte := targetNode.StartByte()
+			endByte := targetNode.EndByte()
+
+			var codeSnippet string
+			if int(startByte) < len(codeBytes) && int(endByte) <= len(codeBytes) {
+				codeSnippet = string(codeBytes[startByte:endByte])
+				// Clean trailing newlines for readable log statements
+				codeSnippet = strings.TrimSpace(codeSnippet)
+			}
+
+			errMessages = append(errMessages, fmt.Sprintf(
+				"syntax error found near line %d (type: %s) fragment: %q",
+				errLine, targetNode.Type(), codeSnippet,
+			))
+		}
+	}
+	return errMessages
 }

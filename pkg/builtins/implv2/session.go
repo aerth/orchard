@@ -37,8 +37,8 @@ func (s Session) SystemMessage() string {
 		// Append lines with explicit absolute 1-based indices to anchor LLM awareness
 		for i := startIdx; i < endIdx; i++ {
 			marked := " "
-			if i > s.LockStart && i <= s.LockEnd {
-				marked = "*"
+			if i+1 >= s.LockStart && i+1 <= s.LockEnd {
+				marked = "*" // astrisk
 			}
 			fmt.Fprintf(&chunkBuilder, "%s%d: %s", marked, i+1, s.Lines[i])
 			if i != endIdx-1 {
@@ -85,7 +85,9 @@ NEXT_CHUNK            - Scroll view window down by %d lines.
 PREV_CHUNK            - Scroll view window up by %d lines.
 GOTO <string>         - Search target string and center view window around it.
 LOCK <start>-<end>    - Lock target coordinates to start editing.
-CANCEL                - Unlock coordinates and return to search navigation.`,
+CANCEL                - Unlock coordinates and return to search navigation.
+### There are no more PROTOCOL COMMANDS ###
+`,
 		s.ActiveFile,
 		lockStatus,
 		len(s.Lines),

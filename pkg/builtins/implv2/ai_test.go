@@ -68,8 +68,8 @@ var tcs = []TC{
 	{
 		Filename: "foo.go",
 		Prompt:   "edit the file (foo.go): Export the Add function by correcting its name casing.",
-		FileInp:  "package main\n\n// add sums two integers\nfunc add(a, b int) int {\n\treturn a + b\n}\n",
-		FileOut:  "package main\n\n// add sums two integers\nfunc Add(a, b int) int {\n\treturn a + b\n}\n",
+		FileInp:  "package main\n\n// Add sums two integers\nfunc add(a, b int) int {\n\treturn a + b\n}\n",
+		FileOut:  "package main\n\n// Add sums two integers\nfunc Add(a, b int) int {\n\treturn a + b\n}\n",
 	},
 }
 
