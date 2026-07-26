@@ -161,6 +161,8 @@ Chat:
 			}
 			if summary, ok := newcaller.Summary.(string); ok {
 				global.LogWriter.Write([]byte("\n\n\n" + summary + "\n\n\n"))
+			} else {
+				global.LogWriter.Write([]byte("\n\n\n" + "NO SUMMARY FOUND" + "\n\n\n"))
 			}
 		}
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
