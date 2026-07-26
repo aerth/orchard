@@ -181,7 +181,7 @@ func Initialize(clearfirst *bool) (*global.Conf, error) {
 		Writer = f
 		global.LogWriter = f
 	}
-	Init().Set(slog.LevelDebug)
+	InitLog().Set(slog.LevelDebug)
 	//	threads := map[uuid.UUID]bool{}
 	//	for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {
 	return conf, nil
@@ -191,10 +191,10 @@ var loglevel *slog.LevelVar
 
 var Writer io.Writer = os.Stderr
 
-// Init color slog
+// InitLog color slog
 //
-// Init().Set(slog.LevelInfo) or use ptr for flag etc
-func Init(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
+// InitLog().Set(slog.LevelInfo) or use ptr for flag etc
+func InitLog(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
 	if len(loglevel1) == 1 {
 		loglevel = loglevel1[0]
 	} else {
