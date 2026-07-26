@@ -27,7 +27,7 @@ func OutputParser(content string) ([]Action, error) {
 
 	// Clean the command operator in case the LLM wrapped it in markdown or punctuation
 	op := fields[0]
-	op = strings.Trim(op, "`*._:,")
+	///op = strings.Trim(op, "`*._:,")
 
 	var actions []Action
 
