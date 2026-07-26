@@ -16,6 +16,7 @@ import (
 	"m/pkg/llm"
 
 	"github.com/joho/godotenv"
+	sitter "github.com/smacker/go-tree-sitter"
 )
 
 func TestMain(t *testing.M) {
@@ -116,6 +117,10 @@ func TestAi(t *testing.T) {
 			if errors.Is(err, implv2.ErrNot) && session.LockEnd != 0 {
 				// target acquired
 				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
+				if err == nil {
+					var lang *sitter.Language
+					err = implv2.ValidateFileSyntax(string(session.Current()), lang)
+				}
 				if err == nil {
 					if session.ActiveFile != tc.Filename {
 						t.Fatal("only one file can be edited but got " + session.ActiveFile)
