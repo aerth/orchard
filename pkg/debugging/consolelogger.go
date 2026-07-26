@@ -69,8 +69,7 @@ func (c ConsoleLogger) Writer() io.Writer {
 //
 
 func (c *ConsoleLogger) HandleChatResponse(cr llm.ChatResponse) error {
-	c.PrintChat(c.w, c.tw, cr)
-	return nil
+	return c.PrintChat(c.w, c.tw, cr)
 }
 
 /*
@@ -94,7 +93,7 @@ func fflush(w io.Writer) {
 	}
 }
 
-func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
+func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 	defer func() {
 		// flush required for some writers
 		fflush(w)
@@ -115,17 +114,21 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 	if c.emode != 0 && len(m.Thinking) != 0 && !c.HideThinking {
 		_, _ = fmt.Fprintf(tw, "%s", m.Thinking)
 	}
+	var err error
 	if m.Content != "" {
 		if c.emode != xCONTENT {
 			if !c.HideThinking && c.emode == xGO {
-				_, _ = fmt.Fprintf(tw, "newline\n")
+				_, _ = fmt.Fprintf(tw, "\n")
 			}
 			if !c.NoColor {
-				_, _ = fmt.Fprintf(w, "%s", ColorGreen)
+				_, err = fmt.Fprintf(w, "%s", ColorGreen)
+				if err != nil {
+					return err
+				}
 			}
 			c.emode = xCONTENT
 		}
-		_, _ = fmt.Fprintf(w, "%s", m.Content)
+		_, err = fmt.Fprintf(w, "%s", m.Content)
 	}
 	if len(m.ToolCalls) != 0 { // ollama api returns a full, parsed tool call(s). TODO: future: reimplement chat template for streaming the building of the tool call
 		type namewrap struct {
@@ -142,6 +145,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 			_, _ = fmt.Fprintf(w, "\n%s```json\n%s(args=%s)\n```\n", c.pre, wraps[0].Function.Name, string(wraps[0].Function.Arguments))
 		}
 	}
+	return err
 }
 
 func (c *ConsoleLogger) Reset() {
@@ -149,7 +153,7 @@ func (c *ConsoleLogger) Reset() {
 	c.buf = ""
 }
 
-func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) {
+func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) error {
 	if cr.Done {
 		c.emode = xDONE
 	}
@@ -157,12 +161,25 @@ func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) {
 	//	fmt.Fprintf(os.Stderr, "%s", cr.DebugInfo.RenderedTemplate)
 	//}
 	if !c.HideToolCalls || len(cr.Message.ToolCalls) == 0 {
-		c.PrintMessage(w, tw, cr.Message)
+		if err := c.PrintMessage(w, tw, cr.Message); err != nil {
+			if cr.Done {
+				c.Reset()
+			}
+			return err
+		}
 	}
+	var err error
 	if cr.Done {
-		_, _ = fmt.Fprintf(w, "%s", ColorReset)
+		defer c.Reset()
+		_, err = fmt.Fprintf(w, "%s", ColorReset)
+		if err != nil {
+			return err
+		}
 		if tw != w {
-			_, _ = fmt.Fprintf(tw, "%s", ColorReset)
+			_, err = fmt.Fprintf(tw, "%s", ColorReset)
+			if err != nil {
+				return err
+			}
 		}
 
 		//		if !c.HideToolCalls || len(cr.Message.ToolCalls) == 0 {
@@ -172,6 +189,6 @@ func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) {
 		//if !noSummaries && !llm.DisableLog {
 		//	cr.Summary()
 		//}
-		c.Reset()
 	}
+	return nil
 }
