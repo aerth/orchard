@@ -139,6 +139,13 @@ Chat:
 		newcaller := chatmessages.NewFromRole(e.From, "assistant", "")
 		newcaller.ThreadID = e.ThreadID
 		{
+			hh := llm.ChatStreamHandlerFunc
+			if cl != nil {
+				hh = append(hh, cl.HandleChatResponse)
+			}
+			if newcaller != nil {
+				hh = append(hh, newcaller.GatherChatResponse)
+			}
 
 			handl := []llm.ChatStreamHandlerFunc{ cl.HandleChatResponse, newcaller.GatherChatResponse}
 			spin := spinner.Start(sctx)
