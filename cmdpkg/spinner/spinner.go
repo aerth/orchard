@@ -4,6 +4,7 @@ package spinner
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"sync"
 	"time"
@@ -22,10 +23,16 @@ func (s *Spinner) Reset() {
 	<-s.stopChan
 }
 
-var Out = os.Stderr
+var (
+	Out    = os.Stderr
+	NoSpin = false
+)
 
 // Start kicks off the spinner in a background goroutine, writing to Out
 func Start(ctx context.Context) *Spinner {
+	if NoSpin || Out == nil || Out == io.Discard {
+		return &Spinner{fake: true}
+	}
 	s := &Spinner{
 		stopChan: make(chan struct{}),
 	}
