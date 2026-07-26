@@ -1,12 +1,12 @@
 VERSION := $(shell git tag | sort -V | tail -n 1)
 NOW := $(shell date +%s)
-bin=./bin
 WD!=pwd
+bin=${WD}/bin
 OCHATDIR=../orchard-chat/
 build: ${bin}/orchard-io
 ${bin}/orchard-io:	*.go */*.go */*/*.go */*/*/*.go
 	@echo Building orchard-io
-	go -C ./cmd/orchard-io build -v -ldflags '-X main.version=${VERSION} -X main.buildtime=${NOW} -X main.ollamahost=${OLLAMA_HOST} -X main.ollamamodel=${OLLAMA_MODEL} -X main.ollamathink=${OLLAMA_THINK}' -o ${WD}/bin/ 
+	go -C ./cmd/orchard-io build -v -ldflags '-X main.version=${VERSION} -X main.buildtime=${NOW} -X main.ollamahost=${OLLAMA_HOST} -X main.ollamamodel=${OLLAMA_MODEL} -X main.ollamathink=${OLLAMA_THINK}' -o $@
 	@test ! -d $(OCHATDIR) || echo "Building Orchard TUI ($(OCHATDIR))"
 	@test ! -d $(OCHATDIR) || ${MAKE} -C $(OCHATDIR) 1>/dev/null
 run: build
@@ -26,7 +26,8 @@ cleaninstall:
 	@test ! -d $(OCHATDIR) || ${MAKE} -C $(OCHATDIR) clean
 	@echo all clean
 	${MAKE} ${bin}/orchard-io
-	install -v bin/* ~/bin/
+	test -x ${bin}/orchard-io
+	install -v ${bin}/* ~/bin/
 	@test ! -d $(OCHATDIR) || echo installing $(OCHATDIR) TUI
 	@test ! -d $(OCHATDIR) || ${MAKE} -C $(OCHATDIR) install 
 .PHONY += clean cleaninstall
