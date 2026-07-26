@@ -112,6 +112,8 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 	store := global.GetStore[*dbstore.Store]()
 
+	threadID := conf.GetThreadID()
+
 	var err error
 	if false { // builtin go tools
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
@@ -146,6 +148,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		}
 	}
 	newmsg := chatmessages.NewFromRole(conf.GetUsername(), "user", "")
+	newmsg.ThreadID = threadID
 	stack = append(stack, *newmsg)
 	newmsg = &stack[len(stack)-1] // fix ptr
 	if _, err := os.Stdin.Read(nil); err != nil {
