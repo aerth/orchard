@@ -130,7 +130,7 @@ func (s *Session) RunAction(action Action) Result {
 	switch action.Op {
 	case OpFilename:
 		if s.ActiveFile == action.Content {
-			return Result{Message: "The file was already selected"}
+			return Result{Message: "The file was already selected."}
 		}
 		// Read file safely into memory snapshot
 		data, err := os.ReadFile(action.Content)
