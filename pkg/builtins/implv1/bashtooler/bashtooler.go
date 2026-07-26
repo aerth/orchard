@@ -90,6 +90,9 @@ func RunBashScript(ctx context.Context, stdinReal io.Reader, params RunParams) (
 		return strings.TrimSpace(buf.String()), err
 	}
 
+	if strings.TrimSpace(buf.String()) == "" {
+		buf.WriteString("(no output)")
+	}
 	x := fmt.Sprintf("\nrun_bash exit code: %d", cmd.ProcessState.ExitCode())
 	//if EchoBash {
 	//	println(buf.String())
