@@ -40,6 +40,17 @@
     }
   },
   {
+    "name": "edit_file",
+    "description": "Begin editing a file, entering a new state for accurate editing.",
+    "required": ["path"],
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string" }
+      }
+    }
+  },
+  {
     "name": "run_go_command",
     "description": "Executes a Go command in the current terminal context (e.g., go build, go test).",
     "required": ["args"],
