@@ -2,6 +2,7 @@ package implv2
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -19,16 +20,11 @@ const (
 )
 
 func OutputParser(content string) ([]Action, error) {
-	// Clean surrounding whitespace and split into fields
 	fields := strings.Fields(content)
 	if len(fields) == 0 {
 		return nil, errors.New("empty LLM response")
 	}
-
-	// Clean the command operator in case the LLM wrapped it in markdown or punctuation
 	op := fields[0]
-	///op = strings.Trim(op, "`*._:,")
-
 	var actions []Action
 
 	switch op {
@@ -36,12 +32,13 @@ func OutputParser(content string) ([]Action, error) {
 		actions = append(actions, Action{Op: op})
 
 	case OpGoTo:
-		// GOTO needs the rest of the text as a raw search query, preserving inner spaces
 		if len(fields) < 2 {
 			return nil, errors.New("GOTO command requires a search target")
 		}
-		// Grab everything after the operator
 		searchTarget := strings.TrimPrefix(content, fields[0])
+		if searchTarget == content {
+			return nil, fmt.Errorf("invalid")
+		}
 		searchTarget = strings.TrimSpace(searchTarget)
 		actions = append(actions, Action{Op: OpGoTo, Content: searchTarget})
 
