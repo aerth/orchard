@@ -1,6 +1,6 @@
 # orchard ai
 
-General, extensible, multi-purpose AI Agent orchestration harness.
+General, extensible, multi-purpose AI Agent orchestration harness system.
 
 ## examples
 
