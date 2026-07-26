@@ -19,27 +19,28 @@ const (
 )
 
 func OutputParser(content string) ([]Action, error) {
-	fields := strings.Fields(content)
-	if len(fields) == 0 {
-		return nil, errors.New("empty LLM response")
-	}
-
-	// 1. Strict Leading Space Check: Content must start exactly with the first field
-	op := fields[0]
-	if !strings.HasPrefix(content, op) {
-		return nil, errors.New("leading whitespace is strictly forbidden")
-	}
-
-	// Remove the operator prefix cleanly
+	var op string
 	var remainder string
-	if len(content) != len(op) {
-		remainder = content[len(op)+1:]
-	}
-
 	var actions []Action
+	{
+		fields := strings.Fields(content)
+		if len(fields) == 0 {
+			return nil, errors.New("empty LLM response")
+		}
+
+		// 1. Strict Leading Space Check: Content must start exactly with the first field
+		op = fields[0]
+		if !strings.HasPrefix(content, op) {
+			return nil, errors.New("leading whitespace is strictly forbidden")
+		}
+		// Remove the operator prefix cleanly
+		if len(content) != len(op) {
+			remainder = content[len(op)+1:]
+		}
+	}
 
 	switch op {
-	case OpNextChunk, OpPrevChunk, OpCancel:
+	case OpNextChunk, OpPrevChunk, OpCancel: // no args
 		if remainder != "" {
 			return nil, errors.New("command " + op + " does not accept arguments or trailing formatting")
 		}
