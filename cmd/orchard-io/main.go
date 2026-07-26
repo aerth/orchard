@@ -179,7 +179,6 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	if showChar {
 		fmt.Fprintf(os.Stderr, "Press ctrl+d to send your message, press ctrl+c to cancel generation. slash commands are supported, see '/help'.\n")
 	}
-	store := global.GetStore[*dbstore.Store]()
 
 	threadID := conf.GetThreadID()
 
@@ -212,6 +211,10 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 
 	var stack chatmessages.A
+	store := global.GetStore[*dbstore.Store]()
+	if store == nil {
+		slog.Warn("no store")
+	}
 	if store != nil {
 		stack, err = store.LoadThread(ctx, conf.GetThreadID(), 4)
 		if err != nil {
