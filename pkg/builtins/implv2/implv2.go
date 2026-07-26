@@ -37,14 +37,13 @@ func OutputParser(content string) ([]Action, error) {
 
 	switch op {
 	case OpNextChunk, OpPrevChunk, OpCancel:
-		// 2. Strict Exact-Match: Remainder must be absolutely empty
 		if remainder != "" {
 			return nil, errors.New("command " + op + " does not accept arguments or trailing formatting")
 		}
 		actions = append(actions, Action{Op: op})
 
 	case OpGoTo:
-		// 3. Strict Separator Check: Remainder must start with exactly one space, followed by a valid character
+		// Ensure remainder starts with exactly one space and has a body
 		if !strings.HasPrefix(remainder, " ") || strings.HasPrefix(remainder, "  ") || remainder == " " {
 			return nil, errors.New("GOTO command must be followed by exactly one space and a target")
 		}
@@ -53,22 +52,19 @@ func OutputParser(content string) ([]Action, error) {
 		actions = append(actions, Action{Op: OpGoTo, Content: searchTarget})
 
 	case OpLockIn:
-		// 4. Strict Coordinate Bound Check: Remainder must start with exactly one space, followed by the coordinate field
-		if !strings.HasPrefix(remainder, " ") || strings.HasPrefix(remainder, "  ") {
+		// Ensure remainder starts with exactly one space and has a body
+		if !strings.HasPrefix(remainder, " ") || strings.HasPrefix(remainder, "  ") || remainder == " " {
 			return nil, errors.New("LOCK command must be followed by exactly one space")
 		}
 
 		coordinates := remainder[1:]
-		// Ensure the coordinate block contains absolutely no extra parameters or punctuation
-		if len(fields) != 2 || coordinates != fields[1] {
-			return nil, errors.New("LOCK command requires exactly one coordinate argument with no trailing text")
-		}
 
-		// Strictly validate that coordinates only consist of digits and hyphens
+		// Strictly validate that coordinates only consist of digits and hyphens.
+		// This single check automatically rejects trailing text, spaces, or punctuation!
 		for i := 0; i < len(coordinates); i++ {
 			c := coordinates[i]
 			if (c < '0' || c > '9') && c != '-' {
-				return nil, errors.New("LOCK arguments contain invalid characters or punctuation")
+				return nil, errors.New("LOCK arguments contain invalid characters, trailing text, or punctuation")
 			}
 		}
 
