@@ -31,7 +31,10 @@ func OutputParser(content string) ([]Action, error) {
 	}
 
 	// Remove the operator prefix cleanly
-	remainder := content[len(op):]
+	if len(content) == len(op) {
+		return nil, errors.New("operation needs argument")
+	}
+	remainder := content[len(op)+1:]
 
 	var actions []Action
 
