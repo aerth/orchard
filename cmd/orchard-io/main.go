@@ -225,27 +225,30 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	if _, err := os.Stdin.Read(nil); err != nil {
 		return stackerr.Errorf("reading stdin: %w", err)
 	}
-	newmsg := chatmessages.NewFromRole(conf.GetUsername(), "user", "")
-	newmsg.ThreadID = threadID
-	stack = append(stack, *newmsg)
-	newmsg = &stack[len(stack)-1] // fix ptr
-	// read stdin directly to the newmsg
-	if showChar {
-		_, _ = fmt.Fprintf(os.Stderr, "%s: ", titlecaser.String(conf.GetUsername())) // eg: Chief:
-	}
-	err = ReadMessage(os.Stdin, conf.GetUsername(), "user", &newmsg) // ptr of ptr
-	if err != nil {
-		return stackerr.Errorf("ReadMessage: %w", err)
+	{ // USER MESSAGE
+		newmsg := chatmessages.NewFromRole(conf.GetUsername(), "user", "")
+		newmsg.ThreadID = threadID
+		stack = append(stack, *newmsg)
+		newmsg = &stack[len(stack)-1] // fix ptr
+		// read stdin directly to the newmsg
+		if showChar {
+			_, _ = fmt.Fprintf(os.Stderr, "%s: ", titlecaser.String(conf.GetUsername())) // eg: Chief:
+		}
+		err = ReadMessage(os.Stdin, conf.GetUsername(), "user", &newmsg) // ptr of ptr
+		if err != nil {
+			return stackerr.Errorf("ReadMessage: %w", err)
+		}
+
+		if newmsg == nil || newmsg.Content == "" {
+			return nil
+		}
+
+		if err = store.Add(ctx, threadID, newmsg); err != nil {
+			slog.Warn("err", "err", err)
+		}
 	}
 
-	if newmsg == nil || newmsg.Content == "" {
-		return nil
-	}
-
-	if err = store.Add(ctx, threadID, newmsg); err != nil {
-		slog.Warn("err", "err", err)
-	}
-
+	// GENERATE ROUNDS
 	if conf.Get().JsonOutput {
 		enc := json.NewEncoder(os.Stdout)
 		cmdpkg.MasterSend = func(v *chatmessages.ChatMessage) error {
