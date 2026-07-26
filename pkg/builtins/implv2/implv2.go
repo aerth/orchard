@@ -46,12 +46,11 @@ func OutputParser(content string) ([]Action, error) {
 		}
 		actions = append(actions, Action{Op: op})
 
-	case OpGoTo:
+	case OpGoTo, OpLockIn:
 		if remainder == "" {
 			return nil, errors.New("GOTO command must be followed by exactly one space and a target")
 		}
-		searchTarget := remainder // Clip the single separating space cleanly
-		actions = append(actions, Action{Op: OpGoTo, Content: searchTarget})
+		actions = append(actions, Action{Op: op, Content: remainder})
 
 	case OpLockIn:
 		// Ensure remainder starts with exactly one space and has a body
