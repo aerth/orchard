@@ -26,6 +26,9 @@ func ValidateFileSyntax(codeContent string, langname string, language *sitter.La
 	defer tree.Close()
 
 	rootNode := tree.RootNode()
+	if !rootNode.HasError() { // 1.3.1, 1.3.2
+		return nil
+	}
 
 	// Query pattern remains optimized for finding ERROR or MISSING tokens
 	errorQuery, err := sitter.NewQuery([]byte(`
