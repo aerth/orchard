@@ -106,7 +106,7 @@ func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		got += fmt.Sprintf("Error: %+v", err)
 	}
 	if got == "" {
-		got = "Error: no output"
+		got = "no output"
 	}
 	gotmsg := chatmessages.NewFromRole("", "tool", got)
 	return chatmessages.ChatMessages{*gotmsg}, nil
