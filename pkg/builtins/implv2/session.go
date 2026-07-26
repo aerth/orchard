@@ -87,7 +87,7 @@ To return to VIEW mode, begin or end your message with the word: CANCEL
 Any LOCKED targeted lines will be replaced by your reply.
 File line numbers are added for your convienence only. Do not prepend lines with numbers.
 Currently locked: %d lines
-Replying with <%d lines will remove lines.
+Replying with <%d lines will remove lines. Empty lines in your reply are retained.
 Replying with >%d lines will insert additional lines.
 
 			`,
