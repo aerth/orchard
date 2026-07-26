@@ -171,7 +171,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		return fmt.Errorf("broken")
 	}
 	if cr.Done {
-		slog.Info("Is Done", "metrics", cr.Metrics)
+		slog.Info("Is Done", "reason", cr.DoneReason, "metrics", cr.Metrics)
 		var buf bytes.Buffer
 		cr.Summary(&buf)
 		cm.Summary = buf.String()
