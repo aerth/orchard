@@ -11,7 +11,7 @@ General, extensible, multi-purpose AI Agent orchestration harness.
 ```bash
 echo 'Why is sky blue' | orchard-io | piper-tts -m $VOICE
 echo 'Check the latest news, summarize into one paragraph.' | orchard-io | piper-tts -m $VOICE
-echo '' | orchard-io | piper-tts -m $VOICE
+echo 'Tell a story (9 paragraphs) about dragons' | orchard-io | piper-tts -m $VOICE
 ```
 
 ### example: Chat TUI app
