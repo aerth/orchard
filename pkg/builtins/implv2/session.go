@@ -90,6 +90,7 @@ Currently locked: %d lines
 Replying with <%d lines will remove lines. Empty lines in your reply are retained.
 Replying with >%d lines will insert additional lines.
 DO NOT ADD LINE NUMBERS.
+As a special case, if newlines are required at the end of a file/chunk, use [EOF] to end edit after newlines.
 
 			`,
 			s.LockEnd-s.LockStart,
