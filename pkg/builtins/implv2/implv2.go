@@ -17,5 +17,12 @@ const (
 
 func OutputParser(content string) ([]Action, error) {
 	fields := strings.Fields(content)
+	switch fields[0] {
+	case OpNextChunk:
+	case OpPrevChunk:
+	case OpGoTo:
+	case OpLockIn:
+	case OpCancel:
+	}
 	return nil, nil
 }
