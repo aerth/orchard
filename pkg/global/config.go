@@ -161,7 +161,6 @@ func NewConfigFlags(clearfirst *bool) *Conf {
 }
 
 func (cfg *ConfigInput) Flags(clearfirst *bool) {
-	cfg.NoColor = cfg.NoColor || !isatty.IsTerminal(os.Stdout.Fd())
 	flag.StringVar(&cfg.Username, "username", cfg.Username, "username like Bob or Chief")
 	flag.StringVar(&cfg.Botname, "bot", cfg.Botname, "username like Alice or project_manager")
 	flag.StringVar(&cfg.Treedir, "tree", cfg.Treedir, "tree for markdown files for system messages (employee descriptions and task templates)")
@@ -227,6 +226,7 @@ func DefaultConfigInput() ConfigInput {
 	if threadID == uuid.Nil {
 		panic("nil uuid")
 	}
+	noColor := os.Getenv("NOCOLOR") != "" || !isatty.IsTerminal(os.Stdout.Fd())
 	return ConfigInput{
 		ThreadID:    threadID,
 		Logfilename: logfilename,
