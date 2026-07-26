@@ -12,6 +12,9 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	if i := slices.Index(replacementLines, "CANCEL"); i >= 0 {
 		replacementLines = replacementLines[:i]
 	}
+	if i := slices.Index(replacementLines, "[EOF]"); i >= 0 {
+		replacementLines = replacementLines[:i]
+	}
 	if len(replacementLines) == 0 {
 		return fmt.Errorf("no replacement lines")
 	}
