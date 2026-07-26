@@ -71,7 +71,7 @@ func TestAi(t *testing.T) {
 				break
 			}
 			generated := chatmessages.NewFromRole("", "assistant", "")
-			for i := range creq.Messages[:len(creq.Messages)-1] {
+			for i := range creq.Messages[1 : len(creq.Messages)-1] {
 				if creq.Messages[i].Role == "system" && strings.HasPrefix(creq.Messages[i].Content, SuccessMessage+"\n") {
 					creq.Messages[i].Content = "Operation Successful"
 				}
