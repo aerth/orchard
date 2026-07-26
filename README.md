@@ -7,6 +7,9 @@ General, extensible, multi-purpose AI Agent orchestration harness. For tasks.
 Familiar paned interface for chatting with a coding agent.
 
 ## example: Cron job
+
+Every N minutes, check my inboxes for any important urgent messages. For each urgent message, send me an SMS message to remind me to check my email.
+
 ## example: Git hook
 ## example: HTTP API endpoint
 
