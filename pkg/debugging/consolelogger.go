@@ -9,6 +9,8 @@ import (
 
 	"m/pkg/global"
 	"m/pkg/llm"
+
+	"github.com/aerth/mostly/stackerr"
 )
 
 type ConsoleLogger struct {
@@ -122,14 +124,14 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 			if !c.NoColor {
 				_, err := fmt.Fprintf(w, "%s", ColorGreen)
 				if err != nil {
-					return err
+					return stackerr.Errorf("%w", err)
 				}
 			}
 			c.emode = xCONTENT
 		}
 		_, err := fmt.Fprintf(w, "%s", m.Content)
 		if err != nil {
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 	}
 	if len(m.ToolCalls) != 0 { // ollama api returns a full, parsed tool call(s). TODO: future: reimplement chat template for streaming the building of the tool call
@@ -148,7 +150,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 
 			_, err = fmt.Fprintf(w, "\n%s```json\n%s(args=%s)\n```\n", c.pre, wraps[0].Function.Name, string(wraps[0].Function.Arguments))
 			if err != nil {
-				return err
+				return stackerr.Errorf("%w", err)
 			}
 		}
 	}
@@ -172,7 +174,7 @@ func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) error {
 			if cr.Done {
 				c.Reset()
 			}
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 	}
 	var err error
@@ -180,12 +182,12 @@ func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) error {
 		defer c.Reset()
 		_, err = fmt.Fprintf(w, "%s", ColorReset)
 		if err != nil {
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 		if tw != w {
 			_, err = fmt.Fprintf(tw, "%s", ColorReset)
 			if err != nil {
-				return err
+				return stackerr.Errorf("%w", err)
 			}
 		}
 
