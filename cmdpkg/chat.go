@@ -115,7 +115,7 @@ Chat:
 		}
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
 		if err != nil && !errors.Is(err, context.Canceled) {
-			return stackerr.Errorf("%w", err)
+			return stackerr.Errorf("gen: %w", err)
 		}
 		if errors.Is(err, context.Canceled) {
 			newcaller.Content += " (this reply was cancelled by user before it finished)"
