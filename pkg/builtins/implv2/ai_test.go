@@ -1,6 +1,7 @@
 package implv2_test
 
 import (
+	"encoding/json"
 	"log"
 	"log/slog"
 	"os"
@@ -77,6 +78,9 @@ func TestAi(t *testing.T) {
 				}
 			}
 			msgs := creq.Messages
+			if testpass {
+				_ = json.NewEncoder(os.Stderr).Encode(msgs)
+			}
 			err = llm.New().Chat(t.Context(), creq, generated.GatherChatResponse)
 			creq.Messages = msgs
 			if err != nil {
