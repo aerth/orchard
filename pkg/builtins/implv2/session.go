@@ -19,6 +19,10 @@ type Session struct {
 	LockEnd   int
 }
 
+func (s Session) Current() []byte {
+	return []byte(strings.Join(s.Lines, "\n"))
+}
+
 func (s Session) SystemMessage() string {
 	// 1. Calculate boundaries for the active viewing chunk window
 	startIdx := max(s.CurrentLine-1, 0)
