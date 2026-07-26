@@ -7,16 +7,17 @@ General, extensible, multi-purpose AI Agent orchestration harness. For tasks.
 
 **The following prompts are extremely simplified for brevity.**
 
-
 ### example: Chat TUI app
 
-Familiar paned interface for chatting with a coding agent.
+Familiar paned interface for chatting with a coding agent. (tools: all)
 
 ### example: Cron job
 
-Every N minutes, check my inboxes for any important urgent messages. For each urgent message, send me an SMS message to remind me to check my email.
+Every N minutes, check my inboxes for any important urgent messages. For each urgent message, send me an SMS message to remind me to check my email. (tools: check_inbox, send_sms)
 
 ### example: Git hook
+
+
 
 
 ### example: HTTP API endpoint
