@@ -155,6 +155,7 @@ func main1(ctx context.Context) error {
 	if clearfirst {
 		store.DeleteThread(ctx, conf.GetThreadID())
 	}
+	slog.Info("STORE ENABLED")
 	global.SetStore(store)
 	global.SetConf(*conf)
 	err = runmain(ctx, conf)
