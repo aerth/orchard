@@ -91,7 +91,7 @@ func TestAi(t *testing.T) {
 			creq.Messages = append(creq.Messages, generated.Message)
 			actions, err := session.Parse(generated.Content)
 			if errors.Is(err, implv2.ErrNot) && session.LockEnd == 0 {
-				// finished
+				// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
 				break
 			}
 			if errors.Is(err, implv2.ErrNot) && session.LockEnd != 0 {
