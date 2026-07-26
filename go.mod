@@ -6,10 +6,10 @@ require (
 	github.com/aerth/mostly v0.0.7
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
-	github.com/lmittmann/tint v1.1.3
+	github.com/lmittmann/tint v1.2.0
 	github.com/smacker/go-tree-sitter v0.0.0-20240827094217-dd81d9e9be82
 	github.com/wk8/go-ordered-map/v2 v2.1.8
-	golang.org/x/text v0.38.0
+	golang.org/x/text v0.40.0
 	gorm.io/gorm v1.31.2
 )
 
