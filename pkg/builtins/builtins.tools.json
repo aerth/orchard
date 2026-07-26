@@ -60,6 +60,15 @@
     }
   },
   {
+    "name": "run_bash",
+    "description": "Executes a complete shell command line, with pipes, quotes",
+    "required": ["args"],
+    "parameters": {
+      "command": "string",
+      "args": ["string"]
+    }
+  },
+  {
     "name": "list_directory",
     "description": "Lists files and directories in a given path.",
     "required": ["path"],
