@@ -226,7 +226,7 @@ func DefaultConfigInput() ConfigInput {
 	if threadID == uuid.Nil {
 		panic("nil uuid")
 	}
-	noColor := os.Getenv("NOCOLOR") != "" || !isatty.IsTerminal(os.Stdout.Fd())
+	noColor := os.Getenv("NO_COLOR") != "" || !isatty.IsTerminal(os.Stdout.Fd())
 	return ConfigInput{
 		ThreadID:    threadID,
 		Logfilename: logfilename,
@@ -235,5 +235,6 @@ func DefaultConfigInput() ConfigInput {
 		Dir:         dir,
 		Treedir:     treedir,
 		Tooldir:     tooldir,
+		NoColor:     noColor,
 	}
 }
