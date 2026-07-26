@@ -5,4 +5,6 @@ type Action struct {
 	Content string
 }
 
-func OutputParser(content string) Action
+func OutputParser(content string) ([]Action, error) {
+	return nil, nil
+}
