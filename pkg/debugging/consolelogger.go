@@ -107,7 +107,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 			m.Thinking = c.buf
 			c.emode = xGO
 			if !c.HideThinking && !c.NoColor {
-				_, _ = fmt.Fprintf(tw, "%s", ColorGreen) // start colorize
+				_, _ = fmt.Fprintf(tw, "%s COLOR ", ColorGreen) // start colorize
 			}
 		}
 	}
@@ -121,7 +121,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 				_, _ = fmt.Fprintf(tw, "newline\n")
 			}
 			if !c.NoColor {
-				_, _ = fmt.Fprintf(w, "%s", ColorGray)
+				_, _ = fmt.Fprintf(w, "%s COLOR ", ColorGray)
 			}
 			c.emode = xCONTENT
 		}
