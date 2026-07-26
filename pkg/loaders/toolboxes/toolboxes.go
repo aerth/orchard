@@ -11,7 +11,6 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
-	"regexp"
 	"slices"
 	"strings"
 
@@ -195,8 +194,7 @@ func GetBashFileEnvironKeys(b []byte) ([]string, error) {
 
 func GetPythonFileEnvironKeys(b []byte) ([]string, error) {
 	// Matches words inside quotes inside .get( or getenv(
-	re := regexp.MustCompile(`(?:environ\.get|getenv)\s*\(\s*['"]([^'"]+)['"]`)
-	matches := re.FindAllStringSubmatch(string(b), -1)
+	matches := rege.PythonEnvironKeys.FindAllStringSubmatch(string(b), -1)
 
 	keys := make([]string, len(matches))
 	for i, m := range matches {
