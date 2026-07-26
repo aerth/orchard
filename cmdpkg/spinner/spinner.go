@@ -59,10 +59,6 @@ func Start(ctx context.Context) *Spinner {
 	return s
 }
 
-// Stop tells the goroutine to exit and cleans up the line
-func (s *Spinner) Stop() {
-}
-
 // HandleChatResponse implements [llm.ChatStreamHandlerFunc] (for cascading chat handlers) so our spinner stops when the first token is generated.
 func (s *Spinner) HandleChatResponse(_ llm.ChatResponse) error {
 	s.quit()
