@@ -94,6 +94,9 @@ func TestAi(t *testing.T) {
 		println(generated.Content)
 		creq.Messages = append(creq.Messages, generated.Message)
 		actions, err := session.Parse(generated.Content)
+		if err != nil && session.LockEnd != 0 {
+			err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
+		}
 		if err != nil {
 			t.Fatal(err)
 		}
