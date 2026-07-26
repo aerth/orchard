@@ -248,7 +248,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		}
 	}
 	e := chat.Ext{ThreadID: threadID, NonStreamHandler: func(cm chatmessages.ChatMessage) {
-	if err ;= 	store.Add(ctx, threadID, &cm); err != nil {
+		if err = store.Add(ctx, threadID, &cm); err != nil {
 			slog.Warn("err", "err", err)
 		}
 	}}
