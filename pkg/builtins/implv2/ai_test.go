@@ -115,7 +115,7 @@ func TestAi(t *testing.T) {
 		for i := range actions {
 			if actions[i].Op == implv2.OpCancel {
 				slog.Info("cancel requested")
-				break
+				return
 			}
 			slog.Info("got action", "i", i, "s", actions[i].Op, "x", strings.Split(actions[i].Content, "\n")[0])
 			res := session.RunAction(actions[i])
