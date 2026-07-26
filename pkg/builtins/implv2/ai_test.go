@@ -117,10 +117,9 @@ func TestAi(t *testing.T) {
 			if errors.Is(err, implv2.ErrNot) && session.LockEnd != 0 {
 				// target acquired
 				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
-				if err == nil {
+				if err == nil && !strings.HasSuffix(session.ActiveFile, ".txt") {
 					var lang *sitter.Language
-					lang, _ := getlang(session.Filename)
-
+					lang, _ := getlang(session.ActiveFile)
 					if lang != nil {
 						err = implv2.ValidateFileSyntax(string(session.Current()), lang)
 					}
