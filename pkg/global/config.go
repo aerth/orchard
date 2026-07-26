@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"m/cmdpkg/spinner"
+
 	"github.com/google/uuid"
 )
 
@@ -169,6 +171,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.StringVar(&cfg.Logfilename, "logfile", cfg.Logfilename, "path to log file")
 	flag.BoolVar(&cfg.JsonOutput, "json", cfg.JsonOutput, "json output")
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
+	flag.BoolVar(&spinner.NoSpin, "nospin", spinner.NoSpin, "disable spin")
 	flag.Func("thread", "uuid", func(s string) error {
 		return cfg.ThreadID.UnmarshalText([]byte(s))
 	})
