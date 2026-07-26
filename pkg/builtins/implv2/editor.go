@@ -3,11 +3,15 @@ package implv2
 import (
 	"errors"
 	"fmt"
+	"slices"
 )
 
 // ApplySurgicalEdit swaps out the locked coordinate range in memory.
 // It maps 1-based human line numbers directly to 0-based Go array indices.
 func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
+	if i := slices.Index(replacementLines, "CANCEL"); i >= 0 {
+		replacementLines = replacementLines[:i]
+	}
 	if s.LockStart == 0 || s.LockEnd == 0 {
 		return errors.New("state error: cannot apply edit without an active coordinate lock")
 	}
