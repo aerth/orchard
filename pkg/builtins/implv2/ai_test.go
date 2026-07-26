@@ -96,6 +96,9 @@ func TestAi(t *testing.T) {
 		actions, err := session.Parse(generated.Content)
 		if err != nil && session.LockEnd != 0 {
 			err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
+			if err == nil {
+				err = os.WriteFile(session.ActiveFile, []byte(strings.Join(session.Lines, "\n")), 0o600)
+			}
 		}
 		if err != nil {
 			t.Fatal(err)
