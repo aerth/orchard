@@ -364,6 +364,7 @@ type ChatRequest struct {
 	Model     string           `json:"model"`
 	Think     any              `json:"think,omitempty"`
 	Stream    *bool            `json:"stream,omitempty"`
+	Verbose   bool             `json:"verbose,omitempty"`
 	Messages  Messages         `json:"messages"`
 	Format    json.RawMessage  `json:"format,omitempty"`
 	Tools     []json.Marshaler `json:"tools,omitempty"`
@@ -445,6 +446,7 @@ func NewChatRequest() *ChatRequest {
 		Model:     model,
 		Think:     think,
 		Stream:    new(true),
+		Verbose:   true,
 		KeepAlive: -1,
 		//	DebugRenderOnly: os.Getenv("OLLAMA_DEBUG_RENDER") == "1",
 		//	TopLogprobs:     0,
