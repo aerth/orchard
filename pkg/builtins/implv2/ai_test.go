@@ -104,6 +104,10 @@ func TestAi(t *testing.T) {
 			}
 			session.LockStart = 0
 			session.LockEnd = 0
+			creq.Messages = append(creq.Messages, llm.Message{
+				Role:    "system",
+				Content: "The file edits were applied to the filesystem",
+			})
 		}
 		if err != nil {
 			t.Fatal(err)
