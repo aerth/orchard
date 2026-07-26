@@ -50,6 +50,9 @@ func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	if err != nil {
 		return NewResponse(call, fmt.Sprintf("ReadFile error: %v", err)), nil
 	}
+	if strings.TrimSpace([]byte(data)) == 0 {
+		data = []byte("(The file is empty)")
+	}
 	x := NewResponse(call, string(data))
 	return x, nil
 }
