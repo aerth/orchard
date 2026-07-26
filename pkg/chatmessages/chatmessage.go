@@ -152,7 +152,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	}
 	cm.Thinking += cr.Message.Thinking
 	cm.Content += cr.Message.Content
-	if len(cr.Message.ToolCalls) == 0 {
+	if len(cr.Message.ToolCalls) == 0 && !cr.Done {
 		return nil
 	}
 	slog.Info("collecting", "mid", cm.MessageID)
