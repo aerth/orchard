@@ -248,7 +248,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		}
 	}
 	e := chat.Ext{ThreadID: threadID, NonStreamHandler: func(cm chatmessages.ChatMessage) {
-		store.Add(ctx, threadID, &cm)
+	if err ;= 	store.Add(ctx, threadID, &cm); err != nil {
+			slog.Warn("err", "err", err)
+		}
 	}}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
