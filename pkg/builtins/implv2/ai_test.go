@@ -52,7 +52,7 @@ func TestAi(t *testing.T) {
 		{Role: "user", Content: "edit the file: Fix typos in foo.txt. do not decrease/increase number of lines."},
 	}
 	session := implv2.Session{}
-	err := os.WriteFile("foo.txt", []byte(), 0o600)
+	err := os.WriteFile("foo.txt", []byte(tc.FileIn), 0o600)
 	if err != nil {
 		t.Fatal(err)
 	}
