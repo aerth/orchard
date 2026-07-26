@@ -25,7 +25,7 @@ For each diff, analyze the work and determine if there are any issues that shoul
 
 ### example: HTTP API endpoint
 
-A user has opened a new Support Ticket. Is this spam?
+A user has opened a new Support Ticket. Is this spam? (format: {"spamminess": {"type": "float", "min": 0, "max": 10}})
 
 ### example: Spam mitigation
 
