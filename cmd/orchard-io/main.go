@@ -132,6 +132,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		basher := func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 			call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 			code := call.Function.Arguments.Code
+			if code == "" {
+				err = fmt.Errorf("empty code")
+			}
 			got, err := bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
 			if err != nil {
 				if got != "" {
