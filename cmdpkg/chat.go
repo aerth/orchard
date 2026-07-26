@@ -148,7 +148,7 @@ Chat:
 			}
 			spin := spinner.Start(sctx)
 			if spin != nil {
-				handl = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse}, handl...)
+				hh = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse}, hh...)
 			}
 
 			//	handl := []llm.ChatStreamHandlerFunc{ cl.HandleChatResponse, newcaller.GatherChatResponse}
