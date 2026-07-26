@@ -23,6 +23,8 @@ import (
 	"github.com/lmittmann/tint"
 )
 
+// See Also: [global.ConfigInput.Flags]
+
 var okenvs = map[string]bool{
 	"INPUT_FILE":          true,
 	"LANG":                true,
