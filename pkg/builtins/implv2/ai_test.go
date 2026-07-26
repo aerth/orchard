@@ -18,6 +18,12 @@ import (
 
 	"github.com/joho/godotenv"
 	sitter "github.com/smacker/go-tree-sitter"
+	"github.com/smacker/go-tree-sitter/css"
+	"github.com/smacker/go-tree-sitter/golang"
+	"github.com/smacker/go-tree-sitter/html"
+	"github.com/smacker/go-tree-sitter/javascript"
+	"github.com/smacker/go-tree-sitter/python"
+	"github.com/smacker/go-tree-sitter/typescript/typescript"
 )
 
 func TestMain(t *testing.M) {
@@ -61,13 +67,14 @@ var tcs = []TC{
 
 	{
 		Filename: "foo.go",
-		Prompt:   "edit the file: Export the Add function by correcting its name casing.",
+		Prompt:   "edit the file (foo.go): Export the Add function by correcting its name casing.",
 		FileInp:  "package main\n\n// add sums two integers\nfunc add(a, b int) int {\n\treturn a + b\n}\n",
 		FileOut:  "package main\n\n// add sums two integers\nfunc Add(a, b int) int {\n\treturn a + b\n}\n",
 	},
 }
 
 func TestAi(t *testing.T) {
+	t.Chdir(t.TempDir())
 	slices.Reverse(tcs)
 	for _, tc := range tcs {
 		if tc.Filename == "" || tc.Prompt == "" || tc.FileInp == "" {
@@ -119,7 +126,6 @@ func TestAi(t *testing.T) {
 				// target acquired
 				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
 				if err == nil && !strings.HasSuffix(session.ActiveFile, ".txt") {
-					var lang *sitter.Language
 					lang, _ := getlang(session.ActiveFile)
 					if lang != nil {
 						err = implv2.ValidateFileSyntax(string(session.Current()), lang)
@@ -180,4 +186,21 @@ func getlang(s string) (*sitter.Language, error) {
 		return nil, fmt.Errorf("no dot")
 	}
 	ss := strings.Split(s, ".")
+	ext := ss[len(ss)-1]
+	switch ext {
+	case "go":
+		return golang.GetLanguage(), nil
+	case "py":
+		return python.GetLanguage(), nil
+	case "html":
+		return html.GetLanguage(), nil
+	case "ts":
+		return typescript.GetLanguage(), nil
+	case "js":
+		return javascript.GetLanguage(), nil
+	case "css":
+		return css.GetLanguage(), nil
+	default:
+		return nil, fmt.Errorf("not implemented yet")
+	}
 }
