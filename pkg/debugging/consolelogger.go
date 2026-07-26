@@ -140,12 +140,16 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 			} `json:"function"`
 		}
 		wraps := make([]namewrap, len(m.ToolCalls))
+		var err error
 		for i := range m.ToolCalls {
 			if err := json.Unmarshal(m.ToolCalls[i], &wraps[i]); err != nil {
 				slog.Error("oops", "err", err)
 			}
 
 			_, err = fmt.Fprintf(w, "\n%s```json\n%s(args=%s)\n```\n", c.pre, wraps[0].Function.Name, string(wraps[0].Function.Arguments))
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
