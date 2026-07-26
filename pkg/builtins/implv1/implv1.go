@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
@@ -50,8 +51,8 @@ func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	if err != nil {
 		return NewResponse(call, fmt.Sprintf("ReadFile error: %v", err)), nil
 	}
-	if strings.TrimSpace([]byte(data)) == 0 {
-		data = []byte("(The file is empty)")
+	if strings.TrimSpace(string(data)) == "" {
+		data = []byte(fmt.Sprintf("(The file is empty as of %s)", time.Now().Format(time.ANSIC)))
 	}
 	x := NewResponse(call, string(data))
 	return x, nil
