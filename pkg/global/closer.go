@@ -92,6 +92,7 @@ func Cancel(err error) {
 	if len(x) == 0 {
 		shouldClose++
 		if shouldClose >= MAX {
+			slog.Error("max cancels, shutting down")
 			Close()
 			os.Exit(1)
 		}
