@@ -411,6 +411,7 @@ func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatSt
 		for i := range callbacks {
 			if err := callbacks[i](resp); err != nil {
 				slog.Error("callback error", "i", i, "l", len(callbacks), "err", err)
+				time.Sleep(time.Second)
 				return stackerr.Errorf("%w", err)
 			}
 		}
