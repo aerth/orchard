@@ -40,6 +40,10 @@ type TC struct {
 	FileOut string
 }
 
+var tcs = []TC{
+	{Prompt: "", FileIn: "Hello\nw0rld\nThs is a testt.\n\nIt works\n", FileOut: "Hello\nWorld\nThis is a test.\n\nIt works\n"},
+}
+
 func TestAi(t *testing.T) {
 	creq := llm.NewChatRequest()
 
@@ -48,7 +52,7 @@ func TestAi(t *testing.T) {
 		{Role: "user", Content: "edit the file: Fix typos in foo.txt. do not decrease/increase number of lines."},
 	}
 	session := implv2.Session{}
-	err := os.WriteFile("foo.txt", []byte("Hello\nw0rld\nThs is a testt.\n\nIt works\n"), 0o600)
+	err := os.WriteFile("foo.txt", []byte(), 0o600)
 	if err != nil {
 		t.Fatal(err)
 	}
