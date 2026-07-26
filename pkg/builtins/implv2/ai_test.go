@@ -147,7 +147,7 @@ func TestAi(t *testing.T) {
 
 			}
 			if err != nil {
-				t.Fatal(err)
+				t.Fatalf("%+v", err)
 			}
 			for i := range actions {
 				if actions[i].Op == implv2.OpCancel {
