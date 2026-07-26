@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 
@@ -49,9 +50,16 @@ var tcs = []TC{
 		FileInp: "Hello\nw0rld\nThs is a testt.\n\nIt works\n",
 		FileOut: "Hello\nworld\nThis is a test.\n\nIt works\n",
 	},
+	{
+		Filename: "foo.py",
+		Prompt:   "edit the file: Fix the logic error in foo.py , function calculate_total to include the tax rate calculation.",
+		FileInp:  "def calculate_total(price, tax_rate):\n    return price\n",
+		FileOut:  "def calculate_total(price, tax_rate):\n    return price + (price * tax_rate)\n",
+	},
 }
 
 func TestAi(t *testing.T) {
+	slices.Reverse(tcs)
 	for _, tc := range tcs {
 		if tc.Filename == "" || tc.Prompt == "" || tc.FileInp == "" {
 			t.Fatal("bad tc")
