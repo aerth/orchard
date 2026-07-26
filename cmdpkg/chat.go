@@ -127,7 +127,9 @@ Chat:
 		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 		sctx := global.NewCancel(ctx)
 		e.Tools = tools.ToMarshaler()
-		cl.Reset()
+		if cl != nil {
+			cl.Reset()
+		}
 		top := stack.Top()
 		if top.Role == "assistant" {
 			slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
