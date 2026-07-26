@@ -39,17 +39,21 @@ const SuccessMessage = "Operation successful."
 type TC struct {
 	Filename string
 	Prompt   string
-	FileIn   string
+	FileInp  string
 	FileOut  string
 }
 
 var tcs = []TC{
-	{Filename: "foo.txt", Prompt: "edit the file: Fix typos in foo.txt. do not decrease/increase number of lines.", FileIn: "Hello\nw0rld\nThs is a testt.\n\nIt works\n", FileOut: "Hello\nworld\nThis is a test.\n\nIt works\n"},
+	{
+		Filename: "foo.txt", Prompt: "edit the file: Fix typos in foo.txt. do not decrease/increase number of lines.",
+		FileInp: "Hello\nw0rld\nThs is a testt.\n\nIt works\n",
+		FileOut: "Hello\nworld\nThis is a test.\n\nIt works\n",
+	},
 }
 
 func TestAi(t *testing.T) {
 	for _, tc := range tcs {
-		if tc.Filename == "" || tc.Prompt == "" || tc.FileIn == "" {
+		if tc.Filename == "" || tc.Prompt == "" || tc.FileInp == "" {
 			t.Fatal("bad tc")
 		}
 		creq := llm.NewChatRequest()
@@ -59,7 +63,7 @@ func TestAi(t *testing.T) {
 			{Role: "user", Content: tc.Prompt},
 		}
 		session := implv2.Session{}
-		err := os.WriteFile(tc.Filename, []byte(tc.FileIn), 0o600)
+		err := os.WriteFile(tc.Filename, []byte(tc.FileInp), 0o600)
 		if err != nil {
 			t.Fatal(err)
 		}
