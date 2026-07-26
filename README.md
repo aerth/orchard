@@ -15,8 +15,9 @@ Familiar paned interface for chatting with a coding agent. (tools: all)
 
 Every N minutes, check my inboxes for any important urgent messages. For each urgent message, send me an SMS message to remind me to check my email. (tools: check_inbox, send_sms)
 
-### example: Git hook
+### example: Keybinding for STT->LLM->TTS
 
+### example: Git hook
 
 
 
