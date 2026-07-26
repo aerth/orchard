@@ -20,8 +20,8 @@ const (
 
 func OutputParser(content string) ([]Action, error) {
 	// Clean surrounding whitespace and split into fields
-	fields := strings.Fields(strings.TrimSpace(content))
-	if len(fields) == 0 {
+	fields := strings.Fields(content)
+	if fields[0] == "" {
 		return nil, errors.New("empty LLM response")
 	}
 
