@@ -227,6 +227,9 @@ func DefaultConfigInput() ConfigInput {
 		panic("nil uuid")
 	}
 	noColor := os.Getenv("NO_COLOR") != "" || !isatty.IsTerminal(os.Stdout.Fd())
+	if !noColor {
+		println("COLOR MODE")
+	}
 	return ConfigInput{
 		ThreadID:    threadID,
 		Logfilename: logfilename,
