@@ -120,7 +120,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	threadID := conf.GetThreadID()
 
 	var err error
-	if false { // builtin go tools
+	if true { // builtin go tools
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file":  implv1.ReadFile,
 			"write_file": implv1.WriteFile,
