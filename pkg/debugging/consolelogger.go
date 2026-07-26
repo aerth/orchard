@@ -123,7 +123,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) {
 	if m.Content != "" {
 		if c.emode != xCONTENT {
 			if !c.HideThinking && c.emode == xGO {
-				_, _ = fmt.Fprintf(tw, "\n")
+				_, _ = fmt.Fprintf(tw, "newline\n")
 			}
 			if !c.NoColor {
 				_, _ = fmt.Fprintf(w, "%s", Colorcontent)
