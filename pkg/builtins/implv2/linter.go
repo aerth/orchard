@@ -32,8 +32,8 @@ func ValidateFileSyntax(codeContent string, langname string, language *sitter.La
 
 	// Query pattern remains optimized for finding ERROR or MISSING tokens
 	errorQuery, err := sitter.NewQuery([]byte(`
-		(ERROR) @syntax_err
-		_ @missing_err (#is-missing? @missing_err)
+(ERROR) @syntax_err
+@missing_err (#is-missing? @missing_err)
 		`), language)
 	if err != nil {
 		return fmt.Errorf("failed to initialize syntax error validation query: %w", err)
