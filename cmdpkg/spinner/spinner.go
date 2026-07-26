@@ -13,9 +13,12 @@ import (
 )
 
 type Spinner struct {
-	Fake     bool
 	stopChan chan struct{}
 	once     sync.Once
+}
+
+func (s *Spinner) Fake() bool {
+	return s.stopChan == nil
 }
 
 func (s *Spinner) Reset() {
