@@ -96,6 +96,7 @@ func main1(ctx context.Context) error {
 		store.DeleteThread(ctx, conf.GetThreadID())
 	}
 	global.SetStore(store)
+	global.SetConf(*conf)
 	err = runmain(ctx, conf)
 	if err != nil {
 		return stackerr.Errorf("runmain: %w", err)
