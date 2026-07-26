@@ -17,10 +17,11 @@ type haspath struct {
 func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	// begin loop
 
-	call, err := chat.ReadToolCall(ctx, caller, toolCallIndex)
+	call, err := chat.ReadToolCall[haspath](ctx, caller, toolCallIndex)
 	if err != nil {
 		return nil, err
 	}
+	path := call.Function.Arguments.Path
 
 	msg := llm.Message{
 		Role:     "tool",
