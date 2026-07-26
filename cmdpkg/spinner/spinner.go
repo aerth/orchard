@@ -13,7 +13,7 @@ import (
 )
 
 type Spinner struct {
-	fake     bool
+	Fake     bool
 	stopChan chan struct{}
 	once     sync.Once
 }
@@ -31,7 +31,7 @@ var (
 // Start kicks off the spinner in a background goroutine, writing to Out
 func Start(ctx context.Context) *Spinner {
 	if NoSpin || Out == nil || Out == io.Discard {
-		return &Spinner{fake: true}
+		return &Spinner{stopChan: nil}
 	}
 	s := &Spinner{
 		stopChan: make(chan struct{}),
