@@ -58,6 +58,7 @@ var builtinTools otool.Tools
 // orchard CLI infinite loop, simple stdin stdout, minimal stderr.
 // debug logs to log file or null
 func main() {
+	signal.Ignore(syscall.SIGPIPE) // ignore pipe sig, let read/write error do its thing
 	//
 	global.SetVersion(version, "stdio")
 	if buildtime != "" {
