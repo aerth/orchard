@@ -158,7 +158,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	if cm.ToolCallID == "" {
 		cm.ToolCallID = cr.Message.ToolCallID
 	}
-	if len(cm.ToolCalls) != 0 && len(cr.Message.ToolCalls) != 0 {
+	if len(cm.ToolCalls) != 0 && len(cr.Message.ToolCalls) != 0 && cr.Message.Summary != "" {
 		slog.Error("already", "prev", toJSON(cm.ToolCalls[0]), "next", toJSON(cr.Message.ToolCalls[0]))
 		panic("wow already?")
 	}
