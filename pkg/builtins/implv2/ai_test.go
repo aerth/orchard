@@ -95,6 +95,7 @@ func TestAi(t *testing.T) {
 				break
 			}
 			if errors.Is(err, implv2.ErrNot) && session.LockEnd != 0 {
+				// target acquired
 				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
 				if err == nil {
 					if session.ActiveFile != tc.Filename {
