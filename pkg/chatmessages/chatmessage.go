@@ -155,7 +155,6 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	if len(cr.Message.ToolCalls) == 0 && !cr.Done {
 		return nil
 	}
-	slog.Info("collecting", "mid", cm.MessageID)
 	if cm.ToolCallID == "" {
 		cm.ToolCallID = cr.Message.ToolCallID
 	}
@@ -163,7 +162,9 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		slog.Error("already", "prev", toJSON(cm.ToolCalls[0]), "next", toJSON(cr.Message.ToolCalls[0]))
 		panic("wow already?")
 	}
-	cm.ToolCalls = append(cm.ToolCalls, cr.Message.ToolCalls...)
+	if len(cr.Message.ToolCalls) != 0 {
+		cm.ToolCalls = append(cm.ToolCalls, cr.Message.ToolCalls...)
+	}
 	if len(cm.ToolCalls) == 0 {
 		cm.ToolCalls = nil
 	}
