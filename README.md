@@ -21,9 +21,11 @@ You are a linux expert who helps the owner manage their computer. (tools: bash_w
 
 ### example: Git hook
 
-For each diff, analyze the work and determine if there are any issues that should be immediately looked at.
+For each diff, analyze the work and determine if there are any issues that should be immediately looked at. (tools: read_file)
 
 ### example: HTTP API endpoint
+
+A user has opened a new Support Ticket. Is this spam?
 
 ### example: Spam mitigation
 
