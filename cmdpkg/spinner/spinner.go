@@ -12,6 +12,7 @@ import (
 )
 
 type Spinner struct {
+	fake     bool
 	stopChan chan struct{}
 	once     sync.Once
 }
