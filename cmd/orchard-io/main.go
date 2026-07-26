@@ -70,6 +70,8 @@ func main() {
 	ctx := context.Background()
 	go Sig()
 	if err := main1(ctx); err != nil {
+		log.Printf("Fatal: %+v", err)
+		slog.Error("fatal", "err", err)
 		global.Close()
 		cmdpkg.Writer = os.Stderr
 		cmdpkg.InitLog()
