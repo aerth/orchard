@@ -101,6 +101,7 @@ func main1(ctx context.Context) error {
 	if err != nil {
 		return stackerr.Errorf("runmain: %w", err)
 	}
+	slog.Info("done without errors")
 	return nil
 }
 
