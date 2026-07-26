@@ -11,6 +11,7 @@ import (
 	"m/pkg/otool"
 
 	"github.com/aerth/mostly/stackerr"
+	"github.com/google/uuid"
 )
 
 var ErrFatalToolResult = errors.New("unrecoverable error")
@@ -58,6 +59,12 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 		for i := range x {
 			if x[i].CreatedAt.IsZero() {
 				x[i].CreatedAt = time.Now().UTC()
+			}
+			if x[i].ThreadID == uuid.Nil {
+				x[i].ThreadID = caller.ThreadID
+			}
+			if x[i].MessageID == uuid.Nil {
+				x[i].MessageID = uuid.New()
 			}
 			if x[i].Role == "" {
 				x[i].Role = "tool"
