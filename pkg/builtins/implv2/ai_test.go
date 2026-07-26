@@ -102,6 +102,8 @@ func TestAi(t *testing.T) {
 				}
 				err = os.WriteFile(session.ActiveFile, []byte(strings.Join(session.Lines, "\n")), 0o600)
 			}
+			session.LockStart = 0
+			session.LockEnd = 0
 		}
 		if err != nil {
 			t.Fatal(err)
