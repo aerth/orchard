@@ -61,7 +61,7 @@
   },
   {
     "name": "run_bash",
-    "description": "Executes a complete shell code, with pipes, quotations, and parenthesis and other bash. This is executed as stdin and the output (stdout/stderr combined) is returned.",
+    "description": "Executes a complete shell code, with pipes, quotations, and parenthesis and other bash. This 'code' argument is executed as stdin and the output (stdout/stderr combined) is returned.",
     "required": ["code"],
     "parameters": {
       "code": ["string"]
