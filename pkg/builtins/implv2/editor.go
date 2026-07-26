@@ -6,6 +6,8 @@ import (
 	"slices"
 )
 
+var eofs = []string{"----------------------------------"}
+
 // ApplySurgicalEdit swaps out the locked coordinate range in memory.
 // It maps 1-based human line numbers directly to 0-based Go array indices.
 func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
@@ -14,6 +16,11 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	}
 	if i := slices.Index(replacementLines, "[EOF]"); i >= 0 {
 		replacementLines = replacementLines[:i]
+	}
+	for _, x := range eofs {
+		if i := slices.Index(replacementLines, x); i >= 0 {
+			replacementLines = replacementLines[:i]
+		}
 	}
 	if len(replacementLines) == 0 {
 		return fmt.Errorf("no replacement lines")
