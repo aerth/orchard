@@ -5,7 +5,7 @@ General, extensible, multi-purpose AI Agent orchestration harness. For tasks.
 
 ## examples
 
-Simplified prompts for brevity.
+**The following prompts are extremely simplified for brevity.**
 
 
 ### example: Chat TUI app
