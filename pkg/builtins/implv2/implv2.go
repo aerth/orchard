@@ -87,6 +87,8 @@ func OutputParser(content string) ([]Action, error) {
 	}
 
 	switch op {
+	default:
+		return nil, errors.New("invalid protocol command: " + op)
 	case OpNextChunk, OpPrevChunk, OpCancel: // no args
 		if remainder != "" {
 			return nil, errors.New("command " + op + " does not accept arguments or trailing formatting")
@@ -107,8 +109,6 @@ func OutputParser(content string) ([]Action, error) {
 			}
 		}
 		actions = append(actions, Action{Op: op, Content: remainder})
-	default:
-		return nil, errors.New("invalid protocol command: " + op)
 	}
 
 	return actions, nil
