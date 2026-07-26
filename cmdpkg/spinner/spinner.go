@@ -33,7 +33,7 @@ func Start(ctx context.Context) *Spinner {
 		frames := []string{"|", "/", "-", "\\"}
 		i := 0
 		defer func() {
-			_, _ = fmt.Fprint(out, "\r \r\n")
+			_, _ = fmt.Fprint(out, "\r \r")
 		}()
 		for {
 			select {
