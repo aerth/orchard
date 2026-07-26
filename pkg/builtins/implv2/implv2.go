@@ -19,59 +19,62 @@ const (
 )
 
 func OutputParser(content string) ([]Action, error) {
-	// 1. Zero tolerance for leading whitespace variations
 	fields := strings.Fields(content)
 	if len(fields) == 0 {
 		return nil, errors.New("empty LLM response")
 	}
 
-	// 2. Strict Operator Match: Must be exactly the uppercase command keyword
+	// 1. Strict Leading Space Check: Content must start exactly with the first field
 	op := fields[0]
+	if !strings.HasPrefix(content, op) {
+		return nil, errors.New("leading whitespace is strictly forbidden")
+	}
+
+	// Remove the operator prefix cleanly
+	remainder := content[len(op):]
 
 	var actions []Action
 
 	switch op {
 	case OpNextChunk, OpPrevChunk, OpCancel:
-		// These commands must be exactly one word. Any extra words mean the LLM generated junk.
-		if len(fields) > 1 {
-			return nil, errors.New("command " + op + " does not accept arguments")
+		// 2. Strict Exact-Match: Remainder must be absolutely empty
+		if remainder != "" {
+			return nil, errors.New("command " + op + " does not accept arguments or trailing formatting")
 		}
 		actions = append(actions, Action{Op: op})
 
 	case OpGoTo:
-		if len(fields) < 2 {
-			return nil, errors.New("GOTO command requires a search target")
+		// 3. Strict Separator Check: Remainder must start with exactly one space, followed by a valid character
+		if !strings.HasPrefix(remainder, " ") || strings.HasPrefix(remainder, "  ") || remainder == " " {
+			return nil, errors.New("GOTO command must be followed by exactly one space and a target")
 		}
 
-		// Slice out the exact trailing search query.
-		// Because we tolerate no leading whitespace, the operator is guaranteed to start at index 0.
-		searchTarget := content[len(OpGoTo):]
-
-		// Enforce exactly one separating space character between "GOTO" and the payload
-		if !strings.HasPrefix(searchTarget, " ") {
-			return nil, errors.New("GOTO command must be followed by exactly one space")
-		}
-		searchTarget = searchTarget[1:] // Drop the single separating space
-
+		searchTarget := remainder[1:] // Clip the single separating space cleanly
 		actions = append(actions, Action{Op: OpGoTo, Content: searchTarget})
 
 	case OpLockIn:
-		// LOCK must have exactly two fields: "LOCK" and the coordinate token (e.g., "101-103")
-		if len(fields) != 2 {
-			return nil, errors.New("LOCK command requires exactly one coordinate argument")
-		}
-
-		// Enforce exactly one separating space character between "LOCK" and the coordinate
-		expectedPrefix := OpLockIn + " "
-		if !strings.HasPrefix(content, expectedPrefix) {
+		// 4. Strict Coordinate Bound Check: Remainder must start with exactly one space, followed by the coordinate field
+		if !strings.HasPrefix(remainder, " ") || strings.HasPrefix(remainder, "  ") {
 			return nil, errors.New("LOCK command must be followed by exactly one space")
 		}
 
-		coordinates := fields[1]
+		coordinates := remainder[1:]
+		// Ensure the coordinate block contains absolutely no extra parameters or punctuation
+		if len(fields) != 2 || coordinates != fields[1] {
+			return nil, errors.New("LOCK command requires exactly one coordinate argument with no trailing text")
+		}
+
+		// Strictly validate that coordinates only consist of digits and hyphens
+		for i := 0; i < len(coordinates); i++ {
+			c := coordinates[i]
+			if (c < '0' || c > '9') && c != '-' {
+				return nil, errors.New("LOCK arguments contain invalid characters or punctuation")
+			}
+		}
+
 		actions = append(actions, Action{Op: OpLockIn, Content: coordinates})
 
 	default:
-		// Any conversational text or inline code blocks without a command will fail immediately
 		return nil, errors.New("invalid protocol command: " + op)
 	}
 
