@@ -9,7 +9,7 @@ const (
 	OpNextChunk = "NEXT_CHUNK"
 	OpPrevChunk = "PREV_CHUNK"
 	OpGoTo      = "GOTO"
-	OpLock      = "LOCK"
+	OpLockIn    = "LOCK"
 )
 
 func OutputParser(content string) ([]Action, error) {
