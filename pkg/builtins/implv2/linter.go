@@ -10,8 +10,8 @@ import (
 	sitter "github.com/smacker/go-tree-sitter"
 )
 
-func ValidateFileSyntax(codeContent string, language *sitter.Language) error {
-	slog.Info("validating syntax", "content", codeContent, "lang", language.SymbolName())
+func ValidateFileSyntax(codeContent string, langname string, language *sitter.Language) error {
+	slog.Info("validating syntax", "content", codeContent, "lang", langname)
 	parser := sitter.NewParser()
 	parser.SetLanguage(language)
 
