@@ -97,7 +97,7 @@ File line numbers are added for your convienence only. Do not prepend lines with
 Currently locked: %d lines
 Replying with <%d lines will remove lines. Empty lines in your reply are retained.
 Replying with >%d lines will insert additional lines.
-If a mistake has been made, ending the edit with CANCEL (on its own line) will revert the entire edit, allowing you to fix any typos and retry.
+If a mistake has been made ending the edit with CANCEL (on its own line) will revert the entire edit, allowing you to fix any typos and retry.
 Special keyword [EOF] is supported for signaling edit completion
 
 			`,
