@@ -36,7 +36,11 @@ func (s Session) SystemMessage() string {
 	} else {
 		// Append lines with explicit absolute 1-based indices to anchor LLM awareness
 		for i := startIdx; i < endIdx; i++ {
-			fmt.Fprintf(&chunkBuilder, "%d: %s", i+1, s.Lines[i])
+			marked := " "
+			if i >= s.LockStart && i <= s.LockEnd {
+				marked = "*"
+			}
+			fmt.Fprintf(&chunkBuilder, "%s%d: %s", marked, i+1, s.Lines[i])
 			if i != endIdx-1 {
 				fmt.Fprintf(&chunkBuilder, "\n")
 			}
@@ -66,7 +70,8 @@ Current Viewport Window: Lines %d to %d
 --- CURRENT FILE CHUNK VISIBLE ---
 %s
 ----------- END CHUNK ------------
-	Note: line numbers are included only for this view
+Note: line numbers are included only for this view
+		Asterisks ('*') mark LOCKed lines
 
 ### PROTOCOL INSTRUCTIONS:
 - You must output exactly ONE command keyword.
