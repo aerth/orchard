@@ -135,12 +135,15 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			if code == "" {
 				err = fmt.Errorf("empty code")
 			}
-			got, err := bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
-			if err != nil {
-				if got != "" {
-					got += "\n"
+			var got string
+			if err == nil {
+				got, err = bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
+				if err != nil {
+					if got != "" {
+						got += "\n"
+					}
+					got += fmt.Sprintf("Error: %+v", err)
 				}
-				got += fmt.Sprintf("Error: %+v", err)
 			}
 			gotmsg := chatmessages.NewFromRole("", "tool", got)
 			return chatmessages.ChatMessages{*gotmsg}, nil
