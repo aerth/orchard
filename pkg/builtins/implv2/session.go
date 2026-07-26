@@ -27,7 +27,11 @@ const (
 	CodeError     = 400
 )
 
-var ErrNoFilename = errors.New(fmt.Sprintf("no active file yet, use %q first", OpFilename))
+var ErrNoFilename = fmt.Errorf("no active file yet, use %q first", OpFilename)
+
+func (s *Session) Parse(content string) ([]Action, error) {
+	return OutputParser(content)
+}
 
 func (s *Session) RunAction(action Action) Result {
 	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
