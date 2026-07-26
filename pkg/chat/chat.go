@@ -24,12 +24,12 @@ type (
 		PostFunc func(err error) error             // should return nil
 		Handlers []ChatHandler                     // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
 
-		AfterGen         func(chatmessages.ChatMessage) error // for toolouts/system (not generated assistant stream)
-		NonStreamHandler func(chatmessages.ChatMessage)       // for toolouts/system (not generated assistant stream)
-		From             string                               // From added to assistant/toolouts
-		Prepend          []llm.Message                        // prepended to messages (tmp)
-		Append           []llm.Message                        // appended to messages (tmp)
-		Tools            []json.Marshaler                     // Tool specs available
+		AfterGen         func(*chatmessages.ChatMessage) error // for toolouts/system (not generated assistant stream)
+		NonStreamHandler func(chatmessages.ChatMessage)        // for toolouts/system (not generated assistant stream)
+		From             string                                // From added to assistant/toolouts
+		Prepend          []llm.Message                         // prepended to messages (tmp)
+		Append           []llm.Message                         // appended to messages (tmp)
+		Tools            []json.Marshaler                      // Tool specs available
 	}
 )
 
