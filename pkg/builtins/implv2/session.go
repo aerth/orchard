@@ -69,6 +69,7 @@ Current Viewport Window: Lines %d to %d
 - You must output exactly ONE command keyword.
 - No markdown wrappers (no backticks `+"`"+`, no asterisks **). No chit-chat.
 - Zero leading whitespace allowed. Follow your command with exactly ONE space.
+- To begin EDIT mode, LOCK a range.
 
 ### AVAILABLE PROTOCOL COMMANDS:
 SELECT_FILE <filename> - Open/switch workspace file.
