@@ -100,7 +100,7 @@ func TestAi(t *testing.T) {
 				if session.ActiveFile != "foo.txt" {
 					t.Fatal("only foo.txt")
 				}
-				err = os.WriteFile(session.ActiveFile, []byte(strings.Join(session.Lines, "\n")), 0o600)
+				err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
 			}
 			session.LockStart = 0
 			session.LockEnd = 0
