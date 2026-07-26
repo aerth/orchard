@@ -41,24 +41,27 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		slog.Warn("noop convo")
 		return nil
 	}
-	var out io.Writer = os.Stdout
-	tw := global.LogWriter
 	var jsonout EncoderFunc
-	if MasterSend != nil {
-		slog.Info("using MasterSend")
-		out = io.Discard
-		tw = io.Discard
-		jsonout = MasterSend
-	} else if conf.Get().JsonOutput {
-		out = io.Discard
-		tw = io.Discard
-		enc := json.NewEncoder(os.Stdout).Encode
-		jsonout = func(v *chatmessages.ChatMessage) error {
-			return enc(v)
+	var cl *debugging.ConsoleLogger
+	{
+		tw := global.LogWriter
+		var out io.Writer = os.Stdout
+		if MasterSend != nil {
+			slog.Info("using MasterSend")
+			out = io.Discard
+			tw = io.Discard
+			jsonout = MasterSend
+		} else if conf.Get().JsonOutput {
+			out = io.Discard
+			tw = io.Discard
+			enc := json.NewEncoder(os.Stdout).Encode
+			jsonout = func(v *chatmessages.ChatMessage) error {
+				return enc(v)
+			}
 		}
+		cl = debugging.NewConsoleLogger(out, tw)
+		cl.HideToolCalls = conf.IsHideToolCalls()
 	}
-	cl := debugging.NewConsoleLogger(out, tw)
-	cl.HideToolCalls = conf.IsHideToolCalls()
 	var err error
 	handlers := e.Handlers
 Chat:
