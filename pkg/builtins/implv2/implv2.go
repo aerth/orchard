@@ -1,5 +1,7 @@
 package implv2
 
+import "strings"
+
 type Action struct {
 	Op      string
 	Content string
@@ -14,5 +16,6 @@ const (
 )
 
 func OutputParser(content string) ([]Action, error) {
+	fields := strings.Fields(content)
 	return nil, nil
 }
