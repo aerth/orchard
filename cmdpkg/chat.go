@@ -157,7 +157,7 @@ Chat:
 			//	handl := []llm.ChatStreamHandlerFunc{ cl.HandleChatResponse, newcaller.GatherChatResponse}
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			if spin != nil {
-				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped regardless of output
+				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
 			}
 			if summary, ok := newcaller.Summary.(string); ok {
 				global.LogWriter.Write([]byte("\n\n\n" + summary + "\n\n\n"))
