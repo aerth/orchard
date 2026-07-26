@@ -10,7 +10,7 @@ General, extensible, multi-purpose AI Agent orchestration harness.
 
 ```bash
 echo 'Why is sky blue' | orchard-io | piper-tts -m $VOICE
-echo 'Check the latest news' | orchard-io | piper-tts -m $VOICE
+echo 'Check the latest news, summarize into one paragraph.' | orchard-io | piper-tts -m $VOICE
 echo '' | orchard-io | piper-tts -m $VOICE
 ```
 
