@@ -3,6 +3,7 @@ package implv2_test
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"log/slog"
 	"os"
@@ -172,4 +173,11 @@ func TestAi(t *testing.T) {
 			t.Fatalf("expected fixed.want:\n%q\ngot:\n%q", tc.FileOut, now)
 		}
 	}
+}
+
+func getlang(s string) (*sitter.Language, error) {
+	if !strings.Contains(s, ".") {
+		return nil, fmt.Errorf("no dot")
+	}
+	ss := strings.Split(s, ".")
 }
