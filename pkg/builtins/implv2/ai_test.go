@@ -56,6 +56,13 @@ var tcs = []TC{
 		FileInp:  "def calculate_total(price, tax_rate):\n    return price\n",
 		FileOut:  "def calculate_total(price, tax_rate):\n    return price + (price * tax_rate)\n",
 	},
+
+	{
+		Filename: "foo.go",
+		Prompt:   "edit the file: Export the Add function by correcting its name casing.",
+		FileInp:  "package main\n\n// add sums two integers\nfunc add(a, b int) int {\n\treturn a + b\n}\n",
+		FileOut:  "package main\n\n// add sums two integers\nfunc Add(a, b int) int {\n\treturn a + b\n}\n",
+	},
 }
 
 func TestAi(t *testing.T) {
