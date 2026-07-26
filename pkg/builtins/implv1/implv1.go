@@ -30,10 +30,12 @@ func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	call, err := chat.ReadToolCall[fileArgs](ctx, caller, toolCallIndex)
 	if err != nil {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: fmt.Sprintf("Error parsing args: %+v", err)})
+		msg.ThreadID = caller.ThreadID
 		return chatmessages.ChatMessages{msg}, nil
 	}
 	if call.Function.Arguments.Path == "" {
 		msg := *chatmessages.New(llm.Message{Role: "tool", Content: "Error parsing args: missing required 'path', check the tool call and try again."})
+		msg.ThreadID = caller.ThreadID
 		return chatmessages.ChatMessages{msg}, nil
 	}
 
