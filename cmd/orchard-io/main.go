@@ -116,7 +116,7 @@ type codeargs struct {
 	Code string `json:"code"`
 }
 
-func (c codeargs) IsTool() {}
+func (c codeargs) IsToolArgument() {}
 
 // rumain already initialized
 func runmain(ctx context.Context, conf *global.Conf) error {
