@@ -122,8 +122,10 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	var err error
 	if true { // builtin go tools
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
-			"read_file":  implv1.ReadFile,
-			"write_file": implv1.WriteFile,
+			"read_file": implv1.ReadFile,
+			//"write_file": implv1.WriteFile,
+
+			"edit_file": implv2.EditTool,
 			//	"run_go_command":   noop,
 			"list_directory": implv1.ListDirectory,
 			//	"get_package_info": noop,
