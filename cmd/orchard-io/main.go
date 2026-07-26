@@ -24,6 +24,7 @@ import (
 	"m/cmdpkg"
 	"m/pkg/builtins"
 	"m/pkg/builtins/implv1"
+	"m/pkg/builtins/implv1/bashtooler"
 	"m/pkg/builtins/implv2"
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
@@ -122,11 +123,13 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	var err error
 	if true { // builtin go tools
+		basher := bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file": implv1.ReadFile,
 			//"write_file": implv1.WriteFile,
 			"edit_file": implv2.EditTool,
 			//	"run_go_command":   noop,
+			"run_bash":       basher,
 			"list_directory": implv1.ListDirectory,
 			//	"get_package_info": noop,
 		})
