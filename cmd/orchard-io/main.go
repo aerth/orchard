@@ -145,8 +145,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			return err
 		}
 	}
-	newmsg := new(chatmessages.ChatMessage)
-	newmsg.From = conf.GetUsername()
+	newmsg := chatmessages.NewFromRole(conf.GetUsername(), "user", "")
 	stack = append(stack, *newmsg)
 	newmsg = &stack[len(stack)-1] // fix ptr
 	if _, err := os.Stdin.Read(nil); err != nil {
