@@ -2,6 +2,7 @@ package implv2_test
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"log/slog"
 	"os"
@@ -89,7 +90,7 @@ func TestAi(t *testing.T) {
 			println(generated.Content)
 			creq.Messages = append(creq.Messages, generated.Message)
 			actions, err := session.Parse(generated.Content)
-			if err != nil && session.LockEnd != 0 {
+			if errors.Is(err, implv2.ErrNot) && session.LockEnd != 0 {
 				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
 				if err == nil {
 					if session.ActiveFile != tc.Filename {
