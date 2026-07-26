@@ -259,6 +259,11 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		if err = store.Add(ctx, threadID, &cm); err != nil {
 			slog.Warn("err", "err", err)
 		}
+	}, AfterGen: func(cm *chatmessages.ChatMessage) error {
+		if err = store.Add(ctx, threadID, &cm); err != nil {
+			return err
+		}
+		return nil
 	}}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
