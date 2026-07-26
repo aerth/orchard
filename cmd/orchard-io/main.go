@@ -24,6 +24,7 @@ import (
 	"m/cmdpkg"
 	"m/pkg/builtins"
 	"m/pkg/builtins/implv1"
+	"m/pkg/builtins/implv2"
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/dbstore"
@@ -137,7 +138,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			panic("no builtin tools")
 		}
 	}
-	if true { // runtime bash/python tools
+	if false { // runtime bash/python tools
 		builtinTools = nil
 		box, err := toolboxes.New("") // use env with toolboxes subdir
 		if err != nil {
