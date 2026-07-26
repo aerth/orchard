@@ -1,9 +1,9 @@
 package implv2
 
 import (
-	"errors"
-	"fmt"
 	"slices"
+
+	"github.com/aerth/mostly/stackerr"
 )
 
 var eofs = []string{"----------------------------------"}
@@ -12,7 +12,7 @@ var eofs = []string{"----------------------------------"}
 // It maps 1-based human line numbers directly to 0-based Go array indices.
 func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	if i := slices.Index(replacementLines, "CANCEL"); i >= 0 {
-		return fmt.Errorf("this edit was cancelled")
+		return stackerr.Errorf("this edit was cancelled")
 	}
 	if i := slices.Index(replacementLines, "[EOF]"); i >= 0 {
 		replacementLines = replacementLines[:i]
@@ -23,10 +23,10 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 		}
 	}
 	if len(replacementLines) == 0 {
-		return fmt.Errorf("no replacement lines")
+		return stackerr.Errorf("no replacement lines")
 	}
 	if s.LockStart == 0 || s.LockEnd == 0 {
-		return errors.New("state error: cannot apply edit without an active coordinate lock")
+		return stackerr.Errorf("state error: cannot apply edit without an active coordinate lock")
 	}
 
 	// 1. Calculate slice bounds
@@ -35,7 +35,7 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	endIdx := s.LockEnd
 
 	if startIdx < 0 || endIdx > len(s.Lines) {
-		return fmt.Errorf("slice error: coordinate bounds %d-%d are out of file range", s.LockStart, s.LockEnd)
+		return stackerr.Errorf("slice error: coordinate bounds %d-%d are out of file range", s.LockStart, s.LockEnd)
 	}
 
 	// 2. Perform the in-memory surgical splice
