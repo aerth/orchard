@@ -64,8 +64,7 @@
     "description": "Executes a complete shell command line, with pipes, quotations, and parenthesis and other bash. This is executed as stdin and the output (stdout/stderr combined) is returned.",
     "required": ["args"],
     "parameters": {
-      "command": "string",
-      "args": ["string"]
+      "code": ["string"]
     }
   },
   {
