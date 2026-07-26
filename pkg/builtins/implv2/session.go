@@ -91,7 +91,7 @@ CANCEL                - Unlock coordinates and return to search navigation.`,
 		nlocked := (s.LockEnd - s.LockStart) + 1
 		lockmodetext := fmt.Sprintf(
 			`
-You are currently in EDITING mode. All output will replace the targeted lines.
+You are currently in EDIT mode. All output will directly replace the targeted lines.
 To return to VIEW mode, begin or end your message with the word: CANCEL
 The entire LOCKed targeted lines range will be replaced by your entire reply, bit-by-bit.
 File line numbers are added for your convienence only. Do not prepend lines with numbers.
