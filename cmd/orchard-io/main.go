@@ -130,7 +130,8 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	var err error
 	if true { // builtin go tools
 		basher := func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-			chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
+			call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
+			code := call.Function.Arguments.Code
 			got, err := bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
 			if err != nil {
 				if got != "" {
