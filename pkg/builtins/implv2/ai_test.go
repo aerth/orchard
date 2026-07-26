@@ -152,6 +152,7 @@ func TestAi(t *testing.T) {
 			t.Fatal("did not pass")
 		}
 		now, _ := os.ReadFile(tc.Filename)
+
 		if string(now) != tc.FileOut {
 			t.Fatalf("expected fixed.want:\n%q\ngot:\n%q", tc.FileOut, now)
 		}
