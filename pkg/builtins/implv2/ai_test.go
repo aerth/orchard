@@ -64,7 +64,7 @@ func TestAi(t *testing.T) {
 
 	creq.Messages = []llm.Message{
 		{Role: "system", Content: sysmsg},
-		{Role: "user", Content: "edit the file: Fix typos in foo.txt"},
+		{Role: "user", Content: "edit the file: Fix typos in foo.txt. keep each line though."},
 	}
 	session := implv2.Session{}
 	err := os.WriteFile("foo.txt", []byte("Hello\nw0rld\nThs is a testt.\n\nIt works\n"), 0o600)
