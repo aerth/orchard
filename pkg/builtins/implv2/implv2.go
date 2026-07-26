@@ -1,6 +1,9 @@
 package implv2
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 type Action struct {
 	Op      string
@@ -16,14 +19,46 @@ const (
 )
 
 func OutputParser(content string) ([]Action, error) {
-	var actions []Action
-	fields := strings.Fields(content)
-	switch fields[0] {
-	case OpNextChunk:
-	case OpPrevChunk:
-	case OpGoTo:
-	case OpLockIn:
-	case OpCancel:
+	// Clean surrounding whitespace and split into fields
+	fields := strings.Fields(strings.TrimSpace(content))
+	if len(fields) == 0 {
+		return nil, errors.New("empty LLM response")
 	}
+
+	// Clean the command operator in case the LLM wrapped it in markdown or punctuation
+	op := strings.ToUpper(fields[0])
+	op = strings.Trim(op, "`*._:,")
+
+	var actions []Action
+
+	switch op {
+	case OpNextChunk, OpPrevChunk, OpCancel:
+		actions = append(actions, Action{Op: op})
+
+	case OpGoTo:
+		// GOTO needs the rest of the text as a raw search query, preserving inner spaces
+		if len(fields) < 2 {
+			return nil, errors.New("GOTO command requires a search target")
+		}
+		// Grab everything after the operator
+		searchTarget := strings.TrimPrefix(content, fields[0])
+		searchTarget = strings.TrimSpace(searchTarget)
+		actions = append(actions, Action{Op: OpGoTo, Content: searchTarget})
+
+	case OpLockIn:
+		// LOCK requires coordinate arguments (e.g., "101-103" or "101")
+		if len(fields) < 2 {
+			return nil, errors.New("LOCK command requires line coordinates")
+		}
+		// Extract the coordinates token and drop any accidental trailing punctuation
+		coordinates := strings.Trim(fields[1], "`*.,")
+		actions = append(actions, Action{Op: OpLockIn, Content: coordinates})
+
+	default:
+		// If it doesn't match a command, it means the LLM is likely chatting or
+		// has jumped straight into sending code blocks (if the state wasn't guarded)
+		return nil, errors.New("unrecognized command sequence: " + fields[0])
+	}
+
 	return actions, nil
 }
