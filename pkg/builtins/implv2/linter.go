@@ -43,6 +43,7 @@ func ValidateFileSyntax(codeContent string, langname string, language *sitter.La
 	var errMessages []string
 	for match, ok := cursor.NextMatch(); ok; {
 		for _, capture := range match.Captures {
+			slog.Info("got match", "cap", capture)
 			node := capture.Node
 			startPoint := node.StartPoint()
 
