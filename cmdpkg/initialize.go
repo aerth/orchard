@@ -201,7 +201,7 @@ func Init(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
 	if len(loglevel1) == 1 {
 		loglevel = loglevel1[0]
 	} else {
-		loglevel = &slog.LevelVar{}
+		loglevel = new(slog.LevelVar)
 		loglevel.Set(slog.LevelDebug)
 	}
 	if Writer == nil {
