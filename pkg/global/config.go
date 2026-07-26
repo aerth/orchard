@@ -177,11 +177,12 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		flag.BoolVar(clearfirst, "clear", *clearfirst, "clear thread from DB first")
 	}
 	flag.Parse()
-	if cfg.Dir != "." && cfg.Dir != "" {
+	wd, _ := os.Getwd()
+	if cfg.Dir != "." && cfg.Dir != "" && cfg.Dir != wd {
 		if err := os.Chdir(cfg.Dir); err != nil {
 			log.Fatalf("Fatal: %v", err)
 		}
-		slog.Info("now in dir", "dir", cfg.Dir)
+		slog.Info("now in dir", "dir", cfg.Dir, "from", wd)
 		time.Sleep(time.Second)
 	}
 }
