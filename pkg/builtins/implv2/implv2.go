@@ -31,10 +31,10 @@ func OutputParser(content string) ([]Action, error) {
 	}
 
 	// Remove the operator prefix cleanly
-	if len(content) == len(op) {
-		return nil, errors.New("operation needs argument")
+	var remainder string
+	if len(content) != len(op) {
+		remainder = content[len(op)+1:]
 	}
-	remainder := content[len(op)+1:]
 
 	var actions []Action
 
@@ -55,7 +55,7 @@ func OutputParser(content string) ([]Action, error) {
 			return nil, errors.New("LOCK command must be followed by exactly one space")
 		}
 
-		coordinates := remainder[1:]
+		coordinates := remainder
 
 		// Strictly validate that coordinates only consist of digits and hyphens.
 		// This single check automatically rejects trailing text, spaces, or punctuation!
