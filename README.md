@@ -6,6 +6,12 @@ General, extensible, multi-purpose AI Agent orchestration harness.
 
 **The following prompts are extremely simplified for brevity, using fake tool names.** 
 
+### example: stdin/stdout assistant
+
+```bash
+echo 'Why is sky blue' | orchard-io | piper-tts ...
+```
+
 ### example: Chat TUI app
 
 Familiar paned interface for chatting with a coding agent. (tools: all)
