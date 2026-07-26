@@ -27,7 +27,12 @@ const (
 	CodeError     = 400
 )
 
+var ErrNoFilename = errors.New(fmt.Sprintf("no active file yet, use %q first", OpFilename))
+
 func (s *Session) RunAction(action Action) Result {
+	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
+		return Result{E: ErrNoFilename}
+	}
 	switch action.Op {
 	case OpFilename:
 		// Read file safely into memory snapshot
