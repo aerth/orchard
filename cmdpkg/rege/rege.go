@@ -18,3 +18,5 @@ func FindImagePaths(s string) []string {
 	}
 	return paths
 }
+
+var BashEnvironKeys = regexp.MustCompile(`(?m)^\s*(?:export\s+)?([A-Z_][A-Z0-9_]*)\s*=`)
