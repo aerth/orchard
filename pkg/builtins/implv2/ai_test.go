@@ -61,7 +61,7 @@ func TestAi(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if _, err := os.ReadFile("foo.txt"); err != nil {
+		if _, err := os.ReadFile(tc.Filename); err != nil {
 			t.Fatal(err)
 		}
 		testpass := false
