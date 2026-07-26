@@ -109,6 +109,7 @@ func TestAi(t *testing.T) {
 					Role:    "system",
 					Content: "The file edits were applied to the filesystem",
 				})
+
 			}
 			if err != nil {
 				t.Fatal(err)
