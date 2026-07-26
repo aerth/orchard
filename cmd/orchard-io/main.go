@@ -123,7 +123,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	var err error
 	if true { // builtin go tools
-		basher := bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
+		basher := func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+			bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
+		}
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file": implv1.ReadFile,
 			//"write_file": implv1.WriteFile,
