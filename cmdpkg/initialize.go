@@ -207,7 +207,8 @@ func Init(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
 	if Writer == nil {
 		Writer = os.Stderr
 	}
-	slog.SetLogLoggerLevel(slog.LevelDebug) // for now to use less
-	slog.SetDefault(slog.New(tint.NewHandler(Writer, &tint.Options{AddSource: true, Level: loglevel, TimeFormat: "ORCHARD", NoColor: global.Get().Get().NoColor})))
+	slog.SetLogLoggerLevel(slog.LevelWarn) // for now to use less
+	slog.SetDefault(slog.New(tint.NewHandler(Writer,
+		&tint.Options{AddSource: true, Level: loglevel, TimeFormat: "ORCHARD", NoColor: global.Get().Get().NoColor})))
 	return loglevel
 }
