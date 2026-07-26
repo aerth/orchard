@@ -46,12 +46,7 @@ func OutputParser(content string) ([]Action, error) {
 		actions = append(actions, Action{Op: op})
 
 	case OpGoTo:
-		// Ensure remainder starts with exactly one space and has a body
-		if !strings.HasPrefix(remainder, " ") || strings.HasPrefix(remainder, "  ") || remainder == " " {
-			return nil, errors.New("GOTO command must be followed by exactly one space and a target")
-		}
-
-		searchTarget := remainder[1:] // Clip the single separating space cleanly
+		searchTarget := remainder // Clip the single separating space cleanly
 		actions = append(actions, Action{Op: OpGoTo, Content: searchTarget})
 
 	case OpLockIn:
