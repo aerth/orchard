@@ -89,10 +89,12 @@ func RunBashScript(ctx context.Context, stdinReal io.Reader, params RunParams) (
 		err = errors.Join(err, fmt.Errorf("%s", buf.String()))
 		return strings.TrimSpace(buf.String()), err
 	}
+
+	x := fmt.Sprintf("\nrun_bash exit code: %d", cmd.ProcessState.ExitCode())
 	//if EchoBash {
 	//	println(buf.String())
 	//}
-	return strings.TrimSpace(buf.String()), nil
+	return strings.TrimSpace(buf.String() + x), nil
 }
 
 // DangerPattern holds a regex and its human-readable rejection reason.
