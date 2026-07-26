@@ -9,8 +9,9 @@ General, extensible, multi-purpose AI Agent orchestration harness.
 ### example: stdin/stdout assistant
 
 ```bash
-echo 'Why is sky blue' | orchard-io | piper-tts ...
-echo 'Check the latest news' | orchard-io | piper-tts ...
+echo 'Why is sky blue' | orchard-io | piper-tts -m $VOICE
+echo 'Check the latest news' | orchard-io | piper-tts -m $VOICE
+echo '' | orchard-io | piper-tts -m $VOICE
 ```
 
 ### example: Chat TUI app
