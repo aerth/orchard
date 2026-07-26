@@ -89,7 +89,7 @@ func TestAi(t *testing.T) {
 				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
 				if err == nil {
 					if session.ActiveFile != tc.Filename {
-						t.Fatal("only foo.txt")
+						t.Fatal("only one file can be edited but got " + session.ActiveFile)
 					}
 					err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
 					testpass = err == nil
