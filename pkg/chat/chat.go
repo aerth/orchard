@@ -6,10 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
 	"os"
 	"slices"
+
+	"m/pkg/chatmessages"
+	"m/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -168,7 +169,9 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	}
 	slog.Info("Chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "handlers", len(e.Handlers))
 	err := client.Chat(ctx, creq, e.Handlers...)
-
+	if err != nil {
+		slog.Error("Chatting error", "err", err)
+	}
 	if e.PostFunc != nil {
 		if e := e.PostFunc(err); e != nil {
 			err = errors.Join(err, stackerr.Errorf("%w", e))
