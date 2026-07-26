@@ -237,8 +237,13 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	if err != nil {
 		return stackerr.Errorf("ReadMessage: %w", err)
 	}
+
 	if newmsg == nil || newmsg.Content == "" {
 		return nil
+	}
+
+	if err = store.Add(ctx, threadID, newmsg); err != nil {
+		slog.Warn("err", "err", err)
 	}
 
 	if conf.Get().JsonOutput {
