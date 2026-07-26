@@ -78,6 +78,9 @@ func (s *Spinner) HandleChatResponse(_ llm.ChatResponse) error {
 
 func (s *Spinner) quit() {
 	s.once.Do(func() {
+		if s.Fake() {
+			return
+		}
 		close(s.stopChan) // Signal the goroutine to stop
 		time.Sleep(200 * time.Millisecond)
 	})
