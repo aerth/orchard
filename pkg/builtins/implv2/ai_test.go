@@ -47,6 +47,9 @@ var tcs = []TC{
 
 func TestAi(t *testing.T) {
 	for _, tc := range tcs {
+		if tc.Filename == "" || tc.Prompt == "" || tc.FileIn == "" {
+			t.Fatal("bad tc")
+		}
 		creq := llm.NewChatRequest()
 
 		creq.Messages = []llm.Message{
@@ -85,7 +88,7 @@ func TestAi(t *testing.T) {
 			if err != nil && session.LockEnd != 0 {
 				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
 				if err == nil {
-					if session.ActiveFile != "foo.txt" {
+					if session.ActiveFile != tc.Filename {
 						t.Fatal("only foo.txt")
 					}
 					err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
