@@ -114,21 +114,20 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 	if c.emode != 0 && len(m.Thinking) != 0 && !c.HideThinking {
 		_, _ = fmt.Fprintf(tw, "%s", m.Thinking)
 	}
-	var err error
 	if m.Content != "" {
 		if c.emode != xCONTENT {
 			if !c.HideThinking && c.emode == xGO {
 				_, _ = fmt.Fprintf(tw, "\n")
 			}
 			if !c.NoColor {
-				_, err = fmt.Fprintf(w, "%s", ColorGreen)
+				_, err := fmt.Fprintf(w, "%s", ColorGreen)
 				if err != nil {
 					return err
 				}
 			}
 			c.emode = xCONTENT
 		}
-		_, err = fmt.Fprintf(w, "%s", m.Content)
+		_, err := fmt.Fprintf(w, "%s", m.Content)
 		if err != nil {
 			return err
 		}
@@ -145,10 +144,11 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 			if err := json.Unmarshal(m.ToolCalls[i], &wraps[i]); err != nil {
 				slog.Error("oops", "err", err)
 			}
-			_, _ = fmt.Fprintf(w, "\n%s```json\n%s(args=%s)\n```\n", c.pre, wraps[0].Function.Name, string(wraps[0].Function.Arguments))
+
+			_, err = fmt.Fprintf(w, "\n%s```json\n%s(args=%s)\n```\n", c.pre, wraps[0].Function.Name, string(wraps[0].Function.Arguments))
 		}
 	}
-	return err
+	return nil
 }
 
 func (c *ConsoleLogger) Reset() {
