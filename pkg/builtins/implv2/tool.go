@@ -38,7 +38,9 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 }
 
 func getpath(rawMessage json.RawMessage) string {
-	return ""
+	var x haspath
+	_ = json.Unmarshal(rawMessage, &x)
+	return x.Path
 }
 
 func jsonstring(v any) string {
