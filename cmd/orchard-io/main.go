@@ -72,7 +72,7 @@ func main() {
 	if err := main1(ctx); err != nil {
 		global.Close()
 		cmdpkg.Writer = os.Stderr
-		cmdpkg.Init()
+		cmdpkg.InitLog()
 		if errors.Is(err, context.Canceled) {
 			println("(cancelled)")
 		} else {
