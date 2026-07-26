@@ -61,6 +61,7 @@ Current Viewport Window: Lines %d to %d
 --- CURRENT FILE CHUNK VISIBLE ---
 %s
 ----------------------------------
+	Note: line numbers are included only for this view
 
 ### PROTOCOL INSTRUCTIONS:
 - You must output exactly ONE command keyword.
@@ -84,6 +85,7 @@ CANCEL                - Unlock coordinates and return to search navigation.`,
 		s.ChunkSize,
 	)
 	if isLocked {
+		nlocked := (s.LockEnd - s.LockStart) + 1
 		lockmodetext := fmt.Sprintf(
 			`
 You are currently in EDITING mode. All output will replace the targeted lines.
@@ -94,12 +96,12 @@ Currently locked: %d lines
 Replying with <%d lines will remove lines. Empty lines in your reply are retained.
 Replying with >%d lines will insert additional lines.
 DO NOT ADD LINE NUMBERS.
-As a special case, if newlines are required at the end of a file/chunk, use [EOF] to end edit after newlines.
+If a mistake has been made, ending the edit with \nCANCEL will skip the entire edit, allowing you to fix any typos and retry.
 
 			`,
-			s.LockEnd-s.LockStart,
-			s.LockEnd-s.LockStart,
-			s.LockEnd-s.LockStart,
+			nlocked,
+			nlocked,
+			nlocked,
 		)
 		return normal + lockmodetext
 	}
@@ -127,6 +129,9 @@ func (s *Session) RunAction(action Action) Result {
 	}
 	switch action.Op {
 	case OpFilename:
+		if s.ActiveFile == action.Content {
+			return Result{Message: "The file was already selected"}
+		}
 		// Read file safely into memory snapshot
 		data, err := os.ReadFile(action.Content)
 		if err != nil {

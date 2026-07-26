@@ -15,33 +15,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-const sysmsg = `You are an AI code-editing agent operating inside a strict state machine workspace. 
-You interact with files exclusively through five explicit commands, and a CANCEL keyword to cancel writing. 
-
-### CRITICAL RULES:
-1. Output EXACTLY one command per message. 
-2. Do NOT wrap your response in markdown formatting (no backticks, no asterisks).
-3. Do NOT include any conversational text, explanations, greetings, or notes.
-4. Leading whitespace is STRICTLY forbidden.
-5. You must follow the command word with exactly ONE space and its argument.
-
-### PROTOCOL COMMANDS:
-SELECT_FILE <filename>  - Select a target file to load its initial memory snapshot.
-NEXT_CHUNK             - Move the view window forward by one chunk size.
-PREV_CHUNK             - Move the view window backward by one chunk size.
-GOTO <search_string>   - Jump the view window to center around a literal code string match.
-LOCK <start>-<end>     - Lock explicit, 1-based line numbers to prepare for a surgical edit.
-CANCEL                 - Release active line locks and return to read-only pagination mode.
-
-### CONVERSATION FLOW:
-- You will start in the "Seeking" phase. Use SELECT_FILE, NEXT_CHUNK, PREV_CHUNK, or GOTO to navigate the prefixed absolute line numbers.
-- Once you locate the exact target code block, issue a LOCK command (e.g., "LOCK 101-103").
-- The system will respond with a confirmation lock. ONLY then may you stream raw code lines to execute the edit.
-
-Any deviation from this formatting protocol will cause an immediate parsing execution failure.
-
-`
-
 func TestMain(t *testing.M) {
 	cmdpkg.InitLog()
 	env := ".env"
@@ -59,11 +32,19 @@ func TestMain(t *testing.M) {
 	os.Exit(code)
 }
 
+const SuccessMessage = "Operation successful."
+
+type TC struct {
+	Prompt  string
+	FileIn  string
+	FileOut string
+}
+
 func TestAi(t *testing.T) {
 	creq := llm.NewChatRequest()
 
 	creq.Messages = []llm.Message{
-		{Role: "system", Content: sysmsg},
+		{Role: "system", Content: implv2.SystemInstruction()},
 		{Role: "user", Content: "edit the file: Fix typos in foo.txt. do not decrease/increase number of lines."},
 	}
 	session := implv2.Session{}
@@ -74,6 +55,7 @@ func TestAi(t *testing.T) {
 	if _, err := os.ReadFile("foo.txt"); err != nil {
 		t.Fatal(err)
 	}
+	testpass := false
 	for {
 		if creq.Messages[len(creq.Messages)-1].Role == "assistant" {
 			println("[test] test is done (latest message is assistant)")
@@ -81,7 +63,7 @@ func TestAi(t *testing.T) {
 		}
 		generated := chatmessages.NewFromRole("", "assistant", "")
 		for i := range creq.Messages[:len(creq.Messages)-1] {
-			if creq.Messages[i].Role == "system" && strings.HasPrefix(creq.Messages[i].Content, "Operation successful.\n") {
+			if creq.Messages[i].Role == "system" && strings.HasPrefix(creq.Messages[i].Content, SuccessMessage+"\n") {
 				creq.Messages[i].Content = "Operation Successful"
 			}
 		}
@@ -101,6 +83,7 @@ func TestAi(t *testing.T) {
 					t.Fatal("only foo.txt")
 				}
 				err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
+				testpass = err == nil
 			}
 			session.LockStart = 0
 			session.LockEnd = 0
@@ -122,13 +105,28 @@ func TestAi(t *testing.T) {
 			if res.E != nil {
 				t.Fatalf("error: %+v", err)
 			}
-			slog.Info("result", "out", res.Code)
-			sys := session.SystemMessage()
-			println(sys)
+			slog.Info("result", "out", res.Code, "message", res.Message)
+			if res.Message == "" {
+				res.Message = SuccessMessage
+			}
 			creq.Messages = append(creq.Messages, llm.Message{
 				Role:    "system",
-				Content: "Operation successful.\n" + sys,
+				Content: res.Message + "\n" + session.SystemMessage(),
 			})
+			println(creq.Messages[len(creq.Messages)-1].Content)
 		}
+	}
+	if !testpass {
+		t.Fatal("did not pass")
+	}
+	now, _ := os.ReadFile("foo.txt")
+	if string(now) != `
+Hello
+world
+This is a test.
+
+It works
+` {
+		t.Fatalf("expected fixed but got:\n%s", now)
 	}
 }

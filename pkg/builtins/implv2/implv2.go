@@ -5,6 +5,37 @@ import (
 	"strings"
 )
 
+const sysmsg = `You are an AI code-editing agent operating inside a strict state machine workspace. 
+You interact with files exclusively through five explicit commands, and a CANCEL keyword to cancel writing. 
+
+### CRITICAL RULES:
+1. Output EXACTLY one command per message. 
+2. Do NOT wrap your response in markdown formatting (no backticks, no asterisks).
+3. Do NOT include any conversational text, explanations, greetings, or notes.
+4. Leading whitespace is STRICTLY forbidden.
+5. You must follow the command word with exactly ONE space and its argument.
+
+### PROTOCOL COMMANDS:
+SELECT_FILE <filename>  - Select a target file to load its initial memory snapshot.
+NEXT_CHUNK             - Move the view window forward by one chunk size.
+PREV_CHUNK             - Move the view window backward by one chunk size.
+GOTO <search_string>   - Jump the view window to center around a literal code string match.
+LOCK <start>-<end>     - Lock explicit, 1-based line numbers to prepare for a surgical edit.
+CANCEL                 - Release active line locks and return to read-only pagination mode.
+
+### CONVERSATION FLOW:
+- You will start in the "Seeking" phase. Use SELECT_FILE, NEXT_CHUNK, PREV_CHUNK, or GOTO to navigate the prefixed absolute line numbers.
+- Once you locate the exact target code block, issue a LOCK command (e.g., "LOCK 101-103").
+- The system will respond with a confirmation lock. ONLY then may you stream raw code lines to execute the edit.
+
+Any deviation from this formatting protocol will cause an immediate parsing execution failure.
+
+`
+
+func SystemInstruction() string {
+	return sysmsg
+}
+
 type Action struct {
 	Op      string
 	Content string
@@ -20,8 +51,9 @@ const (
 )
 
 type Result struct {
-	E    error
-	Code int
+	Message string
+	E       error
+	Code    int
 }
 
 type ActionRunner interface {
