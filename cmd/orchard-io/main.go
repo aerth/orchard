@@ -112,6 +112,12 @@ func main1(ctx context.Context) error {
 
 const showChar = false
 
+type codeargs struct {
+	Code string `json:"code"`
+}
+
+func (c codeargs) IsTool() {}
+
 // rumain already initialized
 func runmain(ctx context.Context, conf *global.Conf) error {
 	if showChar {
@@ -123,10 +129,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	var err error
 	if true { // builtin go tools
+
 		basher := func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-			chat.ReadToolCall[struct {
-				Code string `json:"code"`
-			}](ctx, caller, toolCallIndex)
+			chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 			bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
 		}
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
