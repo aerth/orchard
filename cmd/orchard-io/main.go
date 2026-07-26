@@ -124,7 +124,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	var err error
 	if true { // builtin go tools
 		basher := func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-			chat.ReadToolCall(ctx, caller, toolCallIndex)
+			chat.ReadToolCall[struct {
+				Code string `json:"code"`
+			}](ctx, caller, toolCallIndex)
 			bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
 		}
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
