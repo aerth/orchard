@@ -37,7 +37,7 @@ func (s Session) SystemMessage() string {
 		// Append lines with explicit absolute 1-based indices to anchor LLM awareness
 		for i := startIdx; i < endIdx; i++ {
 			marked := " "
-			if i >= s.LockStart && i <= s.LockEnd {
+			if i > s.LockStart && i <= s.LockEnd {
 				marked = "*"
 			}
 			fmt.Fprintf(&chunkBuilder, "%s%d: %s", marked, i+1, s.Lines[i])
