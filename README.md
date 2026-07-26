@@ -17,6 +17,8 @@ Every N minutes, check my inboxes for any important urgent messages. For each ur
 
 ### example: Keybinding for STT->LLM->TTS
 
+You are a linux expert who helps the owner manage their computer
+
 ### example: Git hook
 
 
