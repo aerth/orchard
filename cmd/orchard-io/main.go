@@ -147,13 +147,15 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			return err
 		}
 	}
+
+	if _, err := os.Stdin.Read(nil); err != nil {
+		return stackerr.Errorf("reading stdin: %w", err)
+	}
 	newmsg := chatmessages.NewFromRole(conf.GetUsername(), "user", "")
 	newmsg.ThreadID = threadID
 	stack = append(stack, *newmsg)
 	newmsg = &stack[len(stack)-1] // fix ptr
-	if _, err := os.Stdin.Read(nil); err != nil {
-		return err
-	}
+	// read stdin directly to the newmsg
 	if showChar {
 		_, _ = fmt.Fprintf(os.Stderr, "%s: ", titlecaser.String(conf.GetUsername())) // eg: Chief:
 	}
