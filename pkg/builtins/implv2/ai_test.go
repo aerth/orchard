@@ -90,22 +90,25 @@ func TestAi(t *testing.T) {
 			println(generated.Content)
 			creq.Messages = append(creq.Messages, generated.Message)
 			actions, err := session.Parse(generated.Content)
+			if errors.Is(err, implv2.ErrNot) && session.LockEnd == 0 {
+				// finished
+				break
+			}
 			if errors.Is(err, implv2.ErrNot) && session.LockEnd != 0 {
-					err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
-					if err == nil {
-						if session.ActiveFile != tc.Filename {
-							t.Fatal("only one file can be edited but got " + session.ActiveFile)
-						}
-						err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
-						testpass = err == nil
+				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
+				if err == nil {
+					if session.ActiveFile != tc.Filename {
+						t.Fatal("only one file can be edited but got " + session.ActiveFile)
 					}
-					session.LockStart = 0
-					session.LockEnd = 0
-					creq.Messages = append(creq.Messages, llm.Message{
-						Role:    "system",
-						Content: "The file edits were applied to the filesystem",
-					})
+					err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
+					testpass = err == nil
 				}
+				session.LockStart = 0
+				session.LockEnd = 0
+				creq.Messages = append(creq.Messages, llm.Message{
+					Role:    "system",
+					Content: "The file edits were applied to the filesystem",
+				})
 			}
 			if err != nil {
 				t.Fatal(err)
