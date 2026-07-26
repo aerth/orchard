@@ -140,11 +140,11 @@ Chat:
 		newcaller.ThreadID = e.ThreadID
 		{
 
+			spin := spinner.Start(sctx)
 			handl := []llm.ChatStreamHandlerFunc{ cl.HandleChatResponse, newcaller.GatherChatResponse}
 			if spin != nil {
 			handl = []llm.ChatStreamHandlerFunc{spin.HandleChatResponse, cl.HandleChatResponse, newcaller.GatherChatResponse}
 			}
-			spin := spinner.Start(sctx)
 			e.Handlers = append(handlers, 
 				...)
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
