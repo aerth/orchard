@@ -3,6 +3,8 @@ package implv2
 import (
 	"errors"
 	"strings"
+
+	"github.com/aerth/mostly/stackerr"
 )
 
 const sysmsg = `You are an AI code-editing agent operating inside a strict state machine workspace. 
@@ -88,7 +90,7 @@ func OutputParser(content string) ([]Action, error) {
 
 	switch op {
 	default:
-		return nil, errors.New("invalid protocol command: " + op)
+		return nil, stackerr.Errorf("%w", ErrNot)
 	case OpNextChunk, OpPrevChunk, OpCancel: // no args
 		if remainder != "" {
 			return nil, errors.New("command " + op + " does not accept arguments or trailing formatting")
