@@ -11,7 +11,7 @@ import (
 )
 
 func ValidateFileSyntax(codeContent string, language *sitter.Language) error {
-	slog.Info("validating syntax", "content", codeContent, "lang", fmt.Sprintf("%T", language))
+	slog.Info("validating syntax", "content", codeContent, "lang", language.SymbolName(""))
 	parser := sitter.NewParser()
 	parser.SetLanguage(language)
 
