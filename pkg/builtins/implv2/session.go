@@ -39,13 +39,16 @@ func (s Session) SystemMessage() string {
 
 	// 3. Format total active system instructions matching your state constraints
 	var lockStatus string
+	isLocked := false
 	if s.LockStart > 0 && s.LockEnd > 0 {
+
+		isLocked = true
 		lockStatus = fmt.Sprintf("LOCKED FOR EDIT: Lines %d-%d", s.LockStart, s.LockEnd)
 	} else {
 		lockStatus = "READ-ONLY NAVIGATION MODE"
 	}
 
-	return fmt.Sprintf(
+	normal := fmt.Sprintf(
 		`Active File: %s
 Status: %s
 Total Lines: %d
@@ -76,6 +79,24 @@ CANCEL                - Unlock coordinates and return to search navigation.`,
 		s.ChunkSize,
 		s.ChunkSize,
 	)
+	if isLocked {
+		lockmodetext := fmt.Sprintf(
+			`
+			You are currently in EDITING mode. All output will replace the targeted lines. To return to VIEW mode, begin or end your message with the word: CANCEL
+Any LOCKED targeted lines will be replaced by your reply.
+File line numbers are added for your convienence only. Do not prepend lines with numbers.
+Currently locked: %d lines
+Replying with <%d lines will remove lines.
+Replying with >%d lines will insert additional lines.
+
+			`,
+			s.LockEnd-s.LockStart,
+			s.LockEnd-s.LockStart,
+			s.LockEnd-s.LockStart,
+		)
+		return normal + lockmodetext
+	}
+	return normal
 }
 
 // Global integer status codes for clear systemic orchestration
@@ -92,6 +113,7 @@ func (s *Session) Parse(content string) ([]Action, error) {
 	return OutputParser(content)
 }
 
+// RunAction implements [ActionRunner]
 func (s *Session) RunAction(action Action) Result {
 	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
 		return Result{E: ErrNoFilename}
@@ -109,6 +131,9 @@ func (s *Session) RunAction(action Action) Result {
 		s.Lines = strings.Split(string(data), "\n")
 		s.CurrentLine = 1 // Reset viewport tracking
 		s.LockStart, s.LockEnd = 0, 0
+		if s.ChunkSize == 0 {
+			s.ChunkSize = 20
+		}
 		return Result{Code: CodeNavigated}
 
 	case OpNextChunk:
@@ -147,10 +172,7 @@ func (s *Session) RunAction(action Action) Result {
 		}
 
 		// Shift viewport to center around the found line target
-		s.CurrentLine = targetLine - (s.ChunkSize / 2)
-		if s.CurrentLine < 1 {
-			s.CurrentLine = 1
-		}
+		s.CurrentLine = max(targetLine-(s.ChunkSize/2), 1)
 		return Result{Code: CodeNavigated}
 
 	case OpLockIn:
