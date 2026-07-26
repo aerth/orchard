@@ -60,7 +60,6 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 			}
 		}
 		cl = debugging.NewConsoleLogger(out, tw)
-		cl.HideToolCalls = conf.IsHideToolCalls()
 	}
 	var err error
 	handlers := e.Handlers
