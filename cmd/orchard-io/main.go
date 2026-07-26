@@ -137,8 +137,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 				if got != "" {
 					got += "\n"
 				}
-				got += "Error: " + err.Error()
+				got += fmt.Sprintf("Error: %+v", err)
 			}
+			return got, nil
 		}
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file": implv1.ReadFile,
