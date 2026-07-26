@@ -139,7 +139,7 @@ Chat:
 		newcaller := chatmessages.NewFromRole(e.From, "assistant", "")
 		newcaller.ThreadID = e.ThreadID
 		{
-			hh := llm.ChatStreamHandlerFunc
+			var hh []llm.ChatStreamHandlerFunc
 			if cl != nil {
 				hh = append(hh, cl.HandleChatResponse)
 			}
@@ -150,7 +150,7 @@ Chat:
 			if spin != nil {
 				hh = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse}, hh...)
 			}
-
+			e.Handlers = hh
 			//	handl := []llm.ChatStreamHandlerFunc{ cl.HandleChatResponse, newcaller.GatherChatResponse}
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped regardless of output
