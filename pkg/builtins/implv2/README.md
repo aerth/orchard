@@ -62,3 +62,57 @@ def calculate_total(price, tax_rate):
 
 Your Go stream consumer simply drops any tokens before [REPLACEMENT_START], buffers everything in the middle as the raw surgical code, and cuts the stream processing immediately when [REPLACEMENT_END] is detected. This keeps token parsing lightweight, fast, and 100% immune to JSON syntax errors. [6] 
 If you are mapping out the network architecture, let me know if you want to look at how to handle partial token parsing for those delimiter tags, or how you plan to handle user interruptions if they see the code streaming incorrectly and want to cancel mid-flight.
+
+
+Here is an example conversation detailing exactly how the AI Agent uses these protocol commands to navigate, lock, and surgically edit a source file.
+------------------------------
+## 🌐 The Conversational Exchange## 🔹 Step 1: Navigating the File (The "Seeking" State)
+System Prompt:
+
+"You are editing main.py. Current position: Window shows lines 1 to 10. Output a single command word to navigate or lock."
+
+LLM Response:
+
+GOTO def calculate_total
+
+(The Go backend reads this payload, extracts "def calculate_total", runs a substring search on the cached file string slice, finds it at line 101, and updates the user context window).
+------------------------------
+## 🔹 Step 2: Confirming the Visual Chunk
+System Prompt:
+
+Current position: Lines 100-105.
+100: 
+101: def calculate_total(price, tax_rate):
+102:     """Calculates the total price including tax."""
+103:     return price + (price * tax_rate)
+104: 
+105: def format_currency(val):
+
+LLM Response:
+
+LOCK 101-103
+
+(The Go backend captures LOCK, validates that lines 101-103 contain numeric characters and hyphens, and cross-checks that the text in those coordinates matches what it just displayed to the model).
+------------------------------
+## 🔹 Step 3: Executing the Surgical Replacement (The "Editing" State)
+System Prompt:
+
+"Coordinates 101-103 are locked for editing. Send the exact replacement lines now. Do not use commands, markdown wrapping, or line numbers."
+
+LLM Response:
+
+def calculate_total(price: float, tax_rate: float) -> float:
+    """Calculates the total price including tax with type safety."""
+    return round(price * (1.0 + tax_rate), 2)
+
+------------------------------
+## 🛠️ How Your Go Backend Processes These Responses
+Here is what your orchestration engine handles behind the scenes for each of those exact payloads:
+
+* For Payload 1 (GOTO def calculate_total): Your parser strips GOTO and sets Action.Content to "def calculate_total". The engine shifts its viewing viewport index straight to line 101.
+* For Payload 2 (LOCK 101-103): Your loop verifies every byte of 101-103 is a digit or hyphen. It passes verification. The orchestrator changes the conversation context state from SEEKING to EDITING.
+* For Payload 3 (The Code Block): The parser is bypassed entirely in this state. The orchestrator consumes the streaming network socket directly as raw text, slices out lines 101–103 from the file array, replaces them with the 3 new incoming lines, and passes the entire file to Tree-sitter.
+
+If you are ready, let me know if you want to look at how the Go tool parses the "101-103" coordinate string into two distinct integer array offsets next!
+
+
