@@ -2,6 +2,8 @@
 
 General, extensible, multi-purpose AI Agent orchestration harness system.
 
+This repo contains the Orchard library, and the basic `orchard-io` command.
+
 ## examples
 
 **The following prompts are extremely simplified for brevity, using fake tool names.** 
