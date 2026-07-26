@@ -16,6 +16,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"os/exec"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -56,6 +57,60 @@ func Sig() {
 }
 
 var builtinTools otool.Tools
+
+func cheatcode(ctx context.Context, s string) bool {
+	sctx := global.NewCancel(ctx)
+	for i := range 2 {
+		slog.Warn("asking", "q", s)
+		println()
+		println()
+		cmd := exec.CommandContext(sctx, "/usr/bin/gum", "confirm", "--default=no", "--padding=\"2 2\"", s)
+		cmd.Stdin = os.Stdin
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+		err := cmd.Run()
+		println()
+		println()
+		if err != nil { // this catches
+			//		slog.Error("error asking", "err", err)
+			return false
+		}
+		if !cmd.ProcessState.Success() {
+			return false
+		}
+		if i == 0 {
+			println("One more to go")
+		}
+	}
+	return true
+}
+
+func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
+	if err != nil {
+		return nil, err
+	}
+	code := call.Function.Arguments.Code
+	if code == "" {
+		return nil, stackerr.Errorf("empty code")
+	}
+	if !cheatcode(ctx, "Run this bash code? "+code) {
+		return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it")
+	}
+	var got string
+	got, err = bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
+	if err != nil {
+		if got != "" {
+			got += "\n"
+		}
+		got += fmt.Sprintf("Error: %+v", err)
+	}
+	if got == "" {
+		got = "Error: no output"
+	}
+	gotmsg := chatmessages.NewFromRole("", "tool", got)
+	return chatmessages.ChatMessages{*gotmsg}, nil
+}
 
 // orchard CLI infinite loop, simple stdin stdout, minimal stderr.
 // debug logs to log file or null
@@ -129,25 +184,6 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	var err error
 	if true { // builtin go tools
-		basher := func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-			call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
-			code := call.Function.Arguments.Code
-			if code == "" {
-				err = fmt.Errorf("empty code")
-			}
-			var got string
-			if err == nil {
-				got, err = bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
-				if err != nil {
-					if got != "" {
-						got += "\n"
-					}
-					got += fmt.Sprintf("Error: %+v", err)
-				}
-			}
-			gotmsg := chatmessages.NewFromRole("", "tool", got)
-			return chatmessages.ChatMessages{*gotmsg}, nil
-		}
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file": implv1.ReadFile,
 			//"write_file": implv1.WriteFile,
