@@ -136,6 +136,9 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	x := jsonstring(operators)
 	msg.Content = fmt.Sprintf("The File edit session (%q) has completed. Transcript: %s", path, x)
 	out = append(out, *chatmessages.New(msg))
+	if final != nil {
+		out = append(out, *final)
+	}
 	return out, nil
 }
 
