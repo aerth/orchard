@@ -138,7 +138,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 				Role:    "system",
 				Content: "Error: " + err.Error() + "\n\nTry again or use CANCEL to return to conversation",
 			}))
-			break
+			continue
 		}
 		for i := range x {
 			operators = append(operators, x[i].Op)
