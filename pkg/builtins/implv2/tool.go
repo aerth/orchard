@@ -138,6 +138,8 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	out = append(out, *chatmessages.New(msg))
 	if final != nil {
 		out = append(out, *final)
+	} else {
+		out = append(out, stack[len(stack)-1])
 	}
 	return out, nil
 }
