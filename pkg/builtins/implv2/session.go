@@ -130,6 +130,10 @@ const (
 
 var ErrNoFilename = fmt.Errorf("no active file yet, use %q first", OpFilename)
 
+func (s *Session) Peak(content string) ([]Action, error) {
+	return OutputParser(content)
+}
+
 func (s *Session) Parse(content string) ([]Action, error) {
 	return OutputParser(content)
 }
