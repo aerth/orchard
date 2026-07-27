@@ -73,7 +73,7 @@ Current Viewport Window: Lines %d to %d
 %s
 ----------- END CHUNK ------------
 Note: line numbers are included only for this view
-		Asterisks ('*') mark LOCKed lines
+Note: Asterisks ('*') mark LOCKed lines
 
 ### PROTOCOL INSTRUCTIONS:
 - You must output exactly ONE command keyword.
