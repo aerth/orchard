@@ -130,7 +130,7 @@ const (
 
 var ErrNoFilename = fmt.Errorf("no active file yet, use %q first", OpFilename)
 
-func (s *Session) Peak(content string) error {
+func (s *Session) Peek(content string) error {
 	switch strings.Fields(content)[0] {
 	case "SELECT_FILE":
 	case "NEXT_CHUNK":
