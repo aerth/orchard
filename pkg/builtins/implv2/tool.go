@@ -57,9 +57,12 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	}
 	stack, _ := ctx.Value(toolrunner.CtxStack).(chatmessages.ChatMessages)
 	startstacklen := len(stack)
-	stack := chatmessages.A{
-		*chatmessages.New(llm.Message{Role: "system", Content: SystemInstruction()}),
+	if startstacklen == 0 {
+		return nil, fmt.Errorf("no conversation memory")
 	}
+	stack = append(stack, chatmessages.A{
+		*chatmessages.New(llm.Message{Role: "system", Content: SystemInstruction()}),
+	}...)
 	//e := chat.Ext{
 	//	NonStreamHandler: func(cm chatmessages.ChatMessage) {
 	//	}
