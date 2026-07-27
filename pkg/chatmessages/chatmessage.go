@@ -387,7 +387,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = cm.Content
 		content = fmt.Sprintf("### tool %q call output\n```\n", cm.ToolName) + content + "\n```\n"
 	case cm.Role == "tool":
-		content = fmt.Sprintf("### tool %q call output\n", cm.ToolName)
+		content = fmt.Sprintf("### tool %q call output (%d bytes)\n", cm.ToolName, len(cm.Content))
 	case cm.Content == "" && !ShowThoughts && len(cm.ToolCalls) != 0:
 		content = ""
 	case cm.Content != "":
