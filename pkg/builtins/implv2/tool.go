@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"strings"
@@ -77,6 +78,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	for ctx.Err() == nil {
 		creq.Messages = stack.Raw()
 		if card != "" {
+			log.Printf("%s", card)
 			creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: card})
 			card = ""
 			for i := range creq.Messages[1+startstacklen : len(creq.Messages)-1] {
