@@ -16,7 +16,12 @@ import (
 
 var ErrFatalToolResult = errors.New("unrecoverable error")
 
+const CtxStack string = "messages stack"
+
 func Runtools(ctx context.Context, stack chatmessages.A, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
+	if stack != nil {
+		ctx = context.WithValue()
+	}
 	toolouts, err := realruntools(ctx, tools, caller)
 	for i := range toolouts {
 		toolouts[i].ThreadID = caller.ThreadID
