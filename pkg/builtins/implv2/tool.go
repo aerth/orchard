@@ -147,6 +147,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	}
 
 	x := jsonstring(operators)
+	x += ""
 	if final == nil {
 		y := stack.Top()
 		final = &y
