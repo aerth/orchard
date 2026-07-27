@@ -30,6 +30,8 @@ type haspath struct {
 	Path string `json:"path"`
 }
 
+var GetHandler = func() chat.Handler { return nil }
+
 func (h haspath) IsToolArgument() {}
 func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	// begin loop
