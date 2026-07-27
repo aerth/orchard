@@ -150,10 +150,6 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	}
 	errmsg.Content = fmt.Sprintf("The File edit session (%q) has completed. Transcript: %s\n\nFinal:\n%s", path, x, final.FormatMarkdownTry(nil, "", "Editor"))
 	out = append(out, *chatmessages.New(errmsg))
-	if final != nil {
-		out = append(out, *final)
-	} else {
-	}
 	slog.Info("returning messages", "n", len(out))
 	return out, nil
 }
