@@ -267,6 +267,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	if err != nil {
 		return stackerr.Errorf("%w", err)
 	}
+
 	return nil
 }
 
