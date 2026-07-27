@@ -162,6 +162,8 @@ func (s *Session) RunAction(action Action) Result {
 		if s.ActiveFile == action.Content {
 			return Result{Message: "The file was already selected. Use CANCEL to exit the file editor."}
 		}
+		s.ActiveFile = action.Content
+		s.Refresh()
 		return Result{Code: CodeNavigated}
 
 	case OpNextChunk:
