@@ -75,6 +75,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	var final *chatmessages.ChatMessage
 	cl := debugging.NewConsoleLogger()
 	rounds := 0
+	filesEdited := 0
 	for ctx.Err() == nil {
 		creq.Messages = stack.Raw()
 		tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
