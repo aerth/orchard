@@ -163,8 +163,8 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	return out, nil
 }
 
-func ConfirmAction(ctx context.Context, s string) error {
-	panic("unimplemented")
+var ConfirmAction = func(ctx context.Context, s string) error {
+	return fmt.Errorf("there is no CnfirmAction function provided")
 }
 
 func jsonstring(v any) string {
