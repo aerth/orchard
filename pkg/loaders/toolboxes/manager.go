@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"time"
 
 	"m/pkg/builtins/implv1/bashtooler"
 	"m/pkg/chatmessages"
@@ -121,6 +122,10 @@ type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int)
 func makeExecFn(toolName string, params OrchParams, doInputEnv bool, pyFilePath string) ExecFunc {
 	_ = toolName
 	execFn := func(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
+		t1 := time.Now()
+		defer func() {
+			slog.Info("done running tool", "namea", toolName, "x", time.Since(t1))
+		}()
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}
