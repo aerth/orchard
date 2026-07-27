@@ -85,6 +85,10 @@ func cheatcode(ctx context.Context, s string) bool {
 	return true
 }
 
+func init() {
+	implv2.ConfirmAction = cheatcode
+}
+
 func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 	if err != nil {
