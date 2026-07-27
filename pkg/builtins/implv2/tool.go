@@ -148,7 +148,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	}
 
 	x := jsonstring(operators)
-	x += ""
+	x += fmt.Sprintf("files edited: %d", filesEdited)
 	if final == nil {
 		y := stack.Top()
 		final = &y
