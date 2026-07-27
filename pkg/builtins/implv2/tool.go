@@ -150,10 +150,10 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 			stack = append(stack, *chatmessages.NewSystemEphemeral("Error: " + err.Error() + "\n\nTry again or use CANCEL to return to conversation"))
 			continue
 		}
+		responseWriter := GetSender
 		for i := range x {
 			operators = append(operators, x[i].Op)
 			resp := session.RunAction(x[i])
-			responseWriter := GetSender
 			if responseWriter != nil {
 				responseWriter(resp)
 			}
