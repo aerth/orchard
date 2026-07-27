@@ -113,7 +113,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 					Role:    "system",
 					Content: "The file edits were applied to the filesystem",
 				})
-				continue
+				break
 			}
 
 		}
