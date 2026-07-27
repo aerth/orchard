@@ -76,7 +76,7 @@ func cheatcode(ctx context.Context, s string) error {
 			return err
 		}
 		if !cmd.ProcessState.Success() {
-			return err
+			return fmt.Errorf("nonzero exit")
 		}
 		if i == 0 {
 			println("One more to go")
@@ -98,7 +98,7 @@ func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	if code == "" {
 		return nil, stackerr.Errorf("empty code")
 	}
-	if !cheatcode(ctx, "Run this bash code? "+code) {
+	if cheatcode(ctx, "Run this bash code? "+code) != nil {
 		return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it")
 	}
 	var got string
