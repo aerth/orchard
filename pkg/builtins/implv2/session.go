@@ -174,7 +174,7 @@ func (s *Session) RunAction(action Action) Result {
 	switch action.Op {
 	case OpFilename:
 		if s.ActiveFile == action.Content {
-			return Result{Message: "The file was already selected. Use CANCEL to exit the file editor."}
+			return Result{Message: "The file was already selected. Use CANCEL to exit the file editor, or LOCK to lock existing lines for targeting.."}
 		}
 		s.ActiveFile = action.Content
 		if r := s.Refresh(); r.E != nil {
