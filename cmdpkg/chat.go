@@ -155,7 +155,7 @@ Chat:
 		//
 		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls))
 		// run the tool exec funcs
-		toolouts, err := toolrunner.Runtools(ctx, tools, *newcaller)
+		toolouts, err := toolrunner.Runtools(ctx, stack, tools, *newcaller)
 		{
 			slog.Info("finished running tool calls",
 				"ncalls", len(newcaller.ToolCalls), "err", err, "nresp", len(toolouts))
