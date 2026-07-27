@@ -117,7 +117,7 @@ File line numbers are added for your convienence only. Do not prepend lines. Out
 		)
 		return normal + lockmodetext
 	} else {
-		normal + "\n" + "send single line (`LOCK <start>-<end>`) to replace those lines."
+		return normal + "\n" + "send single line (`LOCK <start>-<end>`) enter EDIT mode."
 	}
 	return normal
 }
