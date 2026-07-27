@@ -22,7 +22,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 
 	call, err := chat.ReadToolCall[haspath](ctx, caller, toolCallIndex)
 	if err != nil {
-		return nil, err
+		return nil, stackerr.Errorf("%w", err)
 	}
 	path := call.Function.Arguments.Path
 
