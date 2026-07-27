@@ -37,7 +37,7 @@ func BestEffort(ctx context.Context, s string, isQueryOrQuestion bool) *vector25
 }
 
 func GetEmbeddingEndpoint() string {
-	if x := os.Getenv("OLLAMA_EMBED_URL"); x != "" {
+	if x := os.Getenv("OLLAMA_EMBED_HOST"); x != "" {
 		return x
 	}
 	return "http://127.0.0.1:11434"
