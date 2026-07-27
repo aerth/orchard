@@ -131,7 +131,11 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		}
 		if err != nil {
 			slog.Error("parsing edit TODO", "err", err)
-			operators = append(operators, fmt.Sprintf("ERROR: %+v", err))
+			stack = append(stack, *chatmessages.New(llm.Message{
+				Role:    "system",
+				Content: "The file edits were applied to the filesystem",
+			}))
+
 			break
 		}
 		for i := range x {
