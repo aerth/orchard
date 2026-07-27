@@ -36,6 +36,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 
 	// begin loop
 	var out chatmessages.A
+	session := Session{}
 
 	var operators []string
 	x := jsonstring(operators)
