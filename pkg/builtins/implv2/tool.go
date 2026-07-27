@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-	"os"
-	"strings"
-
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
+	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/toolrunner"
+	"os"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	sitter "github.com/smacker/go-tree-sitter"
@@ -33,6 +33,7 @@ type haspath struct {
 var (
 	GetHandler = func() chat.Handler { return nil }
 	GetSender  = func(Result) {}
+	PreFunc    = func() {}
 )
 
 func (h haspath) IsToolArgument() {}
@@ -59,7 +60,8 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	var out chatmessages.A
 	session := Session{ActiveFile: path}
 	if e := session.Refresh().E; e != nil {
-		return nil, stackerr.Errorf("%w", err)
+		slog.Error("refresher error", "err", e)
+		return nil, stackerr.Errorf("%w", e)
 	}
 	stack, _ := ctx.Value(toolrunner.CtxStack).(chatmessages.ChatMessages)
 	startstacklen := len(stack)
@@ -78,7 +80,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	creq := llm.NewChatRequest()
 	var card string
 	var final *chatmessages.ChatMessage
-	cl := debugging.NewConsoleLogger()
+	cl := debugging.NewConsoleLogger(global.LogWriter, global.LogWriter)
 	rounds := 0
 	filesEdited := 0
 	for ctx.Err() == nil {
