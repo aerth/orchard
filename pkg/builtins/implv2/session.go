@@ -139,7 +139,7 @@ func (s *Session) Peek(content string) error {
 	case "LOCK":
 	case "CANCEL":
 	default:
-		return fmt.Errorf("unknown operator keyword. to exit file editor, use CANCEL")
+		return fmt.Errorf("unknown operator keyword. did you mean to send a message? to exit file editor, use plain CANCEL")
 	}
 	return nil
 }
