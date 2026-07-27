@@ -101,6 +101,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		x, err := session.Parse(newmsg.Content)
 		if rounds != 0 && errors.Is(err, ErrNot) && session.LockEnd == 0 {
 			// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
+			slog.Info("Finished editing")
 			final = newmsg
 			break
 		}
