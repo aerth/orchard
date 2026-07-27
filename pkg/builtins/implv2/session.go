@@ -134,6 +134,23 @@ func (s *Session) Parse(content string) ([]Action, error) {
 	return OutputParser(content)
 }
 
+func (s *Session) Refresh() Result {
+	// Read file safely into memory snapshot
+	data, err := os.ReadFile(s.ActiveFile)
+	if err != nil {
+		return Result{E: fmt.Errorf("failed to open file: %w", err), Code: CodeError}
+	}
+
+	// Normalize newlines and preserve perfect line-by-line sizing
+	s.Lines = strings.Split(string(data), "\n")
+	s.CurrentLine = 1 // Reset viewport tracking
+	s.LockStart, s.LockEnd = 0, 0
+	if s.ChunkSize == 0 {
+		s.ChunkSize = 20
+	}
+	return Result{}
+}
+
 // RunAction implements [ActionRunner]
 func (s *Session) RunAction(action Action) Result {
 	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
@@ -144,20 +161,6 @@ func (s *Session) RunAction(action Action) Result {
 	case OpFilename:
 		if s.ActiveFile == action.Content {
 			return Result{Message: "The file was already selected. Use CANCEL to exit the file editor."}
-		}
-		// Read file safely into memory snapshot
-		data, err := os.ReadFile(action.Content)
-		if err != nil {
-			return Result{E: fmt.Errorf("failed to open file: %w", err), Code: CodeError}
-		}
-
-		s.ActiveFile = action.Content
-		// Normalize newlines and preserve perfect line-by-line sizing
-		s.Lines = strings.Split(string(data), "\n")
-		s.CurrentLine = 1 // Reset viewport tracking
-		s.LockStart, s.LockEnd = 0, 0
-		if s.ChunkSize == 0 {
-			s.ChunkSize = 20
 		}
 		return Result{Code: CodeNavigated}
 
