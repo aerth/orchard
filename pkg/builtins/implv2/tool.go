@@ -133,9 +133,8 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 			slog.Error("parsing edit TODO", "err", err)
 			stack = append(stack, *chatmessages.New(llm.Message{
 				Role:    "system",
-				Content: "Could not parse editor operation: " + err.Error(),
+				Content: "Error: " + err.Error(),
 			}))
-
 			break
 		}
 		for i := range x {
