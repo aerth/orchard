@@ -19,6 +19,8 @@ type Session struct {
 	LockEnd   int
 }
 
+const DefaultChunkSize = 50
+
 func (s Session) Current() []byte {
 	return []byte(strings.Join(s.Lines, "\n"))
 }
@@ -78,6 +80,7 @@ Note: line numbers are included only for this view
 - No markdown wrappers (no backticks `+"`"+`, no asterisks **). No chit-chat.
 - Zero leading whitespace allowed. Follow your command with exactly ONE space.
 - To begin EDIT mode, LOCK a range.
+- Protocol Commands are sent directly to the chat, and interpreted by this session.
 
 ### AVAILABLE PROTOCOL COMMANDS:
 SELECT_FILE <filename> - Open/switch workspace file.
@@ -162,7 +165,7 @@ func (s *Session) Refresh() Result {
 	s.CurrentLine = 1 // Reset viewport tracking
 	s.LockStart, s.LockEnd = 0, 0
 	if s.ChunkSize == 0 {
-		s.ChunkSize = 20
+		s.ChunkSize = DefaultChunkSize
 	}
 	return Result{}
 }
