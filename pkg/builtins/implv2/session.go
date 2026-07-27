@@ -119,7 +119,7 @@ File line numbers are added for your convienence only. Do not prepend lines. Out
 	} else {
 		return normal + "\n" + "send single line (`LOCK <start>-<end>`) enter EDIT mode."
 	}
-	return normal
+	//return normal
 }
 
 // Global integer status codes for clear systemic orchestration
