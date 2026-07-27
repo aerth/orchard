@@ -7,10 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
-	"strings"
-	"time"
-
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/chat"
@@ -20,6 +16,9 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -130,8 +129,10 @@ Chat:
 					return stackerr.Errorf("%w", err)
 				}
 			}*/
-		if err := e.AfterGen(newcaller); err != nil {
-			return err
+		if e.AfterGen != nil {
+			if err := e.AfterGen(newcaller); err != nil {
+				return err
+			}
 		}
 		if jsonout != nil {
 			// jsonout encoder may modify the pointer (TODO: hook for confirmation/cancel)

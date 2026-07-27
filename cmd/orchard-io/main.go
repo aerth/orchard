@@ -16,7 +16,6 @@ import (
 	"log"
 	"log/slog"
 	"os"
-	"os/exec"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -58,35 +57,8 @@ func Sig() {
 
 var builtinTools otool.Tools
 
-func cheatcode(ctx context.Context, s string) error {
-	sctx := global.NewCancel(ctx)
-	for i := range 2 {
-		slog.Warn("asking", "q", s)
-		println()
-		println()
-		cmd := exec.CommandContext(sctx, "/usr/bin/gum", "confirm", "--default=no", "--padding=\"10 10\"", "--prompt.background=#FF0000", s)
-		cmd.Stdin = os.Stdin
-		cmd.Stderr = os.Stderr
-		cmd.Stdout = os.Stdout
-		err := cmd.Run()
-		println()
-		println()
-		if err != nil { // this catches
-			//		slog.Error("error asking", "err", err)
-			return err
-		}
-		if !cmd.ProcessState.Success() {
-			return fmt.Errorf("nonzero exit")
-		}
-		if i == 0 {
-			println("One more to go")
-		}
-	}
-	return nil
-}
-
 func init() {
-	implv2.ConfirmAction = cheatcode
+	implv2.ConfirmAction = cmdpkg.Cheatcode
 }
 
 func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
@@ -98,7 +70,7 @@ func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	if code == "" {
 		return nil, stackerr.Errorf("empty code")
 	}
-	if cheatcode(ctx, "Run this bash code? "+code) != nil {
+	if cmdpkg.Cheatcode(ctx, "Run this bash code? "+code) != nil {
 		return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it")
 	}
 	var got string
