@@ -77,7 +77,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 			}
 		}
 		newmsg := chatmessages.NewFromRole("", "assistant", "")
-		err := llm.New().Chat(ctx, creq)
+		err := llm.New().Chat(ctx, creq, newmsg.GatherChatResponse)
 		if err != nil {
 			operators = append(operators, err.Error())
 			break
