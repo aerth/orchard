@@ -8,6 +8,8 @@ import (
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
+
+	"github.com/aerth/mostly/stackerr"
 )
 
 type haspath struct {
@@ -37,7 +39,9 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	// begin loop
 	var out chatmessages.A
 	session := Session{ActiveFile: path}
-	session.Refresh()
+	if e := session.Refresh().E; e != nil {
+		return nil, stackerr.Errorf("%w", err)
+	}
 
 	var operators []string
 	x := jsonstring(operators)
