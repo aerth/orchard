@@ -37,14 +37,14 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	}
 	path := call.Function.Arguments.Path
 
-	msg := llm.Message{
+	errmsg := llm.Message{
 		Role:     "tool",
 		Content:  "no output",
 		ToolName: "edit_file", ToolCallID: caller.ToolCallID,
 	}
 	if path == "" {
-		msg.Content = "Error: path required"
-		return chatmessages.A{*chatmessages.New(msg)}, nil
+		errmsg.Content = "Error: path required"
+		return chatmessages.A{*chatmessages.New(errmsg)}, nil
 	}
 
 	// begin loop
