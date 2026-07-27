@@ -73,6 +73,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	var card string
 	var final *chatmessages.ChatMessage
 	cl := debugging.NewConsoleLogger()
+	rounds := 0
 	for ctx.Err() == nil {
 		creq.Messages = stack.Raw()
 		if card != "" {
@@ -98,7 +99,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		}
 		stack = append(stack, *newmsg)
 		x, err := session.Parse(newmsg.Content)
-		if errors.Is(err, ErrNot) && session.LockEnd == 0 {
+		if rounds != 0 && errors.Is(err, ErrNot) && session.LockEnd == 0 {
 			// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
 			final = newmsg
 			break
