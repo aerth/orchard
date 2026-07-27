@@ -77,6 +77,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	rounds := 0
 	for ctx.Err() == nil {
 		creq.Messages = stack.Raw()
+		card = strings.Join([]string{resp.Message, session.SystemMessage()}, "\n")
 		if card != "" {
 			log.Printf("%s", card)
 			creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: card})
