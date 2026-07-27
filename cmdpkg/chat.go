@@ -141,7 +141,7 @@ Chat:
 		}
 		// handle tools
 		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") {
-			return stackerr.Errorf("need to edit_file first")
+			stack = append(stack, errmsg("need to edit_file first"))
 		}
 		if len(newcaller.ToolCalls) == 0 {
 			return nil
