@@ -56,9 +56,9 @@ func (s Session) SystemMessage() string {
 	if s.LockStart > 0 && s.LockEnd > 0 {
 
 		isLocked = true
-		lockStatus = fmt.Sprintf("LOCKED FOR EDIT: Lines %d-%d (use CANCEL to return to conversation) ", s.LockStart, s.LockEnd)
+		lockStatus = fmt.Sprintf("LOCKED FOR EDIT: Lines %d-%d (use CANCEL to return to READ mode) ", s.LockStart, s.LockEnd)
 	} else {
-		lockStatus = "READ-ONLY NAVIGATION MODE (use LOCK <start>-<end> to target those lines, use CANCEL to return to READ mode)"
+		lockStatus = "READ-ONLY NAVIGATION MODE (use LOCK <start>-<end> to target those lines, use CANCEL to return to conversation)"
 	}
 
 	normal := fmt.Sprintf(
