@@ -112,10 +112,10 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 			if err == nil {
 				session.LockStart = 0
 				session.LockEnd = 0
-				creq.Messages = append(creq.Messages, llm.Message{
+				stack = append(stack, *chatmessages.New(llm.Message{
 					Role:    "system",
 					Content: "The file edits were applied to the filesystem",
-				})
+				}))
 				break
 			}
 
