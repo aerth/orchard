@@ -164,7 +164,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 }
 
 var ConfirmAction = func(ctx context.Context, s string) error {
-	return fmt.Errorf("there is no CnfirmAction function provided")
+	return fmt.Errorf("there is no ConfirmAction function provided")
 }
 
 func jsonstring(v any) string {
