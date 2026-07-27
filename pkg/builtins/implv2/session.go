@@ -58,7 +58,7 @@ func (s Session) SystemMessage() string {
 		isLocked = true
 		lockStatus = fmt.Sprintf("LOCKED FOR EDIT: Lines %d-%d", s.LockStart, s.LockEnd)
 	} else {
-		lockStatus = "READ-ONLY NAVIGATION MODE"
+		lockStatus = "READ-ONLY NAVIGATION MODE (use LOCK to begin edit mode)"
 	}
 
 	normal := fmt.Sprintf(
