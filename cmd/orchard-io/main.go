@@ -58,7 +58,7 @@ func Sig() {
 
 var builtinTools otool.Tools
 
-func cheatcode(ctx context.Context, s string) bool {
+func cheatcode(ctx context.Context, s string) error {
 	sctx := global.NewCancel(ctx)
 	for i := range 2 {
 		slog.Warn("asking", "q", s)
@@ -73,16 +73,16 @@ func cheatcode(ctx context.Context, s string) bool {
 		println()
 		if err != nil { // this catches
 			//		slog.Error("error asking", "err", err)
-			return false
+			return err
 		}
 		if !cmd.ProcessState.Success() {
-			return false
+			return err
 		}
 		if i == 0 {
 			println("One more to go")
 		}
 	}
-	return true
+	return nil
 }
 
 func init() {
