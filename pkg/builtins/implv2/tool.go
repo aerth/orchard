@@ -147,6 +147,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		for i := range x {
 			operators = append(operators, x[i].Op)
 			resp := session.RunAction(x[i])
+			responseWriter(resp)
 			if resp.E != nil {
 				operators = append(operators, fmt.Sprintf("ERROR: %+v", resp.E))
 				break
