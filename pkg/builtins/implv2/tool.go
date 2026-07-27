@@ -11,6 +11,7 @@ import (
 
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
+	"m/pkg/debugging"
 	"m/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
@@ -65,6 +66,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	creq := llm.NewChatRequest()
 	var card string
 	var final *chatmessages.ChatMessage
+	cl := debugging.NewConsoleLogger()
 	for ctx.Err() == nil {
 		creq.Messages = stack.RemoveEphemeral().Raw()
 		if card != "" {
@@ -77,7 +79,8 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 			}
 		}
 		newmsg := chatmessages.NewFromRole("", "assistant", "")
-		err := llm.New().Chat(ctx, creq, newmsg.GatherChatResponse)
+		err := llm.New().Chat(ctx, creq, cl.HandleChatResponse, newmsg.GatherChatResponse)
+		cl.Reset()
 		if err != nil {
 			operators = append(operators, err.Error())
 			break
