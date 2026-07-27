@@ -147,7 +147,6 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 				operators = append(operators, fmt.Sprintf("ERROR: %+v", resp.E))
 				break
 			}
-			card = strings.Join([]string{resp.Message, session.SystemMessage()}, "\n")
 		}
 	}
 
