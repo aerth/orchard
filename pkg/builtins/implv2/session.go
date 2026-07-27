@@ -116,6 +116,8 @@ File line numbers are added for your convienence only. Do not prepend lines. Out
 			nlocked,
 		)
 		return normal + lockmodetext
+	} else {
+		normal + "\n" + "send single line (`LOCK <start>-<end>`) to replace those lines."
 	}
 	return normal
 }
