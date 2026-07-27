@@ -77,15 +77,13 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	rounds := 0
 	for ctx.Err() == nil {
 		creq.Messages = stack.Raw()
-		card = strings.Join([]string{resp.Message, session.SystemMessage()}, "\n")
-		if card != "" {
-			log.Printf("%s", card)
-			creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: card})
-			card = ""
-			for i := range creq.Messages[1+startstacklen : len(creq.Messages)-1] {
-				if creq.Messages[i].Role == "system" && strings.Count(creq.Messages[i].Content, "\n") > 1 {
-					creq.Messages[i].Content = strings.Split(creq.Messages[i].Content, "\n")[0]
-				}
+		tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
+		card = ""
+		log.Printf("%s", tmpmsg)
+		creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: tmpmsg})
+		for i := range creq.Messages[1+startstacklen : len(creq.Messages)-1] {
+			if creq.Messages[i].Role == "system" && strings.Count(creq.Messages[i].Content, "\n") > 1 {
+				creq.Messages[i].Content = strings.Split(creq.Messages[i].Content, "\n")[0]
 			}
 		}
 		newmsg := chatmessages.NewFromRole("", "assistant", "")
