@@ -13,6 +13,7 @@ import (
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
 	"m/pkg/llm"
+	"m/pkg/toolrunner"
 
 	"github.com/aerth/mostly/stackerr"
 	sitter "github.com/smacker/go-tree-sitter"
@@ -54,6 +55,8 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	if e := session.Refresh().E; e != nil {
 		return nil, stackerr.Errorf("%w", err)
 	}
+	stack, _ := ctx.Value(toolrunner.CtxStack).(chatmessages.ChatMessages)
+	startstacklen := len(stack)
 	stack := chatmessages.A{
 		*chatmessages.New(llm.Message{Role: "system", Content: SystemInstruction()}),
 	}
