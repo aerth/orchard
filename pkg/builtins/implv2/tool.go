@@ -141,6 +141,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	} else {
 		out = append(out, stack[len(stack)-1])
 	}
+	slog.Info("returning messages", "n", len(out))
 	return out, nil
 }
 
