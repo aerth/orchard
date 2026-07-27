@@ -156,12 +156,6 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	return out, nil
 }
 
-func getpath(rawMessage json.RawMessage) string {
-	var x haspath
-	_ = json.Unmarshal(rawMessage, &x)
-	return x.Path
-}
-
 func jsonstring(v any) string {
 	b, err := json.Marshal(v)
 	if err != nil {
