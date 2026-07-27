@@ -152,6 +152,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		}
 		responseWriter := GetSender
 		for i := range x {
+			slog.Info("running action", "op", x[i].Op)
 			operators = append(operators, x[i].Op)
 			resp := session.RunAction(x[i])
 			if responseWriter != nil {
