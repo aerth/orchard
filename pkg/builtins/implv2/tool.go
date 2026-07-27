@@ -118,6 +118,9 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 				}
 			}
 			if err == nil {
+				err = ConfirmAction(ctx, "Lines: "+newmsg.Content)
+			}
+			if err == nil {
 				slog.Info("WRITING FILE")
 				err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
 			}
@@ -158,6 +161,10 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	out = append(out, *chatmessages.New(errmsg))
 	slog.Info("returning messages", "n", len(out))
 	return out, nil
+}
+
+func ConfirmAction(ctx context.Context, s string) error {
+	panic("unimplemented")
 }
 
 func jsonstring(v any) string {
