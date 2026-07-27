@@ -41,7 +41,7 @@
   },
   {
     "name": "edit_file",
-    "description": "Begin editing a file, entering a new interactive mode for accurate file viewing and editing. **Preferred file-editing tool.**",
+    "description": "Begin editing a file, entering a new interactive mode for accurate file viewing and editing. **The Preferred file-editing tool.**",
     "required": ["path"],
     "parameters": {
       "type": "object",
