@@ -73,14 +73,16 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 			if x[i].MessageID == uuid.Nil {
 				x[i].MessageID = uuid.New()
 			}
-
 			if x[i].Role == "" {
 				x[i].Role = "tool"
 			}
-			if x[i].Role == "tool" && x[i].ToolName == "" {
+			if x[i].Role != "tool" {
+				continue
+			}
+			if x[i].ToolName == "" {
 				x[i].ToolName = tool.Name
 			}
-			if x[i].Role == "tool" && x[i].ToolCallID == "" {
+			if x[i].ToolCallID == "" {
 				x[i].ToolCallID = call.ID
 			}
 			if x[i].ToolName == "" || x[i].ToolCallID == "" {
