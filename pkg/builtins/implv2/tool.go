@@ -70,10 +70,10 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		if card != "" {
 			creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: card})
 			card = ""
-		}
-		for i := range creq.Messages[1 : len(creq.Messages)-1] {
-			if creq.Messages[i].Role == "system" && strings.Count(creq.Messages[i].Content, "\n") > 1 {
-				creq.Messages[i].Content = strings.Split(creq.Messages[i].Content, "\n")[0]
+			for i := range creq.Messages[1 : len(creq.Messages)-1] {
+				if creq.Messages[i].Role == "system" && strings.Count(creq.Messages[i].Content, "\n") > 1 {
+					creq.Messages[i].Content = strings.Split(creq.Messages[i].Content, "\n")[0]
+				}
 			}
 		}
 		newmsg := chatmessages.NewFromRole("", "assistant", "")
