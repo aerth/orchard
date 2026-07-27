@@ -16,11 +16,13 @@ import (
 
 var ErrFatalToolResult = errors.New("unrecoverable error")
 
-const CtxStack string = "messages stack"
+const CtxStack cx = "messages stack"
+
+type cx string
 
 func Runtools(ctx context.Context, stack chatmessages.A, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	if stack != nil {
-		ctx = context.WithValue()
+		ctx = context.WithValue(ctx, CtxStack, stack)
 	}
 	toolouts, err := realruntools(ctx, tools, caller)
 	for i := range toolouts {
