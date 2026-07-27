@@ -134,11 +134,14 @@ func (s *Session) Peak(content string) error {
 	switch strings.Fields(content)[0] {
 	case "SELECT_FILE":
 	case "NEXT_CHUNK":
-	case "PREV_CHUNK",
-	case "GOTO",
-	case "LOCK",
-	case "CANCEL",
+	case "PREV_CHUNK":
+	case "GOTO":
+	case "LOCK":
+	case "CANCEL":
+	default:
+		return fmt.Errorf("unknown operator keyword. to exit file editor, use CANCEL")
 	}
+	return nil
 }
 
 func (s *Session) Parse(content string) ([]Action, error) {
