@@ -64,6 +64,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	var operators []string
 	creq := llm.NewChatRequest()
 	var card string
+	var final *chatmessages.ChatMessage
 	for ctx.Err() == nil {
 		creq.Messages = stack.RemoveEphemeral().Raw()
 		if card != "" {
@@ -89,6 +90,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		x, err := session.Parse(newmsg.Content)
 		if errors.Is(err, ErrNot) && session.LockEnd == 0 {
 			// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
+			final = newmsg
 			break
 		}
 		if errors.Is(err, ErrNot) && session.LockEnd != 0 {
