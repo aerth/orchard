@@ -141,7 +141,13 @@ Chat:
 		}
 		// handle tools
 		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") {
+			errmsg := func(s string) chatmessages.ChatMessage {
+				cm := chatmessages.NewFromRole("", "system", "Error: you must use edit_file tool to use SELECT_FILE and other operators")
+				cm.Ephemeral = true
+				return *cm
+			}
 			stack = append(stack, errmsg("need to edit_file first"))
+			continue
 		}
 		if len(newcaller.ToolCalls) == 0 {
 			return nil
