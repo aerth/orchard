@@ -107,6 +107,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 				}
 			}
 			if err == nil {
+				slog.Info("WRITING FILE")
 				err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
 			}
 			if err == nil {
