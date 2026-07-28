@@ -17,6 +17,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"slices"
 	"strings"
 	"syscall"
 	"time"
@@ -176,14 +177,18 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			panic("no builtin tools")
 		}
 	}
-	if false { // runtime bash/python tools
+	if true { // runtime bash/python tools
 		builtinTools = nil
 		box, err := toolboxes.New("") // use env with toolboxes subdir
 		if err != nil {
 			return err
 		}
 		tools := box.AllTools()
-		builtinTools = append(builtinTools, tools...)
+		for _, v := range tools {
+			if !slices.Contains(builtinTools.Names(), v.GetName()) {
+				builtinTools = append(builtinTools, v)
+			}
+		}
 	}
 
 	var stack chatmessages.A
