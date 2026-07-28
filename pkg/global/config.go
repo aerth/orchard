@@ -145,6 +145,7 @@ type ConfigInput struct {
 	JsonOutput    bool
 	NoColor       bool
 	NoSpin        bool
+	SystemPrompt  string
 	Dir           string
 }
 type cfginput = ConfigInput
