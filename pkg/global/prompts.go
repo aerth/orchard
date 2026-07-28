@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -13,22 +14,38 @@ import (
 )
 
 func GetSystemBase(data any) string {
-	if s := Get().Get().SystemPrompt; s != "" {
-		if strings.Contains(s, " ") {
-			return s
-		}
-		b, err := os.ReadFile(s)
-		return s
+	var s string
+	if true {
+		s = Get().Get().SystemPrompt
 	}
-	tpl, err := template.New("").Funcs(mdloaders.FuncMap()).ParseFS(orchard.Embedded, "SYSTEM.md")
+	tpl := template.New("").Funcs(mdloaders.FuncMap())
+	var err error
+	name := "SYSTEM.md"
+	if s != "" {
+		name = filepath.Base(s)
+		slog.Info("loading system", "f", s)
+		tpl, err = tpl.ParseFiles(s)
+		if errors.Is(err, os.ErrNotExist) {
+			panic(err.Error())
+		}
+		if err != nil {
+			panic(err.Error())
+		}
+	} else {
+		tpl, err = tpl.ParseFS(orchard.Embedded, "SYSTEM.md")
+	}
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		panic("template SYSTEM.md failed: " + err.Error())
 	}
 	if err != nil {
+		slog.Warn("NO SYSTEM.md FOUND")
 		return "You are a helpful assistant who speaks only nadsat hacker slang. Keep it simple and quick replies only."
 	}
+	if tpl == nil {
+		panic("tpl is nil")
+	}
 	var buf strings.Builder
-	if err := tpl.ExecuteTemplate(&buf, "SYSTEM.md", data); err != nil {
+	if err := tpl.ExecuteTemplate(&buf, name, data); err != nil {
 		slog.Error("error executing template", "err", err)
 	}
 	pre := ""
