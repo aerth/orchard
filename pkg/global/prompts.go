@@ -14,6 +14,10 @@ import (
 
 func GetSystemBase(data any) string {
 	if s := Get().Get().SystemPrompt; s != "" {
+		if strings.Contains(s, " ") {
+			return s
+		}
+		b, err := os.ReadFile(s)
 		return s
 	}
 	tpl, err := template.New("").Funcs(mdloaders.FuncMap()).ParseFS(orchard.Embedded, "SYSTEM.md")
