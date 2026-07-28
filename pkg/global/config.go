@@ -1,6 +1,7 @@
 package global
 
 import (
+	"crypto/sha256"
 	"flag"
 	"fmt"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -175,6 +177,15 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
 	flag.Func("thread", "uuid", func(s string) error {
+		if s == "test" {
+			cfg.ThreadID = SingleThreadID
+		}
+		if strings.Count(s, "-") != 4 {
+
+			hashed := sha256.Sum256([]byte(s)) // 32
+			copy(cfg.ThreadID[:], hashed[:])   // 16
+			return nil
+		}
 		return cfg.ThreadID.UnmarshalText([]byte(s))
 	})
 	flag.StringVar(&cfg.Dir, "C", cfg.Dir, "change dir after loading stuff")
@@ -202,8 +213,8 @@ func DefaultConfigInput() ConfigInput {
 	if err != nil {
 		panic(err.Error())
 	}
-	//threadID := uuid.Nil // nostore
-	threadID := SingleThreadID // dummy testing
+	threadID := uuid.Nil // nostore
+	//threadID := SingleThreadID // dummy testing
 	if x := os.Getenv("ORCHARD_THREAD"); x != "" {
 		if err := threadID.UnmarshalText([]byte(x)); err != nil {
 			panic(err.Error())
@@ -224,9 +235,6 @@ func DefaultConfigInput() ConfigInput {
 	dir := "."
 	if d, err := filepath.Abs(dir); err == nil {
 		dir = d
-	}
-	if threadID == uuid.Nil {
-		panic("nil uuid")
 	}
 	noColor := os.Getenv("NO_COLOR") != "" || !isatty.IsTerminal(os.Stdout.Fd())
 	if !noColor {
