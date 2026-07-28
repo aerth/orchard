@@ -221,7 +221,11 @@ func (m Message) String() string {
 	if m.ToolName != "" {
 		return fmt.Sprintf("tool '%s' output: %s", m.ToolName, shorten(m.Content, 200, true))
 	}
-	return fmt.Sprintf("%s: %s", from, shorten(m.Content, 100, true))
+	return fmt.Sprintf("%s: %s", from, m.ShortContent())
+}
+
+func (m Message) ShortContent() string {
+	return shorten(m.Content, 100, true)
 }
 
 type (
@@ -238,7 +242,7 @@ func (tc ToolCalls) Value() (driver.Value, error) {
 }
 
 // Scan implements the sql.Scanner interface (for Reading from DB)
-func (tc *ToolCalls) Scan(value interface{}) error {
+func (tc *ToolCalls) Scan(value any) error {
 	if value == nil {
 		*tc = nil
 		return nil
