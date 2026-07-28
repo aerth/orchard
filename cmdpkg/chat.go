@@ -113,13 +113,13 @@ Chat:
 				slog.Warn("no summary found")
 			}
 		}
-		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
 		if errors.Is(err, context.Canceled) {
 			newcaller.Content += " (this reply was cancelled by user before it finished)"
 		}
+		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
 		stack = append(stack, *newcaller)
 		newcaller = &stack[len(stack)-1] // fix ptr
 		/*
