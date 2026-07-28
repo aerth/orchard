@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/aerth/mostly/stackerr"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -32,23 +33,22 @@ func NewPostgres(additionalMigrateTypes ...any) (*PostgresDBStore, error) {
 	diale := postgres.Open(os.Getenv("POSTGRES_DSN"))
 	gdb, err := gorm.Open(diale)
 	if err != nil {
-		slog.Error("opening postgres db", "err", err)
-		return nil, err
+		return nil, stackerr.Errorf("db open: %w", err)
 	}
 	db, err := gdb.DB() //sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("open db: %w", err)
+		return nil, stackerr.Errorf("open db: %w", err)
 	}
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("ping db: %w", err)
+		return nil, stackerr.Errorf("ping db: %w", err)
 	}
 	if len(additionalMigrateTypes) == 0 {
 		return &PostgresDBStore{db: gdb}, nil
 	}
-	slog.Debug("automigrations...", "types", typenames(additionalMigrateTypes...))
 	err = gdb.Migrator().AutoMigrate(additionalMigrateTypes...)
 	if err != nil {
-		return nil, err
+		slog.Warn("automigrations...", "types", typenames(additionalMigrateTypes...))
+		return nil, stackerr.Errorf("db automigrations: %w", err)
 	}
 	return &PostgresDBStore{db: gdb}, nil
 }
