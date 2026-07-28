@@ -18,7 +18,6 @@ import (
 	"m/pkg/otool"
 
 	"github.com/aerth/mostly/stackerr"
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 )
@@ -168,9 +167,6 @@ func Initialize(clearfirst *bool) (*global.Conf, error) {
 	if err != nil {
 		return nil, stackerr.Errorf("%w", err)
 	}
-	if conf.GetThreadID() == uuid.Nil {
-		return nil, stackerr.Errorf("thread id cannot be nil")
-	}
 	// set up logging
 	// log.Printf("Got config: %#v", conf)
 	if filename := conf.GetLogFilename(); filename != "" {
@@ -182,8 +178,7 @@ func Initialize(clearfirst *bool) (*global.Conf, error) {
 		global.LogWriter = f
 	}
 	InitLog().Set(slog.LevelDebug)
-	//	threads := map[uuid.UUID]bool{}
-	//	for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {
+	//	for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {}
 	return conf, nil
 }
 
