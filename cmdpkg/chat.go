@@ -7,6 +7,10 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+	"strings"
+	"time"
+
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/chat"
@@ -16,9 +20,6 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
-	"strings"
-	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -26,9 +27,8 @@ import (
 
 type EncoderFunc = func(v *chatmessages.ChatMessage) error
 
+// MasterSend if not nil, is used to 'finish' each message (assistant,system,tool)
 var MasterSend EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
-//	return nil
-//}
 
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
 	stack := stackInput
