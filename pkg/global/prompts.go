@@ -13,6 +13,9 @@ import (
 )
 
 func GetSystemBase(data any) string {
+	if s := Get().Get().SystemPrompt; s != "" {
+		return s
+	}
 	tpl, err := template.New("").Funcs(mdloaders.FuncMap()).ParseFS(orchard.Embedded, "SYSTEM.md")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		panic("template SYSTEM.md failed: " + err.Error())
