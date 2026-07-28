@@ -169,6 +169,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.HideToolCalls, "q", cfg.HideToolCalls, "hide tool call json chunks")
 	flag.BoolVar(&cfg.ShowRequests, "v", cfg.ShowRequests, "show requests in log")
 	flag.BoolVar(&cfg.ShowToolOuts, "show-toolouts", cfg.ShowToolOuts, "show tool output chunks")
+	flag.StringVar(&cfg.SystemPrompt, "system", cfg.SystemPrompt, "a string or path to filename")
 	flag.StringVar(&cfg.Logfilename, "logfile", cfg.Logfilename, "path to log file")
 	flag.BoolVar(&cfg.JsonOutput, "json", cfg.JsonOutput, "json output")
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
