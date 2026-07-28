@@ -108,9 +108,9 @@ Chat:
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
 			}
 			if summary, ok := newcaller.Summary.(string); ok {
-				global.LogWriter.Write([]byte("\n" + summary + "\n"))
-			} else {
-				global.LogWriter.Write([]byte("\n" + "NO SUMMARY FOUND" + "\n"))
+				_, _ = global.LogWriter.Write([]byte("\n" + summary + "\n"))
+			} else if err == nil {
+				slog.Warn("no summary found")
 			}
 		}
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
