@@ -106,4 +106,4 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 	return finishedtoolouts, nil
 }
 
-var AfterTool = func(ctx context.Context, cm *chatmessages.ChatMessage)
+var AfterTool = func(ctx context.Context, cm *chatmessages.ChatMessage) error { return nil }
