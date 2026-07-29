@@ -6,11 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
-	"slices"
-
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
+	"os"
+	"slices"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -33,6 +32,22 @@ type (
 		PreTools         func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error
 	}
 )
+
+// FromA (internal) combines variadic Exts into one
+func (e Ext) FromA(exts ...Ext) Ext {
+	temp := e
+	for i := range exts {
+		// appenders
+		temp.Handlers = append(temp.Handlers, exts[i].Handlers...)
+		temp.Append = append(temp.Append, exts[i].Append...)
+		temp.Prepend = append(temp.Prepend, exts[i].Prepend...)
+		// replacers
+		if exts[i].From != "" {
+			temp.From = exts[i].From
+		}
+	}
+	return temp
+}
 
 type (
 	Handlers = []ChatHandler
@@ -181,20 +196,4 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 		return stackerr.Errorf("%w", err)
 	}
 	return nil
-}
-
-// FromA (internal) combines variadic Exts into one
-func (e Ext) FromA(exts ...Ext) Ext {
-	temp := e
-	for i := range exts {
-		// appenders
-		temp.Handlers = append(temp.Handlers, exts[i].Handlers...)
-		temp.Append = append(temp.Append, exts[i].Append...)
-		temp.Prepend = append(temp.Prepend, exts[i].Prepend...)
-		// replacers
-		if exts[i].From != "" {
-			temp.From = exts[i].From
-		}
-	}
-	return temp
 }
