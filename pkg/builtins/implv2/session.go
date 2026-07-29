@@ -185,6 +185,8 @@ func (s *Session) RunAction(action Action) Result {
 		if r := s.Refresh(); r.E != nil {
 			return r
 		}
+		s.LockStart = 0
+		s.LockEnd = 0
 		return Result{Code: CodeNavigated}
 
 	case OpNextChunk:
