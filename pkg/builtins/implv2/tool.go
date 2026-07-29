@@ -139,7 +139,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 					}
 				}
 			}
-			if err == nil {
+			if ConfirmAction != nil {
 				err = ConfirmAction(ctx, "Lines: "+newmsg.Content)
 			}
 			if err == nil {
