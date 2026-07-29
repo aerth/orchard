@@ -10,9 +10,11 @@ import (
 	"m/pkg/global"
 )
 
+var NumConfirm = 2
+
 func Cheatcode(ctx context.Context, s string) error {
 	sctx := global.NewCancel(ctx)
-	for i := range 2 {
+	for i := range max(1, NumConfirm) {
 		slog.Warn("asking", "q", s)
 		println()
 		println()
