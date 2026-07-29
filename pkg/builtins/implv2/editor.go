@@ -47,9 +47,5 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 
 	s.Lines = updatedLines
 
-	// 3. Clear the lock coordinates immediately after a successful mutation
-	s.LockStart = 0
-	s.LockEnd = 0
-
 	return nil
 }
