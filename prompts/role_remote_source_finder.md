@@ -20,4 +20,5 @@ https://github.com/example/example/blob/master/services/service.js#L11-L13
 file:///path/to/bar.txt#L90-L95
 ```
 
-In the above example, 3 were
+In the above example, 3 were already on our filesystem and did not need the web at all.
+In one of the files, it referenced a library that the source was available on the web.
