@@ -153,7 +153,7 @@ Chat:
 			stack = append(stack, errmsg("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
 			continue
 		}
-		if len(newcaller.ToolCalls) == 0 {
+		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
 			return nil
 		}
 		//
