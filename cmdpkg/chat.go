@@ -7,6 +7,10 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+	"strings"
+	"time"
+
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/chat"
@@ -16,9 +20,6 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
-	"strings"
-	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -161,11 +162,11 @@ Chat:
 		if e.PreTools != nil {
 			err := e.PreTools(ctx, newcaller, names)
 			if err != nil {
-				errmsg := func(s string) chatmessages.ChatMessage {
-					cm := chatmessages.NewFromRole("", "system", "Error: you must use edit_file tool to use SELECT_FILE and other operators")
-					cm.Ephemeral = true
-					return *cm
-				}
+				/*			errmsg := func(s string) chatmessages.ChatMessage {
+							cm := chatmessages.NewFromRole("", "system", "Error: you must use edit_file tool to use SELECT_FILE and other operators")
+							cm.Ephemeral = true
+							return *cm
+						}*/
 				stack = append(stack, errmsg("need to edit_file first"))
 				continue
 			}
