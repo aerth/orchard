@@ -86,6 +86,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	rounds := 0
 	filesEdited := 0
 	for ctx.Err() == nil {
+		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
 		creq.Messages = stack.Raw()
 		tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
 		card = ""
