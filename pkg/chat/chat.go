@@ -6,33 +6,33 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
 	"os"
 	"slices"
+
+	"m/pkg/chatmessages"
+	"m/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )
 
-type (
-	ChatHandler = func(llm.ChatResponse) error
-	Ext         struct {
-		From     string    // From added to assistant/toolouts
-		ThreadID uuid.UUID // will be attached to all messages (generated assistant, tool results, system)
-		//
-		PreFunc          func(creq *llm.ChatRequest) error     // Called right before llm.Chat call, may be used to cancel
-		PostFunc         func(err error) error                 // should return nil
-		AfterGen         func(*chatmessages.ChatMessage) error // for toolouts/system (not generated assistant stream)
-		NonStreamHandler func(chatmessages.ChatMessage)        // for toolouts/system (not generated assistant stream)
-		PreTools         func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error
-		//
-		Prepend  []llm.Message    // prepended to messages (tmp)
-		Append   []llm.Message    // appended to messages (tmp)
-		Tools    []json.Marshaler // Tool specs available
-		Handlers []ChatHandler    // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
-	}
-)
+type ChatHandler = func(llm.ChatResponse) error
+
+type Ext struct {
+	From     string    // From added to assistant/toolouts
+	ThreadID uuid.UUID // will be attached to all messages (generated assistant, tool results, system)
+	//
+	PreFunc          func(creq *llm.ChatRequest) error     // Called right before llm.Chat call, may be used to cancel
+	PostFunc         func(err error) error                 // should return nil
+	AfterGen         func(*chatmessages.ChatMessage) error // for toolouts/system (not generated assistant stream)
+	NonStreamHandler func(chatmessages.ChatMessage)        // for toolouts/system (not generated assistant stream)
+	PreTools         func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error
+	//
+	Prepend  []llm.Message    // prepended to messages (tmp)
+	Append   []llm.Message    // appended to messages (tmp)
+	Tools    []json.Marshaler // Tool specs available
+	Handlers []ChatHandler    // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
+}
 
 // FromA (internal) combines variadic Exts into one
 func (e Ext) FromA(exts ...Ext) Ext {
