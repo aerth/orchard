@@ -67,6 +67,9 @@ func (e Ext) FromA(exts ...Ext) Ext {
 			temp.NonStreamHandler = exts[i].NonStreamHandler
 		}
 	}
+	if len(e.Tools) == 0 {
+		slog.Warn("no tools found")
+	}
 	return temp
 }
 
