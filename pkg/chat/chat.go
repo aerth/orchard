@@ -51,6 +51,9 @@ func (e Ext) FromA(exts ...Ext) Ext {
 		if len(exts[i].Tools) != 0 { // TODO: add?
 			temp.Tools = exts[i].Tools
 		}
+		if exts[i].PreTools != nil {
+			temp.PreTools = exts[i].PreTools
+		}
 	}
 	return temp
 }
