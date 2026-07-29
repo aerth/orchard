@@ -7,14 +7,15 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"os"
+	"strings"
+
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/toolrunner"
-	"os"
-	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	sitter "github.com/smacker/go-tree-sitter"
@@ -123,6 +124,10 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 			// target acquired
 			// TODO: count lines vs locked lines?
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
+			if err != nil {
+				errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
+				continue
+			}
 			if err == nil && !strings.HasSuffix(session.ActiveFile, ".txt") {
 				lang, langname, _ := getlang(session.ActiveFile)
 				if lang != nil {
