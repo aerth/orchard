@@ -411,7 +411,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	//	content = "\n```markdown\n" + content + "\n```\n"
 	//}
 	if content != "" && renderfunc != nil {
-		content += "\n\n---\n"
+		//		content += "\n\n---\n"
 		content, err = renderfunc(content, cm.GetMessageStyle())
 		if err != nil {
 			return err
