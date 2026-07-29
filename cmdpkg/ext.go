@@ -4,17 +4,16 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"m/pkg/global"
 	"os"
 	"os/exec"
-
-	"m/pkg/global"
 )
 
 var NumConfirm = 1
 
 func Cheatcode(ctx context.Context, s string) error {
 	sctx := global.NewCancel(ctx)
-	for i := range max(1, NumConfirm) {
+	for i := 1; i <= max(1, NumConfirm); i++ {
 		slog.Warn("asking", "q", s)
 		println()
 		println()
