@@ -241,8 +241,17 @@ func (t ToolCalls) Names() []string {
 				Name string `json:"name"`
 			} `json:"function"`
 		}{}
-		t[i].UnmarshalJSON(call)
+		if err := t[i].UnmarshalJSON(t[i], &call); err != nil {
+			a[i] = "ERROR"
+			continue
+		}
+		if call.Function.Name == "" {
+			a[i] = "MISSING"
+			continue
+		}
+		a[i] = call.Function.Name
 	}
+	return a
 }
 
 // Value implements the driver.Valuer interface (for Writing to DB)
