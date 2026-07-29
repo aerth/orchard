@@ -17,6 +17,7 @@ Example of 3 matches for a certain topic or keyword:
 file:///path/to/foo.txt#L110-L130
 file:///src/foo/bar.js#L110-L130
 https://github.com/example/example/blob/master/services/service.js#L11-L13
-file:///C:/path/to/bar.txt#L90-L95
+file:///path/to/bar.txt#L90-L95
 ```
 
+In the above example, 3 were
