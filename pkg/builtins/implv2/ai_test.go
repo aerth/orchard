@@ -104,11 +104,11 @@ func TestAi(t *testing.T) {
 				break
 			}
 			generated := chatmessages.NewFromRole("", "assistant", "")
-			for i := range creq.Messages[1 : len(creq.Messages)-1] {
-				if creq.Messages[i].Role == "system" && strings.Count(creq.Messages[i].Content, "\n") > 1 {
-					creq.Messages[i].Content = strings.Split(creq.Messages[i].Content, "\n")[0]
-				}
-			}
+			//		for i := range creq.Messages[1 : len(creq.Messages)-1] {
+			//			if creq.Messages[i].Role == "system" && strings.Count(creq.Messages[i].Content, "\n") > 1 {
+			//				creq.Messages[i].Content = strings.Split(creq.Messages[i].Content, "\n")[0]
+			//			}
+			//		}
 			msgs := creq.Messages
 			creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: session.SystemMessage()})
 			// CHAT
