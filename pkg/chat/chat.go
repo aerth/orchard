@@ -30,12 +30,9 @@ type (
 		Prepend          []llm.Message                         // prepended to messages (tmp)
 		Append           []llm.Message                         // appended to messages (tmp)
 		Tools            []json.Marshaler                      // Tool specs available
+		PreTools         func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error
 	}
 )
-
-func (e Ext) PreTools(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error {
-	return nil
-}
 
 type (
 	Handlers = []ChatHandler
