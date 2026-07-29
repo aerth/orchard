@@ -110,6 +110,7 @@ func TestAi(t *testing.T) {
 				}
 			}
 			msgs := creq.Messages
+			creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: session.SystemMessage()})
 			// CHAT
 			err = llm.New().Chat(t.Context(), creq, generated.GatherChatResponse)
 			creq.Messages = msgs
