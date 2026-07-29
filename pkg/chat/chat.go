@@ -26,15 +26,15 @@ type Ext struct {
 
 	PreFunc          func(creq *llm.ChatRequest) error     // Called right before llm.Chat call, may be used to cancel
 	PostFunc         func(err error) error                 // should return nil
+	Handlers         []ChatHandler                         // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
 	AfterGen         func(*chatmessages.ChatMessage) error // after generation is complete (assistant, toolcalls) for applying modifications or exit early
 	NonStreamHandler func(chatmessages.ChatMessage)        // for tool/system (not generated assistant stream)
 
 	PreTools func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error // for example, a confirmation, or whitelist
 
-	Prepend  []llm.Message    // prepended to messages (tmp)
-	Append   []llm.Message    // appended to messages (tmp)
-	Tools    []json.Marshaler // Tool specs available
-	Handlers []ChatHandler    // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
+	Prepend []llm.Message    // prepended to messages (tmp)
+	Append  []llm.Message    // appended to messages (tmp)
+	Tools   []json.Marshaler // Tool specs available
 }
 
 // FromA (internal) combines variadic Exts into one
