@@ -32,6 +32,7 @@ var MasterSend EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
 
 func errmsg(s string) chatmessages.ChatMessage {
 	cm := chatmessages.NewFromRole("", "system", s)
+	cm.ThreadID = global.Get().GetThreadID()
 	cm.Ephemeral = true
 	return *cm
 }
