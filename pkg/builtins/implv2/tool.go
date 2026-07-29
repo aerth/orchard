@@ -60,6 +60,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	// begin loop
 	var out chatmessages.A
 	session := Session{ActiveFile: path}
+	slog := slog.With("filename", path)
 	if e := session.Refresh().E; e != nil {
 		slog.Error("refresher error", "err", e)
 		return nil, stackerr.Errorf("%w", e)
