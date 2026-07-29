@@ -243,7 +243,13 @@ func (s *Session) RunAction(action Action) Result {
 			end = start
 		} else if len(parts) == 2 {
 			start, err = strconv.Atoi(parts[0])
+			if err != nil {
+				return Result{E: errors.New("invalid coordinate format: " + err.Error()), Code: CodeError}
+			}
 			end, err = strconv.Atoi(parts[1])
+			if err != nil {
+				return Result{E: errors.New("invalid coordinate format"), Code: CodeError}
+			}
 		} else {
 			return Result{E: errors.New("invalid coordinate format"), Code: CodeError}
 		}
