@@ -129,14 +129,13 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 				continue
 			}
 			// in memory still. check lint
-			if err == nil && !strings.HasSuffix(session.ActiveFile, ".txt") {
+			if !strings.HasSuffix(session.ActiveFile, ".txt") {
 				lang, langname, _ := getlang(session.ActiveFile)
 				if lang != nil {
 					err = ValidateFileSyntax(string(session.Current()), langname, lang)
 					if err != nil {
 						errmsg.Content = fmt.Sprintf("ValidateFileSyntax failed: %+v", err)
 						continue
-
 					}
 				}
 			}
