@@ -110,9 +110,7 @@ func TestAi(t *testing.T) {
 				}
 			}
 			msgs := creq.Messages
-			//		if testpass { // if previous round was written
-			//			_ = json.NewEncoder(os.Stderr).Encode(msgs)
-			//		}
+			// CHAT
 			err = llm.New().Chat(t.Context(), creq, generated.GatherChatResponse)
 			creq.Messages = msgs
 			if err != nil {
