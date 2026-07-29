@@ -18,6 +18,7 @@ import (
 
 type ChatHandler = func(llm.ChatResponse) error
 
+// Ext handles logic for the loop
 type Ext struct {
 	From     string    // From added to assistant/toolouts
 	ThreadID uuid.UUID // will be attached to all messages (generated assistant, tool results, system)
