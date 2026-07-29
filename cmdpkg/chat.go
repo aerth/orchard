@@ -167,7 +167,7 @@ Chat:
 							cm.Ephemeral = true
 							return *cm
 						}*/
-				stack = append(stack, errmsg("need to edit_file first"))
+				stack = append(stack, errmsg(err.Error()))
 				continue
 			}
 		}
