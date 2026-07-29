@@ -26,8 +26,8 @@ type Ext struct {
 
 	PreFunc          func(creq *llm.ChatRequest) error     // Called right before llm.Chat call, may be used to cancel
 	PostFunc         func(err error) error                 // should return nil
-	AfterGen         func(*chatmessages.ChatMessage) error // for toolouts/system (not generated assistant stream)
-	NonStreamHandler func(chatmessages.ChatMessage)        // for toolouts/system (not generated assistant stream)
+	AfterGen         func(*chatmessages.ChatMessage) error // after generation is complete (assistant, toolcalls)
+	NonStreamHandler func(chatmessages.ChatMessage)        // for tool/system (not generated assistant stream)
 
 	PreTools func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error // for example, a confirmation, or whitelist
 
