@@ -117,7 +117,7 @@ func TestAi(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			println(generated.Content)
+			println("OUT: " + generated.Content)
 			creq.Messages = append(creq.Messages, generated.Message)
 			actions, err := session.Parse(generated.Content)
 			if errors.Is(err, implv2.ErrNot) && session.LockEnd == 0 {
