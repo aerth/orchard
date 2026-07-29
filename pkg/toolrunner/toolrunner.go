@@ -93,6 +93,7 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 			if x[i].ToolName == "" || x[i].ToolCallID == "" {
 				slog.Warn("bad tool repair")
 			}
+			AfterTool(x[i])
 		}
 		finishedtoolouts = append(finishedtoolouts, x...)
 		if err != nil {
