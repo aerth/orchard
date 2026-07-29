@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -206,6 +205,14 @@ func (cm ChatMessages) Contents() string {
 }
 
 type ChatMessages []ChatMessage
+
+func (cm ChatMessages) FormatRolesFrom() []string {
+	a := make([]string, len(cm))
+	for i := range cm {
+		a[i] = cm[i].From
+	}
+	return a
+}
 
 func (cm ChatMessages) FormatRoles() []string {
 	a := make([]string, len(cm))
