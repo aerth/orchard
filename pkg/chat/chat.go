@@ -24,8 +24,12 @@ type Ext struct {
 	From     string    // From added to assistant/toolouts
 	ThreadID uuid.UUID // will be attached to all messages (generated assistant, tool results, system)
 
-	PreFunc  func(creq *llm.ChatRequest) error     // Called right before llm.Chat call, may be used to cancel
-	PostFunc func(err error) error                 // should return nil
+	// PreFunc current streaming output for DISPLAY
+	// Called right before llm.Chat call, may be used to cancel
+	PreFunc func(creq *llm.ChatRequest) error
+
+	// PostFunc should return nil
+	PostFunc func(err error) error
 	Handlers []ChatHandler                         // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
 	AfterGen func(*chatmessages.ChatMessage) error // after generation is complete (assistant, toolcalls) for applying modifications or exit early
 	// any toolouts or temporary system messages for DISPLAY
