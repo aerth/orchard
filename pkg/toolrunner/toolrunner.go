@@ -31,10 +31,6 @@ func Runtools(ctx context.Context, stack chatmessages.A, tools otool.Tools, call
 		ctx = context.WithValue(ctx, CtxTools, tools)
 	}
 	toolouts, err := realruntools(ctx, tools, caller)
-	for i := range toolouts {
-		toolouts[i].ThreadID = caller.ThreadID
-		toolouts[i].From = caller.From
-	}
 	return toolouts, err
 }
 
@@ -84,6 +80,9 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 			}
 			if x[i].Role != "tool" {
 				continue
+			}
+			if x[i].From == "" {
+				x[i].From = caller.From
 			}
 			if x[i].ToolName == "" {
 				x[i].ToolName = tool.Name
