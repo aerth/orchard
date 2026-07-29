@@ -48,7 +48,7 @@ func (e Ext) FromA(exts ...Ext) Ext {
 		if temp.ThreadID == uuid.Nil {
 			temp.ThreadID = exts[i].ThreadID
 		}
-		if len(exts[i].Tools) != 0 {
+		if len(exts[i].Tools) != 0 { // TODO: add?
 			temp.Tools = exts[i].Tools
 		}
 	}
