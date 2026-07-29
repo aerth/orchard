@@ -94,7 +94,7 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 				slog.Warn("bad tool repair")
 			}
 			if err := AfterTool(ctx, &x[i]); err != nil {
-				return finishedtoolouts, err
+				return finishedtoolouts, stackerr.Errorf("%w", err)
 			}
 		}
 		finishedtoolouts = append(finishedtoolouts, x...)
