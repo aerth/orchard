@@ -141,6 +141,8 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 			}
 			if ConfirmAction != nil {
 				err = ConfirmAction(ctx, "Lines: "+newmsg.Content)
+			} else {
+				slog.Warn("yolo edit mode?", "filename", session.ActiveFile)
 			}
 			if err == nil {
 				slog.Info("WRITING FILE")
