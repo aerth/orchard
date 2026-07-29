@@ -235,6 +235,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		}
 	}
 	e := chat.Ext{
+		PreTools: func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error {
+			return nil
+		},
 		ThreadID: threadID, NonStreamHandler: func(cm chatmessages.ChatMessage) {
 			if err = store.Add(ctx, threadID, &cm); err != nil {
 				slog.Warn("err", "err", err)
@@ -244,7 +247,8 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 				return err
 			}
 			return nil
-		}}
+		},
+	}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
 		return stackerr.Errorf("%w", err)
