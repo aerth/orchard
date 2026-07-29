@@ -62,7 +62,7 @@ var tcs = []TC{
 		Filename: "foo.py",
 		Prompt:   "edit the file: Fix the logic error in foo.py , function calculate_total to include the tax rate calculation.",
 		FileInp:  "def calculate_total(price, tax_rate):\n    return price\n",
-		FileOut:  "def calculate_total(price, tax_rate):\n    return price + (price * tax_rate)\n",
+		FileOut:  "def calculate_total(price, tax_rate):\n    return price * (1 + tax_rate)\n",
 	},
 
 	{
