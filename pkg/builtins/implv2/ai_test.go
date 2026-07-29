@@ -129,6 +129,7 @@ func TestAi(t *testing.T) {
 				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
 				if err != nil {
 					creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: fmt.Sprintf("The file edit failed: %+v", err)})
+					continue
 				}
 				if err == nil && !strings.HasSuffix(session.ActiveFile, ".txt") {
 					lang, langname, _ := getlang(session.ActiveFile)
