@@ -44,15 +44,13 @@ func (e Ext) FromA(exts ...Ext) Ext {
 		temp.Handlers = append(temp.Handlers, exts[i].Handlers...)
 		temp.Append = append(temp.Append, exts[i].Append...)
 		temp.Prepend = append(temp.Prepend, exts[i].Prepend...)
+		temp.Tools = append(temp.Tools, exts[i].Tools...)
 		// replacers
 		if exts[i].From != "" {
 			temp.From = exts[i].From
 		}
 		if temp.ThreadID == uuid.Nil {
 			temp.ThreadID = exts[i].ThreadID
-		}
-		if len(exts[i].Tools) != 0 { // TODO: add?
-			temp.Tools = exts[i].Tools
 		}
 		if exts[i].PreTools != nil {
 			temp.PreTools = exts[i].PreTools
