@@ -233,6 +233,18 @@ type (
 	ToolCalls []json.RawMessage
 )
 
+func (t ToolCalls) Names() []string {
+	a := make([]string, len(t))
+	for i := range t {
+		call := struct {
+			Function struct {
+				Name string `json:"name"`
+			} `json:"function"`
+		}{}
+		t[i].UnmarshalJSON(call)
+	}
+}
+
 // Value implements the driver.Valuer interface (for Writing to DB)
 func (tc ToolCalls) Value() (driver.Value, error) {
 	if tc == nil {
