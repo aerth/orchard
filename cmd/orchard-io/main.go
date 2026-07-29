@@ -234,16 +234,17 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			return enc.Encode(v)
 		}
 	}
-	e := chat.Ext{ThreadID: threadID, NonStreamHandler: func(cm chatmessages.ChatMessage) {
-		if err = store.Add(ctx, threadID, &cm); err != nil {
-			slog.Warn("err", "err", err)
-		}
-	}, AfterGen: func(cm *chatmessages.ChatMessage) error {
-		if err = store.Add(ctx, threadID, cm); err != nil {
-			return err
-		}
-		return nil
-	}}
+	e := chat.Ext{
+		ThreadID: threadID, NonStreamHandler: func(cm chatmessages.ChatMessage) {
+			if err = store.Add(ctx, threadID, &cm); err != nil {
+				slog.Warn("err", "err", err)
+			}
+		}, AfterGen: func(cm *chatmessages.ChatMessage) error {
+			if err = store.Add(ctx, threadID, cm); err != nil {
+				return err
+			}
+			return nil
+		}}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
 		return stackerr.Errorf("%w", err)
