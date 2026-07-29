@@ -133,6 +133,11 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 				lang, langname, _ := getlang(session.ActiveFile)
 				if lang != nil {
 					err = ValidateFileSyntax(string(session.Current()), langname, lang)
+					if err != nil {
+						errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
+						continue
+
+					}
 				}
 			}
 			if err == nil {
