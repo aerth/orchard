@@ -40,11 +40,13 @@ type Ext struct {
 func (e Ext) FromA(exts ...Ext) Ext {
 	temp := e
 	for i := range exts {
+
 		// appenders
 		temp.Handlers = append(temp.Handlers, exts[i].Handlers...)
 		temp.Append = append(temp.Append, exts[i].Append...)
 		temp.Prepend = append(temp.Prepend, exts[i].Prepend...)
 		temp.Tools = append(temp.Tools, exts[i].Tools...)
+
 		// replacers
 		if exts[i].From != "" {
 			temp.From = exts[i].From
