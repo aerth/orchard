@@ -30,6 +30,12 @@ type EncoderFunc = func(v *chatmessages.ChatMessage) error
 // MasterSend if not nil, is used to 'finish' each message (assistant,system,tool)
 var MasterSend EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
 
+func errmsg(s string) chatmessages.ChatMessage {
+	cm := chatmessages.NewFromRole("", "system", s)
+	cm.Ephemeral = true
+	return *cm
+}
+
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
 	stack := stackInput
 	showChar := false
@@ -143,11 +149,6 @@ Chat:
 		}
 		// handle tools
 		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") {
-			errmsg := func(s string) chatmessages.ChatMessage {
-				cm := chatmessages.NewFromRole("", "system", s)
-				cm.Ephemeral = true
-				return *cm
-			}
 			stack = append(stack, errmsg("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
 			continue
 		}
