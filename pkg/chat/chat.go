@@ -16,6 +16,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// ChatHandler would be called ChatStreamHandler but that is too long
 type ChatHandler = func(llm.ChatResponse) error
 
 // Ext handles logic for the loop
