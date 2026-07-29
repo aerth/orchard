@@ -159,6 +159,8 @@ Chat:
 		names := strings.Join(newcaller.ToolCalls.GetNames(), ",")
 		if e.PreTools != nil {
 			err := e.PreTools(ctx, newcaller, names)
+			if err != nil {
+			}
 		}
 		// if e.PreTool(ctx, )
 		// run the tool exec funcs
