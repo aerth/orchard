@@ -33,6 +33,10 @@ type (
 	}
 )
 
+func (e Ext) PreTools(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error {
+	return nil
+}
+
 type (
 	Handlers = []ChatHandler
 	Handler  = ChatHandler
