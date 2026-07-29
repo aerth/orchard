@@ -54,6 +54,9 @@ func (e Ext) FromA(exts ...Ext) Ext {
 		if exts[i].PreTools != nil {
 			temp.PreTools = exts[i].PreTools
 		}
+		if exts[i].NonStreamHandler != nil {
+			temp.NonStreamHandler = exts[i].NonStreamHandler
+		}
 	}
 	return temp
 }
