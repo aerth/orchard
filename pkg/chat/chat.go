@@ -54,6 +54,15 @@ func (e Ext) FromA(exts ...Ext) Ext {
 		if exts[i].PreTools != nil {
 			temp.PreTools = exts[i].PreTools
 		}
+		if exts[i].AfterGen != nil {
+			temp.AfterGen = exts[i].AfterGen
+		}
+		if exts[i].PreFunc != nil {
+			temp.PreFunc = exts[i].PreFunc
+		}
+		if exts[i].PostFunc != nil {
+			temp.PostFunc = exts[i].PostFunc
+		}
 		if exts[i].NonStreamHandler != nil {
 			temp.NonStreamHandler = exts[i].NonStreamHandler
 		}
