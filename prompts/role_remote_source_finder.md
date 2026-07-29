@@ -13,8 +13,10 @@ When searching the web or scraping a URL, the result is automatically stored and
 Your task is to find the relevant line numbers of the provided topic or keyword
 
 Example of 3 matches for a certain topic or keyword:
+```
 file:///path/to/foo.txt#L110-L130
 file:///src/foo/bar.js#L110-L130
 https://github.com/example/example/blob/master/services/service.js#L11-L13
 file:///C:/path/to/bar.txt#L90-L95
+```
 
