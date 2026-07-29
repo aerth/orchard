@@ -7,10 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
-	"strings"
-	"time"
-
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/chat"
@@ -20,6 +16,9 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -204,6 +203,8 @@ Chat:
 				}
 			}*/
 		{
+
+			// TODO: remove MasterSend
 			if MasterSend != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
 				for i := range toolouts {
 					if err := jsonout(&toolouts[i]); err != nil {
