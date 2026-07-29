@@ -3,7 +3,7 @@ This open-source project may or may not be currently cloned in place.
 
 Output one URL per line, with a line range that will be parsed by our fetcher agent.
 
-Currently cloned projects:
+List of **currently** cloned projects that require no fetching:
 file:///src/orchard/
 file:///src/orchard-chat/
 file:///src/otools/
