@@ -160,6 +160,13 @@ Chat:
 		if e.PreTools != nil {
 			err := e.PreTools(ctx, newcaller, names)
 			if err != nil {
+				errmsg := func(s string) chatmessages.ChatMessage {
+					cm := chatmessages.NewFromRole("", "system", "Error: you must use edit_file tool to use SELECT_FILE and other operators")
+					cm.Ephemeral = true
+					return *cm
+				}
+				stack = append(stack, errmsg("need to edit_file first"))
+				continue
 			}
 		}
 		// if e.PreTool(ctx, )
