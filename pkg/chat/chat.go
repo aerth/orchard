@@ -45,6 +45,9 @@ func (e Ext) FromA(exts ...Ext) Ext {
 		if exts[i].From != "" {
 			temp.From = exts[i].From
 		}
+		if temp.ThreadID == uuid.Nil {
+			temp.ThreadID = exts[i].ThreadID
+		}
 	}
 	return temp
 }
