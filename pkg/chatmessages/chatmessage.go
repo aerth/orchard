@@ -213,6 +213,9 @@ func (cm ChatMessages) FormatRolesFrom() []string {
 		if a[i] == "" || cm[i].Role == "tool" {
 			a[i] = cm[i].Role
 		}
+		if len(cm[i].ToolCalls) != 0 {
+			a[i] += " " + strings.Join(cm[i].ToolCalls.GetNames(), " ")
+		}
 	}
 	return a
 }
