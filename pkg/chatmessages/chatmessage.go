@@ -210,7 +210,7 @@ func (cm ChatMessages) FormatRolesFrom() []string {
 	a := make([]string, len(cm))
 	for i := range cm {
 		a[i] = cm[i].From
-		if a[i] == "" {
+		if a[i] == "" || cm[i].Role == "tool" {
 			a[i] = cm[i].Role
 		}
 	}
