@@ -20,6 +20,9 @@ https://github.com/example/example/blob/master/services/service.js#L11-L13
 file:///path/to/bar.txt#L90-L95
 ```
 
+Below is fake:
+
+
 In the above example, 3 were already on our filesystem and did not need the web at all.
 The third was found when referenced in a library. The source was available on the web.
 
@@ -27,6 +30,7 @@ The third was found when referenced in a library. The source was available on th
 Right now you have no tools. What tools do you require?
 
 Example topics: ["jellyfin server discovery", "linux kernel api changes"]
+
 
 ---
 
