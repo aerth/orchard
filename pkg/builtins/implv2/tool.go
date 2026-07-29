@@ -128,6 +128,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 				errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
 				continue
 			}
+			// in memory still
 			if err == nil && !strings.HasSuffix(session.ActiveFile, ".txt") {
 				lang, langname, _ := getlang(session.ActiveFile)
 				if lang != nil {
