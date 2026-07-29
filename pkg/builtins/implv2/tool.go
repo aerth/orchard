@@ -148,10 +148,8 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 			} else {
 				slog.Warn("yolo edit mode?", "filename", session.ActiveFile)
 			}
-			if err == nil {
-				slog.Info("WRITING FILE")
-				err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
-			}
+			slog.Info("WRITING FILE")
+			err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
 			if err == nil {
 				session.LockStart = 0
 				session.LockEnd = 0
