@@ -23,3 +23,7 @@ file:///path/to/bar.txt#L90-L95
 In the above example, 3 were already on our filesystem and did not need the web at all.
 The third was found when referenced in a library. The source was available on the web.
 
+
+Right now you have no tools. What tools do you require?
+
+Example topics: ["jellyfin server discovery", "linux kernel api changes"]
