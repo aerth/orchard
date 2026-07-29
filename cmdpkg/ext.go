@@ -10,7 +10,7 @@ import (
 	"m/pkg/global"
 )
 
-var NumConfirm = 2
+var NumConfirm = 1
 
 func Cheatcode(ctx context.Context, s string) error {
 	sctx := global.NewCancel(ctx)
