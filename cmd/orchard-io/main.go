@@ -236,7 +236,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 	e := chat.Ext{
 		PreTools: func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error {
-			if err := implv2.ConfirmAction(ctx, fmt.Sprintf("Requested tool call: %q", names))
+			if err := implv2.ConfirmAction(ctx, fmt.Sprintf("Requested tool call: %q\n\n```json\n%s```", names, string(newcaller.ToolCalls[0]))); err != nil {
+				return err
+			}
 			return nil
 		},
 		ThreadID: threadID, NonStreamHandler: func(cm chatmessages.ChatMessage) {
