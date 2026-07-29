@@ -233,15 +233,15 @@ type (
 	ToolCalls []json.RawMessage
 )
 
-func (t ToolCalls) Names() []string {
-	a := make([]string, len(t))
-	for i := range t {
+func (tc ToolCalls) GetNames() []string {
+	a := make([]string, len(tc))
+	for i := range tc {
 		call := struct {
 			Function struct {
 				Name string `json:"name"`
 			} `json:"function"`
 		}{}
-		if err := t[i].UnmarshalJSON(t[i], &call); err != nil {
+		if err := json.Unmarshal(tc[i], &call); err != nil {
 			a[i] = "ERROR"
 			continue
 		}
