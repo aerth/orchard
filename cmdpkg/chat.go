@@ -70,7 +70,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		cl = debugging.NewConsoleLogger(out, tw)
 	}
 	var err error
-	handlers := e.Handlers
+	handlers := append(e.Handlers, cl.HandleChatResponse)
 Chat:
 	for ctx.Err() == nil {
 		noStore := global.Get().Get().ThreadID == uuid.Nil
