@@ -14,9 +14,6 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	if i := slices.Index(replacementLines, "CANCEL"); i >= 0 {
 		return stackerr.Errorf("this edit was cancelled")
 	}
-	if i := slices.Index(replacementLines, "[EOF]"); i >= 0 {
-		replacementLines = replacementLines[:i]
-	}
 	for _, x := range eofs {
 		if i := slices.Index(replacementLines, x); i >= 0 {
 			replacementLines = replacementLines[:i]
