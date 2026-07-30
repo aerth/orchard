@@ -49,6 +49,9 @@ type ChatMessage struct {
 // FormatText in dialogue text format with no newline ending
 func (cm ChatMessage) FormatText(username string, botname string) string {
 	from := cm.FromName(username, botname)
+	if !strings.HasSuffix(cm.Content, "\n") {
+		cm.Content += "\n"
+	}
 	return fmt.Sprintf("%s: %s", from, cm.Content)
 }
 
