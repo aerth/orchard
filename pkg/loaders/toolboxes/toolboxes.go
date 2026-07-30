@@ -370,7 +370,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepat
 	if len(entries) > MaxToolboxes {
 		return nil, fmt.Errorf("too many toolboxes (%d) > %d", len(entries), MaxToolboxes)
 	}
-	log.Printf("Toolboxs: %q", entries)
+	log.Printf("Toolbox Directories: %q", entries)
 
 	for _, entry := range entries {
 		if !entry.IsDir() {
