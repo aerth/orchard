@@ -38,6 +38,10 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	updatedLines = append(updatedLines, s.Lines[endIdx:]...)
 
 	s.Lines = updatedLines
+	if l := len(s.Lines); l > endIdx {
+		s.LockStart = 0
+		s.LockEnd = 0
+	}
 
 	return nil
 }
