@@ -438,7 +438,9 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepat
 				Name: toolName,
 				Spec: specjs,
 			}.WithExec(execFn)
-			toolsMap[toolName] = orchTool
+			if _, already := toolsMap[toolName]; already {
+				toolsMap[toolName] = orchTool
+			}
 			orderedTools = append(orderedTools, toolName)
 		}
 
