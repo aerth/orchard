@@ -113,7 +113,7 @@ Chat:
 			*
 			 */
 			if cl != nil {
-				cl.Reset()
+				cl.Reset() // nice thinking colors
 			}
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			if spin != nil {
