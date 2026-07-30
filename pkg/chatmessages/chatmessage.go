@@ -143,6 +143,7 @@ func (cm ChatMessage) TableName() string {
 }
 
 func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
+	slog.Debug("GatherChatResponse", "cr", cr)
 	if cm == nil {
 		panic("GatherChatResponse for nil")
 	}
