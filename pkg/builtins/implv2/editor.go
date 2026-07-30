@@ -13,6 +13,8 @@ var ErrKeywordCancelled = errors.New("contains CANCEL")
 
 // ApplySurgicalEdit swaps out the locked coordinate range in memory.
 // It maps 1-based human line numbers directly to 0-based Go array indices.
+//
+// If error is nil, caller should handle reply messages and writing files.
 func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	if i := slices.Index(replacementLines, "CANCEL"); i >= 0 {
 		return stackerr.Errorf("%w", ErrKeywordCancelled)
