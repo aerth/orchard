@@ -72,7 +72,7 @@ var tcs = []TC{
 	},
 }
 
-// TestAi is lagging behind. see main.go
+// TestAi is lagging behind. see tool.go
 func TestAi(t *testing.T) {
 	t.Chdir(t.TempDir())
 	slices.Reverse(tcs)
