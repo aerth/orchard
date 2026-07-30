@@ -361,10 +361,10 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	if err != nil {
 		return nil, fmt.Errorf("basepath readdir: %w", err)
 	}
-	return NewToolboxEntries(basepath, entries)
+	return NewToolboxEntries(os.ReadDir, basepath, entries)
 }
 
-func NewToolboxEntries(basepath string, entries []fs.DirEntry) (*ToolboxManager, error) {
+func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepath string, entries []fs.DirEntry) (*ToolboxManager, error) {
 	var tbs Toolboxes
 
 	if len(entries) > MaxToolboxes {
