@@ -225,7 +225,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		errmsg.Content = fmt.Sprintf("The editing session (%q) has completed.Transcript: %s\n\nFinal:\n%s", path, x,
 			final.FormatMarkdownTry(nil, "", "Editor"))*/
-	errmsg.Content = fmt.Sprintf("")
+	errmsg.Content = fmt.Sprintf("Transcript of editor session:\n%s", stack[startstacklen:].FormatText("", "Editor"))
 	out = append(out, *chatmessages.New(errmsg))
 	slog.Info("editor returning messages", "n", len(out))
 	return out, nil
