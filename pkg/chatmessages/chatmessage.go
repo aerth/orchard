@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -362,7 +363,7 @@ func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botna
 		slog.Error("error formating markdown msg", "err", err)
 		return got + " (ERROR: formatting markdown failed)"
 	}
-	slog.Info("got rendered", "got", got)
+	//slog.Info("got rendered", "got", got)
 	return got
 }
 
