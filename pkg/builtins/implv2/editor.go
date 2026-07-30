@@ -1,12 +1,15 @@
 package implv2
 
 import (
+	"errors"
 	"slices"
 
 	"github.com/aerth/mostly/stackerr"
 )
 
 var eofs = []string{"----------------------------------"}
+
+var ErrKeywordCancelled = errors.New("contains CANCEL")
 
 // ApplySurgicalEdit swaps out the locked coordinate range in memory.
 // It maps 1-based human line numbers directly to 0-based Go array indices.
