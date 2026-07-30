@@ -28,7 +28,8 @@ import (
 )
 
 type haspath struct {
-	Path string `json:"path"`
+	Path   string `json:"path,omitempty"`
+	Intent string `json:"intent,omitempty"`
 }
 
 var AskBeforeWriting = false
