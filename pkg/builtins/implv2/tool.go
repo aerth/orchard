@@ -7,9 +7,6 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-	"os"
-	"strings"
-
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
@@ -17,6 +14,8 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"os"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -110,9 +109,13 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	if startstacklen == 0 {
 		return nil, fmt.Errorf("no conversation memory")
 	}
-	stack = append(stack, chatmessages.A{
-		*chatmessages.NewSystemEphemeral(SystemInstruction() + "\n\n# Intent\n" + intent), // global no state
-	}...)
+	{
+		m1 := *chatmessages.NewSystemEphemeral(SystemInstruction() + "\n\n# Intent\n" + intent) // global no state
+		m1.ThreadID = threadID
+		stack = append(stack, chatmessages.A{
+			m1,
+		}...)
+	}
 	//e := chat.Ext{
 	//	NonStreamHandler: func(cm chatmessages.ChatMessage) {
 	//	}
