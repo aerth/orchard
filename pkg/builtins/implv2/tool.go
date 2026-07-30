@@ -263,8 +263,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		errmsg.Content = fmt.Sprintf("The editing session (%q) has completed.Transcript: %s\n\nFinal:\n%s", path, x,
 			final.FormatMarkdownTry(nil, "", "Editor"))*/
-	errmsg.Content = fmt.Sprintf("## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords found: %q\n\nMost recent file view:\n\n```\n%s```\n", stack[startstacklen:].FormatText("", ""), operators, session.CurrentView())
-	outmsg1 := *chatmessages.New(errmsg)
+
+	toolout := llm.Message{Role: "tool", Content: fmt.Sprintf("## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords found: %q\n\nMost recent file view:\n\n```\n%s```\n", stack[startstacklen:].FormatText("", ""), operators, session.CurrentView())}
+	outmsg1 := *chatmessages.New(toolout)
 	outmsg1.ThreadID = threadID
 	outmsgs = append(outmsgs, outmsg1)
 	slog.Info("editor returning messages", "n", len(outmsgs))
