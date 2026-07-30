@@ -355,6 +355,7 @@ func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botna
 		slog.Error("error formating markdown msg", "err", err)
 		return got + " (ERROR: formatting markdown failed)"
 	}
+	slog.Info("got rendered", "got", got)
 	return got
 }
 
