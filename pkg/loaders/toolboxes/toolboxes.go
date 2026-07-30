@@ -407,7 +407,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepat
 			scriptFilename := subEntry.Name()
 			toolName := strings.TrimSuffix(scriptFilename, ".py")
 			toolName = strings.TrimSuffix(toolName, ".bash")
-			slog.Info("creating toolbox tool", "box", subDirName, "name", toolName)
+			slog.Info("creating toolbox tool", "box", subDirName, "name", toolName, "file", scriptFilename)
 			pyFilePath := filepath.Join(subDirPath, scriptFilename)
 
 			contentBytes, err := os.ReadFile(pyFilePath)
