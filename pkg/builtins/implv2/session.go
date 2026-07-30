@@ -18,6 +18,8 @@ type Session struct {
 	// Lock bounds (1-based line numbers)
 	LockStart int
 	LockEnd   int
+
+	Intent string
 }
 
 func (s Session) CurrentView() string {
