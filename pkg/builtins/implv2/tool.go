@@ -149,6 +149,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		if x, ok := handler.(interface {
 			BeginStream() error
 		}); ok {
+			slog.Info("BeginStream")
 			if err := x.BeginStream(); err != nil {
 				return nil, err
 			}
