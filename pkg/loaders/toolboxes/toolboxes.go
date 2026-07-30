@@ -360,7 +360,7 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	if err != nil {
 		return nil, fmt.Errorf("basepath readdir: %w", err)
 	}
-	return NewToolboxEntries(entries)
+	return NewToolboxEntries(basepath, entries)
 }
 
 func NewToolboxEntries(basepath string, entries []os.DirEntry) (*ToolboxManager, error) {
