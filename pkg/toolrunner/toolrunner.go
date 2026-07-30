@@ -19,6 +19,7 @@ var ErrFatalToolResult = errors.New("unrecoverable error")
 const (
 	CtxStack cx = "messages stack"
 	CtxTools cx = "tools" // for other tools to call other tools
+	CtxExt   cx = "ext"   // for other tools to call other tools
 )
 
 type cx string
