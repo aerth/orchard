@@ -456,14 +456,17 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			slog.Info("added tool", "box", subDirName, "tool", toolName)
 		}
 
-		if len(toolsMap) > 0 {
-			slices.Sort(alphabeticalToolnames)
-			tbs = append(tbs, Toolbox{
-				Name:    subDirName,
-				Ordered: alphabeticalToolnames,
-				Tools:   toolsMap,
-			})
+		if len(toolsMap) == 0 {
+			slog.Warn("no tools in map", "box", subDirName)
+			continue
 		}
+		slog.Info("adding toolbox", "box", subDirName, "tools", len(toolsMap))
+		slices.Sort(alphabeticalToolnames)
+		tbs = append(tbs, Toolbox{
+			Name:    subDirName,
+			Ordered: alphabeticalToolnames,
+			Tools:   toolsMap,
+		})
 	}
 
 	// Sort toolboxes by Name for stability
