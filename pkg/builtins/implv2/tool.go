@@ -33,7 +33,7 @@ type haspath struct {
 }
 
 var (
-	GetHandler = func() chat.Handler { return nil }
+	GetHandler = func() chat.ChatHandlerPlus { return nil }
 	GetSender  = func(Result) {}
 	PreFunc    = func() {}
 )
@@ -108,6 +108,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	cl := debugging.NewConsoleLogger(global.LogWriter, global.LogWriter)
 	rounds := 0
 	filesEdited := 0
+	handler := GetHandler()
 	for ctx.Err() == nil {
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
 		creq.Messages = stack.Raw()
@@ -122,9 +123,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		newmsg := chatmessages.NewFromRole("", "assistant", "")
 		handlers := []chat.Handler{cl.HandleChatResponse, newmsg.GatherChatResponse}
-		handler := GetHandler()
 		if handler != nil {
-			handlers = append(handlers, handler)
+			handlers = append(handlers, handler.Handle)
 		}
 		if e.Ext.PreFunc != nil {
 			if err := e.Ext.PreFunc(creq); err != nil {
