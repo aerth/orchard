@@ -81,6 +81,10 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		errmsg.Content = "Error: path required"
 		return chatmessages.A{*chatmessages.New(errmsg)}, nil
 	}
+	if len(intent) < 10 {
+		errmsg.Content = "Error: intent should be descriptive"
+		return chatmessages.A{*chatmessages.New(errmsg)}, nil
+	}
 
 	// begin loop
 	var out chatmessages.A
