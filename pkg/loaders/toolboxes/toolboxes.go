@@ -415,7 +415,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			pyFilePath := filepath.Join(subDirPath, scriptFilename)
 			slog.Info("creating toolbox tool", "box", subDirName, "name", toolName, "file", pyFilePath, "name", scriptFilename)
 
-			contentBytes, err := os.ReadFile(pyFilePath)
+			contentBytes, err := readFile(pyFilePath)
 			if err != nil {
 				slog.Warn("could not read file", "path", pyFilePath, "err", err)
 				continue
