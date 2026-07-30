@@ -159,7 +159,7 @@ func (s *Session) Peek(content string) error {
 }
 
 func (s *Session) Parse(content string) ([]Action, error) {
-	return OutputParser(content)
+	acts, err := OutputParser(content)
 }
 
 func (s *Session) Refresh() Result {
