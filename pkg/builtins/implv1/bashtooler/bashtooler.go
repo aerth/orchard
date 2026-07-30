@@ -7,12 +7,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/global"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
-
-	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -93,7 +92,10 @@ func RunBashScript(ctx context.Context, stdinReal io.Reader, params RunParams) (
 	if strings.TrimSpace(buf.String()) == "" {
 		buf.WriteString("(no output)")
 	}
-	x := fmt.Sprintf("\nrun_bash exit code: %d", cmd.ProcessState.ExitCode())
+	var x string
+	if code := cmd.ProcessState.ExitCode(); code != 0 {
+		x = fmt.Sprintf("\nrun_bash exit code: %d", cmd.ProcessState.ExitCode())
+	}
 	//if EchoBash {
 	//	println(buf.String())
 	//}
