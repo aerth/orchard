@@ -187,6 +187,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			if err != nil {
 				errmsg := chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 				errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
+				stack = append(stack, errmsg)
 				continue
 			}
 			// in memory still. check lint
