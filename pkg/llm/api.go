@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
@@ -18,8 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -307,6 +306,16 @@ type Message9 struct {
 	Content   string
 	ToolCalls []json.RawMessage
 }
+type ChatResponses []ChatResponse
+
+func (c ChatResponses) String() string {
+	a := make([]string, len(c))
+	for i := range c {
+		a[i] = c.String()
+	}
+	return strings.Join(a, ",")
+}
+
 type ChatResponse struct {
 	// Model is the model name that generated the response.
 	Model string `json:"model"`
@@ -336,6 +345,14 @@ type ChatResponse struct {
 	// Logprobs []Logprob `json:"logprobs,omitempty"`
 
 	Metrics
+}
+
+func (c ChatResponse) String() string {
+	done := ""
+	if c.Done {
+		done = "done-"
+	}
+	return fmt.Sprintf("cr-%s%s", done, c.Message.String())
 }
 
 type Metrics struct {
