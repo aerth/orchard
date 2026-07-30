@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
-
 	"m/pkg/global"
 	"m/pkg/llm"
+	"os"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -129,7 +128,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 			}
 			c.emode = xCONTENT
 		}
-		_, err := fmt.Fprintf(w, "%s", m.Content)
+		_, err := fmt.Fprintf(w, "%s\n", m.Content)
 		if err != nil {
 			return stackerr.Errorf("%w", err)
 		}
