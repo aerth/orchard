@@ -185,6 +185,7 @@ Chat:
 		}
 		// if e.PreTool(ctx, )
 		// run the tool exec funcs
+		ctx = context.WithValue(ctx, toolrunner.CtxExt, e)
 		toolouts, err := toolrunner.Runtools(ctx, stack, tools, *newcaller)
 		{
 			slog.Info("finished running tool calls",
