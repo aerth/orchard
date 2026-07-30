@@ -139,7 +139,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		creq.Messages = stack.Raw()
 		tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
 		card = ""
-		log.Printf("%s", tmpmsg)
+		log.Printf("TMEPMSG:\n%s", tmpmsg)
 		creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: tmpmsg})
 		newmsg := chatmessages.NewFromRole("editor_agent", "assistant", "")
 		newmsg.ThreadID = threadID
