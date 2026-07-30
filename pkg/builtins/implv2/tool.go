@@ -116,7 +116,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		card = ""
 		log.Printf("%s", tmpmsg)
 		creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: tmpmsg})
-		for i := range creq.Messages[1+startstacklen : len(creq.Messages)-1] {
+		for i := range creq.Messages[1+startstacklen : len(creq.Messages)] {
 			if creq.Messages[i].Role == "system" && strings.Count(creq.Messages[i].Content, "\n") > 1 {
 				creq.Messages[i].Content = strings.Split(creq.Messages[i].Content, "\n")[0]
 			}
