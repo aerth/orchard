@@ -407,6 +407,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepat
 
 			contentBytes, err := os.ReadFile(pyFilePath)
 			if err != nil {
+				slog.Warn("could not read file", "path", pyFilePath, "err", err)
 				continue
 			}
 
