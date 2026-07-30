@@ -228,6 +228,11 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	return out, nil
 }
 
+func NewResultMessage(resp Result) chatmessages.ChatMessage {
+	msg := *chatmessages.NewAux(resp)
+	return msg
+}
+
 var ConfirmAction = func(ctx context.Context, s string) error {
 	return fmt.Errorf("there is no ConfirmAction function provided")
 }
