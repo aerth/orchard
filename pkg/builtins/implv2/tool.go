@@ -71,7 +71,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	path := call.Function.Arguments.Path
 
 	errmsg := llm.Message{
-		Role:     "tool",
+		Role:     "system",
 		Content:  "no output",
 		ToolName: "edit_file", ToolCallID: caller.ToolCallID,
 	}
