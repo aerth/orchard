@@ -368,7 +368,7 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	return NewToolboxEntries(os.ReadDir, os.ReadFile, basepath, entries)
 }
 
-func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepath string, entries []fs.DirEntry) (*ToolboxManager, error) {
+func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFile func(name string) ([]byte, error), basepath string, entries []fs.DirEntry) (*ToolboxManager, error) {
 	var tbs Toolboxes
 
 	if len(entries) > MaxToolboxes {
