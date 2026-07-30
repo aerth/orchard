@@ -3,6 +3,7 @@ package implv2
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
 	"strings"
@@ -160,6 +161,10 @@ func (s *Session) Peek(content string) error {
 
 func (s *Session) Parse(content string) ([]Action, error) {
 	acts, err := OutputParser(content)
+	if len(acts) > 1 {
+		slog.Info("found multiple actions", "n", len(acts))
+	}
+	return acts, err
 }
 
 func (s *Session) Refresh() Result {
