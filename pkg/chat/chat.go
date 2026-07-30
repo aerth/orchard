@@ -6,11 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
-	"slices"
-
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
+	"os"
+	"slices"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -27,7 +26,6 @@ type Ext struct {
 	// PreFunc current streaming output for DISPLAY
 	// Called right before llm.Chat call, may be used to cancel
 	PreFunc func(creq *llm.ChatRequest) error
-
 	// PostFunc should return nil
 	PostFunc func(err error) error
 	Handlers []ChatHandler                         // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
