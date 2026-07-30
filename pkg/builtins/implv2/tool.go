@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"os"
+	"strings"
+
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
@@ -14,8 +17,6 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
-	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	sitter "github.com/smacker/go-tree-sitter"
@@ -41,6 +42,7 @@ func (h haspath) IsToolArgument() {}
 
 type EditorTool struct {
 	session *Session
+	Ext     chat.Ext
 }
 
 func NewEditTool() *EditorTool {
