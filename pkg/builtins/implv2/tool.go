@@ -185,6 +185,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			// TODO: count lines vs locked lines?
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
 			if err != nil {
+				errmsg := chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 				errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
 				continue
 			}
@@ -194,6 +195,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				if lang != nil {
 					err = ValidateFileSyntax(string(session.Current()), langname, lang)
 					if err != nil {
+						errmsg := chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 						errmsg.Content = fmt.Sprintf("ValidateFileSyntax failed: %+v", err)
 						continue
 					}
@@ -202,6 +204,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			if ConfirmAction != nil && AskBeforeWriting {
 				err = ConfirmAction(ctx, "EDDITOR EDITING Lines: "+newmsg.Content)
 				if err != nil {
+					errmsg := chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 					errmsg.Content = fmt.Sprintf("ConfirmAction failed: %+v", err)
 					continue
 				}
