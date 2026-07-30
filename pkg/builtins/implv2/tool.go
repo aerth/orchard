@@ -104,7 +104,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	var operators []string
 	creq := llm.NewChatRequest()
 	var card string
-	var final *chatmessages.ChatMessage
 	cl := debugging.NewConsoleLogger(global.LogWriter, global.LogWriter)
 	rounds := 0
 	numberFilesEdited := 0
@@ -121,7 +120,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				creq.Messages[i].Content = strings.Split(creq.Messages[i].Content, "\n")[0]
 			}
 		}
-		newmsg := chatmessages.NewFromRole("", "assistant", "")
+		newmsg := chatmessages.NewFromRole("Editor", "assistant", "")
 		handlers := []chat.Handler{cl.HandleChatResponse, newmsg.GatherChatResponse}
 		if handler != nil {
 			handlers = append(handlers, handler.Handle)
@@ -147,7 +146,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		if rounds != 0 && errors.Is(err, ErrNot) && session.LockEnd == 0 {
 			// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
 			slog.Info("Finished editing")
-			final = newmsg
 			break
 		}
 		if errors.Is(err, ErrNot) && session.LockEnd != 0 {
