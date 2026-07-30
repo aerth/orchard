@@ -93,7 +93,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	}
 
 	// begin loop
-	var out chatmessages.A
+	var outmsgs chatmessages.A
 	session := Session{ActiveFile: path, Intent: intent}
 	slog := slog.With("filename", path)
 	if e := session.Refresh().E; e != nil {
@@ -254,7 +254,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		errmsg.Content = fmt.Sprintf("The editing session (%q) has completed.Transcript: %s\n\nFinal:\n%s", path, x,
 			final.FormatMarkdownTry(nil, "", "Editor"))*/
 	errmsg.Content = fmt.Sprintf("## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords found: %q\n\nMost recent file view:\n\n```\n%s```\n", stack[startstacklen:].FormatText("", ""), operators, session.CurrentView())
-	out = append(out, *chatmessages.New(errmsg))
+	outmsg := *chatmessages.New(errmsg)
+	out = append(out)
 	slog.Info("editor returning messages", "n", len(out))
 	return out, nil
 }
