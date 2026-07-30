@@ -47,7 +47,7 @@
       "type": "object",
       "properties": {
         "path": { "type": "string" },
-		"intent": { "type": "string", "description": "detailed, clear plan for this file-editing session"}
+		"intent": { "type": "string", "description": "detailed, clear plan for this file-editing session to be parsed by the Editor Agent"}
       }
     }
   },
