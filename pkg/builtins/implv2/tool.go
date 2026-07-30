@@ -52,7 +52,7 @@ func NewEditTool() *EditorTool {
 	return edit
 }
 
-func (s *Session) EditTool() otool.Tool {
+func (s *Session) EditTool() otool.ExecFunc {
 	return s.editor.EditTool
 }
 
