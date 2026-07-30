@@ -411,7 +411,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepat
 				continue
 			}
 
-			slog.Info("creating toolbox tool", "name", toolName)
+			slog.Info("creating toolbox tool", "box", tb, "name", toolName)
 			description, params, requiredParamNames := parsePythonMetadata(pyFilePath, string(contentBytes))
 			if description == "" {
 				description = "Executes " + toolName
