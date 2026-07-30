@@ -393,7 +393,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepat
 		}
 
 		toolsMap := make(map[string]AnyTool)
-		var orderedToolNames []string
+		var alphabeticalToolnames []string
 
 		for _, subEntry := range subEntries {
 			if subEntry.IsDir() || (!strings.HasSuffix(subEntry.Name(), ".py") && !strings.HasSuffix(subEntry.Name(), ".bash")) {
@@ -441,14 +441,14 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepat
 			if _, already := toolsMap[toolName]; already {
 				toolsMap[toolName] = orchTool
 			}
-			orderedToolNames = append(orderedToolNames, toolName)
+			alphabeticalToolnames = append(alphabeticalToolnames, toolName)
 		}
 
 		if len(toolsMap) > 0 {
-			slices.Sort(orderedToolNames)
+			slices.Sort(alphabeticalToolnames)
 			tbs = append(tbs, Toolbox{
 				Name:    subDirName,
-				Ordered: orderedToolNames,
+				Ordered: alphabeticalToolnames,
 				Tools:   toolsMap,
 			})
 		}
