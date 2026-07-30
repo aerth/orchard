@@ -6,10 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
 	"os"
 	"slices"
+
+	"m/pkg/chatmessages"
+	"m/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -73,9 +74,6 @@ func (e Ext) FromA(exts ...Ext) Ext {
 		if exts[i].NonStreamHandler != nil {
 			temp.NonStreamHandler = exts[i].NonStreamHandler
 		}
-	}
-	if len(e.Tools) == 0 {
-		slog.Warn("no tools found")
 	}
 	return temp
 }
