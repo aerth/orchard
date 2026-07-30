@@ -7,8 +7,6 @@ import (
 	"github.com/aerth/mostly/stackerr"
 )
 
-var eofs = []string{"----------------------------------"}
-
 var ErrKeywordCancelled = errors.New("contains CANCEL")
 
 // ApplySurgicalEdit swaps out the locked coordinate range in memory.
@@ -18,11 +16,6 @@ var ErrKeywordCancelled = errors.New("contains CANCEL")
 func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	if i := slices.Index(replacementLines, "CANCEL"); i >= 0 {
 		return stackerr.Errorf("%w", ErrKeywordCancelled)
-	}
-	for _, x := range eofs {
-		if i := slices.Index(replacementLines, x); i >= 0 {
-			replacementLines = replacementLines[:i]
-		}
 	}
 	if len(replacementLines) == 0 {
 		return stackerr.Errorf("no replacement lines")
