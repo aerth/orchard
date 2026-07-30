@@ -107,7 +107,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	var final *chatmessages.ChatMessage
 	cl := debugging.NewConsoleLogger(global.LogWriter, global.LogWriter)
 	rounds := 0
-	filesEdited := 0
+	numberFilesEdited := 0
 	handler := GetHandler()
 	for ctx.Err() == nil {
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
@@ -189,6 +189,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				}))
 				break
 			}
+			numberFilesEdited++
 
 		}
 		if err != nil {
@@ -216,7 +217,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	}
 
 	x := jsonstring(operators)
-	x += fmt.Sprintf("files edited: %d", filesEdited)
+	x += fmt.Sprintf("files edited: %d", numberFilesEdited)
 	if final == nil {
 		y := stack.Top()
 		final = &y
