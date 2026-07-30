@@ -46,6 +46,8 @@ func NewEditTool() *EditorTool {
 }
 
 func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+}
+
 func (*EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	// begin loop
 
