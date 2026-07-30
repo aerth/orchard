@@ -149,6 +149,10 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	}
 	if !cm.Ephemeral {
 		slog.Debug("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo())
+	} else if true { // debug
+		if cr.Message.Content != "" {
+			cr.Message.Content = strings.ToUpper(cr.Message.Content)
+		}
 	}
 	if cr.Message.Role != "" {
 		cm.Role = cr.Message.Role
