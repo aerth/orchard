@@ -78,18 +78,20 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		threadID = global.Get().Get().ThreadID
 	}
 
-	errmsg := llm.Message{
-		Role:     "system",
-		Content:  "no output",
-		ToolName: "edit_file", ToolCallID: caller.ToolCallID,
-	}
-	if path == "" {
-		errmsg.Content = "Error: path required"
-		return chatmessages.A{*chatmessages.New(errmsg)}, nil
-	}
-	if len(intent) < 10 {
-		errmsg.Content = "Error: intent should be descriptive"
-		return chatmessages.A{*chatmessages.New(errmsg)}, nil
+	{
+		errmsg := llm.Message{
+			Role:     "system",
+			Content:  "no output",
+			ToolName: "edit_file", ToolCallID: caller.ToolCallID,
+		}
+		if path == "" {
+			errmsg.Content = "Error: path required"
+			return chatmessages.A{*chatmessages.New(errmsg)}, nil
+		}
+		if len(intent) < 10 {
+			errmsg.Content = "Error: intent should be descriptive"
+			return chatmessages.A{*chatmessages.New(errmsg)}, nil
+		}
 	}
 
 	// begin loop
