@@ -90,6 +90,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		return nil, stackerr.Errorf("%w", e)
 	}
 	stack, _ := ctx.Value(toolrunner.CtxStack).(chatmessages.ChatMessages)
+	if l := len(stack); l > 4 {
+		stack = stack[l-4:]
+	}
 	startstacklen := len(stack)
 	if startstacklen == 0 {
 		return nil, fmt.Errorf("no conversation memory")
