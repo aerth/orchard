@@ -7,10 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
-	"strings"
-	"time"
-
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/chat"
@@ -20,6 +16,9 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -227,7 +226,7 @@ Chat:
 			}
 			if e.NonStreamHandler != nil {
 				for i := range toolouts {
-					e.NonStreamHandler(toolouts[i])
+					e.NonStreamHandler(toolouts[i]) // should handle a tool output similar to generated, such as displaying it
 				}
 			}
 			if !conf.IsHideToolOuts() && jsonout == nil {
