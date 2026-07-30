@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"log/slog"
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
@@ -56,11 +57,11 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		var out io.Writer = os.Stdout
 		if MasterSend != nil {
 			slog.Info("using MasterSend")
-			out = io.Discard
+			out = log.Writer()
 			tw = io.Discard
 			jsonout = MasterSend
 		} else if conf.Get().JsonOutput {
-			out = io.Discard
+			out = log.Writer()
 			tw = io.Discard
 			enc := json.NewEncoder(os.Stdout).Encode
 			jsonout = func(v *chatmessages.ChatMessage) error {
