@@ -110,6 +110,11 @@ Chat:
 			}
 			e.Handlers = append(hh, handlers...)
 			//	handl := []llm.ChatStreamHandlerFunc{ cl.HandleChatResponse, newcaller.GatherChatResponse}
+
+			/*
+			* CHAT LLM GENERATE
+			*
+			 */
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
