@@ -179,10 +179,10 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 		if strings.HasSuffix(pyFilePath, ".py") {
 			slog.Info("executing python", "file", pyFilePath, "args", execArgs)
 			//		return nil, fmt.Errorf("uhoh, we disabled python")
-			outputMessage, err = bashtooler.RunPy(ctx, ".", pyFilePath, execArgs...)
+			outputMessage, err = bashtooler.RunPy(ctx, ".", readFile, pyFilePath, execArgs...)
 		} else if strings.HasSuffix(pyFilePath, ".bash") {
 			slog.Info("executing bash", "file", pyFilePath, "args", execArgs)
-			outputMessage, err = bashtooler.RunBash(ctx, ".", pyFilePath, execArgs...)
+			outputMessage, err = bashtooler.RunBash(ctx, ".", readFile, pyFilePath, execArgs...)
 		}
 		if err != nil {
 			return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", fmt.Sprintf("Error running tool script %q: %s", pyFilePath, err.Error()))}, nil
