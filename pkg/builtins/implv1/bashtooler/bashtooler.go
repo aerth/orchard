@@ -22,7 +22,7 @@ func Init(newcleanenv func() []string) {
 	NewCleanEnviron = newcleanenv
 }
 
-func RunBash(ctx context.Context, wd string, filename string, args ...string) (string, error) {
+func RunBash(ctx context.Context, wd string, readFile func(string) ([]byte, error), filename string, args ...string) (string, error) {
 	stdin, err := os.Open(filename)
 	if err != nil {
 		return "", err
@@ -33,7 +33,7 @@ func RunBash(ctx context.Context, wd string, filename string, args ...string) (s
 	return RunBashScript(ctx, stdin, RunParams{WorkingDir: wd, Args: append([]string{"/dev/stdin"}, args...)})
 }
 
-func RunPy(ctx context.Context, wd string, filename string, args ...string) (string, error) {
+func RunPy(ctx context.Context, wd string, readFile func(string) ([]byte, error), filename string, args ...string) (string, error) {
 	stdin, err := os.Open(filename)
 	if err != nil {
 		return "", err
