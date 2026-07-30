@@ -7,6 +7,10 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+	"strings"
+	"time"
+
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/chat"
@@ -16,9 +20,6 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
-	"strings"
-	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -34,6 +35,12 @@ func errmsg(s string) chatmessages.ChatMessage {
 	cm.ThreadID = global.Get().GetThreadID()
 	cm.Ephemeral = true
 	return *cm
+}
+
+type Session struct{}
+
+func NewSession() *Session {
+	return &Session{}
 }
 
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
