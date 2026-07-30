@@ -3,30 +3,27 @@ package global
 import (
 	"errors"
 	"log/slog"
+	"m/pkg/loaders/mdloaders"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 
 	orchard "m"
-
-	"m/pkg/loaders/mdloaders"
 )
 
 func GetSystemBase(data any) string {
-	var s string
-	if true {
-		s = Get().Get().SystemPrompt
-	}
+	endingMessage := []string{Get().Get().SystemPrompt}
+
 	tpl := template.New("").Funcs(mdloaders.FuncMap())
 	var err error
 	name := "SYSTEM.md"
-	if s != "" {
-		name = filepath.Base(s)
-		slog.Info("loading system", "f", s)
-		tpl, err = tpl.ParseFiles(s)
+	if len(endingMessage) == 1 && endingMessage[0] != "" {
+		name = filepath.Base(endingMessage[0])
+		slog.Info("loading system", "f", endingMessage[0])
+		tpl, err = tpl.ParseFiles(endingMessage...)
 		if errors.Is(err, os.ErrNotExist) {
-			panic(err.Error())
+			slog.Error("system prompt file does not exist")
 		}
 		if err != nil {
 			panic(err.Error())
@@ -61,6 +58,7 @@ func GetSystemBase(data any) string {
 	}
 	got := strings.TrimSpace(strings.Join([]string{buf.String(), pre}, "\n"))
 	slog.Info("sticky system instruction", "size", len(got))
+	withEnding := strings.Join(append([]string{got}, append(endingMessage, Get().Get().AddSystemPrompt)...), "\n")
 	//_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
-	return got
+	return withEnding
 }
