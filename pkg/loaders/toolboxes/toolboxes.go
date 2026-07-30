@@ -393,6 +393,11 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepat
 		subDirPath := filepath.Join(basepath, subDirName)
 		subEntries, err := readDir(subDirPath)
 		if err != nil {
+			subDirPath := filepath.Join(basepath, subDirName)
+			_, e := readDir(subDirPath)
+			if e == nil {
+				slog.Warn("found other though")
+			}
 			return nil, fmt.Errorf("subdir readdir: %w", err)
 		}
 
