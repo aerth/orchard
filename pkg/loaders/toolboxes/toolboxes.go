@@ -8,17 +8,16 @@ import (
 	"iter"
 	"log"
 	"log/slog"
-	"maps"
-	"os"
-	"path/filepath"
-	"slices"
-	"strings"
-
 	"m/cmdpkg/rege"
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/yoke"
+	"maps"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
 )
 
 type Toolbox struct {
@@ -361,6 +360,10 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	if err != nil {
 		return nil, fmt.Errorf("basepath readdir: %w", err)
 	}
+	return NewToolboxEntries(entries)
+}
+
+func NewToolboxEntries(entries []os.DirEntry) (*ToolboxManager, error) {
 	var tbs Toolboxes
 
 	if len(entries) > MaxToolboxes {
