@@ -88,7 +88,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 
 	// begin loop
 	var out chatmessages.A
-	session := Session{ActiveFile: path, Intention: intent}
+	session := Session{ActiveFile: path, Intent: intent}
 	slog := slog.With("filename", path)
 	if e := session.Refresh().E; e != nil {
 		slog.Error("refresher error", "err", e)
