@@ -38,6 +38,7 @@ func errmsg(s string) chatmessages.ChatMessage {
 
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
 	slog := slog.With("ntools", len(tools))
+	slog.Info("starting CHatWith")
 	stack := stackInput
 	showChar := false
 	conf := global.Get()
