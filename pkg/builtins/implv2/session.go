@@ -20,16 +20,7 @@ type Session struct {
 	LockEnd   int
 }
 
-const DefaultChunkSize = 50
-
-func (s Session) Current() []byte {
-	return []byte(strings.Join(s.Lines, "\n"))
-}
-
-var ErrNot = errors.New("not an operator keyword and no LOCK range selected")
-
-func (s Session) SystemMessage() string {
-	// 1. Calculate boundaries for the active viewing chunk window
+func (s Session) CurrentView() string {
 	startIdx := max(s.CurrentLine-1, 0)
 	endIdx := min(startIdx+s.ChunkSize, len(s.Lines))
 	// 2. Build the visual representation of the active file chunk
@@ -52,6 +43,19 @@ func (s Session) SystemMessage() string {
 			chunkBuilder.WriteString("[Empty File]")
 		}
 	}
+	return chunkBuilder.String()
+}
+
+const DefaultChunkSize = 50
+
+func (s Session) Current() []byte {
+	return []byte(strings.Join(s.Lines, "\n"))
+}
+
+var ErrNot = errors.New("not an operator keyword and no LOCK range selected")
+
+func (s Session) SystemMessage() string {
+	// 1. Calculate boundaries for the active viewing chunk window
 
 	// 3. Format total active system instructions matching your state constraints
 	var lockStatus string
