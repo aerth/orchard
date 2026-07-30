@@ -42,10 +42,11 @@ func (h haspath) IsToolArgument() {}
 type EditorTool struct{}
 
 func NewEditTool() *EditorTool {
-	return &EditTool{}
+	return &EditorTool{}
 }
 
 func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+	return nil, fmt.Errorf("wrong tool")
 }
 
 func (*EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
