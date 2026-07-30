@@ -94,6 +94,12 @@ func New(m llm.Message) *ChatMessage {
 	return NewFrom("", m)
 }
 
+func NewThread(threadID uuid.UUID, m llm.Message) *ChatMessage {
+	cm := New(m)
+	cm.ThreadID = threadID
+	return cm
+}
+
 func NewChatMessage(role string, content string) *ChatMessage {
 	return NewFrom("", llm.Message{Role: role, Content: content})
 }
