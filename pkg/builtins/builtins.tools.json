@@ -46,7 +46,8 @@
     "parameters": {
       "type": "object",
       "properties": {
-        "path": { "type": "string" }
+        "path": { "type": "string" },
+		"intent": { "type": "string", "description": "detailed, clear plan for this file-editing session"}
       }
     }
   },
