@@ -386,7 +386,7 @@ func NewToolboxEntries(basepath string, entries []fs.DirEntry) (*ToolboxManager,
 
 		//	slog.Info("testing dir", "entry", entry.Name(), "en", entry)
 		subDirPath := filepath.Join(basepath, subDirName)
-		subEntries, err := os.ReadDir(subDirPath)
+		subEntries, err := readDir(subDirPath)
 		if err != nil {
 			return nil, fmt.Errorf("subdir readdir: %w", err)
 		}
