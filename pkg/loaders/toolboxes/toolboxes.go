@@ -365,7 +365,7 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	for i := range entries {
 		slog.Info("found entry filesystem toolbox", "e", entries[i])
 	}
-	return NewToolboxEntries(os.ReadDir, basepath, entries)
+	return NewToolboxEntries(os.ReadDir, os.ReadFile, basepath, entries)
 }
 
 func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepath string, entries []fs.DirEntry) (*ToolboxManager, error) {
