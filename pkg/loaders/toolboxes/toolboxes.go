@@ -374,6 +374,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), basepat
 
 	for _, entry := range entries {
 		if !entry.IsDir() {
+			slog.Warn("skipping toolbox nonbox", "e", entry.Name())
 			continue
 		}
 
