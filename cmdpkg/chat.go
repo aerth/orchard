@@ -83,9 +83,6 @@ Chat:
 		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 		sctx := global.NewCancel(ctx)
 		e.Tools = tools.ToMarshaler()
-		if cl != nil {
-			cl.Reset()
-		}
 		top := stack.Top()
 		if top.Role == "assistant" {
 			slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
@@ -115,6 +112,9 @@ Chat:
 			* CHAT LLM GENERATE
 			*
 			 */
+			if cl != nil {
+				cl.Reset()
+			}
 			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
