@@ -144,9 +144,11 @@ func (cm ChatMessage) TableName() string {
 }
 
 func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
-	slog.Debug("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo())
 	if cm == nil {
 		panic("GatherChatResponse for nil")
+	}
+	if !cm.Ephemeral {
+		slog.Debug("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo())
 	}
 	if cr.Message.Role != "" {
 		cm.Role = cr.Message.Role
