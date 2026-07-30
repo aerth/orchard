@@ -15,6 +15,7 @@ import (
 	"m/pkg/debugging"
 	"m/pkg/global"
 	"m/pkg/llm"
+	"m/pkg/otool"
 	"m/pkg/toolrunner"
 
 	"github.com/aerth/mostly/stackerr"
@@ -44,9 +45,15 @@ type EditorTool struct {
 }
 
 func NewEditTool() *EditorTool {
-	return &EditorTool{
+	edit := &EditorTool{
 		session: &Session{},
 	}
+	edit.session.editor = edit
+	return edit
+}
+
+func (s *Session) EditTool() otool.Tool {
+	return editor
 }
 
 func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
