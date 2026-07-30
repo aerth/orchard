@@ -146,7 +146,13 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		 *  CHAT GEN
 		 *
 		 */
-
+		if x, ok := handler.(interface {
+			BeginStream() error
+		}); ok {
+			if err := x.BeginStream(); err != nil {
+				return nil, err
+			}
+		}
 		err := llm.New().Chat(ctx, creq, handlers...)
 		cl.Reset()
 		if err != nil {
