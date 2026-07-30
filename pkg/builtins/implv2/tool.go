@@ -19,6 +19,7 @@ import (
 	"m/pkg/toolrunner"
 
 	"github.com/aerth/mostly/stackerr"
+	"github.com/google/uuid"
 	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/smacker/go-tree-sitter/css"
 	"github.com/smacker/go-tree-sitter/golang"
@@ -72,7 +73,10 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	}
 	path := call.Function.Arguments.Path
 	intent := call.Function.Arguments.Intent
-	threadId := e.Ext.ThreadID
+	threadID := e.Ext.ThreadID
+	if threadID == uuid.Nil {
+		threadID = global.Get().Get().ThreadID
+	}
 
 	errmsg := llm.Message{
 		Role:     "system",
