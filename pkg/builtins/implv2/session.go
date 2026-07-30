@@ -57,6 +57,7 @@ var ErrNot = errors.New("not an operator keyword and no LOCK range selected")
 func (s Session) SystemMessage() string {
 	// 1. Calculate boundaries for the active viewing chunk window
 
+	viewportview := s.CurrentView()
 	// 3. Format total active system instructions matching your state constraints
 	var lockStatus string
 	isLocked := false
