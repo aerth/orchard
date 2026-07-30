@@ -32,6 +32,7 @@ type haspath struct {
 	Path string `json:"path"`
 }
 
+var AskBeforeWriting = false
 var (
 	GetHandler = func() chat.ChatHandlerPlus { return nil }
 	GetSender  = func(Result) {}
@@ -167,7 +168,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 					}
 				}
 			}
-			if ConfirmAction != nil {
+			if ConfirmAction != nil && AskBeforeWriting {
 				err = ConfirmAction(ctx, "EDDITOR EDITING Lines: "+newmsg.Content)
 				if err != nil {
 					errmsg.Content = fmt.Sprintf("ConfirmAction failed: %+v", err)
