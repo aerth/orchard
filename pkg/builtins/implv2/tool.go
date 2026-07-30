@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"os"
+	"strings"
+
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
@@ -14,8 +17,6 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
-	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -225,7 +226,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				session.LockEnd = 0
 				stack = append(stack, *chatmessages.NewThread(threadID, llm.Message{
 					Role:    "system",
-					Content: "The file edits were applied to the filesystem",
+					Content: "The file edits were applied to the filesystem\n " + fmt.Sprintf("The file currently has %d lines.", len(session.Lines)),
 				}))
 				break
 			}
