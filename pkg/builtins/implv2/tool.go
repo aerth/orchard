@@ -103,7 +103,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		return nil, fmt.Errorf("no conversation memory")
 	}
 	stack = append(stack, chatmessages.A{
-		*chatmessages.NewSystemEphemeral(SystemInstruction()), // global no state
+		*chatmessages.NewSystemEphemeral(SystemInstruction() + "\n\n# Intent\n" + intent), // global no state
 	}...)
 	//e := chat.Ext{
 	//	NonStreamHandler: func(cm chatmessages.ChatMessage) {
