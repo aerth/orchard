@@ -7,6 +7,10 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+	"strings"
+	"time"
+
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/chat"
@@ -16,9 +20,6 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
-	"strings"
-	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -80,9 +81,7 @@ Chat:
 				return fmt.Errorf("detected a non-system (%s) message with no IDs: %d: %s", stack[i].Role, i, stack[i].String())
 			}
 		}
-		e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 		sctx := global.NewCancel(ctx)
-		e.Tools = tools.ToMarshaler()
 		top := stack.Top()
 		if top.Role == "assistant" {
 			slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
@@ -115,7 +114,9 @@ Chat:
 			if cl != nil {
 				cl.Reset() // nice thinking colors
 			}
-			err = chat.Chat(sctx, conf.GetThreadID(), stack, e)
+			e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
+			e.Tools = tools.ToMarshaler()
+			err = chat.Chat(sctx, conf.GetThreadID(), stack.TopN(20), e)
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
 			}
