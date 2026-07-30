@@ -363,7 +363,7 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	return NewToolboxEntries(entries)
 }
 
-func NewToolboxEntries(entries []os.DirEntry) (*ToolboxManager, error) {
+func NewToolboxEntries(basepath string, entries []os.DirEntry) (*ToolboxManager, error) {
 	var tbs Toolboxes
 
 	if len(entries) > MaxToolboxes {
