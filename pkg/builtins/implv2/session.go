@@ -287,7 +287,7 @@ func (s *Session) RunAction(action Action) Result {
 			return Result{E: errors.New("coordinates out of file range boundaries (start)"), Code: CodeError}
 		}
 		if end > len(s.Lines) {
-			return Result{E: fmt.Errorf("coordinates out of file range boundaries (end %d is greater than %d)", end, len(s.Lines)), Code: CodeError}
+			return Result{E: fmt.Errorf("coordinates out of file range boundaries (end %d is greater than number of lines %d)", end, len(s.Lines)), Code: CodeError}
 		}
 		s.LockStart = start
 		s.LockEnd = end
