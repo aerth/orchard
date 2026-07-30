@@ -144,7 +144,8 @@ const (
 var ErrNoFilename = fmt.Errorf("no active file yet, use %q first", OpFilename)
 
 func (s *Session) Peek(content string) error {
-	switch strings.Fields(content)[0] {
+	first := strings.Fields(content)[0]
+	switch first {
 	case "SELECT_FILE":
 	case "NEXT_CHUNK":
 	case "PREV_CHUNK":
@@ -152,7 +153,7 @@ func (s *Session) Peek(content string) error {
 	case "LOCK":
 	case "CANCEL":
 	default:
-		return fmt.Errorf("unknown operator keyword. did you mean to send a message? to exit file editor, use plain CANCEL")
+		return fmt.Errorf("unknown operator keyword %q. did you mean to send a message? to exit file editor, use plain CANCEL", first)
 	}
 	return nil
 }
