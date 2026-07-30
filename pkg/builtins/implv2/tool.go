@@ -70,6 +70,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		return nil, stackerr.Errorf("%w", err)
 	}
 	path := call.Function.Arguments.Path
+	intent := call.Function.Arguments.Intent
 
 	errmsg := llm.Message{
 		Role:     "system",
