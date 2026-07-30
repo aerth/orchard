@@ -73,6 +73,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	handlers := e.Handlers // unmodified before loop
 Chat:
 	for ctx.Err() == nil {
+		slog.Info("Wow")
 		noStore := global.Get().Get().ThreadID == uuid.Nil
 		for i := range stack {
 			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil || (!noStore && stack[i].ThreadID == uuid.Nil) {
