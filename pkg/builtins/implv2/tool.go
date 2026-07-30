@@ -38,6 +38,13 @@ var (
 )
 
 func (h haspath) IsToolArgument() {}
+
+type EditorTool struct{}
+
+func NewEditTool() *EditorTool {
+	return &EditTool{}
+}
+
 func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	// begin loop
 
