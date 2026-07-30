@@ -53,7 +53,7 @@ func NewEditTool() *EditorTool {
 }
 
 func (s *Session) EditTool() otool.Tool {
-	return editor
+	return s.editor.EditTool
 }
 
 func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
