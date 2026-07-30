@@ -127,10 +127,10 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 				}
 			}
 			c.emode = xCONTENT
-		}
-		_, err := fmt.Fprintf(w, "%s\n", m.Content)
-		if err != nil {
-			return stackerr.Errorf("%w", err)
+			_, err := fmt.Fprintf(w, "%s\n", m.Content)
+			if err != nil {
+				return stackerr.Errorf("%w", err)
+			}
 		}
 	}
 	if len(m.ToolCalls) != 0 { // ollama api returns a full, parsed tool call(s). TODO: future: reimplement chat template for streaming the building of the tool call
