@@ -449,7 +449,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 				Name: toolName,
 				Spec: specjs,
 			}.WithExec(execFn)
-			if _, already := toolsMap[toolName]; already {
+			if _, already := toolsMap[toolName]; !already {
 				toolsMap[toolName] = orchTool
 			}
 			alphabeticalToolnames = append(alphabeticalToolnames, toolName)
