@@ -78,10 +78,10 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	}
 	var err error
 	handlers := e.Handlers // unmodified before loop
-	noStore := global.Get().Get().ThreadID == uuid.Nil
-	if e.ThreadID == uuid.Nil && !noStore {
+	if e.ThreadID == uuid.Nil {
 		e.ThreadID = global.Get().Get().ThreadID
 	}
+	noStore := e.ThreadID == uuid.Nil
 Chat:
 	for ctx.Err() == nil {
 		slog.Info("Wow")
