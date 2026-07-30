@@ -86,6 +86,7 @@ func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		got = "command completed with no output (exit code 0)"
 	}
 	gotmsg := chatmessages.NewFromRole("", "tool", got)
+	gotmsg.ThreadID = global.Get().Get().ThreadID
 	return chatmessages.ChatMessages{*gotmsg}, nil
 }
 
