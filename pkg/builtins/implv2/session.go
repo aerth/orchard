@@ -206,7 +206,7 @@ func (s *Session) RunAction(action Action) Result {
 
 	case OpNextChunk:
 		if s.ActiveFile == "" {
-			return Result{E: errors.New("no active file selected"), Code: CodeError}
+			return Result{E: errors.New("no active file selected, cant go to next"), Code: CodeError}
 		}
 		if s.CurrentLine+s.ChunkSize <= len(s.Lines) {
 			s.CurrentLine += s.ChunkSize
@@ -215,7 +215,7 @@ func (s *Session) RunAction(action Action) Result {
 
 	case OpPrevChunk:
 		if s.ActiveFile == "" {
-			return Result{E: errors.New("no active file selected"), Code: CodeError}
+			return Result{E: errors.New("no active file selected, cant go to prev"), Code: CodeError}
 		}
 		s.CurrentLine -= s.ChunkSize
 		if s.CurrentLine < 1 {
