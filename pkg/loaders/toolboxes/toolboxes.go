@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"iter"
 	"log"
 	"log/slog"
@@ -363,7 +364,7 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	return NewToolboxEntries(basepath, entries)
 }
 
-func NewToolboxEntries(basepath string, entries []os.DirEntry) (*ToolboxManager, error) {
+func NewToolboxEntries(basepath string, entries []fs.DirEntry) (*ToolboxManager, error) {
 	var tbs Toolboxes
 
 	if len(entries) > MaxToolboxes {
