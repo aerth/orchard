@@ -170,6 +170,21 @@ func (s *Session) Refresh() Result {
 	return Result{}
 }
 
+func (s *Session) PromptFileHasLines() string {
+	return fmt.Sprintf("File currently has %d lines.", len(s.Lines))
+}
+
+func (s *Session) PromptEdiited() string {
+	return fmt.Sprintf("Successfully replaced %d lines.", s.NumLinesLocked())
+}
+
+func (s *Session) NumLinesLocked() int {
+	if s.LockEnd == 0 {
+		return 0
+	}
+	return 1 + (s.LockEnd - s.LockStart)
+}
+
 // RunAction implements [ActionRunner]
 func (s *Session) RunAction(action Action) Result {
 	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
@@ -238,26 +253,36 @@ func (s *Session) RunAction(action Action) Result {
 		var start, end int
 		var err error
 
-		if len(parts) == 1 {
-			start, err = strconv.Atoi(parts[0])
-			end = start
-		} else if len(parts) == 2 {
-			start, err = strconv.Atoi(parts[0])
-			if err != nil {
-				return Result{E: errors.New("invalid coordinate format: " + err.Error()), Code: CodeError}
-			}
-			end, err = strconv.Atoi(parts[1])
-			if err != nil {
-				return Result{E: errors.New("invalid coordinate format: " + err.Error()), Code: CodeError}
-			}
-		} else {
+		if len(parts) == 0 || len(parts) > 2 {
 			return Result{E: errors.New("invalid coordinate format"), Code: CodeError}
 		}
-
-		if err != nil || start < 1 || end < start || end > len(s.Lines) {
-			return Result{E: errors.New("coordinates out of file range boundaries"), Code: CodeError}
+		l := len(parts)
+		switch {
+		case l == 0:
+			return Result{E: errors.New("invalid coordinate format: need '%d' or '%d-%d' format (not enough args)"), Code: CodeError}
+		case l > 2:
+			return Result{E: errors.New("invalid coordinate format: need '%d' or '%d-%d' format (too many args)"), Code: CodeError}
 		}
 
+		start, err = strconv.Atoi(parts[0])
+		if err != nil {
+			return Result{E: errors.New("invalid start coordinate format: " + err.Error()), Code: CodeError}
+		}
+		if l == 1 {
+			end = start
+		}
+		if l == 2 {
+			end, err = strconv.Atoi(parts[1])
+			if err != nil {
+				return Result{E: errors.New("invalid end coordinate format: " + err.Error()), Code: CodeError}
+			}
+		}
+		if start < 1 || end < start {
+			return Result{E: errors.New("coordinates out of file range boundaries (start)"), Code: CodeError}
+		}
+		if end > len(s.Lines) {
+			return Result{E: errors.New("coordinates out of file range boundaries (end)"), Code: CodeError}
+		}
 		s.LockStart = start
 		s.LockEnd = end
 		return Result{Code: CodeLocked}
