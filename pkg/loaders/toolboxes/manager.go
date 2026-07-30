@@ -5,15 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"m/pkg/builtins/implv1/bashtooler"
+	"m/pkg/chatmessages"
+	"m/pkg/llm"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/builtins/implv1/bashtooler"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
 )
 
 type (
@@ -119,7 +118,7 @@ func (t *ToolboxManager) MarshalJSON() ([]byte, error) {
 type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
 
 // [orch.OrchTool.Exec]
-func makeExecFn(toolName string, params OrchParams, doInputEnv bool, pyFilePath string) ExecFunc {
+func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile func(string) ([]byte, error), pyFilePath string) ExecFunc {
 	_ = toolName
 	execFn := func(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
 		t1 := time.Now()
