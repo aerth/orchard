@@ -7,10 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
-	"strings"
-	"time"
-
 	"m/cmdpkg/spinner"
 	"m/cmdpkg/templatedata"
 	"m/pkg/chat"
@@ -20,6 +16,9 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -92,6 +91,7 @@ Chat:
 		// this goroutine needs its own chat ptr for GatherChatResponse and then tool calls
 		newcaller := chatmessages.NewFromRole(e.From, "assistant", "")
 		newcaller.ThreadID = e.ThreadID
+		newcaller.Ephemeral = true
 		if true {
 			var hh []llm.ChatStreamHandlerFunc
 			if cl != nil {
