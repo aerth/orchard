@@ -141,6 +141,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		log.Printf("%s", tmpmsg)
 		creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: tmpmsg})
 		newmsg := chatmessages.NewFromRole("editor_agent", "assistant", "")
+		newmsg.ThreadID = threadID
 		handlers := []chat.Handler{cl.HandleChatResponse, newmsg.GatherChatResponse}
 		if handler != nil {
 			handlers = append(handlers, handler.Handle)
