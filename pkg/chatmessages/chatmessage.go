@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -143,7 +144,7 @@ func (cm ChatMessage) TableName() string {
 }
 
 func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
-	slog.Debug("GatherChatResponse", "cr", cr)
+	slog.Debug("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo())
 	if cm == nil {
 		panic("GatherChatResponse for nil")
 	}
