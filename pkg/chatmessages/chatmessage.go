@@ -149,7 +149,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	}
 	if !cm.Ephemeral {
 		if cr.Message.Content != "" && strings.HasSuffix(cm.Message.Content, cr.Message.Content) {
-			slog.Info("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo(1), stackerr.GetFuncCallerInfo(2))
+			slog.Info("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo(1), "caller3", stackerr.GetFuncCallerInfo(2))
 			cr.Message.Content = strings.ToUpper(cr.Message.Content)
 		}
 	} else if true { // debug
