@@ -9,6 +9,7 @@ import (
 )
 
 type Session struct {
+	editor      *EditorTool
 	ActiveFile  string   // Selected filename
 	Lines       []string // The cached file content split by line
 	CurrentLine int      // The top line number currently visible in the chunk window
