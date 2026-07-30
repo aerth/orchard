@@ -15,7 +15,7 @@ var ErrKeywordCancelled = errors.New("contains CANCEL")
 // It maps 1-based human line numbers directly to 0-based Go array indices.
 func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	if i := slices.Index(replacementLines, "CANCEL"); i >= 0 {
-		return stackerr.Errorf("this edit was cancelled")
+		return stackerr.Errorf("%w", ErrKeywordCancelled)
 	}
 	for _, x := range eofs {
 		if i := slices.Index(replacementLines, x); i >= 0 {
