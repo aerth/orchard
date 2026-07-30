@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"os"
+	"strings"
+
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
@@ -14,8 +17,6 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
-	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	sitter "github.com/smacker/go-tree-sitter"
@@ -71,6 +72,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	}
 	path := call.Function.Arguments.Path
 	intent := call.Function.Arguments.Intent
+	threadId := e.Ext.ThreadID
 
 	errmsg := llm.Message{
 		Role:     "system",
