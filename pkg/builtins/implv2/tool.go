@@ -211,7 +211,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			if err == nil {
 				session.LockStart = 0
 				session.LockEnd = 0
-				stack = append(stack, *chatmessages.New(llm.Message{
+				stack = append(stack, *chatmessages.NewThread(threadID, llm.Message{
 					Role:    "system",
 					Content: "The file edits were applied to the filesystem",
 				}))
@@ -222,7 +222,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		if err != nil {
 			slog.Error("parsing edit TODO", "err", err)
-			stack = append(stack, *chatmessages.NewSystemEphemeral("Error: " + err.Error() + "\n\nTry again or use CANCEL to return to conversation"))
+			msg := *chatmessages.NewSystemEphemeral("Error: " + err.Error() + "\n\nTry again or use CANCEL to return to conversation")
+			msg.ThreadID = threadID
+			stack = append(stack, msg)
 			continue
 		}
 		responseWriter := GetSender
@@ -231,7 +233,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			operators = append(operators, x[i].Op)
 			resp := session.RunAction(x[i])
 			if responseWriter == nil && handler != nil {
-				handler.HandleToolOutputs(NewResultMessage(resp))
+				handler.HandleToolOutputs(NewResultMessage(threadID, resp))
 			}
 			if responseWriter != nil {
 				responseWriter(resp)
@@ -254,14 +256,16 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		errmsg.Content = fmt.Sprintf("The editing session (%q) has completed.Transcript: %s\n\nFinal:\n%s", path, x,
 			final.FormatMarkdownTry(nil, "", "Editor"))*/
 	errmsg.Content = fmt.Sprintf("## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords found: %q\n\nMost recent file view:\n\n```\n%s```\n", stack[startstacklen:].FormatText("", ""), operators, session.CurrentView())
-	outmsg := *chatmessages.New(errmsg)
-	out = append(out)
-	slog.Info("editor returning messages", "n", len(out))
-	return out, nil
+	outmsg1 := *chatmessages.New(errmsg)
+	outmsg1.ThreadID = threadID
+	outmsgs = append(outmsgs)
+	slog.Info("editor returning messages", "n", len(outmsgs))
+	return outmsgs, nil
 }
 
-func NewResultMessage(resp Result) chatmessages.ChatMessage {
+func NewResultMessage(threadID uuid.UUID, resp Result) chatmessages.ChatMessage {
 	msg := *chatmessages.NewAux(resp)
+	msg.ThreadID = threadID
 	return msg
 }
 
