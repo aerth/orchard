@@ -135,20 +135,22 @@ func envor(s, d string) string {
 }
 
 type ConfigInput struct {
-	Username      string
-	Botname       string
-	Treedir       string
-	Tooldir       string
-	Logfilename   string
-	ThreadID      uuid.UUID
-	HideToolCalls bool
-	ShowToolOuts  bool
-	ShowRequests  bool
-	JsonOutput    bool
-	NoColor       bool
-	NoSpin        bool
-	SystemPrompt  string
-	Dir           string
+	Username          string
+	Botname           string
+	Treedir           string
+	Tooldir           string
+	Logfilename       string
+	ThreadID          uuid.UUID
+	HideToolCalls     bool
+	ShowToolOuts      bool
+	ShowRequests      bool
+	JsonOutput        bool
+	NoColor           bool
+	NoSpin            bool
+	SystemPrompt      string
+	AddSystemPrompt   string
+	InitialUserPrompt string
+	Dir               string
 }
 type cfginput = ConfigInput
 
@@ -172,10 +174,12 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.ShowRequests, "v", cfg.ShowRequests, "show requests in log")
 	flag.BoolVar(&cfg.ShowToolOuts, "show-toolouts", cfg.ShowToolOuts, "show tool output chunks")
 	flag.StringVar(&cfg.SystemPrompt, "system", cfg.SystemPrompt, "a string or path to filename")
+	flag.StringVar(&cfg.AddSystemPrompt, "addsystem", cfg.AddSystemPrompt, "a string or path to filename")
 	flag.StringVar(&cfg.Logfilename, "logfile", cfg.Logfilename, "path to log file")
 	flag.BoolVar(&cfg.JsonOutput, "json", cfg.JsonOutput, "json output")
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
+	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
 	flag.Func("thread", "uuid", func(s string) error {
 		if s == "test" {
 			cfg.ThreadID = SingleThreadID
