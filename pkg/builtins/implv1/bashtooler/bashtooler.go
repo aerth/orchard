@@ -23,13 +23,11 @@ func Init(newcleanenv func() []string) {
 }
 
 func RunBash(ctx context.Context, wd string, readFile func(string) ([]byte, error), filename string, args ...string) (string, error) {
-	stdin, err := os.Open(filename)
+	b, err := readFile(filename)
 	if err != nil {
 		return "", err
 	}
-	defer func() {
-		_ = stdin.Close()
-	}()
+	stdin := bytes.NewReader(b)
 	return RunBashScript(ctx, stdin, RunParams{WorkingDir: wd, Args: append([]string{"/dev/stdin"}, args...)})
 }
 
