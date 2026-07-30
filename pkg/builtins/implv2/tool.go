@@ -61,7 +61,7 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	return nil, fmt.Errorf("wrong tool")
 }
 
-func (*EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	// begin loop
 
 	call, err := chat.ReadToolCall[haspath](ctx, caller, toolCallIndex)
@@ -125,6 +125,11 @@ func (*EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallInd
 		handler := GetHandler()
 		if handler != nil {
 			handlers = append(handlers, handler)
+		}
+		if e.Ext.PreFunc != nil {
+			if err := e.Ext.PreFunc(creq); err != nil {
+				return nil, err
+			}
 		}
 		err := llm.New().Chat(ctx, creq, handlers...)
 		cl.Reset()
@@ -203,6 +208,7 @@ func (*EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallInd
 				operators = append(operators, fmt.Sprintf("ERROR: %+v", resp.E))
 				break
 			}
+
 		}
 	}
 
