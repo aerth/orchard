@@ -440,7 +440,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			}
 			// doInputEnv
 			doInputEnv := slices.Contains(envs, "INPUT_FILE")
-			execFn := makeExecFn(toolName, params, doInputEnv, pyFilePath)
+			execFn := makeExecFn(toolName, params, doInputEnv, readFile, pyFilePath)
 			//		orchTool := MakeAPITool1(toolName, description, execFn, params...)
 			par := OrchParamsWrapper{Required: requiredParamNames, Properties: params.ToMap()}
 			spec := ToolFunction{Name: toolName, Description: description, Parameters: par} // params, requiredParamNames}
