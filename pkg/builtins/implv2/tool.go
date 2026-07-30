@@ -7,9 +7,6 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-	"os"
-	"strings"
-
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
@@ -17,6 +14,8 @@ import (
 	"m/pkg/llm"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"os"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	sitter "github.com/smacker/go-tree-sitter"
@@ -164,7 +163,7 @@ func (*EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallInd
 				}
 			}
 			if ConfirmAction != nil {
-				err = ConfirmAction(ctx, "Lines: "+newmsg.Content)
+				err = ConfirmAction(ctx, "EDDITOR EDITING Lines: "+newmsg.Content)
 				if err != nil {
 					errmsg.Content = fmt.Sprintf("ConfirmAction failed: %+v", err)
 					continue
