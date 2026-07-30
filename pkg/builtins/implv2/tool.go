@@ -216,14 +216,15 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 	}
 
-	x := jsonstring(operators)
-	x += fmt.Sprintf("files edited: %d", numberFilesEdited)
-	if final == nil {
-		y := stack.Top()
-		final = &y
-	}
-	errmsg.Content = fmt.Sprintf("The editing session (%q) has completed.Transcript: %s\n\nFinal:\n%s", path, x,
-		final.FormatMarkdownTry(nil, "", "Editor"))
+	/*
+		x := jsonstring(operators)
+		x += fmt.Sprintf("files edited: %d", numberFilesEdited)
+		if final == nil {
+			y := stack.Top()
+			final = &y
+		}
+		errmsg.Content = fmt.Sprintf("The editing session (%q) has completed.Transcript: %s\n\nFinal:\n%s", path, x,
+			final.FormatMarkdownTry(nil, "", "Editor"))*/
 	out = append(out, *chatmessages.New(errmsg))
 	slog.Info("returning messages", "n", len(out))
 	return out, nil
