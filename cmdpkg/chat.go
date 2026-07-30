@@ -85,7 +85,6 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 Chat:
 	for ctx.Err() == nil {
 		slog.Info("Wow")
-		noStore := global.Get().Get().ThreadID == uuid.Nil
 		for i := range stack {
 			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil || (!noStore && stack[i].ThreadID == uuid.Nil) {
 				return fmt.Errorf("detected a non-system (%s) message with no IDs: %d: %s", stack[i].Role, i, stack[i].String())
