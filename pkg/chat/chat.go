@@ -17,7 +17,12 @@ import (
 )
 
 // ChatHandler would be called ChatStreamHandler but that is too long
-type ChatHandler = func(llm.ChatResponse) error
+type (
+	ChatHandler     = func(llm.ChatResponse) error
+	ChatHandlerPlus interface {
+		Handle(llm.ChatResponse) error
+	}
+)
 
 // Ext handles logic for the loop
 type Ext struct {
