@@ -35,7 +35,7 @@ func (t *Tools) FromMarshalers(a []json.Marshaler) error {
 		xx, ok := a[i].(Tool)
 		if ok {
 			x[i] = xx
-			slog.Info("got tool", "name", xx.Name)
+			//		slog.Info("got tool", "name", xx.Name)
 			continue
 		}
 		tn := fmt.Sprintf("%T", a[i])
