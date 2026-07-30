@@ -21,6 +21,7 @@ type (
 	ChatHandler     = func(llm.ChatResponse) error
 	ChatHandlerPlus interface {
 		Handle(llm.ChatResponse) error
+		HandleToolOutputs(cm chatmessages.ChatMessage)
 	}
 )
 
