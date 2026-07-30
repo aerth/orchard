@@ -118,10 +118,11 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	rounds := 0
 	numberFilesEdited := 0
 	handler := GetHandler()
-	var ext chat.Ext
+	var ext chat.Ext = e.Ext
 	if e, ok := ctx.Value(toolrunner.CtxExt).(chat.Ext); ok {
 		ext = e
 	}
+	e.Ext = ext
 	for ctx.Err() == nil {
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
 		creq.Messages = stack.Raw()
