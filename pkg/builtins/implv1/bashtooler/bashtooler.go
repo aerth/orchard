@@ -32,13 +32,11 @@ func RunBash(ctx context.Context, wd string, readFile func(string) ([]byte, erro
 }
 
 func RunPy(ctx context.Context, wd string, readFile func(string) ([]byte, error), filename string, args ...string) (string, error) {
-	stdin, err := os.Open(filename)
+	b, err := readFile(filename)
 	if err != nil {
 		return "", err
 	}
-	defer func() {
-		_ = stdin.Close()
-	}()
+	stdin := bytes.NewReader(b)
 	return RunPyStdin(ctx, stdin, RunParams{WorkingDir: wd, Args: args})
 }
 
