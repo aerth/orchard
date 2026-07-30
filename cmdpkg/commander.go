@@ -24,6 +24,7 @@ func IsCommand(content string) bool {
 }
 
 func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmessages.ChatMessages) (chatmessages.A, error) {
+	panic("wrong HandleCommand")
 	fields := strings.Fields(newmsg.Content)
 	cmd := strings.TrimPrefix(fields[0], "/")
 	slog.Info("commander", "cmd", cmd)
