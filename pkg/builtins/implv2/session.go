@@ -100,8 +100,8 @@ CANCEL                - Unlock coordinates and return to search navigation.
 		lockStatus,
 		len(s.Lines),
 		s.CurrentLine,
-		endIdx,
-		chunkBuilder.String(),
+		s.CurrentLine+s.ChunkSize,
+		viewportview,
 		s.ChunkSize,
 		s.ChunkSize,
 	)
