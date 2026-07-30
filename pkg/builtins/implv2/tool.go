@@ -39,10 +39,14 @@ var (
 
 func (h haspath) IsToolArgument() {}
 
-type EditorTool struct{}
+type EditorTool struct {
+	session *Session
+}
 
 func NewEditTool() *EditorTool {
-	return &EditorTool{}
+	return &EditorTool{
+		session: &Session{},
+	}
 }
 
 func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
