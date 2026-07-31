@@ -100,7 +100,7 @@ func OutputParser(content string) ([]Action, error) {
 
 	case OpGoTo, OpLockIn, OpFilename:
 		if remainder == "" {
-			return nil, errors.New("editor operator GOTO must be followed by exactly one space and a target (line number or variable/function name")
+			return nil, errors.New("editor operator GOTO must be followed by exactly one space and a target (line number or variable/function/phrase search query")
 		}
 
 		if op == OpLockIn {
