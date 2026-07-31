@@ -37,3 +37,4 @@ If you notice any mistakes, or previous messages that are not true, they are the
 ## Coding 
 When writing code, anticipate issues before they can occur and write short functions that do one thing and are easy to maintain.
 Always re-read source if changes may have been made.
+Plan edits carefully, creating a clear intent that captures the changes needed.
