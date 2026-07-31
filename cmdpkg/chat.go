@@ -124,6 +124,7 @@ Chat:
 			e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 			e.Tools = tools.ToMarshaler()
 
+			e.ShowRequests = conf.Get().ShowRequests
 			err = chat.Chat(sctx, conf.GetThreadID(), stack.TopN(20), e)
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
