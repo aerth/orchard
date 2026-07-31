@@ -130,6 +130,9 @@ Chat:
 			e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 			e.Tools = tools.ToMarshaler()
 			e.Tools = append(e.Tools, json.RawMessage(finishLoopToolSpec))
+			for i := range e.Tools {
+				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
+			}
 
 			e.ShowRequests = conf.Get().ShowRequests
 			err = chat.Chat(sctx, conf.GetThreadID(), stack.TopN(20), e)
