@@ -9,16 +9,17 @@ import (
 	"iter"
 	"log"
 	"log/slog"
-	"m/cmdpkg/rege"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
-	"m/pkg/otool"
-	"m/pkg/yoke"
 	"maps"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"m/cmdpkg/rege"
+	"m/pkg/chatmessages"
+	"m/pkg/llm"
+	"m/pkg/otool"
+	"m/pkg/yoke"
 )
 
 type Toolbox struct {
@@ -55,34 +56,6 @@ func (t *Toolboxes) Add(t2 ...Toolbox) Toolboxes {
 	return *t
 }
 
-/*
-	func (t Toolboxes) Export() api.Tools {
-		a := make(api.Tools, len(t))
-		for i := range t {
-			a[i] = api.Tool{
-				Type: "string",
-				Function: api.ToolFunction{
-					Name:        t[i].Name,
-					Description: t[i].GetDescription(),
-				},
-			}
-		}
-		return a
-	}
-*/
-
-/*
-type Tool struct {
-	Type     string       `json:"type,omitempty"`
-	Function ToolFunction `json:"function"`
-	exec     func(ctx context.Context, caller CallerT) (chatmessages.ChatMessages, error)
-}
-
-func (t Tool) WithExec(execFn func(ctx context.Context, caller CallerT) (chatmessages.ChatMessages, error)) Tool {
-	t.exec = execFn
-	return t
-}*/
-
 type (
 	Tools           = otool.Tools
 	Tool            = otool.Tool
@@ -103,22 +76,6 @@ type OrchParamsWrapper struct {
 	Properties map[string]OrchParam `json:"properties,omitempty"`
 }
 
-// func (t Tool) GetName() string        { return t.Function.Name }
-// func (t Tool) GetDescription() string { return t.Function.Description }
-// type Tools []Tool
-/*
-func (t Tools) Export() []json.RawMessage {
-	a := make([]json.RawMessage, len(t))
-	for i := range t {
-		b, err := t[i].MarshalJSON()
-		if err != nil {
-			panic(err.Error())
-		}
-		a[i] = b
-	}
-	return a
-}
-*/
 func (t *Toolbox) ToolSpecs() Tools {
 	var a Tools
 	for _, v := range t.Tools {
