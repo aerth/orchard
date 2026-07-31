@@ -148,6 +148,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		slog.Info("done running tool", "namea", s.Name, "x", time.Since(t1))
 	}()
 	if ctx.Err() != nil {
+		slog.Warn("context is finished before tool could run", "err", ctx.Err(), "cause", context.Cause(ctx))
 		return nil, ctx.Err()
 	}
 	var caller chatmessages.Call[map[string]json.RawMessage]
