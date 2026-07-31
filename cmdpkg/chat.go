@@ -185,6 +185,7 @@ Chat:
 		toolouts, err := toolrunner.Runtools(ctx, stack, tools, *newcaller)
 		if len(toolouts) == 0 && err == nil {
 			slog.Error("no tool outs and no err")
+			return stackerr.Errorf("no tool outs and no error")
 		}
 		slog.Info("finished running tool calls",
 			"ncalls", len(newcaller.ToolCalls), "err", err, "nresp", len(toolouts))
