@@ -201,12 +201,6 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 
 	// GENERATE ROUNDS
-	if conf.Get().JsonOutput {
-		enc := json.NewEncoder(os.Stdout)
-		cmdpkg.MasterSend = func(v *chatmessages.ChatMessage) error {
-			return enc.Encode(v)
-		}
-	}
 	e := chat.Ext{
 		PreTools: func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error {
 			for i := range newcaller.ToolCalls {
@@ -226,6 +220,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			}
 			return nil
 		},
+	}
+	if conf.Get().JsonOutput {
+		enc := json.NewEncoder(os.Stdout)
 	}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
