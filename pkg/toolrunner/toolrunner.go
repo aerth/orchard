@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -38,6 +39,9 @@ func Runtools(ctx context.Context, stack chatmessages.A, tools otool.Tools, call
 
 // realruntools handles all calls
 func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
+	if len(caller.ToolCalls) == 0 {
+		return nil, fmt.Errorf("no tool calls in this caller")
+	}
 	var finishedtoolouts chatmessages.ChatMessages // outputs from all calls
 	for toolCallIndex := range caller.ToolCalls {
 		x, err := realruntool(ctx, tools, caller, toolCallIndex)
