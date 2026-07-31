@@ -211,7 +211,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			}
 			if AskBeforeWriting {
 				if ConfirmAction == nil {
-					return fmt.Errorf("")
+					operators = append(operators, fmt.Sprintf("ERROR: %+v", resp.E))
+					break
 				}
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```\n%s\n```", newmsg.Content))
 				if err != nil {
