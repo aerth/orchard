@@ -134,6 +134,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		ext = e
 	}
 	e.Ext = ext
+
 	for ctx.Err() == nil {
 		rounds++
 		if rounds > MaxRounds {
