@@ -20,6 +20,12 @@ func Dir() string {
 	return wd
 }
 
+func RefreshDir() {
+	wd, _ := os.Getwd()
+	gconf.i.Dir = wd
+	slog.Info("now in", "dir", wd)
+}
+
 type Conf struct {
 	i ConfigInput
 }
@@ -82,6 +88,8 @@ type dbstore interface {
 	IsDB()
 }
 
+var gstore any
+
 func SetStore[T dbstore](store T) {
 	gstore = store
 }
@@ -93,8 +101,6 @@ func GetStore[T any]() T {
 	}
 	return x
 }
-
-var gstore any
 
 func GetVersionString() string {
 	if omode == "" {
