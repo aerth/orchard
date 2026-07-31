@@ -202,18 +202,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		cm.Model = cr.Model
 
 	}
-	if cr.Message.Content == " (END)" {
-		return fmt.Errorf("broken")
-	}
 	return nil
-}
-
-func toJSON(rawMessage json.RawMessage) string {
-	b, err := json.Marshal(rawMessage)
-	if err != nil {
-		panic(err.Error())
-	}
-	return string(b)
 }
 
 func (cm ChatMessage) IsEmpty() bool {
