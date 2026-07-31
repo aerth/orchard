@@ -424,7 +424,8 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	case cm.Content == "" && !ShowThoughts && len(cm.ToolCalls) != 0:
 		content = ""
 	case cm.Content != "":
-		content = cm.Content
+		content = strings.TrimSpace(strings.TrimSuffix(cm.Content, "finish_turn")) // TODO: other place
+
 	case len(cm.ToolCalls) == 1:
 		content = "Tool Call"
 	case len(cm.ToolCalls) != 0:
