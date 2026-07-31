@@ -143,8 +143,8 @@ Chat:
 			newcaller.Content += " (this reply was cancelled by user before it finished)"
 		}
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
-		stack = append(stack, *newcaller)
-		newcaller = &stack[len(stack)-1] // fix ptr
+		stack = append(stack, *newcaller) // for this thread only
+		newcaller = &stack[len(stack)-1]  // fix ptr
 		/*
 			if e.Store != nil {
 				// Add sets initial msg.DBID
