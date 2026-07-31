@@ -2,7 +2,6 @@ package global
 
 import (
 	"errors"
-	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -50,7 +49,7 @@ func GetSystemBase(data any) string {
 	pre := ""
 	orchardfile, err := os.ReadFile("ORCHARD.md")
 	if err == nil {
-		pre = string("## Project-level ORCHARD.md file contents\n" + QuickTemplate(string(orchardfile)))
+		pre = string("## Project-level ORCHARD.md file contents\n" + QuickTemplate(string(orchardfile), data))
 	}
 	if errors.Is(err, os.ErrNotExist) {
 		orchardfile, err = os.ReadFile("AGENTS.md")
@@ -66,11 +65,9 @@ func GetSystemBase(data any) string {
 }
 
 // QuickTemplate best-effort template parse and execute, otherwise return plain s
-func QuickTemplate(f fs.FS, name string, data any) string {
-	if f == nil {
-		// is on disk
-	} else {
-		// use f
+func QuickTemplate(s string, data any) string {
+	if s == "" {
+		return ""
 	}
 	return s
 }
