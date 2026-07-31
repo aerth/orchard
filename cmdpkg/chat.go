@@ -27,9 +27,6 @@ import (
 
 type EncoderFunc = func(v *chatmessages.ChatMessage) error
 
-// MasterSend if not nil, is used to 'finish' each message (assistant,system,tool)
-var MasterSend EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
-
 const (
 	finishLoopTool     = "finish_turn"
 	finishLoopToolSpec = `{"function": {"name": "finish_turn", "description": "immediately finish this round, waiting for the user to respond"}, "parameters": {"required": [], "properties": {}}, "type": "function"}`
@@ -167,12 +164,6 @@ Chat:
 		if e.AfterGen != nil {
 			if err := e.AfterGen(newcaller); err != nil {
 				return err
-			}
-		}
-		if jsonout != nil {
-			// jsonout encoder may modify the pointer (TODO: hook for confirmation/cancel)
-			if err := jsonout(&stack[len(stack)-1]); err != nil {
-				return stackerr.Errorf("%w", err)
 			}
 		}
 		// handle tools
