@@ -91,16 +91,16 @@ func OutputParser(content string) ([]Action, error) {
 
 	switch op {
 	default:
-		return nil, stackerr.Errorf("operator not found: %q  %w", content, ErrNot)
+		return nil, stackerr.Errorf("editor operator not found: %q  %w", content, ErrNot)
 	case OpNextChunk, OpPrevChunk, OpCancel: // no args
 		if remainder != "" {
-			return nil, errors.New("operator" + op + " does not accept arguments or trailing formatting")
+			return nil, errors.New("editor operator" + op + " does not accept arguments or trailing formatting")
 		}
 		actions = append(actions, Action{Op: op})
 
 	case OpGoTo, OpLockIn, OpFilename:
 		if remainder == "" {
-			return nil, errors.New("GOTO command must be followed by exactly one space and a target")
+			return nil, errors.New("editor operator GOTO must be followed by exactly one space and a target")
 		}
 
 		if op == OpLockIn {
