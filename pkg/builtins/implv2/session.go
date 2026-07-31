@@ -199,6 +199,8 @@ func (s *Session) NumLinesLocked() int {
 	return 1 + (s.LockEnd - s.LockStart)
 }
 
+const always = "Use CANCEL to exit the file editor, or use LOCK <from>-<to> to lock existing lines for targeting."
+
 // RunAction implements [ActionRunner]
 func (s *Session) RunAction(action Action) Result {
 	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
@@ -208,7 +210,7 @@ func (s *Session) RunAction(action Action) Result {
 	switch action.Op {
 	case OpFilename:
 		if s.ActiveFile == action.Content {
-			return Result{Message: "The file was already selected. Use CANCEL to exit the file editor, or use LOCK <from>-<to> to lock existing lines for targeting.."}
+			return Result{Message: "The file was already selected."}
 		}
 		s.ActiveFile = action.Content
 		if r := s.Refresh(); r.E != nil {
