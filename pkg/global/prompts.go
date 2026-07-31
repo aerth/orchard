@@ -2,6 +2,7 @@ package global
 
 import (
 	"errors"
+	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -65,6 +66,11 @@ func GetSystemBase(data any) string {
 }
 
 // QuickTemplate best-effort template parse and execute, otherwise return plain s
-func QuickTemplate(s string, data any) string {
+func QuickTemplate(f fs.FS, name string, data any) string {
+	if f == nil {
+		// is on disk
+	} else {
+		// use f
+	}
 	return s
 }
