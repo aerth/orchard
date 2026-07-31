@@ -113,6 +113,7 @@ type ToolboxManager struct {
 }
 
 func (t *ToolboxManager) MarshalJSON() ([]byte, error) {
+	slog.Info("toolboxman marshal to json")
 	return json.Marshal(t.Toolbox.ToolSpecs())
 }
 
