@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -428,7 +429,6 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = ""
 	case cm.Content != "":
 		content = strings.TrimSpace(strings.TrimSuffix(cm.Content, "finish_turn")) // TODO: other place
-
 	case len(cm.ToolCalls) == 1:
 		content = "Tool Call"
 	case len(cm.ToolCalls) != 0:
