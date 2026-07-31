@@ -70,6 +70,7 @@ Chat:
 		slog.Info("Wow")
 		for i := range stack {
 			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil || (!noStore && stack[i].ThreadID == uuid.Nil) {
+				// keep this to identify regressions
 				return fmt.Errorf("detected a non-system (%s) message with no IDs: %d: %s", stack[i].Role, i, stack[i].String())
 			}
 		}
