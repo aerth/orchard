@@ -80,6 +80,7 @@ func realruntool(ctx context.Context, tools otool.Tools, caller chatmessages.Cha
 	}
 	slog.Info("Running tools...", "caller", caller.String(), "i", toolCallIndex, "call", call)
 	x, err := tool.Exec(ctx, caller.Message, toolCallIndex)
+	slog.Info("Running tools got", "toolouts", len(x), "err", err, "caller", caller.String(), "i", toolCallIndex, "call", call)
 	if len(x) == 0 && err == nil {
 		x = append(x, *chatmessages.NewFromRole("", "tool", "(empty)"))
 	}
