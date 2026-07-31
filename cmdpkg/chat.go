@@ -169,11 +169,10 @@ Chat:
 			continue
 		}
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
-
 			if isAuto {
 				return nil
 			}
-			stack = append(stack, errmsg("To end this round, use the %q tool to give voice to the user. Otherwise, proceed.", finishLoopTool))
+			stack = append(stack, errmsg("To end this round, use the %q tool to send the previous message to the user. Otherwise, proceed.", finishLoopTool))
 			continue
 		}
 		//
