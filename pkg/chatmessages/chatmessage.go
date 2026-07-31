@@ -146,7 +146,7 @@ type MessageOptions struct {
 	Ephemeral   bool
 	GenDuration time.Duration
 	MaxDistance int    // will be removed from mem stack after N messages
-	CreatedBy   string // caller func
+	CreatedBy   string // internal, caller func
 
 	Model   string
 	Summary any
