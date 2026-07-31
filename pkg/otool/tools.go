@@ -36,7 +36,7 @@ func (t *Tools) FromMarshalers(a []json.Marshaler) error {
 			continue
 		}
 
-		// TODO: check if this part works. not sure
+		// TODO: check if this part works for a otool.ToolV2 or something
 
 		tn := fmt.Sprintf("%T", a[i])
 		if tn != "main.ToolDummy" {
