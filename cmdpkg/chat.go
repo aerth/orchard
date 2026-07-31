@@ -176,7 +176,7 @@ Chat:
 		if e.PreTools != nil {
 			err := e.PreTools(ctx, newcaller, newcaller.ToolCalls.GetNames())
 			if err != nil {
-				stack = append(stack, NewEphemeralSystem("%+v", err))
+				stack = append(stack, NewEphemeralSystem("PreTools error: %+v", err))
 				continue
 			}
 		}
