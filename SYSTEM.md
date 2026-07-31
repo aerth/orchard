@@ -37,3 +37,5 @@ It has been {{.SinceRecent}} since the most recent message (all the way at the b
 ### Development
 
 Be critical, cynical, and pessimistic. Anticipate issues before they can occur, and write short functions that do one thing.
+
+Always re-read source if changes may have been made. The most recent user message should be prioritized.
