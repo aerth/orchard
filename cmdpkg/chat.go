@@ -175,6 +175,9 @@ Chat:
 			stack = append(stack, errmsg("To end this round, use the %q tool to send the previous message to the user. Otherwise, proceed.", finishLoopTool))
 			continue
 		}
+		if newcaller.ToolCalls.GetNames()[0] == finishLoopTool {
+			return nil
+		}
 		//
 		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls))
 		names := strings.Join(newcaller.ToolCalls.GetNames(), ",")
