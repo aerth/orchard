@@ -178,9 +178,8 @@ Chat:
 		}
 		//
 		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls))
-		names := strings.Join(newcaller.ToolCalls.GetNames(), ",")
 		if e.PreTools != nil {
-			err := e.PreTools(ctx, newcaller, names)
+			err := e.PreTools(ctx, newcaller, newcaller.ToolCalls.GetNames())
 			if err != nil {
 				/*			errmsg := func(s string) chatmessages.ChatMessage {
 							cm := chatmessages.NewFromRole("", "system", "Error: you must use edit_file tool to use SELECT_FILE and other operators")
