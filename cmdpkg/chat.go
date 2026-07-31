@@ -75,7 +75,6 @@ Chat:
 				return fmt.Errorf("detected a non-system (%s) message with no IDs: %d: %s", stack[i].Role, i, stack[i].String())
 			}
 		}
-		sctx := global.NewCancel(ctx)
 		top := stack.Top()
 		if top.Role == "assistant" {
 			slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
@@ -95,7 +94,7 @@ Chat:
 			if newcaller != nil {
 				hh = append(hh, newcaller.GatherChatResponse)
 			}
-			spin := spinner.Start(sctx)
+			spin := spinner.Start(ctx)
 			if spin != nil {
 				hh = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse}, hh...)
 			}
@@ -116,7 +115,7 @@ Chat:
 				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
 			}
 			e.ShowRequests = conf.Get().ShowRequests
-			err = chat.Chat(sctx, conf.GetThreadID(), stack.TopN(20), e)
+			err = chat.Chat(ctx, conf.GetThreadID(), stack.TopN(20), e)
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
 			}
