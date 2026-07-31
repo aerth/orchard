@@ -22,6 +22,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const FinishLoopToolName = "yield_control"
+
 type haspath struct {
 	Path   string `json:"path,omitempty"`
 	Intent string `json:"intent,omitempty"`
