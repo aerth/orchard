@@ -173,7 +173,8 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 	var execArgs []string
 	var inputFile string
 	if len(s.params) == 0 {
-		slog.Warn("no params for this func")
+		slog.Warn("no params for this func but args given", "nargs", len(args))
+		return nil, fmt.Errorf("args given (%q) but none are allowed for this function", len(args))
 	}
 	for i, param := range s.params {
 		if param.Name == "" {
