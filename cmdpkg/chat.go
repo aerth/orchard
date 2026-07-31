@@ -217,6 +217,8 @@ Chat:
 			for i := range toolouts {
 				toolouts[i].ThreadID = e.ThreadID
 				toolouts[i].From = e.From
+				if toolouts[i].ToolName == "" {
+				}
 			}
 		}
 		if e.NonStreamHandler != nil {
