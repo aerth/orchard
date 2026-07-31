@@ -27,7 +27,7 @@ func (c codeargs) IsToolArgument() {}
 type anymap map[string]any
 
 func (a anymap) IsToolArgument() {}
-func Basher2(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 	if err != nil {
 		return nil, err
@@ -41,9 +41,13 @@ func Basher2(ctx context.Context, caller llm.Message, toolCallIndex int) (chatme
 	if implv2.ConfirmAction == nil {
 		implv2.ConfirmAction = cmdpkg.Cheatcode
 	}
-	if implv2.ConfirmAction(ctx, "Run this bash code? "+code) != nil {
-		return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it")
+
+	if !isOkBashCode(code) {
+		if implv2.ConfirmAction(ctx, "Run this bash code? "+code) != nil {
+			return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it")
+		}
 	}
+
 	var got string
 	got, err = bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
 	if err != nil {
@@ -60,7 +64,7 @@ func Basher2(ctx context.Context, caller llm.Message, toolCallIndex int) (chatme
 	return chatmessages.ChatMessages{*gotmsg}, nil
 }
 
-func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+func Basher1(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 	if err != nil {
 		return nil, err
