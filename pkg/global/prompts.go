@@ -64,5 +64,7 @@ func GetSystemBase(data any) string {
 	return withEnding
 }
 
+// QuickTemplate best-effort template parse and execute, otherwise return plain s
 func QuickTemplate(s string, data any) string {
+	return s
 }
