@@ -255,6 +255,9 @@ func (s *Session) RunAction(action Action) Result {
 
 		// Shift viewport to center around the found line target
 		newline := max(targetLine-(s.ChunkSize/2), 1)
+		if s.CurrentLine == newline {
+			return Result{Code: CodeNavigated, Message: fmt.Sprintf("We have already centered the viewport at line %d.", newline)}
+		}
 		s.CurrentLine = newline
 		return Result{Code: CodeNavigated}
 
