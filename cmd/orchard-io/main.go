@@ -15,7 +15,6 @@ import (
 	"io"
 	"log"
 	"log/slog"
-	"maps"
 	"os"
 	"os/signal"
 	"slices"
@@ -24,9 +23,9 @@ import (
 	"time"
 
 	"m/cmdpkg"
+	"m/cmdpkg/basher1"
 	"m/pkg/builtins"
 	"m/pkg/builtins/implv1"
-	"m/pkg/builtins/implv1/bashtooler"
 	"m/pkg/builtins/implv2"
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
@@ -61,39 +60,6 @@ var builtinTools otool.Tools
 
 func init() {
 	implv2.ConfirmAction = cmdpkg.Cheatcode
-}
-
-type anymap map[string]any
-
-func (a anymap) IsToolArgument() {}
-func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
-	if err != nil {
-		return nil, err
-	}
-	code := call.Function.Arguments.Code
-	if code == "" {
-		call2, _ := chat.ReadToolCall[anymap](ctx, caller, toolCallIndex)
-		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
-		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead", calls)
-	}
-	if cmdpkg.Cheatcode(ctx, "Run this bash code? "+code) != nil {
-		return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it")
-	}
-	var got string
-	got, err = bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
-	if err != nil {
-		if got != "" {
-			got += "\n"
-		}
-		got += fmt.Sprintf("Error: %+v", err)
-	}
-	if got == "" {
-		got = "command completed with no output (exit code 0)"
-	}
-	gotmsg := chatmessages.NewFromRole("", "tool", got)
-	gotmsg.ThreadID = global.Get().Get().ThreadID
-	return chatmessages.ChatMessages{*gotmsg}, nil
 }
 
 // orchard CLI infinite loop, simple stdin stdout, minimal stderr.
@@ -174,7 +140,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			"edit_file":      implv2.EditTool,
 			//"write_file": implv1.WriteFile,
 			//	"run_go_command":   noop,
-			"run_bash": basher,
+			"run_bash": basher1.Basher,
 			//	"get_package_info": noop,
 		})
 		if err != nil {
