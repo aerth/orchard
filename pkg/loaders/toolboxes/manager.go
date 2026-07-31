@@ -136,17 +136,17 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 	return s.Exec
 }
 
-func (StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
+func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
 	t1 := time.Now()
 	defer func() {
-		slog.Info("done running tool", "namea", toolName, "x", time.Since(t1))
+		slog.Info("done running tool", "namea", s.Name, "x", time.Since(t1))
 	}()
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
 	var caller chatmessages.Call[map[string]json.RawMessage]
 
-	if len(required) == 0 && len(caller1.ToolCalls) == 0 {
+	if len(s.required) == 0 && len(caller1.ToolCalls) == 0 {
 	} else {
 		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
 		if err != nil {
@@ -156,7 +156,7 @@ func (StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callIndex
 	args := caller.Function.Arguments
 	var execArgs []string
 	var inputFile string
-	for i, param := range params {
+	for i, param := range s.params {
 		if param.Name == "" {
 			return nil, fmt.Errorf("param has no name")
 		}
