@@ -2,7 +2,6 @@ package implv2
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -119,11 +118,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			m1,
 		}...)
 	}
-	//e := chat.Ext{
-	//	NonStreamHandler: func(cm chatmessages.ChatMessage) {
-	//	}
-	//}
-	//
 	var operators []string
 	creq := llm.NewChatRequest()
 	var card string
@@ -131,7 +125,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	rounds := 0
 	numberFilesEdited := 0
 	handler := GetHandler()
-	var ext chat.Ext = e.Ext
+	ext := e.Ext
 	if e, ok := ctx.Value(toolrunner.CtxExt).(chat.Ext); ok {
 		ext = e
 	}
@@ -204,7 +198,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			}
 			// in memory still. check lint
 			if !strings.HasSuffix(session.ActiveFile, ".txt") {
-				lang, langname, _ := getlang(session.ActiveFile)
+				lang, langname, _ := Getlang(session.ActiveFile)
 				if lang != nil {
 					err = ValidateFileSyntax(string(session.Current()), langname, lang)
 					if err != nil {
@@ -284,23 +278,7 @@ var ConfirmAction = func(ctx context.Context, s string) error {
 	return fmt.Errorf("there is no ConfirmAction function provided")
 }
 
-func jsonstring(v any) string {
-	b, err := json.Marshal(v)
-	if err != nil {
-		panic(err)
-	}
-	return string(b)
-}
-
-func foo(stack chatmessages.A) chatmessages.A {
-	beginLength := len(stack)
-	x := chatmessages.New(llm.Message{Role: "system", Content: SystemInstruction()})
-	x.Ephemeral = true
-
-	return stack[beginLength:]
-}
-
-func getlang(s string) (*sitter.Language, string, error) {
+func Getlang(s string) (*sitter.Language, string, error) {
 	if !strings.Contains(s, ".") {
 		return nil, "", fmt.Errorf("no dot")
 	}
