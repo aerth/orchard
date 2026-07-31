@@ -153,7 +153,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			}
 			val, ok := argsGet(args, param.Name)
 			if !ok && slices.Contains(param.Required, param.Name) {
-				panic("is required")
+				return nil, fmt.Errorf("required param %q was missing from function call", param.Name)
 			}
 			if !ok {
 				execArgs = append(execArgs, "") // still ordered
