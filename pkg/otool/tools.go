@@ -35,6 +35,9 @@ func (t *Tools) FromMarshalers(a []json.Marshaler) error {
 			x[i] = xx
 			continue
 		}
+
+		// TODO: check if this part works. not sure
+
 		tn := fmt.Sprintf("%T", a[i])
 		if tn != "main.ToolDummy" {
 			slog.Error("weird tool", "x", tn)
