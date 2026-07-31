@@ -180,11 +180,11 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	if cm.ToolCallID == "" {
 		cm.ToolCallID = cr.Message.ToolCallID
 	}
-	if len(cm.ToolCalls) != 0 && len(cr.Message.ToolCalls) != 0 {
-		slog.Info("more tool calls found", "ncalls", len(cm.ToolCalls))
-	}
 	if len(cr.Message.ToolCalls) != 0 {
 		cm.ToolCalls = append(cm.ToolCalls, cr.Message.ToolCalls...)
+		if len(cm.ToolCalls) != 0 && len(cr.Message.ToolCalls) != 0 {
+			slog.Info("more tool calls found", "ncalls", len(cm.ToolCalls))
+		}
 	}
 	if len(cm.ToolCalls) == 0 {
 		cm.ToolCalls = nil
