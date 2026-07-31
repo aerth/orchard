@@ -170,7 +170,10 @@ Chat:
 		}
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
 
-			return nil
+			if isAuto {
+				return nil
+			}
+			continue
 		}
 		//
 		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls))
