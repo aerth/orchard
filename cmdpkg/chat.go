@@ -212,7 +212,7 @@ Chat:
 				return stackerr.Errorf("%w", err)
 			}
 			if len(toolouts) == 0 {
-				toolouts = append(toolouts, WrapToolError(fmt.Errorf("no output"))...)
+				toolouts = append(toolouts, WrapToolError(fmt.Errorf("function %q gave no outputs, signalling an error", newcaller.ToolCalls.GetNames()))...)
 			}
 			for i := range toolouts {
 				toolouts[i].ThreadID = e.ThreadID
