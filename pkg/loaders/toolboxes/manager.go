@@ -137,7 +137,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			required = append(required, params[i].Name)
 		}
 	}
-	s := StaticExecFuncFS{Name: toolName, readFile: readFile, required: required, doInputEnv: doInputEnv, pyFilePath: pyFilePath}
+	s := StaticExecFuncFS{Name: toolName, readFile: readFile, required: required, doInputEnv: doInputEnv, pyFilePath: pyFilePath, params: params}
 	return s.Exec
 }
 
