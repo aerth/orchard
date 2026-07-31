@@ -194,6 +194,10 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		cr.Summary(&buf)
 		cm.Summary = buf.String()
 		cm.Metrics = cr.Metrics
+		if !cr.CreatedAt.IsZero() {
+			cm.CreatedAt = cr.CreatedAt
+			cm.UpdatedAt = cr.CreatedAt
+		}
 	}
 	if cr.Message.Content == " (END)" {
 		return fmt.Errorf("broken")
