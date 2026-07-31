@@ -210,6 +210,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				}
 			}
 			if AskBeforeWriting {
+				if ConfirmAction == nil {
+					return fmt.Errorf("")
+				}
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```\n%s\n```", newmsg.Content))
 				if err != nil {
 					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
