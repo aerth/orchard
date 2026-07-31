@@ -195,6 +195,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			outputMessage, err = bashtooler.RunBash(ctx, ".", readFile, pyFilePath, execArgs...)
 		} else {
 			slog.Warn("wtf?", "path", pyFilePath)
+			outputMessage = "wtf tool was that? dunno"
 		}
 		if err != nil {
 			return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", fmt.Sprintf("Error running tool script %q: %s", pyFilePath, err.Error()))}, nil
