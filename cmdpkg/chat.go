@@ -139,13 +139,6 @@ Chat:
 			stack = append(stack, *newcaller) // for this thread only
 			newcaller = &stack[len(stack)-1]  // fix ptr
 		}
-		/*
-			if e.Store != nil {
-				// Add sets initial msg.DBID
-				if err := e.Store.Add(context.WithoutCancel(ctx), e.ThreadID, newgenerated); err != nil {
-					return stackerr.Errorf("%w", err)
-				}
-			}*/
 		if e.AfterGen != nil {
 			if err := e.AfterGen(newcaller); err != nil {
 				return err
