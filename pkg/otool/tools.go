@@ -85,7 +85,7 @@ func (t Tool) GetDescription() string {
 	return dd.Description
 }
 
-// Exec is likely a [toolboxes.StaticExecFunc.Exec]
+// Exec is likely a [../toolboxes.StaticExecFunc.Exec]
 func (t Tool) Exec(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	if t.exec != nil {
 		slog.Debug("exec", "tool", t.Name)
