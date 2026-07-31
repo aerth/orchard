@@ -202,7 +202,7 @@ Chat:
 							cm.Ephemeral = true
 							return *cm
 						}*/
-				stack = append(stack, errmsg(err.Error()))
+				stack = append(stack, errmsg("%+v", err))
 				continue
 			}
 		}
