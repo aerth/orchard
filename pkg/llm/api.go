@@ -192,7 +192,7 @@ func (m Message) String() string {
 	}
 	from := m.RoleTitle()
 	if len(m.ToolCalls) != 0 {
-		return fmt.Sprintf("%s tool calls: %s", from, m.ToolCalls)
+		return fmt.Sprintf("%s %s [tool calls]: %s", from, m.Content, m.ToolCalls)
 	}
 	if m.Content == "" {
 		return fmt.Sprintf("%s: (thinking) %s", from, shorten(m.Thinking, 200, false))
