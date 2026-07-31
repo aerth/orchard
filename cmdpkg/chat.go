@@ -26,8 +26,8 @@ import (
 type EncoderFunc = func(v *chatmessages.ChatMessage) error
 
 const (
-	finishLoopTool     = "finish_turn"
-	finishLoopToolSpec = `{"function": {"name": "finish_turn", "description": "immediately finish this round, waiting for the user to respond"}, "parameters": {"required": [], "properties": {}}, "type": "function"}`
+	finishLoopTool     = otool.FinishLoopToolName //"finish_turn"
+	finishLoopToolSpec = `{"function": {"name": "` + finishLoopTool + `", "description": "immediately finish this round, waiting for the user to respond"}, "parameters": {"required": [], "properties": {}}, "type": "function"}`
 )
 
 func NewEphemeralSystem(s string, v ...any) chatmessages.ChatMessage {
