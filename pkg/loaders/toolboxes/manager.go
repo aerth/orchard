@@ -152,6 +152,14 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		return nil, ctx.Err()
 	}
 	var caller chatmessages.Call[map[string]json.RawMessage]
+	if len(s.required) == 0 && len(caller1.ToolCalls) == 0 {
+	} else {
+		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if len(caller1.ToolCalls) != 0 && caller.Function.Name != s.Name {
 		slog.Warn("does not equal", "x", caller.Function.Name, "want", s.Name, "caller", caller1)
 		for i := range caller1.ToolCalls {
@@ -160,13 +168,6 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		return nil, fmt.Errorf("Tool %q is currently unavailable", s.Name)
 	}
 	slog.Info("RUN TOOL", "function", caller.Function.Name)
-	if len(s.required) == 0 && len(caller1.ToolCalls) == 0 {
-	} else {
-		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
-		if err != nil {
-			return nil, err
-		}
-	}
 	args := caller.Function.Arguments
 	var execArgs []string
 	var inputFile string
