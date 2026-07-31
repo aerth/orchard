@@ -140,6 +140,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 	return s.Exec
 }
 
+// [otool.Tool.Exec]
 func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
 	t1 := time.Now()
 	defer func() {
