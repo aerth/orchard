@@ -209,7 +209,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 					}
 				}
 			}
-			if ConfirmAction != nil && AskBeforeWriting {
+			if AskBeforeWriting {
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```\n%s\n```", newmsg.Content))
 				if err != nil {
 					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
@@ -217,8 +217,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 					stack = append(stack, errmsg)
 					continue
 				}
-			} else {
-				slog.Warn("yolo edit mode?", "filename", session.ActiveFile)
 			}
 			slog.Info("WRITING FILE")
 			err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
