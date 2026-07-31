@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -147,6 +146,7 @@ type MessageOptions struct {
 	Attachments []string // Attachments filenames
 	Ephemeral   bool
 	GenDuration time.Duration
+	MaxDistance int
 }
 
 func (cm ChatMessage) TableName() string {
