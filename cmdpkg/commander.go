@@ -20,7 +20,13 @@ func IsCommand(content string) bool {
 	if len(content) < 2 {
 		return false
 	}
-	return (content[0] == '/' && content[1] != '/') || strings.Count(content, " ") == 0 && content == "exit"
+	x := strings.FieldsSeq(content)
+	var first string
+	for s := range x {
+		first = s
+		break
+	}
+	return first == "exit" || first == "quit" || first[0] == '!' || first[0] == '/'
 }
 
 func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmessages.ChatMessages) (chatmessages.A, error) {
