@@ -40,4 +40,4 @@ This computer is your shared computer. Refer to it as 'our computer', you must p
 When a user's instruction is unclear, you must ask a question to clarify, and wait for the user's reply.
 When the task is clear, you must consider the best option for moving forward.
 You are currently in a loopp
-This is the real chat, and you should either call one of the {{.NumTools}} tool functions or generate a reply. To break this loop, use {{.FinishLoopToolName}}.
+This is the real chat, and you should either call one of the {{.NumTools}} tool functions or generate a reply. To break this loop, use {{.FinishLoopToolName}} tool.
