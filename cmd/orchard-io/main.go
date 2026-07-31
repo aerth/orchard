@@ -15,6 +15,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"maps"
 	"os"
 	"os/signal"
 	"slices"
@@ -73,7 +74,7 @@ func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	code := call.Function.Arguments.Code
 	if code == "" {
 		call2, _ := chat.ReadToolCall[anymap](ctx, caller, toolCallIndex)
-		json.Unmarshal(caller.ToolCalls[toolCallIndex], &calls)
+		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead", calls)
 	}
 	if cmdpkg.Cheatcode(ctx, "Run this bash code? "+code) != nil {
