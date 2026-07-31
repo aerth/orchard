@@ -119,7 +119,8 @@ func (t *ToolboxManager) MarshalJSON() ([]byte, error) {
 type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
 
 type StaticExecFuncFS struct {
-	Name string // eg: tooltest or read_file
+	Name     string // eg: tooltest or read_file
+	readFile func(string) ([]byte, error)
 }
 
 // [orch.OrchTool.Exec]
@@ -131,9 +132,11 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			required = append(required, params[i].Name)
 		}
 	}
+	s := StaticExecFuncFS{Name: toolName, readFile: readFile}
+	return s.Exec
 }
 
-func (StatelessExecFunc) Exec(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
+func (StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
 	t1 := time.Now()
 	defer func() {
 		slog.Info("done running tool", "namea", toolName, "x", time.Since(t1))
