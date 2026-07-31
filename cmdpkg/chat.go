@@ -202,7 +202,7 @@ Chat:
 			return stackerr.Errorf("%w", err)
 		}
 		if len(toolouts) == 0 {
-			toolouts = append(toolouts, WrapToolError(fmt.Errorf("function %q gave no outputs, signalling an error", newcaller.ToolCalls.GetNames()))...)
+			toolouts = append(toolouts, WrapToolError(fmt.Errorf("function %q gave no outputs, signalling an error in our orchestration loop", newcaller.ToolCalls.GetNames()))...)
 		}
 		for i := range toolouts {
 			toolouts[i].ThreadID = e.ThreadID
