@@ -1,4 +1,4 @@
-// Package spinner for terminal/console
+// Package spinner for terminal/console "loading" indicator
 package spinner
 
 import (
