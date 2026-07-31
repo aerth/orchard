@@ -51,6 +51,12 @@ func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmes
 		return nil, os.Setenv("OLLAMA_MODEL", fields[1])
 	case "think":
 		return nil, os.Setenv("OLLAMA_THINK", fields[1])
+	case "cd":
+
+		if err := os.Chdir(fields[1]); err != nil {
+			return nil, err
+		}
+		global.RefreshDir()
 	case "system":
 		return chatmessages.A{*chatmessages.NewFromEphemeral("", llm.Message{Role: "system", Content: strings.Join(fields[1:], " ")})}, nil
 	case "setsystem":
