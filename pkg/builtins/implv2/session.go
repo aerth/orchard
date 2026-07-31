@@ -243,9 +243,11 @@ func (s *Session) RunAction(action Action) Result {
 		}
 		// Search the file slice for the exact matching code text
 		targetLine := -1
+		ext := ""
 		for idx, line := range s.Lines[s.CurrentLine:] { // get NEXT
 			if strings.Contains(line, action.Content) {
 				targetLine = idx + 1 // Convert to 1-based indexing
+				ext = " around " + action.Content
 				break
 			}
 		}
@@ -253,6 +255,7 @@ func (s *Session) RunAction(action Action) Result {
 			for idx, line := range s.Lines {
 				if strings.Contains(line, action.Content) {
 					targetLine = idx + 1 // Convert to 1-based indexing
+					ext = " around " + action.Content
 					break
 				}
 			}
@@ -266,7 +269,6 @@ func (s *Session) RunAction(action Action) Result {
 		if s.CurrentLine == newline {
 			return Result{Code: CodeNavigated, Message: fmt.Sprintf("We have already centered the viewport at line %d.", newline)}
 		}
-		ext := ""
 		s.CurrentLine = newline
 		return Result{Code: CodeNavigated, Message: fmt.Sprintf("The viewport is now centered at line %d%s.", newline, ext)}
 
