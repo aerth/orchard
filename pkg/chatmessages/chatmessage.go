@@ -162,6 +162,8 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 			slog.Info("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo(1), "caller3", stackerr.GetFuncCallerInfo(2))
 			cr.Message.Content = strings.ToUpper(cr.Message.Content)
 		}
+	} else {
+		slog.Error("Ephemeral Gather?")
 	}
 	if cr.Message.Role != "" {
 		cm.Role = cr.Message.Role
