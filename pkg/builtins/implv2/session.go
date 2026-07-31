@@ -269,10 +269,10 @@ func (s *Session) RunAction(action Action) Result {
 		// Shift viewport to center around the found line target
 		newline := max(targetLine-(s.ChunkSize/2), 1)
 		if s.CurrentLine == newline {
-			return Result{Code: CodeNavigated, Message: fmt.Sprintf("We have already centered the viewport at line %d.", newline)}
+			return Result{Code: CodeNavigated, Message: fmt.Sprintf("We have already centered the viewport at line %d. %s", newline, always)}
 		}
 		s.CurrentLine = newline
-		return Result{Code: CodeNavigated, Message: fmt.Sprintf("The viewport is now centered at line %d%s.", newline, ext)}
+		return Result{Code: CodeNavigated, Message: fmt.Sprintf("The viewport is now centered at line %d%s. %s", newline, ext, always)}
 
 	case OpLockIn:
 		if s.ActiveFile == "" {
