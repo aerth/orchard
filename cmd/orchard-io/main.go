@@ -62,6 +62,9 @@ func init() {
 	implv2.ConfirmAction = cmdpkg.Cheatcode
 }
 
+type anymap map[string]any
+
+func (a anymap) IsToolArgument() {}
 func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 	if err != nil {
@@ -69,7 +72,7 @@ func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	}
 	code := call.Function.Arguments.Code
 	if code == "" {
-		call2, _ := chat.ReadToolCall[map[string]any](ctx, caller, toolCallIndex)
+		call2, _ := chat.ReadToolCall[anymap](ctx, caller, toolCallIndex)
 		json.Unmarshal(caller.ToolCalls[toolCallIndex], &calls)
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead", calls)
 	}
