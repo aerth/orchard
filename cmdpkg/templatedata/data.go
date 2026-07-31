@@ -47,7 +47,7 @@ func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
 		"RecentFrom":         recentMessage.From,
 		"RepoInfo":           repoinfo,
 		"NumTools":           len(global.GetTools[[]otool.Tool]()),
-		"FinishLoopToolName": "finish_turn", // TODO: sync with other package
+		"FinishLoopToolName": otool.FinishLoopToolName, // TODO: sync with other package
 	}
 }
 
