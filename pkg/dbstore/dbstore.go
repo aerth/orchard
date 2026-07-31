@@ -61,7 +61,12 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 		if !should {
 			return false
 		}
-		slog.Warn("Add skipping", "dbid", v.DBID, "is_ephemeral", v.Ephemeral, "'s", v.String(), "content", v.Content)
+		already, err := s.GetMessage(ctx, threadID, v.MessageID)
+		if err == nil {
+			slog.Warn("Add skipping", "dbid", v.DBID, "is_ephemeral", v.Ephemeral, "'s", v.String(), "content", v.Content, "already", already.Content)
+		} else {
+			slog.Error("bad err", "err", err)
+		}
 		return true
 	})
 	if len(msgs) == 0 {
@@ -83,6 +88,13 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 
 	return nil
 }
+
+func (s *Store) GetMessage(ctx context.Context, threadID uuid.UUID, messageID uuid.UUID) (chatmessages.ChatMessage, error) {
+	return gorm.G[chatmessages.ChatMessage](s.db.DB()).
+		Where("role is NOT NULL and message_id = ? and thread_id = ?", threadID).Order("id desc").First(ctx)
+}
+
+//.Omit("embedding")
 
 func (s *Store) SaveThread(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages) error {
 	if threadID == uuid.Nil {
