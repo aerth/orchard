@@ -7,6 +7,7 @@ import (
 
 	"m/pkg/chatmessages"
 	"m/pkg/global"
+	"m/pkg/otool"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -45,7 +46,7 @@ func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
 		"SinceRecent":   time.Since(recentMessage.CreatedAt),
 		"RecentFrom":    recentMessage.From,
 		"RepoInfo":      repoinfo,
-		"NumTools":      len(global.GetTools()),
+		"NumTools":      len(global.GetTools[[]otool.Tool]()),
 	}
 }
 
