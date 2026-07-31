@@ -185,6 +185,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			os.Unsetenv("INPUT_FILE")
 		}
 		var outputMessage string
+		var err error
 		if strings.HasSuffix(pyFilePath, ".py") {
 			slog.Info("executing python", "file", pyFilePath, "args", execArgs)
 			//		return nil, fmt.Errorf("uhoh, we disabled python")
