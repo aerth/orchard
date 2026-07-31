@@ -57,7 +57,7 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 		return v == nil || v.DBID != 0 || v.Ephemeral
 	})
 	if len(msgs) == 0 {
-		slog.Warn("no valid storable messages")
+		slog.Warn("no valid storable messages", "in", len(msgsInput))
 		return nil
 	}
 	for i := range msgs {
