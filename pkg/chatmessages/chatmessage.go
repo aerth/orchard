@@ -191,7 +191,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		cm.ToolCalls = nil
 	}
 	if cr.Done {
-		slog.Info("Is Done", "reason", cr.DoneReason, "metrics", cr.Metrics)
+		slog.Info("Is Done", "reason", cr.DoneReason, "metrics", cr.Metrics, "cr", cr)
 		var buf bytes.Buffer
 		cr.Summary(&buf)
 		cm.Summary = buf.String()
@@ -201,6 +201,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 			cm.UpdatedAt = cr.CreatedAt
 		}
 		cm.Model = cr.Model
+
 	}
 	if cr.Message.Content == " (END)" {
 		return fmt.Errorf("broken")
