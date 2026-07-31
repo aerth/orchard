@@ -36,8 +36,9 @@ func Runtools(ctx context.Context, stack chatmessages.A, tools otool.Tools, call
 	return toolouts, err
 }
 
+// realruntools handles all calls
 func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
-	var finishedtoolouts chatmessages.ChatMessages
+	var finishedtoolouts chatmessages.ChatMessages // outputs from all calls
 	for toolCallIndex := range caller.ToolCalls {
 		var call struct {
 			ID       string `json:"id"`
