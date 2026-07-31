@@ -69,7 +69,7 @@ func basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	}
 	code := call.Function.Arguments.Code
 	if code == "" {
-		return nil, stackerr.Errorf("empty code")
+		return nil, stackerr.Errorf("empty 'code' function argument")
 	}
 	if cmdpkg.Cheatcode(ctx, "Run this bash code? "+code) != nil {
 		return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it")
