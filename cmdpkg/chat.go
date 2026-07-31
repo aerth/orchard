@@ -30,6 +30,8 @@ type EncoderFunc = func(v *chatmessages.ChatMessage) error
 // MasterSend if not nil, is used to 'finish' each message (assistant,system,tool)
 var MasterSend EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
 
+const finishLoopTool = "finish_turn"
+
 func errmsg(s string) chatmessages.ChatMessage {
 	cm := chatmessages.NewFromRole("", "system", s)
 	cm.ThreadID = global.Get().GetThreadID()
