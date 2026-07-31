@@ -132,6 +132,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	threadID := conf.GetThreadID()
 
+	session := &cmdpkg.Session{}
 	var err error
 	if true { // builtin go tools
 		slog.Debug("loading native tools")
