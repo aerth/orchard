@@ -22,6 +22,32 @@ import (
 	"m/pkg/yoke"
 )
 
+func (t *ToolboxManager) AllTools() Tools {
+	var a Tools
+	for i := range t.Toolboxes {
+		a = append(a, t.Toolboxes[i].ToolSpecs()...)
+	}
+	a = append(a, t.AdditionalTools...)
+	a = append(a, t.ToolSpec())
+	return a
+}
+
+func (t *ToolboxManager) CountAllTools() int {
+	n := 0
+	for i := range t.Toolboxes {
+		n += len(t.Toolboxes[i].Tools)
+	}
+	return n
+}
+
+func (t *ToolboxManager) GetName() string {
+	return ToolboxManagerName
+}
+
+func (t *ToolboxManager) GetDescription() string {
+	return "Open a toolbox that contains more tools."
+}
+
 type Toolbox struct {
 	Name    string
 	Ordered []string // optional
