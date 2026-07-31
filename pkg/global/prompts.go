@@ -3,11 +3,12 @@ package global
 import (
 	"errors"
 	"log/slog"
-	"m/pkg/loaders/mdloaders"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"m/pkg/loaders/mdloaders"
 
 	orchard "m"
 )
@@ -61,4 +62,7 @@ func GetSystemBase(data any) string {
 	withEnding := strings.Join(append([]string{got}, append(endingMessage, Get().Get().AddSystemPrompt)...), "\n")
 	//_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
 	return withEnding
+}
+
+func QuickTemplate(s string, data any) string {
 }
