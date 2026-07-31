@@ -123,7 +123,7 @@ type StaticExecFuncFS struct {
 	readFile func(string) ([]byte, error)
 }
 
-// [orch.OrchTool.Exec]
+// [otool.Tool.Exec]
 func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile func(string) ([]byte, error), pyFilePath string) ExecFunc {
 	_ = toolName
 	var required []string
