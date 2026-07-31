@@ -173,7 +173,7 @@ Chat:
 			if isAuto {
 				return nil
 			}
-			stack = append(stack, errmsg("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
+			stack = append(stack, errmsg("To end this round, use the %q tool. Otherwise, proceed.", finishLoopTool))
 			continue
 		}
 		//
