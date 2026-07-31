@@ -38,6 +38,9 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead", calls)
 	}
+	if strings.Contains(code, "rm ") {
+		return nil, fmt.Errorf("you may not use bash to rm files")
+	}
 	if implv2.ConfirmAction == nil {
 		implv2.ConfirmAction = cmdpkg.Cheatcode
 	}
