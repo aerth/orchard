@@ -56,6 +56,8 @@ func NewEditTool() *EditorTool {
 	return edit
 }
 
+var MaxRounds = 7
+
 func (s *Session) EditTool() otool.ExecFunc {
 	return s.editor.EditTool
 }
