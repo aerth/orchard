@@ -173,6 +173,7 @@ Chat:
 			if isAuto {
 				return nil
 			}
+			stack = append(stack, autousermsg)
 			continue
 		}
 		//
