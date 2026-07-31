@@ -121,6 +121,7 @@ type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int)
 // [orch.OrchTool.Exec]
 func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile func(string) ([]byte, error), pyFilePath string) ExecFunc {
 	_ = toolName
+	var required []string
 	execFn := func(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
 		t1 := time.Now()
 		defer func() {
@@ -130,7 +131,6 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			return nil, ctx.Err()
 		}
 		var caller chatmessages.Call[map[string]json.RawMessage]
-		noparams := len(params) == 0
 		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
 		if err != nil {
 			return nil, err
