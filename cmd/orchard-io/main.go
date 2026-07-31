@@ -132,14 +132,16 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	threadID := conf.GetThreadID()
 
-	session := &cmdpkg.Session{}
+	editor := implv2.NewEditTool()
+
 	var err error
 	if true { // builtin go tools
 		slog.Debug("loading native tools")
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file":      implv1.ReadFile,
 			"list_directory": implv1.ListDirectory,
-			"edit_file":      implv2.EditTool,
+			//"edit_file":      implv2.EditTool,
+			"edit_file": editor.EditTool,
 			//"write_file": implv1.WriteFile,
 			//	"run_go_command":   noop,
 			"run_bash": basher1.Basher,
