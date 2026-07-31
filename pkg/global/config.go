@@ -168,13 +168,16 @@ func DefaultConfigInput() ConfigInput {
 		println("COLOR MODE")
 	}
 	return ConfigInput{
-		ThreadID:    threadID,
-		Logfilename: logfilename,
-		Username:    username,
-		Botname:     botname,
-		Dir:         dir,
-		Treedir:     treedir,
-		Tooldir:     tooldir,
-		NoColor:     noColor,
+		ThreadID:      threadID,
+		Logfilename:   logfilename,
+		Username:      username,
+		Botname:       botname,
+		Dir:           dir,
+		Treedir:       treedir,
+		Tooldir:       tooldir,
+		NoColor:       noColor,
+		HideToolCalls: false,
+		ShowToolOuts:  true,
+		ShowRequests:  true,
 	}
 }
