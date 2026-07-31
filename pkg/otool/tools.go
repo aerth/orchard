@@ -88,7 +88,7 @@ func (t Tool) GetDescription() string {
 // Exec is likely a [toolboxes.StaticExecFuncFS]
 func (t Tool) Exec(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	if t.exec != nil {
-		slog.Debug("exec", "tool", t.Name)
+		slog.Debug("exec", "tool", t.Name, "caller_funcs", caller.ToolCalls.GetNames())
 		return t.exec(ctx, caller, toolCallIndex)
 	}
 	return nil, fmt.Errorf("exec func was called but is not implemented for this tool %q", t.Name)
