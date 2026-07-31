@@ -173,7 +173,7 @@ Chat:
 			if isAuto {
 				return nil
 			}
-			stack = append(stack, errmsg("To end this round, use the %q tool. Otherwise, proceed.", finishLoopTool))
+			stack = append(stack, errmsg("To end this round, use the %q tool to give voice to the user. Otherwise, proceed.", finishLoopTool))
 			continue
 		}
 		//
