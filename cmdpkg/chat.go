@@ -32,7 +32,7 @@ var MasterSend EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
 
 const (
 	finishLoopTool     = "finish_turn"
-	finishLoopToolSpec = `{}`
+	finishLoopToolSpec = `{"name": "finish_turn", "description": "immediately finish this round, waiting for the user to respond"}`
 )
 
 func errmsg(s string, v ...any) chatmessages.ChatMessage {
