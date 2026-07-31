@@ -250,14 +250,6 @@ Chat:
 			}*/
 		{
 
-			// TODO: remove MasterSend
-			if MasterSend != nil || (!conf.IsHideToolOuts() && jsonout != nil) { // if external handled, send all
-				for i := range toolouts {
-					if err := jsonout(&toolouts[i]); err != nil {
-						return stackerr.Errorf("%w", err)
-					}
-				}
-			}
 			if e.NonStreamHandler != nil {
 				for i := range toolouts {
 					e.NonStreamHandler(toolouts[i]) // should handle a tool output similar to generated, such as displaying it
