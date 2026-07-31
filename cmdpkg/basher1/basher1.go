@@ -53,7 +53,7 @@ func Basher2(ctx context.Context, caller llm.Message, toolCallIndex int) (chatme
 		got += fmt.Sprintf("Error: %+v", err)
 	}
 	if got == "" {
-		got = "command completed with no output (exit code 0)"
+		got = "command completed with no output (exit code 0) -- you should confirm that this command is meant to be silent"
 	}
 	gotmsg := chatmessages.NewFromRole("", "tool", got)
 	gotmsg.ThreadID = global.Get().Get().ThreadID
