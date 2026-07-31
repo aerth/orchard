@@ -43,6 +43,7 @@ func NewSession() *Session {
 	return &Session{}
 }
 
+// ChatWith caller MUST call global.Cancel() after to prevent Context memory leaks
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
 	slog := slog.With("ntools", len(tools))
 	slog.Info("starting ChatWith")
