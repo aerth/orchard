@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -416,9 +417,10 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = "```json\n" + cm.Content + "\n```\n(JSON ACTUAL)\n"
 	case ShowThoughts && cm.Content == "" && cm.Thinking != "":
 		content = ""
+	case cm.Role == "tool" && cm.ToolName == "":
+		content = fmt.Sprintf("### tool %q call output\n```\n", "!MISSING!") + cm.Content + "\n```\n"
 	case cm.Role == "tool" && ShowToolOutputs:
-		content = cm.Content
-		content = fmt.Sprintf("### tool %q call output\n```\n", cm.ToolName) + content + "\n```\n"
+		content = fmt.Sprintf("### tool %q call output\n```\n", cm.ToolName) + cm.Content + "\n```\n"
 	case cm.Role == "tool":
 		content = fmt.Sprintf("### tool %q call output (%d bytes)\n", cm.ToolName, len(cm.Content))
 	case cm.Content == "" && !ShowThoughts && len(cm.ToolCalls) != 0:
