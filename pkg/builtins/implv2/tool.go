@@ -66,6 +66,9 @@ func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 }
 
 func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+	if ConfirmAction == nil {
+		return nil, fmt.Errorf("no ConfirmAction available for EditTool")
+	}
 	// begin loop
 
 	call, err := chat.ReadToolCall[haspath](ctx, caller, toolCallIndex)
@@ -210,10 +213,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				}
 			}
 			if AskBeforeWriting {
-				if ConfirmAction == nil {
-					operators = append(operators, fmt.Sprintf("ERROR: %+v", "No ConfirmAction function is available"))
-					break
-				}
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```\n%s\n```", newmsg.Content))
 				if err != nil {
 					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
