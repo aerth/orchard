@@ -195,7 +195,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		cm.Summary = buf.String()
 		cm.Metrics = cr.Metrics
 		if !cr.CreatedAt.IsZero() {
-			cm.CreatedAt = cr.CreatedAt
+			cm.CreatedAt = cr.CreatedAt // NOTE: this uses server's timestamp which may be off.
 			cm.UpdatedAt = cr.CreatedAt
 		}
 	}
