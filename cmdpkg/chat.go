@@ -30,7 +30,7 @@ const (
 	finishLoopToolSpec = `{"function": {"name": "finish_turn", "description": "immediately finish this round, waiting for the user to respond"}, "parameters": {"required": [], "properties": {}}, "type": "function"}`
 )
 
-func errmsg(s string, v ...any) chatmessages.ChatMessage {
+func NewEphemeralSystem(s string, v ...any) chatmessages.ChatMessage {
 	cm := chatmessages.NewFromRole("", "system", fmt.Sprintf(s, v...))
 	cm.ThreadID = global.Get().GetThreadID()
 	cm.Ephemeral = true
@@ -153,7 +153,7 @@ Chat:
 		}
 		// handle tools
 		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") {
-			stack = append(stack, errmsg("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
+			stack = append(stack, NewEphemeralSystem("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
 			continue
 		}
 
@@ -169,7 +169,7 @@ Chat:
 				return nil // max 2 consecutive
 			}
 			z := fmt.Sprintf("Does that look complete? Any further steps, or should we finish using %q?", finishLoopTool)
-			stack = append(stack, errmsg(z))
+			stack = append(stack, NewEphemeralSystem(z))
 			//		stack = append(stack, errmsg("If the previous message is complete and this turn should end, use %q tool function to transfer conversation to the user. Otherwise, proceed with additional tool function calls to accomplish the task. If any questions remain, you must use the %q function to end the round.", finishLoopTool, finishLoopTool))
 			isAuto = true
 			continue
@@ -189,7 +189,7 @@ Chat:
 							cm.Ephemeral = true
 							return *cm
 						}*/
-				stack = append(stack, errmsg("%+v", err))
+				stack = append(stack, NewEphemeralSystem("%+v", err))
 				continue
 			}
 		}
