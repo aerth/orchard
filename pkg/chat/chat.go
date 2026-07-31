@@ -36,7 +36,7 @@ type Ext struct {
 	// PostFunc should return nil
 	PostFunc func(err error) error
 	Handlers []ChatHandler                         // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
-	AfterGen func(*chatmessages.ChatMessage) error // after generation is complete (assistant, toolcalls) for applying modifications or exit early
+	AfterGen func(*chatmessages.ChatMessage) error // after generation is complete (assistant, toolcalls) for applying modifications or exit early or store to DB
 	// NonStreamHandler for any toolouts or temporary system messages for DISPLAY
 	// for tool/system (not generated assistant stream)
 	NonStreamHandler func(chatmessages.ChatMessage)
