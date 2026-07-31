@@ -182,6 +182,7 @@ Chat:
 		if shouldBreak || strings.HasSuffix(newcaller.Content, finishLoopTool) {
 			return nil
 		}
+
 		if len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool {
 			return nil
 		}
