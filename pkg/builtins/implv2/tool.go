@@ -189,9 +189,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			slog.Info("Finished editing")
 			break
 		}
-		if errors.Is(err, ErrNot) && session.LockEnd != 0 {
-			// target acquired
-			// TODO: count lines vs locked lines?
+		if errors.Is(err, ErrNot) && session.LockEnd != 0 { // this is the raw reply that will replace the locked lines in memory
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
 			if err != nil {
 				errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
