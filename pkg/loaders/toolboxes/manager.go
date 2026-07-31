@@ -157,7 +157,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		for i := range caller1.ToolCalls {
 			slog.Warn("debug:\n" + string(caller1.ToolCalls[i]))
 		}
-		return nil, fmt.Errorf("Tool %q is currently unavailable", caller.Function.Name)
+		return nil, fmt.Errorf("Tool %q is currently unavailable", s.Name)
 	}
 	slog.Info("RUN TOOL", "function", caller.Function.Name)
 	if len(s.required) == 0 && len(caller1.ToolCalls) == 0 {
