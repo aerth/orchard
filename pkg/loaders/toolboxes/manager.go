@@ -145,7 +145,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
 	t1 := time.Now()
 	defer func() {
-		slog.Info("done running tool", "namea", s.Name, "x", time.Since(t1))
+		slog.Info("done running tool", "namea", s.Name, "duration", time.Since(t1))
 	}()
 	if ctx.Err() != nil {
 		slog.Warn("context is finished before tool could run", "err", ctx.Err(), "cause", context.Cause(ctx))
