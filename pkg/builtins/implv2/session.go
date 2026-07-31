@@ -254,7 +254,8 @@ func (s *Session) RunAction(action Action) Result {
 		}
 
 		// Shift viewport to center around the found line target
-		s.CurrentLine = max(targetLine-(s.ChunkSize/2), 1)
+		newline := max(targetLine-(s.ChunkSize/2), 1)
+		s.CurrentLine = newline
 		return Result{Code: CodeNavigated}
 
 	case OpLockIn:
