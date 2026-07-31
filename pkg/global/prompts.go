@@ -64,10 +64,25 @@ func GetSystemBase(data any) string {
 	return withEnding
 }
 
+import (
+	"bytes"
+	"text/template"
+)
+
 // QuickTemplate best-effort template parse and execute, otherwise return plain s
 func QuickTemplate(s string, data any) string {
 	if s == "" {
 		return ""
 	}
-	return s
+	tmpl, err := template.New("quick").Parse(s)
+	if err != nil {
+		return s
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return s
+	}
+
+	return buf.String()
 }
