@@ -151,7 +151,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		return nil, ctx.Err()
 	}
 	var caller chatmessages.Call[map[string]json.RawMessage]
-
+	slog.Info("RUN TOOL", "function", caller.Function.Name)
 	if len(s.required) == 0 && len(caller1.ToolCalls) == 0 {
 	} else {
 		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
