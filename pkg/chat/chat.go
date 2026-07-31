@@ -174,7 +174,7 @@ var DebugTrimImages = true
 func PrintMessages(creq *llm.ChatRequest) error {
 	w := global.LogWriter
 	slog.Info("showing messages", "n", len(creq.Messages), "roles", FormatRoles(creq.Messages))
-	fmt.Fprintf(w, "MESSAGES: %d (%q)\n", len(creq.Messages), FormatRoles(creq.Messages))
+	_, _ = fmt.Fprintf(w, "MESSAGES: %d (%q)\n", len(creq.Messages), FormatRoles(creq.Messages))
 	msg := slices.Clone(creq.Messages)
 	if DebugTrimImages {
 		for i := range msg {
