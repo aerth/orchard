@@ -49,9 +49,6 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	stack := stackInput
 	showChar := false
 	conf := global.Get()
-	if e.PreFunc == nil && conf.GetVerbose() {
-		e.PreFunc = chat.PrintMessages
-	}
 	if len(stack) == 0 {
 		slog.Warn("noop convo")
 		return nil
@@ -126,6 +123,7 @@ Chat:
 			}
 			e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 			e.Tools = tools.ToMarshaler()
+
 			err = chat.Chat(sctx, conf.GetThreadID(), stack.TopN(20), e)
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
