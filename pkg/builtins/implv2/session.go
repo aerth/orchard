@@ -243,7 +243,7 @@ func (s *Session) RunAction(action Action) Result {
 		}
 		// Search the file slice for the exact matching code text
 		targetLine := -1
-		for idx, line := range s.Lines {
+		for idx, line := range s.Lines[s.CurrentLine:] {
 			if strings.Contains(line, action.Content) {
 				targetLine = idx + 1 // Convert to 1-based indexing
 				break
