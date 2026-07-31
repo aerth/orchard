@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
 	"strings"
@@ -59,20 +58,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	var cl *debugging.ConsoleLogger
 	{
 		tw := global.LogWriter // thought writer
-		var out io.Writer = global.LogWriter
-		if MasterSend != nil {
-			slog.Info("using MasterSend")
-			out = global.LogWriter
-			tw = global.LogWriter
-			jsonout = MasterSend
-		} else if conf.Get().JsonOutput {
-			out = global.LogWriter
-			tw = global.LogWriter
-			enc := json.NewEncoder(os.Stdout).Encode
-			jsonout = func(v *chatmessages.ChatMessage) error {
-				return enc(v)
-			}
-		}
+		out := global.LogWriter
 		cl = debugging.NewConsoleLogger(out, tw)
 	}
 	var err error
