@@ -200,6 +200,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 	}
 	var outputMessage string
 	var err error
+	pyFilePath := s.pyFilePath
 	if strings.HasSuffix(pyFilePath, ".py") {
 		slog.Info("executing python", "file", pyFilePath, "args", execArgs)
 		//		return nil, fmt.Errorf("uhoh, we disabled python")
