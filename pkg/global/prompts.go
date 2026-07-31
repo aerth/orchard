@@ -14,6 +14,7 @@ import (
 	orchard "m"
 )
 
+// GetSystemBase where data is [templatedata.NewData]
 func GetSystemBase(data any) string {
 	endingMessage := []string{Get().Get().SystemPrompt}
 
