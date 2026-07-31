@@ -181,6 +181,8 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			}
 			inputfilename = file.Name()
 			_ = os.Setenv("INPUT_FILE", inputfilename)
+		} else if os.Getenv("INPUT_FILE") != "" {
+			os.Unsetenv("INPUT_FILE")
 		}
 		var outputMessage string
 		if strings.HasSuffix(pyFilePath, ".py") {
