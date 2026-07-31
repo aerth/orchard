@@ -205,6 +205,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	return nil
 }
 
+// IsEmpty permits non-empty Role, ToolCallID, and ToolName
 func (cm ChatMessage) IsEmpty() bool {
 	return cm.Thinking == "" && cm.Content == "" && len(cm.ToolCalls) == 0
 }
