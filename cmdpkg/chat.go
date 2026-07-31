@@ -58,8 +58,8 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	var jsonout EncoderFunc
 	var cl *debugging.ConsoleLogger
 	{
-		tw := global.LogWriter
-		var out io.Writer = os.Stdout
+		tw := global.LogWriter // thought writer
+		var out io.Writer = global.LogWriter
 		if MasterSend != nil {
 			slog.Info("using MasterSend")
 			out = global.LogWriter
