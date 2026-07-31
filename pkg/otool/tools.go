@@ -22,9 +22,7 @@ func (t Tools) ToMarshaler() []json.Marshaler {
 	a := make([]json.Marshaler, len(t))
 	for i := range t {
 		a[i] = t[i]
-		//		slog.Info("tool", "name", t[i].Name)
 	}
-	//slog.Info("tools", "n", len(a))
 	return a
 }
 
@@ -35,7 +33,6 @@ func (t *Tools) FromMarshalers(a []json.Marshaler) error {
 		xx, ok := a[i].(Tool)
 		if ok {
 			x[i] = xx
-			//		slog.Info("got tool", "name", xx.Name)
 			continue
 		}
 		tn := fmt.Sprintf("%T", a[i])
