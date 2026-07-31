@@ -58,7 +58,7 @@
     "parameters": {
       "code": {
         "type": "string",
-        "description": "relative path to dir, or single dot"
+        "description": "bash source to execute"
 	  }
     }
   },
