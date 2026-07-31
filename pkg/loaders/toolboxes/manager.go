@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"m/pkg/builtins/implv1/bashtooler"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/builtins/implv1/bashtooler"
+	"m/pkg/chatmessages"
+	"m/pkg/llm"
 )
 
 type (
@@ -129,6 +130,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			return nil, ctx.Err()
 		}
 		var caller chatmessages.Call[map[string]json.RawMessage]
+		noparams := len(params) == 0
 		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
 		if err != nil {
 			return nil, err
