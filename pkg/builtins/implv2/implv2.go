@@ -94,7 +94,7 @@ func OutputParser(content string) ([]Action, error) {
 		return nil, stackerr.Errorf("operator not found: %q  %w", content, ErrNot)
 	case OpNextChunk, OpPrevChunk, OpCancel: // no args
 		if remainder != "" {
-			return nil, errors.New("command " + op + " does not accept arguments or trailing formatting")
+			return nil, errors.New("operator" + op + " does not accept arguments or trailing formatting")
 		}
 		actions = append(actions, Action{Op: op})
 
