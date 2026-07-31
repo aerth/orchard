@@ -319,7 +319,7 @@ func (s *Session) RunAction(action Action) Result {
 		}
 		s.LockStart = start
 		s.LockEnd = end
-		return Result{Code: CodeLocked}
+		return Result{Code: CodeLocked, Message: fmt.Sprintf("Lines are locked and EDIT mode is active. Your raw reply output will replace %d lines", s.NumLinesLocked())}
 
 	case OpCancel:
 		s.LockStart, s.LockEnd = 0, 0
