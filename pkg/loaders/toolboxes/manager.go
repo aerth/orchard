@@ -153,7 +153,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 	}
 	var caller chatmessages.Call[map[string]json.RawMessage]
 	if len(s.required) == 0 && len(caller1.ToolCalls) == 0 {
-		// to make testing easy, we can call a no-arg tooltest without any args
+		// to make testing easy, we can call a no-arg tooltest without any real tool calls
 	} else {
 		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
 		if err != nil {
