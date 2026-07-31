@@ -119,8 +119,11 @@ func (t *ToolboxManager) MarshalJSON() ([]byte, error) {
 type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
 
 type StaticExecFuncFS struct {
-	Name     string // eg: tooltest or read_file
-	readFile func(string) ([]byte, error)
+	Name       string // eg: tooltest or read_file
+	readFile   func(string) ([]byte, error)
+	params     OrchParams
+	doInputEnv bool
+	required   []string
 }
 
 // [otool.Tool.Exec]
@@ -132,7 +135,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			required = append(required, params[i].Name)
 		}
 	}
-	s := StaticExecFuncFS{Name: toolName, readFile: readFile}
+	s := StaticExecFuncFS{Name: toolName, readFile: readFile, required: required, doInputEnv: doInputEnv}
 	return s.Exec
 }
 
@@ -169,7 +172,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 			execArgs = append(execArgs, "")
 			continue
 		}
-		if doInputEnv && inputFile == "" && i == len(params)-1 {
+		if s.doInputEnv && inputFile == "" && i == len(s.params)-1 {
 			slog.Warn("inserting file")
 			inputFile = val.(string)
 		} else {
