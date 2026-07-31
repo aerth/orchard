@@ -134,8 +134,11 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		ext = e
 	}
 	e.Ext = ext
-	rounds := 0
 	for ctx.Err() == nil {
+		rounds++
+		if rounds > MaxRounds {
+			break
+		}
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
 		creq.Messages = stack.Raw()
 		tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
@@ -181,7 +184,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		stack = append(stack, *newmsg)
 		x, err := session.Parse(newmsg.Content)
-		if rounds != 0 && errors.Is(err, ErrNot) && session.LockEnd == 0 {
+		if rounds > 1 && errors.Is(err, ErrNot) && session.LockEnd == 0 {
 			// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
 			slog.Info("Finished editing")
 			break
