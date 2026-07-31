@@ -182,7 +182,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 	}
 	if len(cr.Message.ToolCalls) != 0 {
 		cm.ToolCalls = append(cm.ToolCalls, cr.Message.ToolCalls...)
-		if l := len(cm.ToolCalls); l != len(cr.Message.ToolCalls) {
+		if l := len(cm.ToolCalls); l != len(cr.Message.ToolCalls) { // gather additional tool calls TODO: make more often
 			slog.Info("more tool calls found", "ncalls", l)
 		}
 	}
