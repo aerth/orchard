@@ -46,14 +46,14 @@ type Store struct {
 	db Underlying
 }
 
-func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgs ...*chatmessages.ChatMessage) error {
-	if len(msgs) == 0 {
+func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatmessages.ChatMessage) error {
+	if len(msgsInput) == 0 {
 		slog.Warn("no messages given to add")
 		return nil
 	}
 	//slog.Debug("adding to db...", "threadID", threadID, "msgs", len(msgs))
 
-	msgs = slices.DeleteFunc(msgs, func(v *chatmessages.ChatMessage) bool {
+	msgs := slices.DeleteFunc(msgsInput, func(v *chatmessages.ChatMessage) bool {
 		return v == nil || v.DBID != 0 || v.Ephemeral
 	})
 	if len(msgs) == 0 {
