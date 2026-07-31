@@ -141,14 +141,16 @@ func NewToolReply(caller ChatMessage, i int, content string) *ChatMessage {
 
 // MessageOptions are not saved to DB
 type MessageOptions struct {
-	Summary     any
-	Metrics     llm.Metrics
 	Aux         any
 	Attachments []string // Attachments filenames
 	Ephemeral   bool
 	GenDuration time.Duration
 	MaxDistance int    // will be removed from mem stack after N messages
 	CreatedBy   string // caller func
+
+	Model   string
+	Summary any
+	Metrics llm.Metrics
 }
 
 func (cm ChatMessage) TableName() string {
