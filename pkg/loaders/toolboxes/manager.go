@@ -124,6 +124,7 @@ type StaticExecFuncFS struct {
 	params     OrchParams
 	doInputEnv bool
 	required   []string
+	pyFilePath string
 }
 
 // [otool.Tool.Exec]
@@ -135,7 +136,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			required = append(required, params[i].Name)
 		}
 	}
-	s := StaticExecFuncFS{Name: toolName, readFile: readFile, required: required, doInputEnv: doInputEnv}
+	s := StaticExecFuncFS{Name: toolName, readFile: readFile, required: required, doInputEnv: doInputEnv, pyFilePath: pyFilePath}
 	return s.Exec
 }
 
