@@ -181,8 +181,10 @@ Chat:
 				return nil
 			}
 			stack = append(stack, errmsg("Do not repeat the previous message. If this turn is finished, use %q tool function. Otherwise, proceed with additional tool function calls to accomplish the task.", finishLoopTool))
+			isAuto = true
 			continue
 		}
+		isAuto = false
 		if newcaller.ToolCalls.GetNames()[0] == finishLoopTool {
 			return nil
 		}
