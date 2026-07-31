@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
 	"strings"
 	"time"
 
@@ -48,13 +47,11 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	slog := slog.With("ntools", len(tools))
 	slog.Info("starting ChatWith")
 	stack := stackInput
-	showChar := false
 	conf := global.Get()
 	if len(stack) == 0 {
 		slog.Warn("noop convo")
 		return nil
 	}
-	var jsonout EncoderFunc
 	var cl *debugging.ConsoleLogger
 	{
 		tw := global.LogWriter // thought writer
@@ -221,32 +218,12 @@ Chat:
 				toolouts[i].From = e.From
 			}
 		}
-		/*
-			if e.Store != nil {
-				if err := e.Store.Add(ctx, conf.GetThreadID(), chat.Ptrs(toolouts)...); err != nil {
-					return stackerr.Errorf("adding tool output to db: %w", err)
-				}
-			}*/
-		{
-
-			if e.NonStreamHandler != nil {
-				for i := range toolouts {
-					e.NonStreamHandler(toolouts[i]) // should handle a tool output similar to generated, such as displaying it
-				}
-			}
-
-			// TODO: move this toolout printer to orchard-io main to set as e.NonStreamHandler
-			if !conf.IsHideToolOuts() && jsonout == nil {
-				for i := range toolouts {
-					if showChar {
-						_, _ = fmt.Fprintf(os.Stderr, "TOOL> ")
-					}
-					_, _ = fmt.Fprintf(os.Stderr, "\n```\n%s\n```\n", toolouts[i].ContentOrToolCall())
-				}
+		if e.NonStreamHandler != nil {
+			for i := range toolouts {
+				e.NonStreamHandler(toolouts[i]) // should handle a tool output similar to generated, such as displaying it
 			}
 		}
 		stack = append(stack, toolouts...)
-		slog.Info("added toolouts", "n", len(toolouts), "ignored", conf.IsHideToolOuts(), "sent", jsonout != nil, "printed", jsonout == nil)
 		continue Chat
 	}
 
