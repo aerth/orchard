@@ -32,8 +32,8 @@ var MasterSend EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
 
 const finishLoopTool = "finish_turn"
 
-func errmsg(s string) chatmessages.ChatMessage {
-	cm := chatmessages.NewFromRole("", "system", s)
+func errmsg(s string, v ...any) chatmessages.ChatMessage {
+	cm := chatmessages.NewFromRole("", "system", fmt.Sprintf(s, v...))
 	cm.ThreadID = global.Get().GetThreadID()
 	cm.Ephemeral = true
 	return *cm
