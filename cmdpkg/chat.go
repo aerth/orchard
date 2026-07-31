@@ -86,7 +86,7 @@ Chat:
 		// this goroutine needs its own chat ptr for GatherChatResponse and then tool calls
 		newcaller := chatmessages.NewFromRole(e.From, "assistant", "")
 		newcaller.ThreadID = e.ThreadID
-		newcaller.Ephemeral = true
+		//	newcaller.Ephemeral = true  // to prevent storing
 		if true {
 			var hh []llm.ChatStreamHandlerFunc
 			if cl != nil {
