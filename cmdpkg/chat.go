@@ -255,6 +255,8 @@ Chat:
 					e.NonStreamHandler(toolouts[i]) // should handle a tool output similar to generated, such as displaying it
 				}
 			}
+
+			// TODO: move this toolout printer to orchard-io main to set as e.NonStreamHandler
 			if !conf.IsHideToolOuts() && jsonout == nil {
 				for i := range toolouts {
 					if showChar {
