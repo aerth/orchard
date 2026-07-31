@@ -198,10 +198,10 @@ func (StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callIndex
 	if strings.HasSuffix(pyFilePath, ".py") {
 		slog.Info("executing python", "file", pyFilePath, "args", execArgs)
 		//		return nil, fmt.Errorf("uhoh, we disabled python")
-		outputMessage, err = bashtooler.RunPy(ctx, ".", readFile, pyFilePath, execArgs...)
+		outputMessage, err = bashtooler.RunPy(ctx, ".", s.readFile, pyFilePath, execArgs...)
 	} else if strings.HasSuffix(pyFilePath, ".bash") {
 		slog.Info("executing bash", "file", pyFilePath, "args", execArgs)
-		outputMessage, err = bashtooler.RunBash(ctx, ".", readFile, pyFilePath, execArgs...)
+		outputMessage, err = bashtooler.RunBash(ctx, ".", s.readFile, pyFilePath, execArgs...)
 	} else {
 		slog.Warn("wtf?", "path", pyFilePath)
 		outputMessage = "wtf tool was that? dunno"
