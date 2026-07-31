@@ -180,8 +180,8 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 				return nil, fmt.Errorf("invalid: %w", err)
 			}
 			inputfilename = file.Name()
+			_ = os.Setenv("INPUT_FILE", inputfilename)
 		}
-		_ = os.Setenv("INPUT_FILE", inputfilename)
 		var outputMessage string
 		if strings.HasSuffix(pyFilePath, ".py") {
 			slog.Info("executing python", "file", pyFilePath, "args", execArgs)
