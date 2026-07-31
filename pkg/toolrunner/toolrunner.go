@@ -76,7 +76,7 @@ func realruntool(ctx context.Context, tools otool.Tools, caller chatmessages.Cha
 	}
 	if tool.Name != call.Function.Name {
 		slog.Warn("Not Running tools...", "i", toolCallIndex, "call", call)
-		return nil, stackerr.Errorf("cant find tool named %s", call.Function.Name)
+		return nil, stackerr.Errorf("cant find tool named %s in %d tools", call.Function.Name, len(tools))
 	}
 	slog.Info("Running tools...", "caller", caller.String(), "i", toolCallIndex, "call", call)
 	x, err := tool.Exec(ctx, caller.Message, toolCallIndex)
