@@ -148,9 +148,6 @@ Chat:
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
-		if strings.HasSuffix(newcaller.Content, "finish_turn") {
-			return nil
-		}
 		if errors.Is(err, context.Canceled) {
 			newcaller.Content += " (this reply was cancelled by user before it finished)"
 		}
@@ -179,6 +176,9 @@ Chat:
 		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") {
 			stack = append(stack, errmsg("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
 			continue
+		}
+		if strings.HasSuffix(newcaller.Content, finishLoopTool) {
+			return nil
 		}
 		if len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool {
 			return nil
