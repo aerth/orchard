@@ -61,7 +61,7 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 		if !should {
 			return false
 		}
-		slog.Warn("Add skipping", "dbid", v.DBID, "is_ephemeral", v.Ephemeral)
+		slog.Warn("Add skipping", "dbid", v.DBID, "is_ephemeral", v.Ephemeral, "'s", v.String(), "content", v.Content)
 		return true
 	})
 	if len(msgs) == 0 {
