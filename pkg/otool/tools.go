@@ -12,6 +12,8 @@ import (
 	"github.com/aerth/mostly/stackerr"
 )
 
+const FinishLoopToolName = "yield_control"
+
 type (
 	ToolRunnerFunc = func(ctx context.Context, tools Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error)
 	Tools          []Tool
