@@ -193,8 +193,7 @@ Chat:
 				continue
 			}
 		}
-		// if e.PreTool(ctx, )
-		// run the tool exec funcs
+		// run the tool exec funcs (add Ext)
 		ctx = context.WithValue(ctx, toolrunner.CtxExt, e)
 		toolouts, err := toolrunner.Runtools(ctx, stack, tools, *newcaller)
 		{
