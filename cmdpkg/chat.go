@@ -144,6 +144,7 @@ Chat:
 				slog.Warn("no summary found")
 			}
 		}
+
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
