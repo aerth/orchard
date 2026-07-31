@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -398,6 +397,8 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	var err error
 	var content string
 	switch {
+	case cm.Content == "finish_turn" || (len(cm.ToolCalls) == 1 && cm.ToolCalls.GetNames()[0] == "finish_turn"):
+		return nil
 	case cm.Aux != nil:
 		switch v := cm.Aux.(type) {
 		case error:
