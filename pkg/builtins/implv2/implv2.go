@@ -33,7 +33,6 @@ CANCEL                 - Return to previous mode.
 - The system will respond with a confirmation lock. ONLY then may you stream raw code lines to execute the edit.
 
 Any deviation from this formatting protocol will cause an immediate parsing execution failure.
-
 `
 
 func SystemInstruction() string {
