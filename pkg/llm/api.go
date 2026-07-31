@@ -191,7 +191,7 @@ func (m Message) String() string {
 		return fmt.Sprintf("%s tool calls: %s", from, m.ToolCalls)
 	}
 	if m.Content == "" {
-		return fmt.Sprintf("%s: (thinking) %s", from, m.Thinking)
+		return fmt.Sprintf("%s: (thinking) %s", from, shorten(m.Thinking, 200, true))
 	}
 	if m.ToolName != "" {
 		return fmt.Sprintf("tool '%s' output: %s", m.ToolName, shorten(m.Content, 200, true))
