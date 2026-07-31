@@ -148,6 +148,9 @@ Chat:
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
+		if strings.TrimSpace(strings.TrimSuffix(newcaller.Content, "finish_turn")) {
+			return nil
+		}
 		if errors.Is(err, context.Canceled) {
 			newcaller.Content += " (this reply was cancelled by user before it finished)"
 		}
