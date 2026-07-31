@@ -178,6 +178,7 @@ Chat:
 			stack = append(stack, errmsg("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
 			continue
 		}
+
 		if shouldBreak || strings.HasSuffix(newcaller.Content, finishLoopTool) {
 			return nil
 		}
@@ -188,7 +189,7 @@ Chat:
 			if isAuto {
 				return nil
 			}
-			stack = append(stack, errmsg("Do not repeat the previous message. If this round is finished, use %q tool function to transfer conversation to the user. Otherwise, proceed with additional tool function calls to accomplish the task.", finishLoopTool))
+			stack = append(stack, errmsg("Do not repeat the previous message. If this round is finished, use %q tool function to transfer conversation to the user. Otherwise, proceed with additional tool function calls to accomplish the task. If any questions remain, you must use the function to end the round.", finishLoopTool))
 			isAuto = true
 			continue
 		}
