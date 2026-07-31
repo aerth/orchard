@@ -219,9 +219,15 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			if err = store.Add(ctx, threadID, &cm); err != nil {
 				slog.Warn("err", "err", err)
 			}
+			if enc != nil {
+				_ = enc.Encode(cm)
+			}
 		}, AfterGen: func(cm *chatmessages.ChatMessage) error {
 			if err = store.Add(ctx, threadID, cm); err != nil {
 				return err
+			}
+			if enc != nil {
+				_ = enc.Encode(cm)
 			}
 			return nil
 		},
