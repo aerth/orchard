@@ -188,32 +188,30 @@ Chat:
 		// run the tool exec funcs (add Ext)
 		ctx = context.WithValue(ctx, toolrunner.CtxExt, e)
 		toolouts, err := toolrunner.Runtools(ctx, stack, tools, *newcaller)
-		{
-			slog.Info("finished running tool calls",
-				"ncalls", len(newcaller.ToolCalls), "err", err, "nresp", len(toolouts))
+		slog.Info("finished running tool calls",
+			"ncalls", len(newcaller.ToolCalls), "err", err, "nresp", len(toolouts))
 
-			// option: let the bot handle errors
-			if WrapToolErrors &&
-				err != nil &&
-				!errors.Is(err, context.Canceled) &&
-				!errors.Is(err, toolrunner.ErrFatalToolResult) {
-				toolouts = append(toolouts, WrapToolError(err)...)
-				err = nil
-			}
-			if err != nil {
-				return stackerr.Errorf("%w", err)
-			}
-			if len(toolouts) == 0 {
-				toolouts = append(toolouts, WrapToolError(fmt.Errorf("function %q gave no outputs, signalling an error", newcaller.ToolCalls.GetNames()))...)
-			}
-			for i := range toolouts {
-				toolouts[i].ThreadID = e.ThreadID
-				toolouts[i].From = e.From
-				if toolouts[i].ToolName == "" {
-					names := newcaller.ToolCalls.GetNames()
-					slog.Warn("missing toolname, guessing", "i", i, "ncalls", len(names), "name", names[i%len(names)])
-					toolouts[i].ToolName = names[i%len(names)]
-				}
+		// option: let the bot handle errors
+		if WrapToolErrors &&
+			err != nil &&
+			!errors.Is(err, context.Canceled) &&
+			!errors.Is(err, toolrunner.ErrFatalToolResult) {
+			toolouts = append(toolouts, WrapToolError(err)...)
+			err = nil
+		}
+		if err != nil {
+			return stackerr.Errorf("%w", err)
+		}
+		if len(toolouts) == 0 {
+			toolouts = append(toolouts, WrapToolError(fmt.Errorf("function %q gave no outputs, signalling an error", newcaller.ToolCalls.GetNames()))...)
+		}
+		for i := range toolouts {
+			toolouts[i].ThreadID = e.ThreadID
+			toolouts[i].From = e.From
+			if toolouts[i].ToolName == "" {
+				names := newcaller.ToolCalls.GetNames()
+				slog.Warn("missing toolname, guessing", "i", i, "ncalls", len(names), "name", names[i%len(names)])
+				toolouts[i].ToolName = names[i%len(names)]
 			}
 		}
 		if e.NonStreamHandler != nil {
