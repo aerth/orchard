@@ -91,7 +91,7 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 
 func (s *Store) GetMessage(ctx context.Context, threadID uuid.UUID, messageID uuid.UUID) (chatmessages.ChatMessage, error) {
 	return gorm.G[chatmessages.ChatMessage](s.db.DB()).
-		Where("role is NOT NULL and message_id = ? and thread_id = ?", threadID).Order("id desc").First(ctx)
+		Where("role is NOT NULL and message_id = ? and thread_id = ?", messageID, threadID).Order("id desc").First(ctx)
 }
 
 //.Omit("embedding")
