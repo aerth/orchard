@@ -30,7 +30,11 @@ cleaninstall:
 	install -v ${bin}/orchard-io ~/bin/
 	@test ! -d $(OCHATDIR) || echo installing $(OCHATDIR) TUI
 	@test ! -d $(OCHATDIR) || ${MAKE} -C $(OCHATDIR) install 
-.PHONY += clean cleaninstall
+push:
+	git push
+	git -C ../orchard-chat push
+	git -C ../otools push
+.PHONY += clean cleaninstall push
 
 
 
