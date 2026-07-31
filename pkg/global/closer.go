@@ -62,7 +62,7 @@ var (
 )
 
 func NewCancel(ctx context.Context) context.Context {
-	ctx, cancel := context.WithCancelCause(ctx)
+	ctx, cancel := context.WithCancelCause(context.WithoutCancel(ctx))
 	AddCancel(cancel)
 	return ctx
 }
