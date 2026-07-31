@@ -197,7 +197,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		}
 	}
 	var inputfilename string
-	if inputFile != "" {
+	if inputFile != "" { // for when inputs are too big
 		file, err := os.CreateTemp("", "input_*")
 		if err != nil {
 			return nil, fmt.Errorf("invalid: %w", err)
@@ -210,6 +210,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		}
 		inputfilename = file.Name()
 		_ = os.Setenv("INPUT_FILE", inputfilename)
+		// TODO: defer remove file
 	} else if os.Getenv("INPUT_FILE") != "" {
 		_ = os.Unsetenv("INPUT_FILE")
 	}
