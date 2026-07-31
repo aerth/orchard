@@ -64,37 +64,6 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	return chatmessages.ChatMessages{*gotmsg}, nil
 }
 
-func Basher1(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
-	if err != nil {
-		return nil, err
-	}
-	code := call.Function.Arguments.Code
-	if code == "" {
-		return nil, stackerr.Errorf("empty code")
-	}
-
-	if !isOkBashCode(code) {
-		if implv2.ConfirmAction(ctx, "Run this bash code? "+code) != nil {
-			return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it")
-		}
-	}
-	var got string
-	got, err = bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
-	if err != nil {
-		if got != "" {
-			got += "\n"
-		}
-		got += fmt.Sprintf("Error: %+v", err)
-	}
-	if got == "" {
-		got = "command completed with no output (exit code 0) -- you should confirm that this command is meant to be silent"
-	}
-	gotmsg := chatmessages.NewFromRole("", "tool", got)
-	gotmsg.ThreadID = global.Get().Get().ThreadID
-	return chatmessages.ChatMessages{*gotmsg}, nil
-}
-
 // not a security check. let it touch and cat eof heredoc without bugging user with confirmation modal popup. (TODO: more accurate)
 func isOkBashCode(code string) bool {
 	if strings.Contains(code, "../") {
