@@ -133,7 +133,6 @@ Chat:
 			for i := range e.Tools {
 				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
 			}
-
 			e.ShowRequests = conf.Get().ShowRequests
 			err = chat.Chat(sctx, conf.GetThreadID(), stack.TopN(20), e)
 			if spin != nil {
