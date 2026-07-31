@@ -153,7 +153,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 	}
 	var caller chatmessages.Call[map[string]json.RawMessage]
 	if len(caller1.ToolCalls) != 0 && caller.Function.Name != s.Name {
-		slog.Warn("does not equal", "x", caller.Function.Name, "want", s.Name)
+		slog.Warn("does not equal", "x", caller.Function.Name, "want", s.Name, "caller", caller1)
 		for i := range caller1.ToolCalls {
 			slog.Warn("debug:\n" + string(caller1.ToolCalls[i]))
 		}
