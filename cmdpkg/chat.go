@@ -79,6 +79,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		e.ThreadID = global.Get().Get().ThreadID
 	}
 	noStore := e.ThreadID == uuid.Nil
+	isAuto := false
 Chat:
 	for ctx.Err() == nil {
 		slog.Info("Wow")
@@ -168,6 +169,7 @@ Chat:
 			continue
 		}
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
+
 			return nil
 		}
 		//
