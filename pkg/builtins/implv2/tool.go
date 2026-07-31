@@ -14,18 +14,12 @@ import (
 	"m/pkg/debugging"
 	"m/pkg/global"
 	"m/pkg/llm"
+	"m/pkg/loaders/treesitters"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
-	sitter "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/css"
-	"github.com/smacker/go-tree-sitter/golang"
-	"github.com/smacker/go-tree-sitter/html"
-	"github.com/smacker/go-tree-sitter/javascript"
-	"github.com/smacker/go-tree-sitter/python"
-	"github.com/smacker/go-tree-sitter/typescript/typescript"
 )
 
 type haspath struct {
@@ -199,7 +193,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			}
 			// in memory still. check lint
 			if !strings.HasSuffix(session.ActiveFile, ".txt") {
-				lang, langname, _ := Getlang(session.ActiveFile)
+				lang, langname, _ := treesitters.Getlang(session.ActiveFile)
 				if lang != nil {
 					err = ValidateFileSyntax(string(session.Current()), langname, lang)
 					if err != nil {
@@ -278,28 +272,4 @@ func NewResultMessage(threadID uuid.UUID, resp Result) chatmessages.ChatMessage 
 
 var ConfirmAction = func(ctx context.Context, s string) error {
 	return fmt.Errorf("there is no ConfirmAction function provided")
-}
-
-func Getlang(s string) (*sitter.Language, string, error) {
-	if !strings.Contains(s, ".") {
-		return nil, "", fmt.Errorf("no dot")
-	}
-	ss := strings.Split(s, ".")
-	ext := ss[len(ss)-1]
-	switch ext {
-	case "go":
-		return golang.GetLanguage(), ext, nil
-	case "py":
-		return python.GetLanguage(), ext, nil
-	case "html":
-		return html.GetLanguage(), ext, nil
-	case "ts":
-		return typescript.GetLanguage(), ext, nil
-	case "js":
-		return javascript.GetLanguage(), ext, nil
-	case "css":
-		return css.GetLanguage(), ext, nil
-	default:
-		return nil, ext, fmt.Errorf("not implemented yet")
-	}
 }
