@@ -45,6 +45,7 @@ func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
 		"SinceRecent":   time.Since(recentMessage.CreatedAt),
 		"RecentFrom":    recentMessage.From,
 		"RepoInfo":      repoinfo,
+		"NumTools":      len(global.GetTools()),
 	}
 }
 
