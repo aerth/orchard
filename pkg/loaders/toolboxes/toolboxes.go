@@ -150,9 +150,8 @@ func GetBashFileEnvironKeys(b []byte) ([]string, error) {
 	return keys, nil
 }
 
-// GetPythonFileEnvironKeys returns [FOO,BAR,BAZ] from
+// GetPythonFileEnvironKeys returns [FOO,BAR,BAZ] from .get( or getenv(
 func GetPythonFileEnvironKeys(b []byte) ([]string, error) {
-	// Matches words inside quotes inside .get( or getenv(
 	matches := rege.PythonEnvironKeys.FindAllStringSubmatch(string(b), -1)
 
 	keys := make([]string, len(matches))
