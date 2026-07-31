@@ -169,7 +169,7 @@ Chat:
 			return nil
 		}
 		//
-		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls))
+		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls), "ok", ctx.Err() == nil)
 		if e.PreTools != nil {
 			err := e.PreTools(ctx, newcaller, newcaller.ToolCalls.GetNames())
 			if err != nil {
