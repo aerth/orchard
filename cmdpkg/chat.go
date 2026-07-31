@@ -218,6 +218,9 @@ Chat:
 				toolouts[i].ThreadID = e.ThreadID
 				toolouts[i].From = e.From
 				if toolouts[i].ToolName == "" {
+					names := newcaller.ToolCalls.GetNames()
+					slog.Warn("missing toolname, guessing", "i", i, "ncalls", len(names), "name", names[i%len(names)])
+					toolouts[i].ToolName = names[i%len(names)]
 				}
 			}
 		}
