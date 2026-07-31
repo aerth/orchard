@@ -168,7 +168,7 @@ Chat:
 			if isAuto {
 				return nil // max 2 consecutive
 			}
-			stack = append(stack, NewEphemeralSystem("Does that look complete? Any further steps, or should we finish using %q?", finishLoopTool))
+			stack = append(stack, NewEphemeralSystem("Task Complete? Any further steps, or should we finish using %q?", finishLoopTool))
 			isAuto = true
 			continue
 		}
