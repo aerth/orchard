@@ -1,6 +1,7 @@
 package global
 
 import (
+	"bytes"
 	"errors"
 	"log/slog"
 	"os"
@@ -63,11 +64,6 @@ func GetSystemBase(data any) string {
 	//_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
 	return withEnding
 }
-
-import (
-	"bytes"
-	"text/template"
-)
 
 // QuickTemplate best-effort template parse and execute, otherwise return plain s
 func QuickTemplate(s string, data any) string {
