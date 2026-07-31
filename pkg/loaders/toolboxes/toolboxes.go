@@ -84,7 +84,7 @@ func (t *Toolbox) ToolSpecs() Tools {
 			continue
 		} else {
 			slog.Error("exporting tool in box", "toolbox", t.Name, "tool", v.GetName())
-			panic("not ready")
+			panic("not ready for ToolV2")
 			continue
 		}
 	}
