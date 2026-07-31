@@ -30,7 +30,10 @@ type EncoderFunc = func(v *chatmessages.ChatMessage) error
 // MasterSend if not nil, is used to 'finish' each message (assistant,system,tool)
 var MasterSend EncoderFunc = nil // = func(v *chatmessages.ChatMessage) error {
 
-const finishLoopTool = "finish_turn"
+const (
+	finishLoopTool     = "finish_turn"
+	finishLoopToolSpec = `{}`
+)
 
 func errmsg(s string, v ...any) chatmessages.ChatMessage {
 	cm := chatmessages.NewFromRole("", "system", fmt.Sprintf(s, v...))
@@ -126,6 +129,7 @@ Chat:
 			}
 			e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 			e.Tools = tools.ToMarshaler()
+			e.Tools = append(e.Tools, json.RawMessage(finishLoopToolSpec))
 
 			e.ShowRequests = conf.Get().ShowRequests
 			err = chat.Chat(sctx, conf.GetThreadID(), stack.TopN(20), e)
