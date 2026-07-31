@@ -8,8 +8,9 @@ import (
 	"iter"
 	"log"
 	"log/slog"
-	"m/pkg/chatmessages"
 	"slices"
+
+	"m/pkg/chatmessages"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -56,6 +57,7 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgs ...*chatmessag
 		return v == nil || v.DBID != 0 || v.Ephemeral
 	})
 	if len(msgs) == 0 {
+		slog.Warn("no valid storable messages")
 		return nil
 	}
 	for i := range msgs {
