@@ -74,7 +74,6 @@ Chat:
 				return fmt.Errorf("detected a non-system (%s) message with no IDs: %d: %s", stack[i].Role, i, stack[i].String())
 			}
 		}
-		global.Cancel(fmt.Errorf("new ChatWith round"))
 		sctx := global.NewCancel(ctx)
 		top := stack.Top()
 		if top.Role == "assistant" {
