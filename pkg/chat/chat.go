@@ -6,11 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"slices"
-
 	"m/pkg/chatmessages"
 	"m/pkg/global"
 	"m/pkg/llm"
+	"slices"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -37,8 +36,9 @@ type Ext struct {
 	PostFunc func(err error) error
 	Handlers []ChatHandler                         // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
 	AfterGen func(*chatmessages.ChatMessage) error // after generation is complete (assistant, toolcalls) for applying modifications or exit early
-	// any toolouts or temporary system messages for DISPLAY
-	NonStreamHandler func(chatmessages.ChatMessage) // for tool/system (not generated assistant stream)
+	// NonStreamHandler for any toolouts or temporary system messages for DISPLAY
+	// for tool/system (not generated assistant stream)
+	NonStreamHandler func(chatmessages.ChatMessage)
 
 	PreTools func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error // for example, a confirmation, or whitelist
 
