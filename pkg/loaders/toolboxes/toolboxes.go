@@ -448,6 +448,7 @@ func (t *ToolboxManager) Exec(ctx context.Context, caller llm.Message, callIndex
 	var call Call
 	err := json.Unmarshal(caller.ToolCalls[callIndex], &call)
 	if err != nil {
+		slog.Error("toolbox manager Exec called", "err", err)
 		return nil, err
 	}
 	args := call.Function.Arguments
