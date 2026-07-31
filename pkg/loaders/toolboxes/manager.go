@@ -122,6 +122,11 @@ type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int)
 func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile func(string) ([]byte, error), pyFilePath string) ExecFunc {
 	_ = toolName
 	var required []string
+	for i := range params {
+		if params[i].IsRequired {
+			required = append(required, params[i].Name)
+		}
+	}
 	execFn := func(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
 		t1 := time.Now()
 		defer func() {
