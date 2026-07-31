@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"log/slog"
-	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,6 +18,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -300,12 +301,6 @@ func (m Message) Equals(msg Message) bool {
 	return m.Content == msg.Content && m.Thinking == msg.Thinking && toolCallsEqual(m.ToolCalls, msg.ToolCalls)
 }
 
-type Message9 struct {
-	Role      string
-	Thinking  string
-	Content   string
-	ToolCalls []json.RawMessage
-}
 type ChatResponses []ChatResponse
 
 func (c ChatResponses) String() string {
