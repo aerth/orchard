@@ -45,6 +45,8 @@ type Ext struct {
 	Prepend []llm.Message    // prepended to messages (tmp)
 	Append  []llm.Message    // appended to messages (tmp)
 	Tools   []json.Marshaler // Tool specs available
+	//
+	ShowRequests bool // from conf
 }
 
 // FromA (internal) combines variadic Exts into one
@@ -219,8 +221,8 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	}
 	slog.Info("Chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "handlers", len(e.Handlers))
 
-	if e.PrintMessages {
-		PrintMessages(creq)
+	if e.ShowRequests {
+		_ = PrintMessages(creq)
 	}
 	err := client.Chat(ctx, creq, e.Handlers...)
 	if err != nil {
