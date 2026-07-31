@@ -49,7 +49,7 @@ func (s Session) CurrentView() string {
 	return chunkBuilder.String()
 }
 
-const DefaultChunkSize = 50
+const DefaultChunkSize = 75
 
 func (s Session) Current() []byte {
 	return []byte(strings.Join(s.Lines, "\n"))
