@@ -55,7 +55,7 @@ func GetSystemBase(data any) string {
 	if errors.Is(err, os.ErrNotExist) {
 		orchardfile, err = os.ReadFile("AGENTS.md")
 		if err == nil {
-			pre = string("## Project-level AGENTS.md file contents\n" + string(orchardfile))
+			pre = string("## Project-level AGENTS.md file contents\n" + QuickTemplate(string(orchardfile), data))
 		}
 	}
 	got := strings.TrimSpace(strings.Join([]string{buf.String(), pre}, "\n"))
