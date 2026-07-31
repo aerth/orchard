@@ -189,7 +189,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 			execArgs = append(execArgs, "")
 			continue
 		}
-		if s.doInputEnv && inputFile == "" && i == len(s.params)-1 {
+		if s.doInputEnv && inputFile == "" && i == len(s.params)-1 && param.Type[0] == "string" {
 			slog.Warn("inserting file")
 			inputFile = val.(string)
 		} else {
