@@ -118,8 +118,8 @@ func (t *ToolboxManager) MarshalJSON() ([]byte, error) {
 
 type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
 
-type StatelessExecFunc struct {
-	Name string
+type StaticExecFuncFS struct {
+	Name string // eg: tooltest or read_file
 }
 
 // [orch.OrchTool.Exec]
