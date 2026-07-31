@@ -131,82 +131,82 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			required = append(required, params[i].Name)
 		}
 	}
-	execFn := func(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
-		t1 := time.Now()
-		defer func() {
-			slog.Info("done running tool", "namea", toolName, "x", time.Since(t1))
-		}()
-		if ctx.Err() != nil {
-			return nil, ctx.Err()
-		}
-		var caller chatmessages.Call[map[string]json.RawMessage]
+}
 
-		if len(required) == 0 && len(caller1.ToolCalls) == 0 {
-		} else {
-			err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
-			if err != nil {
-				return nil, err
-			}
-		}
-		args := caller.Function.Arguments
-		var execArgs []string
-		var inputFile string
-		for i, param := range params {
-			if param.Name == "" {
-				return nil, fmt.Errorf("param has no name")
-			}
-			val, ok := argsGet(args, param.Name)
-			if !ok && slices.Contains(param.Required, param.Name) {
-				return nil, fmt.Errorf("required param %q was missing from function call", param.Name)
-			}
-			if !ok {
-				// optional arg was not present but is still a ordered positional arg for the script
-				execArgs = append(execArgs, "")
-				continue
-			}
-			if doInputEnv && inputFile == "" && i == len(params)-1 {
-				slog.Warn("inserting file")
-				inputFile = val.(string)
-			} else {
-				execArgs = append(execArgs, fmt.Sprint(val))
-			}
-		}
-		var inputfilename string
-		if inputFile != "" {
-			file, err := os.CreateTemp("", "input_*")
-			if err != nil {
-				return nil, fmt.Errorf("invalid: %w", err)
-			}
-			slog.Info("creating input file...", "size", len(inputFile), "name", file.Name())
-			_, err = file.WriteString(inputFile)
-			_ = file.Close()
-			if err != nil {
-				return nil, fmt.Errorf("invalid: %w", err)
-			}
-			inputfilename = file.Name()
-			_ = os.Setenv("INPUT_FILE", inputfilename)
-		} else if os.Getenv("INPUT_FILE") != "" {
-			_ = os.Unsetenv("INPUT_FILE")
-		}
-		var outputMessage string
-		var err error
-		if strings.HasSuffix(pyFilePath, ".py") {
-			slog.Info("executing python", "file", pyFilePath, "args", execArgs)
-			//		return nil, fmt.Errorf("uhoh, we disabled python")
-			outputMessage, err = bashtooler.RunPy(ctx, ".", readFile, pyFilePath, execArgs...)
-		} else if strings.HasSuffix(pyFilePath, ".bash") {
-			slog.Info("executing bash", "file", pyFilePath, "args", execArgs)
-			outputMessage, err = bashtooler.RunBash(ctx, ".", readFile, pyFilePath, execArgs...)
-		} else {
-			slog.Warn("wtf?", "path", pyFilePath)
-			outputMessage = "wtf tool was that? dunno"
-		}
-		if err != nil {
-			return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", fmt.Sprintf("Error running tool script %q: %s", pyFilePath, err.Error()))}, nil
-		}
-		return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", outputMessage)}, nil
+func (StatelessExecFunc) Exec(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
+	t1 := time.Now()
+	defer func() {
+		slog.Info("done running tool", "namea", toolName, "x", time.Since(t1))
+	}()
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
 	}
-	return execFn
+	var caller chatmessages.Call[map[string]json.RawMessage]
+
+	if len(required) == 0 && len(caller1.ToolCalls) == 0 {
+	} else {
+		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args := caller.Function.Arguments
+	var execArgs []string
+	var inputFile string
+	for i, param := range params {
+		if param.Name == "" {
+			return nil, fmt.Errorf("param has no name")
+		}
+		val, ok := argsGet(args, param.Name)
+		if !ok && slices.Contains(param.Required, param.Name) {
+			return nil, fmt.Errorf("required param %q was missing from function call", param.Name)
+		}
+		if !ok {
+			// optional arg was not present but is still a ordered positional arg for the script
+			execArgs = append(execArgs, "")
+			continue
+		}
+		if doInputEnv && inputFile == "" && i == len(params)-1 {
+			slog.Warn("inserting file")
+			inputFile = val.(string)
+		} else {
+			execArgs = append(execArgs, fmt.Sprint(val))
+		}
+	}
+	var inputfilename string
+	if inputFile != "" {
+		file, err := os.CreateTemp("", "input_*")
+		if err != nil {
+			return nil, fmt.Errorf("invalid: %w", err)
+		}
+		slog.Info("creating input file...", "size", len(inputFile), "name", file.Name())
+		_, err = file.WriteString(inputFile)
+		_ = file.Close()
+		if err != nil {
+			return nil, fmt.Errorf("invalid: %w", err)
+		}
+		inputfilename = file.Name()
+		_ = os.Setenv("INPUT_FILE", inputfilename)
+	} else if os.Getenv("INPUT_FILE") != "" {
+		_ = os.Unsetenv("INPUT_FILE")
+	}
+	var outputMessage string
+	var err error
+	if strings.HasSuffix(pyFilePath, ".py") {
+		slog.Info("executing python", "file", pyFilePath, "args", execArgs)
+		//		return nil, fmt.Errorf("uhoh, we disabled python")
+		outputMessage, err = bashtooler.RunPy(ctx, ".", readFile, pyFilePath, execArgs...)
+	} else if strings.HasSuffix(pyFilePath, ".bash") {
+		slog.Info("executing bash", "file", pyFilePath, "args", execArgs)
+		outputMessage, err = bashtooler.RunBash(ctx, ".", readFile, pyFilePath, execArgs...)
+	} else {
+		slog.Warn("wtf?", "path", pyFilePath)
+		outputMessage = "wtf tool was that? dunno"
+	}
+	if err != nil {
+		return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", fmt.Sprintf("Error running tool script %q: %s", pyFilePath, err.Error()))}, nil
+	}
+	return chatmessages.ChatMessages{*chatmessages.NewChatMessage("tool", outputMessage)}, nil
 }
 
 func (t *ToolboxManager) AllTools() Tools {
