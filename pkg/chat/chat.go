@@ -10,6 +10,7 @@ import (
 	"slices"
 
 	"m/pkg/chatmessages"
+	"m/pkg/global"
 	"m/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
@@ -183,7 +184,7 @@ func PrintMessages(creq *llm.ChatRequest) error {
 		}
 	}
 
-	enc := json.NewEncoder(os.Stderr)
+	enc := json.NewEncoder(global.LogWriter)
 	enc.SetIndent("", " ")
 	enc.SetEscapeHTML(true)
 	_ = enc.Encode(msg)
