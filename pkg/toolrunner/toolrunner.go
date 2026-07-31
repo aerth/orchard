@@ -41,6 +41,7 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 	var finishedtoolouts chatmessages.ChatMessages // outputs from all calls
 	for toolCallIndex := range caller.ToolCalls {
 		x, err := realruntool(ctx, tools, caller, toolCallIndex)
+		slog.Info("realruntool got", "toolouts", len(x), "err", err)
 		finishedtoolouts = append(finishedtoolouts, x...) // outputs from *this* message's toolcall
 		if err != nil {
 			return finishedtoolouts, err
