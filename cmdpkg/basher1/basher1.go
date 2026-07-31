@@ -36,7 +36,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	if code == "" {
 		call2, _ := chat.ReadToolCall[anymap](ctx, caller, toolCallIndex)
 		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
-		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead", calls)
+		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
 	}
 	if strings.Contains(code, "rm ") {
 		return nil, fmt.Errorf("you may not use bash to rm files")
