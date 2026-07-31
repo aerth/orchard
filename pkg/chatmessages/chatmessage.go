@@ -146,7 +146,7 @@ type MessageOptions struct {
 	Attachments []string // Attachments filenames
 	Ephemeral   bool
 	GenDuration time.Duration
-	MaxDistance int
+	MaxDistance int // will be removed from mem stack after N messages
 }
 
 func (cm ChatMessage) TableName() string {
@@ -162,7 +162,6 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 			slog.Info("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo(1), "caller3", stackerr.GetFuncCallerInfo(2))
 			cr.Message.Content = strings.ToUpper(cr.Message.Content)
 		}
-	} else if true { // debug
 	}
 	if cr.Message.Role != "" {
 		cm.Role = cr.Message.Role
