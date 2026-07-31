@@ -173,18 +173,22 @@ type EmbedResponse struct {
 }
 
 type Message struct {
-	Role       string    `json:"role"`
-	Thinking   string    `json:"thinking,omitempty" gorm:"null"`
-	Content    string    `json:"content,omitempty"`
-	ToolCalls  ToolCalls `json:"tool_calls,omitempty" gorm:"type:jsonb;null"`
-	ToolName   string    `json:"tool_name,omitempty" gorm:"null"`
-	ToolCallID string    `json:"tool_call_id,omitempty" gorm:"null"`
-	Images     [][]byte  `json:"images,omitempty" gorm:"-"`
+	Role      string    `json:"role"`
+	Thinking  string    `json:"thinking,omitempty" gorm:"null"`
+	Content   string    `json:"content,omitempty"`
+	ToolCalls ToolCalls `json:"tool_calls,omitempty" gorm:"type:jsonb;null"`
+	//
+	ToolName   string   `json:"tool_name,omitempty" gorm:"null"`
+	ToolCallID string   `json:"tool_call_id,omitempty" gorm:"null"`
+	Images     [][]byte `json:"images,omitempty" gorm:"-"`
 }
 
 func (m Message) String() string {
 	if len(m.ToolCalls) == 0 && m.Content == "" && m.Thinking == "" {
-		return "(empty-message)"
+		if m.Role == "" {
+			m.Role = "no_role"
+		}
+		return "(empty-" + m.Role + "-message)"
 	}
 	from := m.RoleTitle()
 	if len(m.ToolCalls) != 0 {
