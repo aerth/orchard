@@ -136,9 +136,13 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 			return nil, ctx.Err()
 		}
 		var caller chatmessages.Call[map[string]json.RawMessage]
-		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
-		if err != nil {
-			return nil, err
+
+		if len(required) == 0 && len(caller1.ToolCalls) == 0 {
+		} else {
+			err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
+			if err != nil {
+				return nil, err
+			}
 		}
 		args := caller.Function.Arguments
 		var execArgs []string
