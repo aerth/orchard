@@ -204,7 +204,7 @@ func (m Message) String() string {
 }
 
 func (m Message) ShortContent() string {
-	return shorten(m.Content, 100, true)
+	return shorten(m.Content, 100, false)
 }
 
 type (
