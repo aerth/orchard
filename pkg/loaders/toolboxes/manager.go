@@ -156,7 +156,8 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 				return nil, fmt.Errorf("required param %q was missing from function call", param.Name)
 			}
 			if !ok {
-				execArgs = append(execArgs, "") // optional arg was not present but is still a ordered positional arg in the script tool call
+				// optional arg was not present but is still a ordered positional arg for the script
+				execArgs = append(execArgs, "")
 				continue
 			}
 			if doInputEnv && inputFile == "" && i == len(params)-1 {
