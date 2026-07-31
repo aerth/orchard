@@ -312,6 +312,9 @@ func (s *Session) RunAction(action Action) Result {
 		if end > len(s.Lines) {
 			return Result{E: fmt.Errorf("coordinates out of file range boundaries (end %d is greater than number of lines %d)", end, len(s.Lines)), Code: CodeError}
 		}
+		if end-start > MaxLinesLocked {
+			return Result{E: fmt.Errorf("coordinates are too big and the edit should be broken into smaller pieces (%d > max %d)", (end+1)-start, len(s.Lines)), Code: CodeError}
+		}
 		s.LockStart = start
 		s.LockEnd = end
 		return Result{Code: CodeLocked}
