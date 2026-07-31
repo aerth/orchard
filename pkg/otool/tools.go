@@ -87,6 +87,7 @@ func (t Tool) GetDescription() string {
 
 func (t Tool) Exec(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	if t.exec != nil {
+		slog.Debug("exec", "tool", t.Name)
 		return t.exec(ctx, caller, toolCallIndex)
 	}
 	return nil, fmt.Errorf("exec func was called but is not implemented for this tool %q", t.Name)
