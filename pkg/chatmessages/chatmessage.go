@@ -427,6 +427,10 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = fmt.Sprintf("### tool %q call output (%d bytes)\n", cm.ToolName, len(cm.Content))
 	case cm.Content == "" && !ShowThoughts && len(cm.ToolCalls) != 0:
 		content = ""
+	case len(cm.ToolCalls) != 0 && cm.Content != "":
+		slog.Info("FOUND A TOOL CALL WITH CONTENT") // it exists!
+
+		content = strings.TrimSpace(strings.TrimSuffix(cm.Content, "finish_turn")) // TODO: other place
 	case cm.Content != "":
 		content = strings.TrimSpace(strings.TrimSuffix(cm.Content, "finish_turn")) // TODO: other place
 	case len(cm.ToolCalls) == 1:
