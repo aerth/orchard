@@ -79,11 +79,11 @@ type OrchParamsWrapper struct {
 func (t *Toolbox) ToolSpecs() Tools {
 	var a Tools
 	for _, v := range t.Tools {
-		//	slog.Info("exporting tool in box", "toolbox", t.Name, "tool", v.GetName())
 		if orchtool, ok := v.(Tool); ok {
 			a = append(a, orchtool)
 			continue
 		} else {
+			slog.Error("exporting tool in box", "toolbox", t.Name, "tool", v.GetName())
 			panic("not ready")
 			continue
 		}
