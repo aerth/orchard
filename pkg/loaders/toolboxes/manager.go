@@ -152,7 +152,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		return nil, ctx.Err()
 	}
 	var caller chatmessages.Call[map[string]json.RawMessage]
-	if caller.Function.Name != s.Name {
+	if len(caller1.ToolCalls) != 0 && caller.Function.Name != s.Name {
 		slog.Warn("does not equal")
 		return nil, fmt.Errorf("Error: Tool %q is currently unavailable", caller.Function.Name)
 	}
