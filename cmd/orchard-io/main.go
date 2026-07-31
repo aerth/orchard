@@ -134,6 +134,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	var err error
 	if true { // builtin go tools
+		slog.Debug("loading native tools")
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file":      implv1.ReadFile,
 			"list_directory": implv1.ListDirectory,
@@ -151,6 +152,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		}
 	}
 	if true { // runtime bash/python tools
+		slog.Debug("loading toolbox tools")
 		builtinTools = nil
 		box, err := toolboxes.New("") // use env with toolboxes subdir
 		if err != nil {
@@ -162,6 +164,21 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 				builtinTools = append(builtinTools, v)
 			}
 		}
+	}
+
+	if true { // run tooltest
+		i := slices.Index(builtinTools.Names(), "tooltest")
+		if i < 0 {
+			return fmt.Errorf("could not find tooltest")
+		}
+		caller := llm.Message{}
+		x, err := builtinTools[i].Exec(ctx, caller, 0)
+		if err != nil || len(x) == 0 || strings.Contains(x[0].Content, "Error") {
+			err = errors.Join(err, stackerr.Errorf("tooltest failed: %q", x.Contents()))
+			return fmt.Errorf("got err: %w", err)
+		}
+		slog.Info("tool pass", "x", x.Contents())
+
 	}
 
 	var stack chatmessages.A
