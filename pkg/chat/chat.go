@@ -226,7 +226,7 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	}
 	err := client.Chat(ctx, creq, e.Handlers...)
 	if err != nil {
-		slog.Error("Chatting error", "err", err)
+		slog.Error("Chatting error", "err", err, "cause", context.Cause(ctx))
 	}
 	if e.PostFunc != nil {
 		if e := e.PostFunc(err); e != nil {
