@@ -207,7 +207,7 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 	return ChatReq(ctx, creq, e)
 }
 
-// ChatReq uses 'e' returns a single new message without running tools, running PreFunc, PostFunc, and all layered stream Handlers in order.
+// ChatReq WITHOUT RUNNING TOOLS uses 'e' returns a single new message without running tools, running PreFunc, PostFunc, and all layered stream Handlers in order.
 // uses [llm.Client.Chat] using the default global client, creating one from env if first call.
 func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	if e.PreFunc != nil {
