@@ -152,13 +152,8 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 				return nil, fmt.Errorf("param has no name")
 			}
 			val, ok := argsGet(args, param.Name)
-			//		if !ok {
-			//			val, ok = args.GetStringCaseInsensitive(param.Name)
-			//		}
 			if !ok && slices.Contains(param.Required, param.Name) {
 				panic("is required")
-				//			return nil, fmt.Errorf("missing required param %q for tool %q (case-sensitive) - Available params: %q - Received bad param name: %q", param.Name,
-				//				toolName, params.Names(), slices.Collect(maps.Keys(args.ToMap())))
 			}
 			if !ok {
 				execArgs = append(execArgs, "") // still ordered
