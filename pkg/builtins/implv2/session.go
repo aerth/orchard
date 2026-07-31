@@ -258,6 +258,7 @@ func (s *Session) RunAction(action Action) Result {
 		if s.CurrentLine == newline {
 			return Result{Code: CodeNavigated, Message: fmt.Sprintf("We have already centered the viewport at line %d.", newline)}
 		}
+		ext := ""
 		s.CurrentLine = newline
 		return Result{Code: CodeNavigated, Message: fmt.Sprintf("The viewport is now centered at line %d%s.", newline, ext)}
 
