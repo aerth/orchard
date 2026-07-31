@@ -187,7 +187,7 @@ Chat:
 			if isAuto {
 				return nil
 			}
-			stack = append(stack, errmsg("Do not repeat the previous message. If this turn is finished, use %q tool function. Otherwise, proceed with additional tool function calls to accomplish the task.", finishLoopTool))
+			stack = append(stack, errmsg("Do not repeat the previous message. If this round is finished, use %q tool function to transfer conversation to the user. Otherwise, proceed with additional tool function calls to accomplish the task.", finishLoopTool))
 			isAuto = true
 			continue
 		}
