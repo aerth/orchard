@@ -6,10 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"slices"
+
 	"m/pkg/chatmessages"
 	"m/pkg/global"
 	"m/pkg/llm"
-	"slices"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -40,7 +41,7 @@ type Ext struct {
 	// for tool/system (not generated assistant stream)
 	NonStreamHandler func(chatmessages.ChatMessage)
 
-	PreTools func(ctx context.Context, newcaller *chatmessages.ChatMessage, names string) error // for example, a confirmation, or whitelist
+	PreTools func(ctx context.Context, newcaller *chatmessages.ChatMessage, functionNames []string) error // for example, a confirmation, or whitelist
 
 	Prepend []llm.Message    // prepended to messages (tmp)
 	Append  []llm.Message    // appended to messages (tmp)
