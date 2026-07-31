@@ -259,7 +259,7 @@ func (s *Session) RunAction(action Action) Result {
 			return Result{Code: CodeNavigated, Message: fmt.Sprintf("We have already centered the viewport at line %d.", newline)}
 		}
 		s.CurrentLine = newline
-		return Result{Code: CodeNavigated}
+		return Result{Code: CodeNavigated, Message: fmt.Sprintf("The viewport is now centered at line %d%s.", newline, ext)}
 
 	case OpLockIn:
 		if s.ActiveFile == "" {
