@@ -54,7 +54,15 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 	//slog.Debug("adding to db...", "threadID", threadID, "msgs", len(msgs))
 
 	msgs := slices.DeleteFunc(msgsInput, func(v *chatmessages.ChatMessage) bool {
-		return v == nil || v.DBID != 0 || v.Ephemeral
+		if v == nil {
+			return true
+		}
+		should := v == nil || v.DBID != 0 || v.Ephemeral
+		if !should {
+			return false
+		}
+		slog.Warn("Add skipping", "dbid", v.DBID, "is_ephemeral", v.Ephemeral)
+		return true
 	})
 	if len(msgs) == 0 {
 		slog.Warn("no valid storable messages", "in", len(msgsInput))
