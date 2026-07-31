@@ -127,7 +127,7 @@ type StaticExecFuncFS struct {
 	pyFilePath string
 }
 
-// [otool.Tool.Exec]
+// makeExecFn for [otool.Tool.Exec]
 func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile func(string) ([]byte, error), pyFilePath string) ExecFunc {
 	_ = toolName
 	var required []string
@@ -140,7 +140,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 	return s.Exec
 }
 
-// [otool.Tool.Exec]
+// Exec for [otool.Tool.Exec]
 func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callIndex int) (chatmessages.ChatMessages, error) {
 	t1 := time.Now()
 	defer func() {
