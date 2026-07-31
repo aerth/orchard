@@ -198,6 +198,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 			cm.CreatedAt = cr.CreatedAt // NOTE: this uses server's timestamp which may be off.
 			cm.UpdatedAt = cr.CreatedAt
 		}
+		cm.Model = cr.Model
 	}
 	if cr.Message.Content == " (END)" {
 		return fmt.Errorf("broken")
