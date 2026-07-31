@@ -211,7 +211,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			}
 			if AskBeforeWriting {
 				if ConfirmAction == nil {
-					operators = append(operators, fmt.Sprintf("ERROR: %+v", resp.E))
+					operators = append(operators, fmt.Sprintf("ERROR: %+v", "No ConfirmAction function is available"))
 					break
 				}
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```\n%s\n```", newmsg.Content))
