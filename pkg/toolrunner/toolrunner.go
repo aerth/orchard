@@ -99,7 +99,7 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 				return finishedtoolouts, stackerr.Errorf("%w", err)
 			}
 		}
-		finishedtoolouts = append(finishedtoolouts, x...)
+		finishedtoolouts = append(finishedtoolouts, x...) // outputs from *this* message's toolcalls
 		if err != nil {
 			return finishedtoolouts, err
 		}
