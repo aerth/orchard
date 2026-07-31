@@ -216,7 +216,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				}
 			}
 			if ConfirmAction != nil && AskBeforeWriting {
-				err = ConfirmAction(ctx, "EDITOR EDITING Lines: "+fmt.Sprintf("%q", newmsg.Content))
+				err = ConfirmAction(ctx, "EDITOR EDITING Lines: "+fmt.Sprintf("%q", newmsg.ShortContent()))
 				if err != nil {
 					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 					errmsg.Content = fmt.Sprintf("ConfirmAction failed: %+v", err)
