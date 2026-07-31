@@ -326,3 +326,5 @@ func (s *Session) RunAction(action Action) Result {
 
 	return Result{E: errors.New("unhandled driver operator"), Code: CodeError}
 }
+
+var MaxLinesLocked = 12
