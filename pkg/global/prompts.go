@@ -50,7 +50,7 @@ func GetSystemBase(data any) string {
 	pre := ""
 	orchardfile, err := os.ReadFile("ORCHARD.md")
 	if err == nil {
-		pre = string("## Project-level ORCHARD.md file contents\n" + string(orchardfile))
+		pre = string("## Project-level ORCHARD.md file contents\n" + QuickTemplate(string(orchardfile)))
 	}
 	if errors.Is(err, os.ErrNotExist) {
 		orchardfile, err = os.ReadFile("AGENTS.md")
