@@ -413,7 +413,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = cm.Content + "\n\n(JSON ACTUAL FENCED)\n"
 	case cm.Content != "" && cm.Content[0] == '{':
 		//	slog.Info("detected json", "msg", cm.Content)
-		content = cm.Content + "\n\n(JSON ACTUAL)\n"
+		content = "```json\n" + cm.Content + "\n```\n(JSON ACTUAL)\n"
 	case ShowThoughts && cm.Content == "" && cm.Thinking != "":
 		content = ""
 	case cm.Role == "tool" && ShowToolOutputs:
