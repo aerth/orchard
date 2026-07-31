@@ -47,7 +47,8 @@ func NewSession() *Session {
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
 	slog := slog.With("ntools", len(tools))
 	slog.Info("starting ChatWith")
-	stack := stackInput
+	stack := make(chatmessages.ChatMessages, len(stackInput), 10000)
+	copy(stack, stackInput)
 	conf := global.Get()
 	if len(stack) == 0 {
 		slog.Warn("noop convo")
