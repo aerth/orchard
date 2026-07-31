@@ -36,17 +36,18 @@ func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
 	repoinfo, _ := runBashInfo()
 	return map[string]any{
 		"OrchardVersion": global.GetVersion(), "Now": time.Now(),
-		"Model":         os.Getenv("OLLAMA_MODEL"),
-		"Think":         os.Getenv("OLLAMA_THINK"),
-		"uname":         uname,
-		"Env":           cleanenv,
-		"FastFetch":     fastfetch,
-		"RecentMessage": recentMessage,
-		"Messages":      recentMessages,
-		"SinceRecent":   time.Since(recentMessage.CreatedAt),
-		"RecentFrom":    recentMessage.From,
-		"RepoInfo":      repoinfo,
-		"NumTools":      len(global.GetTools[[]otool.Tool]()),
+		"Model":              os.Getenv("OLLAMA_MODEL"),
+		"Think":              os.Getenv("OLLAMA_THINK"),
+		"uname":              uname,
+		"Env":                cleanenv,
+		"FastFetch":          fastfetch,
+		"RecentMessage":      recentMessage,
+		"Messages":           recentMessages,
+		"SinceRecent":        time.Since(recentMessage.CreatedAt),
+		"RecentFrom":         recentMessage.From,
+		"RepoInfo":           repoinfo,
+		"NumTools":           len(global.GetTools[[]otool.Tool]()),
+		"FinishLoopToolName": "finish_turn", // TODO: sync with other package
 	}
 }
 
