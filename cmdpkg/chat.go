@@ -191,7 +191,8 @@ Chat:
 				return nil // max 2 consecutive
 			}
 			z := fmt.Sprintf("Does that look complete? Any further steps, or should we finish using %q?", finishLoopTool)
-			stack = append(stack, errmsg("If the previous message is complete and this turn should end, use %q tool function to transfer conversation to the user. Otherwise, proceed with additional tool function calls to accomplish the task. If any questions remain, you must use the %q function to end the round.", finishLoopTool, finishLoopTool))
+			stack = append(stack, errmsg(z))
+			//		stack = append(stack, errmsg("If the previous message is complete and this turn should end, use %q tool function to transfer conversation to the user. Otherwise, proceed with additional tool function calls to accomplish the task. If any questions remain, you must use the %q function to end the round.", finishLoopTool, finishLoopTool))
 			isAuto = true
 			continue
 		}
