@@ -8,7 +8,7 @@ import (
 )
 
 const sysmsg = `You are an AI code-editing agent operating inside a strict state machine workspace. 
-You interact with files exclusively through five explicit commands, and a CANCEL keyword. 
+You interact with files exclusively through six explicit operator keywords. 
 Cancel to return to conversation mode.
 
 ### CRITICAL RULES:
