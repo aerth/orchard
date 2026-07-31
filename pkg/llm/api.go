@@ -182,31 +182,6 @@ type Message struct {
 	Images     [][]byte  `json:"images,omitempty" gorm:"-"`
 }
 
-var caser = cases.Title(language.AmericanEnglish)
-
-func title(in string) string {
-	if in == "" {
-		return in
-	}
-	return caser.String(in)
-}
-
-func (m Message) RoleTitle() string {
-	from := title(m.Role)
-	return from
-}
-
-func shorten(s string, n int, x bool) string {
-	s = strings.TrimSpace(s)
-	if x {
-		s = strings.Split(s, "\n")[0]
-	}
-	if len(s) < n {
-		return s
-	}
-	return s[:n]
-}
-
 func (m Message) String() string {
 	if len(m.ToolCalls) == 0 && m.Content == "" && m.Thinking == "" {
 		return "(empty-message)"
@@ -232,6 +207,31 @@ type (
 	Messages  []Message
 	ToolCalls []json.RawMessage
 )
+
+var caser = cases.Title(language.AmericanEnglish)
+
+func title(in string) string {
+	if in == "" {
+		return in
+	}
+	return caser.String(in)
+}
+
+func (m Message) RoleTitle() string {
+	from := title(m.Role)
+	return from
+}
+
+func shorten(s string, n int, x bool) string {
+	s = strings.TrimSpace(s)
+	if x {
+		s = strings.Split(s, "\n")[0]
+	}
+	if len(s) < n {
+		return s
+	}
+	return s[:n]
+}
 
 func (tc ToolCalls) GetNames() []string {
 	a := make([]string, len(tc))
