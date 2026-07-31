@@ -130,6 +130,9 @@ Chat:
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
+		if errors.Is(err, context.Canceled) && newcaller.Content == "" {
+			return err
+		}
 		if errors.Is(err, context.Canceled) {
 			newcaller.Content += " (this reply was cancelled by user before it finished)"
 		}
