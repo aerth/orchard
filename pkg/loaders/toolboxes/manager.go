@@ -168,7 +168,7 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		}
 		return nil, fmt.Errorf("Tool %q is currently unavailable", s.Name)
 	}
-	slog.Info("RUN TOOL", "function", caller.Function.Name)
+	slog.Info("RUN TOOL", "function", caller.Function.Name, "args", caller.Function.Arguments)
 	args := caller.Function.Arguments
 	var execArgs []string
 	var inputFile string
