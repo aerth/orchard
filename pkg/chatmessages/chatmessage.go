@@ -216,7 +216,11 @@ func (cm ChatMessage) IsEmpty() bool {
 }
 
 func (cm ChatMessage) String() string {
-	return "thr_" + cm.ThreadID.String()[:8] + "_msg_" + cm.MessageID.String()[:8] + "_" + cm.Message.String()
+	return cm.Tag() + "_" + cm.Message.String()
+}
+
+func (cm ChatMessage) Tag() string {
+	return "thr_" + cm.ThreadID.String()[:8] + "_msg_" + cm.MessageID.String()[:8]
 }
 
 func (cm ChatMessages) Contents() string {
