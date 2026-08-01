@@ -379,6 +379,9 @@ func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botna
 }
 
 func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname string) (string, error) {
+	if cm.RenderHidden && renderfunc != nil {
+		return "", nil
+	}
 	if cm.Aux == nil {
 		if cm.Equals(llm.Message{}) && cm.From != "" {
 			return fmt.Sprintf("(empty from %s)", cm.From), nil
