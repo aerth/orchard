@@ -70,10 +70,11 @@ func (s Session) SystemMessageForEdit() string {
 	nlocked := s.NumLinesLocked()
 	lockmodetext := fmt.Sprintf(
 		`
-You are currently in EDIT mode. All output will directly replace the targeted lines.
+You are currently in EDIT mode. All output will directly replace the targeted (locked) lines.
 To return to VIEW mode, begin or end your message with the word: "CANCEL" to discard this message
 The entire LOCKed targeted lines range will be replaced by your entire reply, byte-by-byte.
 Currently locked: %d lines
+An empty reply will delete the locked line range.
 Replying with <%d lines will remove lines. Empty lines in your reply are retained.
 Replying with >%d lines will insert additional lines.
 If a mistake has been made ending the edit with CANCEL (on its own line) will revert the entire edit, allowing you to fix any typos and retry.
