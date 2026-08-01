@@ -34,7 +34,12 @@ func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 
 func WithoutFinishCall(cm *chatmessages.ChatMessage) {
 	if IsFinishOnly(*cm) {
+		cm.MessageOptions = chatmessages.MessageOptions{}
+		cm.Message = llm.Message{}
 		cm.RenderHidden = true
+		cm.Ephemeral = true
+		cm.From = ""
+		cm.Aux = "--"
 		cm.ToolCalls = nil
 		cm.Thinking = ""
 		return
