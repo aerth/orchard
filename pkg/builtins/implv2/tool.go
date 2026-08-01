@@ -6,10 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
-	"strconv"
-	"strings"
-
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
@@ -18,6 +14,9 @@ import (
 	"m/pkg/loaders/treesitters"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"os"
+	"strconv"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -165,7 +164,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		newmsg.ThreadID = threadID
 		handlers := []chat.Handler{cl.HandleChatResponse, newmsg.GatherChatResponse}
 		if handler != nil {
-			handlers = append(handlers, handler.Handle)
+			handlers = append(handlers, handler.Handle) // stream to channel
 		}
 		if e.Ext.PreFunc != nil {
 			if err := e.Ext.PreFunc(creq); err != nil {
