@@ -38,6 +38,12 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
 	}
+	gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
+	creq := llm.NewChatRequest()
+	err = llm.New().Chat(ctx, creq, gr.GatherChatResponse)
+	if err != nil {
+		return nil, err
+	}
 	// TODO: actual
 	if strings.Contains(code, "&rm ") || strings.Contains(code, "& rm ") ||
 		strings.Contains(code, "|rm ") || strings.Contains(code, "| rm ") {
