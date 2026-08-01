@@ -26,31 +26,33 @@ const HowTo = `
 ### For inserting a line *after* another line, two rounds:
 
 Given a file such as:
+
+--------- example -------------
 4. The sun rises
 5. Over the hills
 6. Casting a light
 7. Across the valley
 8. To start today
+--------- example -------------
 
 	Send the "LOCK 3" operation first
 	(wait for lock verification)
 	Send a raw reply with two lines: 
-		
-		
-		
 
-	The example would become
+The lines would become:
 
+--------- example -------------
 4. The sun rises
 5. Over the hills
 6. Casting a light
 7. A golden glow
 8. Across the valley
 9. To start today
+--------- example -------------
 
 ### Other examples
 
-	Inserting a line before 
+Inserting a line *before* another line, is similar
 
 `)
 
@@ -112,7 +114,7 @@ func (s Session) SystemMessage() string {
 }
 
 func (s Session) SystemMessageForEdit() string {
-	normal := s.SystemMessageForBoth()
+	normal := s.SystemMessageForBoth() +  HowTo 
 	nlocked := s.NumLinesLocked()
 	lockmodetext := fmt.Sprintf(
 		`
