@@ -66,7 +66,9 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
 		creq := llm.NewChatRequest()
 		creq.Think = "low"
-		creq.Options = make(map[string]any)
+		if creq.Options == nil {
+			creq.Options = make(map[string]any)
+		}
 		creq.Options["seed"] = rand.Intn(13089823748)
 		creq.Messages = llm.Messages{
 			{Role: "system", Content: randReviewerText()},
