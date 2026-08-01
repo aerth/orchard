@@ -178,14 +178,14 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			operators = append(operators, err.Error())
 			break
 		}
-		isEditMode := session.NumLinesLocked() == 0
-		if isEditMode && newmsg.Content == "" {
+		isEditMode := session.NumLinesLocked() > 0
+		if !isEditMode && newmsg.Content == "" {
 			operators = append(operators, "no output")
 			break
 		}
 		stack = append(stack, *newmsg)
 		x, err := session.Parse(newmsg.Content)
-		if rounds > 1 && errors.Is(err, ErrNot) && session.LockEnd == 0 {
+		if rounds > 1 && errors.Is(err, ErrNot) && !isEditMode {
 			// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
 			slog.Info("Finished editing")
 			break
