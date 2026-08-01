@@ -144,9 +144,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
 		newstate := *chatmessages.NewSystemEphemeral(tmpmsg)
 		newstate.ThreadID = threadID
-		newstate.MaxDistance = 4
 		newusermsg := *chatmessages.NewFromRole("auto", "user", "What is the next action? Use a single operator command.")
-		newusermsg.MaxDistance = 4
 		newusermsg.ThreadID = threadID
 		if numLocked := session.NumLinesLocked(); numLocked != 0 {
 			if numLocked == 1 {
@@ -308,7 +306,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 
 	toolout := llm.Message{Role: "tool", Content: fmt.Sprintf(
 		"## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords found: %q\n\nMost recent file view:\n\n```\n%s```\n",
-		stack[startstacklen:].FormatText("", ""), operators, session.CurrentView(),
+		stack[startstacklen:].RemoveThoughts().FormatText("", ""), operators, session.CurrentView(),
 	)}
 	outmsg1 := *chatmessages.New(toolout)
 	outmsg1.ThreadID = threadID
