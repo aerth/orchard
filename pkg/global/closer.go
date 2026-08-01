@@ -95,18 +95,14 @@ func CancelAll(err error) {
 }
 
 func Cancel(err error) {
-	x := cancels
-	cancels = nil
-	if len(x) == 0 {
+	if len(cancels) == 0 {
 		shouldClose++
 		if shouldClose >= MAX {
-			slog.Error("max cancels, shutting down")
+			slog.Error("max cancels, shutting down", "cause", err)
 			Close()
 		}
 		return
 	}
 	shouldClose = 0
-	for i := range x {
-		x[i](err)
-	}
+	CancelAll(err)
 }
