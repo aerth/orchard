@@ -177,6 +177,23 @@ const (
 	CodeError     CodeInt = 400
 )
 
+func (c CodeInt) String() string {
+	switch c {
+	case CodeNavigated:
+		return "navigated"
+	case CodeLocked:
+		return "locked"
+	case CodeCancelled:
+		return "cancelled"
+	case CodeError:
+		return "errored"
+	case 0:
+		return "unset"
+	default:
+		return fmt.Sprintf("unknown: %d", int(c))
+	}
+}
+
 var ErrNoFilename = fmt.Errorf("no active file yet, use %q first", OpFilename)
 
 func (s *Session) Peek(content string) error {
