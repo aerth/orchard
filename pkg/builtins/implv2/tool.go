@@ -8,6 +8,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"strconv"
 	"strings"
 
 	"m/pkg/chat"
@@ -139,8 +140,22 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
 		tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
 		newstate := *chatmessages.NewSystemEphemeral(tmpmsg)
+		newstate.ThreadID = threadID
 		newstate.MaxDistance = 4
+		newusermsg := *chatmessages.NewFromRole("auto", "user", "What is the next action? Use a single operator command.")
+		newusermsg.MaxDistance = 4
+		newusermsg.ThreadID = threadID
+		if numLocked := session.NumLinesLocked(); numLocked != 0 {
+			if numLocked == 1 {
+				newusermsg.Content = fmt.Sprintf("Line %d is locked. Reply with only the updated lines (or CANCEL).", session.LockStart)
+			} else {
+				newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked. Reply with only the updated lines (or CANCEL).", session.LockStart, session.LockEnd)
+			}
+		}
 		stack = append(stack, newstate)
+		handler.HandleToolOutputs(newstate)
+		stack = append(stack, newusermsg)
+		handler.HandleToolOutputs(newusermsg)
 		creq.Messages = stack.Raw()
 		card = ""
 		log.Printf("TMEPMSG:\n%s", tmpmsg)
@@ -184,7 +199,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			break
 		}
 		var actionsParsed []Action
-		if !isEditMode {
+		if newmsg.Content != "" {
 			actionsParsed, err = session.Parse(newmsg.Content)
 			if rounds > 1 && errors.Is(err, ErrNot) && !isEditMode {
 				// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
@@ -194,6 +209,21 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			}
 			if len(actionsParsed) != 0 {
 				newmsg.Aux = actionsParsed
+			}
+			if len(actionsParsed) == 1 && actionsParsed[0].Op == "DELETE_LINES" {
+				isEditMode = true
+				n1, n2, err := ParseRange(&session, actionsParsed[0].Content)
+				if err != nil {
+					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
+					errmsg.Content = fmt.Sprintf("Delete Lines failed: %+v", err)
+					stack = append(stack, errmsg)
+					handler.HandleToolOutputs(errmsg)
+					continue
+				}
+				// trick to delete lines going directly to ApplySurgicalEdit
+				session.LockStart = n1
+				session.LockEnd = n2
+				newmsg.Content = ""
 			}
 		}
 		stack = append(stack, *newmsg)
@@ -278,10 +308,53 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	outmsg1 := *chatmessages.New(toolout)
 	outmsg1.ThreadID = threadID
 	outmsgs = append(outmsgs, outmsg1)
+	outmsgs = outmsgs.RemoveThoughts()
 	_ = json.NewEncoder(global.LogWriter).Encode(stack[startstacklen:])
 	slog.Info("editor returning messages", "n", len(outmsgs))
 	_ = json.NewEncoder(global.LogWriter).Encode(outmsgs)
 	return outmsgs, nil
+}
+
+func ParseRange(s *Session, actionContent string) (int, int, error) {
+	// Unpack coordinate arguments safely
+	parts := strings.Split(actionContent, "-")
+	var start, end int
+	var err error
+
+	if len(parts) == 0 || len(parts) > 2 {
+		return 0, 0, errors.New("invalid coordinate format")
+	}
+	l := len(parts)
+	switch {
+	case l == 0:
+		return 0, 0, errors.New("invalid coordinate format: need '%d' or '%d-%d' format (not enough args)")
+	case l > 2:
+		return 0, 0, errors.New("invalid coordinate format: need '%d' or '%d-%d' format (too many args)")
+	}
+
+	start, err = strconv.Atoi(parts[0])
+	if err != nil {
+		return 0, 0, errors.New("invalid start coordinate format: " + err.Error())
+	}
+	if l == 1 {
+		end = start
+	}
+	if l == 2 {
+		end, err = strconv.Atoi(parts[1])
+		if err != nil {
+			return 0, 0, errors.New("invalid end coordinate format: " + err.Error())
+		}
+	}
+	if start < 1 || end < start {
+		return 0, 0, errors.New("coordinates out of file range boundaries (start)")
+	}
+	if end > len(s.Lines) {
+		return 0, 0, fmt.Errorf("coordinates out of file range boundaries (end %d is greater than number of lines %d)", end, len(s.Lines))
+	}
+	if end-start > MaxLinesLocked {
+		return 0, 0, fmt.Errorf("coordinates are too big and the edit should be broken into smaller pieces (%d > max %d)", (end+1)-start, len(s.Lines))
+	}
+	return start, end, nil
 }
 
 func NewResultMessage(threadID uuid.UUID, resp Result) chatmessages.ChatMessage {
