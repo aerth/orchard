@@ -64,7 +64,7 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 			return true
 		}
 		if v.ThreadID == uuid.Nil {
-			slog.Warn("Add skipping no threadID", "dbid", v.DBID, "is_ephemeral", v.Ephemeral, "'s", v.String(), "content", v.Content, "already", already.Content)
+			slog.Warn("Add skipping no threadID", "dbid", v.DBID, "is_ephemeral", v.Ephemeral, "'s", v.String(), "content", v.Content)
 			return true
 		}
 		return false
