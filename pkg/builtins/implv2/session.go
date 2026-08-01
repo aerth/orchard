@@ -156,7 +156,7 @@ Best practices:
 		Use CANCEL to ask the user a question.
 		Make a single change. You may return to line replacement mode after the edit was successfully applied.
 To return to NORMAL mode, begin or end your message with the word: "CANCEL".
-If you meant to delete these locked lines, use CANCEL to go back, then DELETE_LINES operator command from normal mode.
+If you meant to delete these locked lines, use CANCEL to go back, then DELETE_LINES protocol command from normal mode.
 
 			`,
 		nlocked,
@@ -321,7 +321,7 @@ func (s *Session) ApplyAction(action Action) Result {
 
 	switch action.Op {
 	default:
-		return Result{E: stackerr.Errorf("unhandled operator command %q", action.Op), Code: CodeError}
+		return Result{E: stackerr.Errorf("unhandled protocol command %q", action.Op), Code: CodeError}
 	case OpFilename:
 		if s.ActiveFile == action.Content {
 			return Result{Message: "The file was already selected."}
