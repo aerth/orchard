@@ -84,31 +84,35 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 
 	var tools otool.Tools
 	err := tools.FromMarshalers(e.Tools)
-	if err == nil && e.Context == nil {
-		err = stackerr.Errorf("need Context")
+	if err != nil {
+		fail()
+		return
 	}
 	if err == nil {
 		err = cmdpkg.ChatWith(e.Context, e.ChatMessages, tools, ext2)
 	}
 	if err != nil { // ensure a Done is received
 		slog.Error("RunChatTools failed", "err", err, "id", genID)
-		if err := e.Send(hgr2.ResponseWrap{
-			GenID: genID,
-			V: llm.ChatResponse{
-				Done:       true,
-				DoneReason: stackerr.Errorf("%w", err),
-				Message: llm.Message{Role: "system", Content: fmt.Sprintf(
-					"**This text-generation run was cancelled by user (%v)**\n```\nError: %+v\n```\n",
-					context.Cause(e.Context), err,
-				)},
-			},
-		}); err != nil {
-			slog.Warn("Could not finish up after error", "err", err)
-		}
 	}
 }
 
 func Postfunc(genID uuid.UUID, c chan<- hgr2.ResponseWrap) func(err error) error {
 	slog.Info("empty postfunc")
 	return nil
+}
+
+func fail() {
+	if err := e.Send(hgr2.ResponseWrap{
+		GenID: genID,
+		V: llm.ChatResponse{
+			Done:       true,
+			DoneReason: stackerr.Errorf("%w", err),
+			Message: llm.Message{Role: "system", Content: fmt.Sprintf(
+				"**This text-generation run was cancelled by user (%v)**\n```\nError: %+v\n```\n",
+				context.Cause(e.Context), err,
+			)},
+		},
+	}); err != nil {
+		slog.Warn("Could not finish up after error", "err", err)
+	}
 }
