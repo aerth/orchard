@@ -23,13 +23,15 @@ const HowTo = `
 
 	DELETE_LINES 4-5
 
-### For inserting a line after line 4, two rounds:
+### For inserting a line *after* line 3, two rounds:
 
 	2: hello
 	3: world
 	4: !
 
-	LOCK 4
+	LOCK 3
+	internet
+
 
 `)
 
