@@ -133,7 +133,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	threadID := conf.GetThreadID()
 
-	singleeditor := implv2.NewEditTool() // single file editor
+	singleeditor := implv2.NewEditTool(nil) // single file editor
 
 	var err error
 	if true { // builtin go tools
