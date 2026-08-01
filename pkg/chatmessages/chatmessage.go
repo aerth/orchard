@@ -398,6 +398,9 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	var err error
 	var content string
 	switch {
+	case len(cm.ToolCalls) == 1 && cm.Content == "" && cm.ToolCalls.GetNames()[0] == "yield_control":
+		// skip
+		return nil
 	case strings.TrimSpace(cm.Content) == "finish_turn" || (len(cm.ToolCalls) == 1 && cm.ToolCalls.GetNames()[0] == "finish_turn"):
 		return nil
 	case cm.Aux != nil:
