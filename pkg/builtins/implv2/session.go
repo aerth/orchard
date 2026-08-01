@@ -32,6 +32,13 @@ const HowTo = `
 	LOCK 3
 	internet
 
+	The example would become
+
+	2: hello
+	3: internet
+	4: world
+	5: !
+
 
 `)
 
