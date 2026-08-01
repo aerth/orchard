@@ -42,9 +42,9 @@ type ChatMessage struct {
 	DBMODEL
 	ThreadID       uuid.UUID `gorm:"type:uuid;not null;index:idx_thread_time,priority:1" json:"thread_id,omitempty"` // ThreadID for storing in DB
 	MessageID      uuid.UUID `gorm:"type:uuid;primaryKey;notnull;" json:"message_id,omitempty"`                      // MessageID is unique identifier for each message
+	From           string    `json:"from,omitempty"`                                                                 // name of assistant
 	llm.Message    `gorm:"embedded" json:"message"`
 	Embedding      *vector256.Vector256 `gorm:"type:vector(256);null" json:"-"`
-	From           string               `json:"from,omitempty"` // name of assistant
 	MessageOptions `gorm:"-" json:"-"`
 }
 
