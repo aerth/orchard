@@ -121,6 +121,9 @@ func realruntool(ctx context.Context, tools otool.Tools, caller chatmessages.Cha
 		if x[i].ToolName == "" || x[i].ToolCallID == "" {
 			slog.Warn("bad tool repair")
 		}
+		if len(x[i].Content) > MaxKeeper {
+			x[i].MaxDistance = 5
+		}
 	}
 
 	// then send the toolouts if we do that
@@ -132,4 +135,7 @@ func realruntool(ctx context.Context, tools otool.Tools, caller chatmessages.Cha
 	return x, nil
 }
 
-var AfterTool = func(ctx context.Context, cm *chatmessages.ChatMessage) error { return nil }
+var (
+	AfterTool = func(ctx context.Context, cm *chatmessages.ChatMessage) error { return nil }
+	MaxKeeper = 200
+)
