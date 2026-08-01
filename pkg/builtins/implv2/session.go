@@ -66,22 +66,41 @@ func (s Session) SystemMessage() string {
 }
 
 func (s Session) SystemMessageForEdit() string {
-	return ""
-}
+	normal := s.SystemMessageForBoth()
+	nlocked := (s.LockEnd - s.LockStart) + 1
+	lockmodetext := fmt.Sprintf(
+		`
+You are currently in EDIT mode. All output will directly replace the targeted lines.
+To return to VIEW mode, begin or end your message with the word: "CANCEL" to discard this message
+The entire LOCKed targeted lines range will be replaced by your entire reply, byte-by-byte.
+Currently locked: %d lines
+Replying with <%d lines will remove lines. Empty lines in your reply are retained.
+Replying with >%d lines will insert additional lines.
+If a mistake has been made ending the edit with CANCEL (on its own line) will revert the entire edit, allowing you to fix any typos and retry.
+File line numbers are added for your convienence only. Do not prepend lines. Output only the raw changed lines.
 
-func (s Session) SystemMessageForBoth() string {
+			`,
+		nlocked,
+		nlocked,
+		nlocked,
+	)
+	return normal + lockmodetext
+	//return normal
 }
 
 func (s Session) SystemMessageForView() string {
+	return s.SystemMessageForBoth()
+}
+
+func (s Session) SystemMessageForBoth() string {
 	// 1. Calculate boundaries for the active viewing chunk window
 
 	viewportview := s.CurrentView()
 	// 3. Format total active system instructions matching your state constraints
 	var lockStatus string
-	isLocked := false
+	//isLocked := false
 	if s.LockStart > 0 && s.LockEnd > 0 {
-
-		isLocked = true
+		//	isLocked = true
 		lockStatus = fmt.Sprintf("LOCKED FOR EDIT: Lines %d-%d (use CANCEL to return to READ mode) ", s.LockStart, s.LockEnd)
 	} else {
 		lockStatus = "READ-ONLY NAVIGATION MODE (use LOCK <start>-<end> to target those lines, use CANCEL to return to conversation)"
@@ -106,12 +125,14 @@ Note: Asterisks ('*') mark LOCKed lines
 - To begin EDIT mode, LOCK a range.
 - Protocol Commands are sent directly to the chat, and interpreted by this session.
 
-### AVAILABLE PROTOCOL COMMANDS:
+### AVAILABLE PROTOCOL COMMANDS (VIEW-MODE):
 SELECT_FILE <filename> - Open/switch workspace file.
 NEXT_CHUNK            - Scroll view window down by %d lines.
 PREV_CHUNK            - Scroll view window up by %d lines.
 GOTO <string>         - Search target string and center view window around it.
 LOCK <start>-<end>    - Lock target coordinates to start editing.
+
+### ALWAYS AVAILABLE
 CANCEL                - Unlock coordinates and return to search navigation.
 ### There are no more PROTOCOL COMMANDS ###
 `,
@@ -124,29 +145,7 @@ CANCEL                - Unlock coordinates and return to search navigation.
 		s.ChunkSize,
 		s.ChunkSize,
 	)
-	if isLocked {
-		nlocked := (s.LockEnd - s.LockStart) + 1
-		lockmodetext := fmt.Sprintf(
-			`
-You are currently in EDIT mode. All output will directly replace the targeted lines.
-To return to VIEW mode, begin or end your message with the word: "CANCEL" to discard this message
-The entire LOCKed targeted lines range will be replaced by your entire reply, byte-by-byte.
-Currently locked: %d lines
-Replying with <%d lines will remove lines. Empty lines in your reply are retained.
-Replying with >%d lines will insert additional lines.
-If a mistake has been made ending the edit with CANCEL (on its own line) will revert the entire edit, allowing you to fix any typos and retry.
-File line numbers are added for your convienence only. Do not prepend lines. Output only the raw changed lines.
-
-			`,
-			nlocked,
-			nlocked,
-			nlocked,
-		)
-		return normal + lockmodetext
-	} else {
-		return normal + "\n" + "send single line (`LOCK <start>-<end>`) enter EDIT mode."
-	}
-	//return normal
+	return normal
 }
 
 // Global integer status codes for clear systemic orchestration
