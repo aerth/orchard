@@ -144,9 +144,11 @@ func (s Session) SystemMessageForEdit() string {
 	lockmodetext := fmt.Sprintf(
 		`
 
-### AVAILABLE PROTOCOL COMMANDS (targeted lines locked, we are in line replacement mode):
+### ONLY ONE AVAILABLE PROTOCOL COMMAND
 
 CANCEL                - Unlock target coordinates, returning to normal mode.
+		
+	(%d targeted lines, we are in line replacement mode):
 
 ### Line Replacement Instructions
 All output will directly replace the targeted (locked) lines.
@@ -164,7 +166,7 @@ Best practices:
 To return to NORMAL mode, begin or end your message with the word: "CANCEL".
 If you meant to delete these locked lines, use CANCEL to go back, then DELETE_LINES protocol command from normal mode.
 
-			`,
+			`, nlocked,
 		nlocked,
 		nlocked,
 		nlocked,
