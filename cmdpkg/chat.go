@@ -67,9 +67,11 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	}
 	noStore := e.ThreadID == uuid.Nil
 	isAuto := false
+	numRounds := 0
 Chat:
 	for ctx.Err() == nil {
-		slog.Info("Wow")
+		numRounds++
+		slog = slog.With("round", numRounds)
 		for i := range stack {
 			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil || (!noStore && stack[i].ThreadID == uuid.Nil) {
 				// keep this to identify regressions
