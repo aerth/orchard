@@ -151,6 +151,8 @@ type MessageOptions struct {
 	Model   string
 	Summary any
 	Metrics llm.Metrics
+	Style   int
+	Hidden  bool
 }
 
 func (cm ChatMessage) TableName() string {
@@ -398,18 +400,9 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	var err error
 	var content string
 
-	const finishTool = "yield_control"
-	isFinishToolONLY := false
-	switch {
-	// // TODO: sync with otool package that imports this package NVM
-	case len(cm.ToolCalls) == 1 && cm.Content == "" && cm.ToolCalls.GetNames()[0] == finishTool:
-		isFinishToolONLY = true
-	case len(cm.ToolCalls) == 0 && strings.TrimSpace(cm.Content) == finishTool:
-		isFinishToolONLY = true
-	}
 	//	return nil
 	switch {
-	case isFinishToolONLY && renderfuncMaybe != nil:
+	case cm.Hidden && renderfuncMaybe != nil: // hide from rendered but not the raw display
 		return nil
 	case cm.Aux != nil:
 		switch v := cm.Aux.(type) {
@@ -444,7 +437,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	default:
 		content = "UNKNOWN"
 	}
-	if content == "" && !isFinishToolONLY {
+	if content == "" {
 		switch {
 		case len(cm.ToolCalls) == 1:
 			content = "Tool Call"
