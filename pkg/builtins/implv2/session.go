@@ -150,8 +150,8 @@ var ViewOnlyChunk = `- To begin EDIT mode, LOCK a range.
 
 ### AVAILABLE PROTOCOL COMMANDS (VIEW-MODE):
 SELECT_FILE <filename> - Open/switch workspace file.
-NEXT_CHUNK            - Scroll view window down by %d lines.
-PREV_CHUNK            - Scroll view window up by %d lines.
+NEXT_CHUNK            - Scroll view window down by ` + fmt.Sprint(DefaultChunkSize) + ` lines.
+PREV_CHUNK            - Scroll view window up by ` + fmt.Sprint(DefaultChunkSize) + ` lines.
 GOTO <string>         - Search target string and center view window around it.
 LOCK <start>-<end>    - Lock target coordinates to start editing.
 
