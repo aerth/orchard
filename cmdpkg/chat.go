@@ -144,17 +144,18 @@ Chat:
 			stack = append(stack, *newcaller) // for this thread only
 			newcaller = &stack[len(stack)-1]  // fix ptr
 		}
+		// handle tools
+		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
+			newcaller.Ephemeral = true
+			stack = append(stack, NewEphemeralSystem("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
+			continue
+		}
+
 		if e.AfterGen != nil {
 			if err := e.AfterGen(newcaller); err != nil {
 				return err
 			}
 		}
-		// handle tools
-		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
-			stack = append(stack, NewEphemeralSystem("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
-			continue
-		}
-
 		// case len(cm.ToolCalls) == 1 && cm.Content == "" && cm.ToolCalls.GetNames()[0] == finishTool:
 		// skip
 		//	return nil
