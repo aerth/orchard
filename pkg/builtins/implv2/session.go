@@ -83,6 +83,7 @@ Currently locked: %d lines
 Replying with <%d lines will remove lines. Empty lines in your reply are retained.
 Replying with >%d lines will insert additional lines.
 File line numbers are added for your convienence only. Do not prepend lines. Output only the raw changed lines.
+Any lines that were not targeted by lock will remain unmodified.
 Best practices:
 		Lock only the lines you will modify.
 		Use CANCEL to ask the user a question.
