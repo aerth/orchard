@@ -348,10 +348,15 @@ func (cm ChatMessages) Raw() llm.Messages {
 		distance = l - (i + 1)  // 4
 		mx := cm[i].MaxDistance // eg: 4
 		if mx > distance {
+			slog.Warn("skipping raw(maxdistance)", "i", i)
 			continue
 		}
-		if cm[i].Aux != nil || cm[i].IsEmpty() {
-			slog.Warn("skipping raw()", "i", i)
+		if cm[i].Aux != nil {
+			slog.Warn("skipping raw(aux)", "i", i)
+			continue
+		}
+		if cm[i].IsEmpty() {
+			slog.Warn("skipping raw(empty)", "i", i)
 			continue
 		}
 
