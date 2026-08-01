@@ -341,10 +341,11 @@ type A = ChatMessages
 func (cm ChatMessages) Raw() llm.Messages {
 	a := make(llm.Messages, 0, len(cm))
 
-	l := len(cm)
+	// [1 2 3 4 5]
+	l := len(cm) // 5
 	var distance int
 	for i := range cm {
-		distance = l - i
+		distance = l - (i + 1) // 4
 		if cm[i].Aux != nil || cm[i].IsEmpty() {
 			slog.Warn("skipping raw()", "i", i)
 			continue
