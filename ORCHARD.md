@@ -1,4 +1,4 @@
-# ORCHARD {{.Version}}
+# ORCHARD {{.OrchardVersion}}
 
 Messages have UUID, Timestamp, and MessageOptions.
 A message may begin a fork, or gather messages from elsewhere.
