@@ -13,7 +13,7 @@ import (
 
 const HowTo = `
 
-## Editor Examples
+## Examples for using the Edit Tool
 
 --------- example -------------
 4. The sun rises
