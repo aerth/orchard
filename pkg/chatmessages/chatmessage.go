@@ -453,20 +453,18 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	case cm.Content != "" && cm.Content[0] == '{':
 		//	slog.Info("detected json", "msg", cm.Content)
 		content = "```json\n" + cm.Content + "\n```\n(JSON ACTUAL)\n"
-	case ShowThoughts && cm.Content == "" && cm.Thinking != "":
-		content = ""
 	case cm.Role == "tool" && cm.ToolName == "":
 		content = fmt.Sprintf("### tool %q call output\n```\n", "!MISSING!") + cm.Content + "\n```\n"
 	case cm.Role == "tool" && ShowToolOutputs:
 		content = fmt.Sprintf("### tool %q call output\n```\n", cm.ToolName) + cm.Content + "\n```\n"
 	case cm.Role == "tool":
 		content = fmt.Sprintf("### tool %q call output (%d bytes)\n", cm.ToolName, len(cm.Content))
-	case cm.Content == "" && !ShowThoughts && len(cm.ToolCalls) != 0:
-		content = ""
 	case len(cm.ToolCalls) != 0 && cm.Content != "":
 		slog.Info("FOUND A TOOL CALL WITH CONTENT", "d1", cm.CreatedAt, "by", cm.CreatedBy) // it exists!
 		content = cm.Content
 	case len(cm.ToolCalls) != 0 && cm.Content == "":
+		content = ""
+	case ShowThoughts && cm.Content == "" && cm.Thinking != "":
 		content = ""
 	case cm.Content != "":
 		content = cm.Content
