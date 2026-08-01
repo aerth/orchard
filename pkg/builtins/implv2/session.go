@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"strconv"
+	"slices"
 	"strings"
 )
 
@@ -88,7 +88,7 @@ Best practices:
 		Lock only the lines you will modify.
 		Use CANCEL to ask the user a question.
 		Make a single change. You may return to edit mode after the edit was successfully applied.
-To return to VIEW mode, begin or end your message with the word: "CANCEL".
+To return to NORMAL mode, begin or end your message with the word: "CANCEL".
 
 			`,
 		nlocked,
@@ -114,7 +114,7 @@ func (s Session) SystemMessageForBoth() string {
 		//	isLocked = true
 		lockStatus = fmt.Sprintf("LOCKED FOR EDIT: Lines %d-%d (use CANCEL to return to READ mode) ", s.LockStart, s.LockEnd)
 	} else {
-		lockStatus = "READ-ONLY NAVIGATION MODE (use LOCK <start>-<end> to target those lines, use CANCEL to return to conversation)"
+		lockStatus = "NORMAL MODE (ALL OPERATORS AVAILABLE. Use LOCK <start>-<end> to target those lines, use CANCEL to return to conversation)"
 	}
 
 	normal := fmt.Sprintf(
@@ -149,18 +149,24 @@ Note: Asterisks ('*') mark LOCKed lines
 	return normal
 }
 
-var ViewOnlyChunk = `- To begin EDIT mode, LOCK a range.
+var ViewOnlyChunk = `- To begin EDIT mode, LOCK a range to target replacement.
 
-### AVAILABLE PROTOCOL COMMANDS (VIEW-MODE):
+### AVAILABLE PROTOCOL COMMANDS (normal mode, no targeted lines locked):
 SELECT_FILE <filename> - Open/switch workspace file.
-NEXT_CHUNK            - Scroll view window down by ` + fmt.Sprint(DefaultChunkSize) + ` lines.
-PREV_CHUNK            - Scroll view window up by ` + fmt.Sprint(DefaultChunkSize) + ` lines.
-GOTO <string>         - Search target string and center view window around it.
+NEXT_CHUNK            - Scroll source-view window down by ` + fmt.Sprint(DefaultChunkSize) + ` lines.
+PREV_CHUNK            - Scroll source-view window up by ` + fmt.Sprint(DefaultChunkSize) + ` lines.
+GOTO <string>         - Search target string and center source-view window around it.
 LOCK <start>-<end>    - Lock target coordinates to start editing.
 DELETE_LINES <start>-<end>   - Delete the specified line range.
+LOCK <single-line-number>    - Lock a single line for replacement..
+DELETE_LINES <single-line-number>   - Delete the specified line.
 
 ### ALWAYS AVAILABLE
+
 CANCEL                - Return to conversation with user.
+
+
+
 `
 
 // Global integer status codes for clear systemic orchestration
@@ -175,18 +181,10 @@ var ErrNoFilename = fmt.Errorf("no active file yet, use %q first", OpFilename)
 
 func (s *Session) Peek(content string) error {
 	first := strings.Fields(content)[0]
-	switch first {
-	case "SELECT_FILE":
-	case "NEXT_CHUNK":
-	case "PREV_CHUNK":
-	case "GOTO":
-	case "LOCK":
-	case "CANCEL":
-	case "DELETE_LINES":
-	default:
-		return fmt.Errorf("unknown operator keyword %q. did you mean to send a message? to exit file editor, use plain CANCEL", first)
+	if slices.Contains(AllOperations, first) {
+		return nil
 	}
-	return nil
+	return fmt.Errorf("unknown operator keyword %q. did you mean to send a message? to exit file editor, use plain CANCEL", first)
 }
 
 func (s *Session) Parse(content string) ([]Action, error) {
@@ -308,47 +306,9 @@ func (s *Session) RunAction(action Action) Result {
 		return Result{Code: CodeNavigated, Message: fmt.Sprintf("The viewport is now centered at line %d%s. %s", newline, ext, always)}
 
 	case OpLockIn:
-		if s.ActiveFile == "" {
-			return Result{E: errors.New("no active file selected"), Code: CodeError}
-		}
-
-		// Unpack coordinate arguments safely
-		parts := strings.Split(action.Content, "-")
-		var start, end int
-		var err error
-
-		if len(parts) == 0 || len(parts) > 2 {
-			return Result{E: errors.New("invalid coordinate format"), Code: CodeError}
-		}
-		l := len(parts)
-		switch {
-		case l == 0:
-			return Result{E: errors.New("invalid coordinate format: need '%d' or '%d-%d' format (not enough args)"), Code: CodeError}
-		case l > 2:
-			return Result{E: errors.New("invalid coordinate format: need '%d' or '%d-%d' format (too many args)"), Code: CodeError}
-		}
-
-		start, err = strconv.Atoi(parts[0])
+		start, end, err := ParseRange(s, action.Content)
 		if err != nil {
-			return Result{E: errors.New("invalid start coordinate format: " + err.Error()), Code: CodeError}
-		}
-		if l == 1 {
-			end = start
-		}
-		if l == 2 {
-			end, err = strconv.Atoi(parts[1])
-			if err != nil {
-				return Result{E: errors.New("invalid end coordinate format: " + err.Error()), Code: CodeError}
-			}
-		}
-		if start < 1 || end < start {
-			return Result{E: errors.New("coordinates out of file range boundaries (start)"), Code: CodeError}
-		}
-		if end > len(s.Lines) {
-			return Result{E: fmt.Errorf("coordinates out of file range boundaries (end %d is greater than number of lines %d)", end, len(s.Lines)), Code: CodeError}
-		}
-		if end-start > MaxLinesLocked {
-			return Result{E: fmt.Errorf("coordinates are too big and the edit should be broken into smaller pieces (%d > max %d)", (end+1)-start, len(s.Lines)), Code: CodeError}
+			return Result{E: err, Code: CodeError}
 		}
 		s.LockStart = start
 		s.LockEnd = end
