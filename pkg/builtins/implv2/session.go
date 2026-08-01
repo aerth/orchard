@@ -15,6 +15,14 @@ const HowTo = `
 
 ## Editor Examples
 
+If the intention is to delete a line, a single round:
+
+	DELETE_LINES 4
+
+If the intention is to delete a line range (lines 4 and 5), a single round:
+
+	DELETE_LINES 4-5
+
 `)
 
 type Session struct {
