@@ -184,8 +184,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			break
 		}
 		stack = append(stack, *newmsg)
+		var x []Action
 		if !isEditMode {
-			x, err := session.Parse(newmsg.Content)
+			x, err = session.Parse(newmsg.Content)
 			if rounds > 1 && errors.Is(err, ErrNot) && !isEditMode {
 				// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
 				slog.Info("Finished editing")
