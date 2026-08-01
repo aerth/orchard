@@ -261,9 +261,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	outmsg1 := *chatmessages.New(toolout)
 	outmsg1.ThreadID = threadID
 	outmsgs = append(outmsgs, outmsg1)
-	json.NewEncoder(global.LogWriter).Encode(stack[startstacklen:])
+	_ = json.NewEncoder(global.LogWriter).Encode(stack[startstacklen:])
 	slog.Info("editor returning messages", "n", len(outmsgs))
-	json.NewEncoder(global.LogWriter).Encode(outmsgs)
+	_ = json.NewEncoder(global.LogWriter).Encode(outmsgs)
 	return outmsgs, nil
 }
 
