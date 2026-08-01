@@ -7,6 +7,8 @@ import (
 	"os"
 	"slices"
 	"strings"
+
+	"github.com/aerth/mostly/stackerr"
 )
 
 type Session struct {
@@ -261,7 +263,7 @@ func (s *Session) ApplyAction(action Action) Result {
 
 	switch action.Op {
 	default:
-		return Result{E: errors.New("unhandled driver operator"), Code: CodeError}
+		return Result{E: stackerr.Errorf("unhandled operator command %q", action.Op), Code: CodeError}
 	case OpFilename:
 		if s.ActiveFile == action.Content {
 			return Result{Message: "The file was already selected."}
