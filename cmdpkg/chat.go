@@ -148,7 +148,7 @@ Chat:
 			}
 		}
 		// handle tools
-		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") {
+		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
 			stack = append(stack, NewEphemeralSystem("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
 			continue
 		}
