@@ -8,6 +8,8 @@ import (
 	"os/exec"
 
 	"m/pkg/global"
+
+	"github.com/aerth/mostly/stackerr"
 )
 
 var NumConfirm = 1
@@ -27,7 +29,7 @@ func Cheatcode(ctx context.Context, s string) error {
 		println()
 		if err != nil { // this catches
 			//		slog.Error("error asking", "err", err)
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 		if !cmd.ProcessState.Success() {
 			return fmt.Errorf("nonzero exit")
