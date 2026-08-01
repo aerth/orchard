@@ -150,7 +150,11 @@ Chat:
 		stack = append(stack, *newcaller) // for this thread only
 		newcaller = &stack[len(stack)-1]  // fix ptr for below
 		switch {
+		case len(newcaller.ToolCalls) == 1 && newcaller.Content == "" && newcaller.ToolCalls.GetNames()[0] == finishLoopTool:
+			newcaller.Ephemeral = true
 		case len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool:
+			newcaller.Ephemeral = true
+		default:
 		}
 		if e.AfterGen != nil {
 			if err := e.AfterGen(newcaller); err != nil {
