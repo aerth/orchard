@@ -21,9 +21,9 @@ func Close() {
 	if len(closers) == 0 && len(cancels) == 0 {
 		return
 	}
-	Cancel(fmt.Errorf("shutdown"))
 	cl := closers
 	closers = nil
+	CancelAll(fmt.Errorf("shutdown"))
 	for i := range cl {
 		if err := cl[i](); err != nil {
 			slog.Error("closing error", "n", i, "err", err)
