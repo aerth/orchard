@@ -23,11 +23,13 @@ const HowTo = `
 8. To start today
 --------- example -------------
 
-### Enter EDIT (line-replacement) mode
+### Enter line-replacement mode
 Lets change line 7's "valley" to "village"
 	LOCK 7
 	(wait for lock verification)
 	Across the village
+
+After the change is made, syntax will be checked and the file will be updated on the disk.
 
 ### If the intention is to delete a single line, a single round without LOCK:
 
@@ -136,7 +138,7 @@ func (s Session) SystemMessageForEdit() string {
 	lockmodetext := fmt.Sprintf(
 		`
 
-### AVAILABLE PROTOCOL COMMANDS (targeted lines locked, we are in edit mode):
+### AVAILABLE PROTOCOL COMMANDS (targeted lines locked, we are in line replacement mode):
 
 CANCEL                - Unlock target coordinates, returning to normal mode.
 
@@ -151,9 +153,9 @@ Any lines that were not targeted by lock will remain unmodified.
 Best practices:
 		Lock only the lines you will modify.
 		Use CANCEL to ask the user a question.
-		Make a single change. You may return to edit mode after the edit was successfully applied.
+		Make a single change. You may return to line replacement mode after the edit was successfully applied.
 To return to NORMAL mode, begin or end your message with the word: "CANCEL".
-If you meant to delete these locked lines, use CANCEL, then DELETE_LINES operator command from normal mode.
+If you meant to delete these locked lines, use CANCEL to go back, then DELETE_LINES operator command from normal mode.
 
 			`,
 		nlocked,
@@ -392,7 +394,7 @@ func (s *Session) ApplyAction(action Action) Result {
 		}
 		s.LockStart = start
 		s.LockEnd = end
-		return Result{Code: CodeLocked, Message: fmt.Sprintf("Lines are locked and EDIT mode is active. Your raw reply output will replace %d lines, or use CANCEL to return to viewing/conversation", s.NumLinesLocked())}
+		return Result{Code: CodeLocked, Message: fmt.Sprintf("Lines are locked and line replacement mode is active. Your raw reply output will replace %d lines, or use CANCEL to return to viewing/conversation", s.NumLinesLocked())}
 
 	case OpCancel:
 		s.LockStart, s.LockEnd = 0, 0
