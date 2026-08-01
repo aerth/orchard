@@ -23,8 +23,8 @@ func Prefunc(genID uuid.UUID, threadID uuid.UUID, from string, c chan<- hgr2.Res
 	return func(creq *llm.ChatRequest) error {
 		callnum++
 		top := creq.Messages[len(creq.Messages)-1]
-		slog.Info("Prefunc PREFUNC", "top", top, "callnum", callnum)
 		almost := *chatmessages.NewFromRole(from, "assistant", "")
+		slog.Info("Prefunc PREFUNC", "top", top, "callnum", callnum, "message_id", almost.MessageID)
 		almost.ThreadID = threadID
 		wrapped := hgr2.ResponseWrap{
 			V:     almost,
