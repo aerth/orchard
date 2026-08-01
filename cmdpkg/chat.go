@@ -149,7 +149,8 @@ Chat:
 
 		stack = append(stack, *newcaller) // for this thread only
 		newcaller = &stack[len(stack)-1]  // fix ptr for below
-		if len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool {
+		switch {
+		case len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool:
 		}
 		if e.AfterGen != nil {
 			if err := e.AfterGen(newcaller); err != nil {
