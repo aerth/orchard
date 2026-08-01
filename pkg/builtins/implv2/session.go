@@ -215,14 +215,6 @@ func (s *Session) Refresh() Result {
 	return Result{}
 }
 
-func (s *Session) PromptFileHasLines() string {
-	return fmt.Sprintf("File currently has %d lines.", len(s.Lines))
-}
-
-func (s *Session) PromptEdiited() string {
-	return fmt.Sprintf("Successfully replaced %d lines.", s.NumLinesLocked())
-}
-
 func (s *Session) NumLinesLocked() int {
 	if s.LockEnd == 0 {
 		return 0
@@ -234,6 +226,10 @@ const always = "Use CANCEL to exit the file editor, or use LOCK <from>-<to> to l
 
 // RunAction implements [ActionRunner] for [RunAction] in [EditorTool.EditTool]
 func (s *Session) RunAction(action Action) Result {
+	return s.ApplyAction(action)
+}
+
+func (s *Session) ApplyAction(action Action) Result {
 	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
 		return Result{E: ErrNoFilename}
 	}
