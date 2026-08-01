@@ -37,7 +37,7 @@ func GetTools[T any]() []T {
 	}
 	x, ok := tools.([]T)
 	if !ok && tools != nil {
-		slog.Warn("invalid type given")
+		slog.Warn("invalid type given", "want", fmt.Sprintf("%T", []T{}, "got", fmt.Sprintf("%T", tools)))
 	}
 	return x
 }
