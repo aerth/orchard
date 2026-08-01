@@ -216,6 +216,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			if len(actionsParsed) == 1 && actionsParsed[0].Op == OpDeleteLines {
 				isEditMode = true
 				n1, n2, err := ParseRange(session, actionsParsed[0].Content)
+				slog.Warn("deleting lines", "from", n1, "to", n2, "err", err)
 				if err != nil {
 					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 					errmsg.Content = fmt.Sprintf("Delete Lines failed: %+v", err)
