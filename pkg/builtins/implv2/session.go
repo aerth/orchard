@@ -15,17 +15,19 @@ const HowTo = `
 
 ## Editor Examples
 
-If the intention is to delete a line, a single round:
+### If the intention is to delete a line, a single round:
 
 	DELETE_LINES 4
 
-If the intention is to delete a line range (lines 4 and 5), a single round:
+### If the intention is to delete a line range (lines 4 and 5), a single round:
 
 	DELETE_LINES 4-5
 
-For deleting multiple line ranges, separate with commas..
+### For deleting multiple line ranges, separate with commas:
 
 	DELETE_LINES 4-5,7,9-20
+
+### For inserting a line after line 4: 
 `)
 
 type Session struct {
