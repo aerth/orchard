@@ -47,7 +47,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 
 	if !isOkBashCode(code) {
 		if implv2.ConfirmAction(ctx, "Run this bash code? "+code) != nil {
-			return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it")
+			return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it. Cause: %s.", context.Cause(ctx))
 		}
 	}
 
