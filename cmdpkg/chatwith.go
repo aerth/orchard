@@ -37,12 +37,6 @@ func NewEphemeralSystem(s string, v ...any) chatmessages.ChatMessage {
 	return *cm
 }
 
-type Session struct{}
-
-func NewSession() *Session {
-	return &Session{}
-}
-
 // ChatWith is the main fully-featured chat loop, it gathers generated responses, runs tools, and runs Ext hooks.
 //
 // caller MUST call global.Cancel() after to prevent Context memory leaks
