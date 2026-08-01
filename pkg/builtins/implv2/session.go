@@ -213,24 +213,16 @@ Note: Asterisks ('*') mark LOCKed lines
 	return normal + HowTo
 }
 
-var ViewOnlyChunk = `- To begin EDIT mode, LOCK a range to target replacement.
+var ViewOnlyChunk = `- To begin replacing lines, find the line number(s) and LOCK a range to target replacement.
 
-### AVAILABLE PROTOCOL COMMANDS (normal mode, no targeted lines locked):
+### AVAILABLE PROTOCOL COMMANDS NOW (normal mode, no targeted lines locked):
 SELECT_FILE <filename> - Open/switch workspace file.
 NEXT_CHUNK            - Scroll source-view window down by ` + fmt.Sprint(DefaultChunkSize) + ` lines.
 PREV_CHUNK            - Scroll source-view window up by ` + fmt.Sprint(DefaultChunkSize) + ` lines.
 GOTO <string>         - Search target string and center source-view window around it.
-LOCK <start>-<end>    - Lock target coordinates to start editing.
-DELETE_LINES <start>-<end>   - Delete the specified line range.
-LOCK <single-line-number>    - Lock a single line for replacement..
-DELETE_LINES <single-line-number>   - Delete the specified line.
-
-### ALWAYS AVAILABLE
-
+LOCK <start>-<end>    - Lock target coordinates to begin line-replacement. May be a single (LOCK 4)
+DELETE_LINES <start>-<end>   - Delete the specified line range immediately. May be a single (DELETE_LINES 4)
 CANCEL                - Return to conversation with user.
-
-
-
 `
 
 // Global integer status codes for clear systemic orchestration
