@@ -127,7 +127,7 @@ Note: Asterisks ('*') mark LOCKed lines
 - No markdown wrappers (no backticks `+"`"+`, no asterisks **). No chit-chat.
 - To return to the conversation to ask user a question, use CANCEL.
 - Zero leading whitespace allowed. Follow your command with exactly ONE space.
-- To begin EDIT mode, LOCK a range. To exit any mode, use CANCEL.
+- To exit EDIT mode, use CANCEL. To begin EDIT mode, LOCK a range.
 - Protocol Commands are sent directly to the chat, and interpreted by this session.
 
 ### AVAILABLE PROTOCOL COMMANDS (VIEW-MODE):
