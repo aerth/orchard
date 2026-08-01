@@ -71,7 +71,9 @@ The source-view would become:
 
 ### Other examples
 
-Inserting a line *before* another line, is similar
+**Minimalist Execution Rule:**                                                                                                                                                      │
+For simple pattern-based file edits (e.g., removing all empty lines, deleting lines containing specific strings, or global whitespace cleanup), 
+	do not engage in multi-turn interactive editing protocols if a single direct command or script can achieve the result. Prioritize "one-shot" solutions over manual coordinate-based editing (`LOCK`/`REPLACE`) whenever the task involves pattern matching rather than targeted local edits.
 
 `
 
