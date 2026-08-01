@@ -51,7 +51,6 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	}
 	e.GenID = genID
 	e.ch = c
-	slog := slog.With("gen_id", genID, "from", e.From, "ntools", len(e.Tools))
 	if len(e.Handlers) != 0 {
 		panic("got handlers")
 	}
@@ -101,7 +100,8 @@ func Postfunc(genID uuid.UUID, c chan<- hgr2.ResponseWrap) func(err error) error
 }
 
 func fail(genID uuid.UUID, err error, e XE) {
-	slog.Error("RunChatTools failed", "err", err, "id", genID)
+	slog := slog.With("gen_id", genID, "from", e.From, "ntools", len(e.Tools))
+	slog.Error("RunChatTools failed", "err", err)
 	if err := e.Send(hgr2.ResponseWrap{
 		GenID: genID,
 		V: llm.ChatResponse{
