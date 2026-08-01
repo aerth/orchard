@@ -49,6 +49,10 @@ func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmes
 				e.PreFunc = nil
 			}
 			return nil, nil*/
+	case "reset":
+		err := global.GetStore[*dbstore.Store]().DeleteThread(context.TODO(), e.ThreadID)
+		//	*stack = nil
+		return nil, err
 	case "clear":
 		err := global.GetStore[*dbstore.Store]().DeleteThread(context.TODO(), e.ThreadID)
 		*stack = nil
