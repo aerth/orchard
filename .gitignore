@@ -16,3 +16,4 @@ foo
 foo.txt
 foo.py
 foo.*
+/testdata/delete_me.txt
