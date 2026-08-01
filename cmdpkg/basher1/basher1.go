@@ -77,7 +77,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		cl := debugging.NewConsoleLogger(global.LogWriter)
 		err = llm.New().Chat(ctx, creq, gr.GatherChatResponse, cl.HandleChatResponse)
 		if err != nil {
-			return nil, stackerr.Errorf("%w", err)
+			return nil, stackerr.Errorf("shell review generation failed: %w", err)
 		}
 		gr.Content = strings.TrimSpace(gr.Content)
 		slog.Info("bash reviewer", "output", gr.Content)
