@@ -409,6 +409,8 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	}
 	//	return nil
 	switch {
+	case isFinishToolONLY && renderfuncMaybe != nil:
+		return nil
 	case cm.Aux != nil:
 		switch v := cm.Aux.(type) {
 		case error:
