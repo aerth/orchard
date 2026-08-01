@@ -139,6 +139,7 @@ LOCK <start>-<end>    - Lock target coordinates to start editing.
 
 ### ALWAYS AVAILABLE
 CANCEL                - Unlock coordinates and return to search navigation.
+
 ### There are no undocumented protocol commands ###
 `,
 		s.ActiveFile,
