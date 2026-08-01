@@ -147,6 +147,11 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	m1 := *chatmessages.NewSystemEphemeral(SystemInstruction() + "\n\n# Intent\n" + intent) // global no state
 	m1.ThreadID = threadID
 	handler.HandleToolOutputs(m1) // for display
+
+	defer func() {
+		session.LockStart = 0
+		session.LockEnd = 0
+	}()
 	for ctx.Err() == nil {
 		rounds++
 		if rounds > MaxRounds {
@@ -332,8 +337,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	_ = json.NewEncoder(global.LogWriter).Encode(stack[startstacklen:])
 	slog.Info("editor returning messages", "n", len(outmsgs))
 	_ = json.NewEncoder(global.LogWriter).Encode(outmsgs)
-	session.LockStart = 0
-	session.LockEnd = 0
 	return outmsgs, nil
 }
 
