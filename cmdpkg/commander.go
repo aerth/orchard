@@ -30,8 +30,12 @@ func IsCommand(content string) bool {
 }
 
 func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmessages.ChatMessages, startAt *int) (chatmessages.A, error) {
-	panic("wrong HandleCommand")
-	fields := strings.Fields(newmsg.Content)
+	panic("this is the wrong HandleCommand")
+	return HandleCommandPlain(newmsg.Content, e, stack, startAt)
+}
+
+func HandleCommandPlain(s string, e *chat.Ext, stack *chatmessages.ChatMessages, startAt *int) (chatmessages.A, error) {
+	fields := strings.Fields(s)
 	cmd := strings.TrimPrefix(fields[0], "/")
 	slog.Info("commander", "cmd", cmd)
 	switch cmd {
