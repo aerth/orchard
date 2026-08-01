@@ -332,6 +332,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	_ = json.NewEncoder(global.LogWriter).Encode(stack[startstacklen:])
 	slog.Info("editor returning messages", "n", len(outmsgs))
 	_ = json.NewEncoder(global.LogWriter).Encode(outmsgs)
+	session.LockStart = 0
+	session.LockEnd = 0
 	return outmsgs, nil
 }
 
