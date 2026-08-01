@@ -78,7 +78,7 @@ CANCEL                - Unlock coordinates and return to search navigation.
 ### Edit Mode Instructions
 All output will directly replace the targeted (locked) lines.
 The entire targeted lines range will be replaced by your entire raw reply, byte-by-byte, without string-replacement of any kind.
-An empty reply will delete the locked line range.
+An empty reply, or a single 'space' character, will delete the locked line range.
 Currently locked: %d lines
 Replying with <%d lines will remove lines. Empty lines in your reply are retained.
 Replying with >%d lines will insert additional lines.
