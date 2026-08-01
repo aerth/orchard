@@ -178,7 +178,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			operators = append(operators, err.Error())
 			break
 		}
-		if newmsg.Content == "" {
+		if newmsg.Content == "" && session.NumLinesLocked() == 0 {
 			operators = append(operators, "no output")
 			break
 		}
