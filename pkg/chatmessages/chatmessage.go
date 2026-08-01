@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -393,7 +394,7 @@ func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname 
 	return str.String(), nil
 }
 
-func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, username string, botname string) error {
+func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc, username string, botname string) error {
 	var err error
 	var content string
 
@@ -457,9 +458,9 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 	//if cm.Role == "tool" {
 	//	content = "\n```markdown\n" + content + "\n```\n"
 	//}
-	if content != "" && renderfunc != nil {
+	if content != "" && renderfuncMaybe != nil {
 		//		content += "\n\n---\n"
-		content, err = renderfunc(content, cm.GetMessageStyle())
+		content, err = renderfuncMaybe(content, cm.GetMessageStyle())
 		if err != nil {
 			return err
 		}
