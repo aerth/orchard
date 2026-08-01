@@ -13,6 +13,7 @@ import (
 	"m/pkg/builtins/implv2"
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
+	"m/pkg/debugging"
 	"m/pkg/global"
 	"m/pkg/llm"
 
@@ -42,28 +43,34 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	{
 		gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
 		creq := llm.NewChatRequest()
+		creq.Think = "low"
+		if creq.Options == nil {
+			creq.Options = map[string]any{}
+		}
+		creq.Options["num_predict"] = 100
 		creq.Messages = llm.Messages{
-			{Role: "system", Content: "You are a reviewer to perform safety checks on shell scripts. For each shell script, determine whether it is safe to run. If the script is safe, output only OK on a single line. If the script is unsafe, output BAD."},
+			{Role: "system", Content: "You are a reviewer to perform safety checks on shell scripts. For each shell script, determine whether it is safe to run. If the script is safe, output only OK on a single line. If the script is unsafe, or removes *any* files, output only BAD."},
 			{Role: "user", Content: code},
 		}
-		err = llm.New().Chat(ctx, creq, gr.GatherChatResponse)
+		cl := debugging.NewConsoleLogger(global.LogWriter)
+		err = llm.New().Chat(ctx, creq, gr.GatherChatResponse, cl.HandleChatResponse)
 		if err != nil {
-			return nil, err
+			return nil, stackerr.Errorf("%w", err)
 		}
 		gr.Content = strings.TrimSpace(gr.Content)
 		slog.Info("bash reviewer", "output", gr.Content)
 		fields := strings.Fields(gr.Content)
 		if len(fields) == 0 || fields[0] != "OK" {
-			return nil, fmt.Errorf("shell reviewer said no")
+			return nil, stackerr.Errorf("shell reviewer said no (%q)", gr.Content)
 		}
 	}
 	// TODO: actual
 	if strings.Contains(code, "&rm ") || strings.Contains(code, "& rm ") ||
 		strings.Contains(code, "|rm ") || strings.Contains(code, "| rm ") {
-		return nil, fmt.Errorf("you may not use bash to rm files") // TODO: real
+		return nil, stackerr.Errorf("you may not use bash to rm files") // TODO: real
 	}
 	if strings.HasPrefix(code, "rm ") {
-		return nil, fmt.Errorf("you may not use bash to rm files") // TODO: real
+		return nil, stackerr.Errorf("you may not use bash to rm files") // TODO: real
 	}
 	if implv2.ConfirmAction == nil {
 		implv2.ConfirmAction = cmdpkg.Cheatcode
