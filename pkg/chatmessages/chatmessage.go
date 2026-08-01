@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -112,7 +113,7 @@ func NewFromRole(from, role, content string) *ChatMessage {
 
 func NewFrom(from string, m llm.Message) *ChatMessage {
 	t := time.Now().UTC()
-	return &ChatMessage{From: from, Message: m, CreatedAt: t, MessageID: uuid.New(), UpdatedAt: t}
+	return &ChatMessage{From: from, Message: m, DBMODEL: DBMODEL{CreatedAt: t, UpdatedAt: t}, MessageID: uuid.New(), MessageOptions: MessageOptions{}}
 }
 
 func NewFromEphemeral(from string, m llm.Message) *ChatMessage {
