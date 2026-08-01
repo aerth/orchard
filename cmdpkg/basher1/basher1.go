@@ -73,10 +73,10 @@ func isOkBashCode(code string) bool {
 		return false
 	}
 	if strings.HasPrefix(code, "cat <<EOF >") {
-		return strings.Count(code, "EOF") == 2 && strings.HasSuffix(code, "EOF")
+		return strings.Count(code, "EOF") == 2 && strings.HasSuffix(code, "\nEOF\n")
 	}
 	if strings.HasPrefix(code, "cat <<EOF >>") {
-		return strings.Count(code, "EOF") == 2 && strings.HasSuffix(code, "EOF")
+		return strings.Count(code, "EOF") == 2 && strings.HasSuffix(code, "\nEOF\n")
 	}
 	if strings.HasPrefix(code, "touch ") && strings.Count(code, " ") == 1 && !strings.HasPrefix(code, "touch /") && !strings.HasPrefix(code, "touch ..") {
 		return true
