@@ -122,7 +122,7 @@ func realruntool(ctx context.Context, tools otool.Tools, caller chatmessages.Cha
 			slog.Warn("bad tool repair")
 		}
 		if len(x[i].Content) > MaxKeeper {
-			x[i].MaxDistance = 5
+			x[i].MaxDistance = 5 // auto maxdistance
 		}
 	}
 
