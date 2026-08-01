@@ -437,13 +437,19 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = strings.TrimSpace(strings.TrimSuffix(cm.Content, "finish_turn")) // TODO: other place
 	case cm.Content != "":
 		content = strings.TrimSpace(strings.TrimSuffix(cm.Content, "finish_turn")) // TODO: other place
+	}
+	default:
+		content = "UNKNOWN"
+	}
+	if content == "" {
+
+switch {		
 	case len(cm.ToolCalls) == 1:
 		content = "Tool Call"
 	case len(cm.ToolCalls) != 0:
 		content = fmt.Sprintf("Tool Calls: %d", len(cm.ToolCalls))
 
-	default:
-		content = "UNKNOWN"
+}
 	}
 	if ShowThoughts && cm.Thinking != "" {
 		content = strings.Join([]string{italicMarkdown(cm.Thinking), content}, "\n\n")
