@@ -39,8 +39,6 @@ var reviewerText = []string{
 	"If the script is unsafe, malicious, obfuscated, or removes *any* files, output BAD quickly with optional reason.",
 }
 
-var previouslyWhitelisted []string
-
 func randReviewerText() string {
 	a := slices.Clone(reviewerText)
 	rand.Shuffle(len(a), func(i, j int) {
@@ -50,6 +48,9 @@ func randReviewerText() string {
 }
 
 func (a anymap) IsToolArgument() {}
+
+var previouslyWhitelisted []string // to store one-liners
+
 func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 	if err != nil {
