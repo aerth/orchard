@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"log/slog"
 	"os"
 	"strconv"
@@ -160,8 +159,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		handler.HandleToolOutputs(newusermsg)
 		creq.Messages = stack.Raw()
 		card = ""
-		log.Printf("TMEPMSG:\n%s", tmpmsg)
-		creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: tmpmsg})
 		newmsg := chatmessages.NewFromRole("editor_agent", "assistant", "")
 		newmsg.ThreadID = threadID
 		handlers := []chat.Handler{cl.HandleChatResponse, newmsg.GatherChatResponse}
