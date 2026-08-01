@@ -41,11 +41,5 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 		return stackerr.Errorf("editor error: no lines were modified")
 	}
 	s.Lines = updatedLines
-
-	//if l := len(s.Lines); l > endIdx {
-	//	s.LockStart = 0
-	//	s.LockEnd = 0
-	//}
-
 	return nil
 }
