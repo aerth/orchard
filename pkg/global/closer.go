@@ -24,8 +24,9 @@ func Close() {
 	cl := closers
 	closers = nil
 	CancelAll(fmt.Errorf("shutdown"))
+	x := len(cl) - 1
 	for i := range cl {
-		if err := cl[i](); err != nil {
+		if err := cl[x-i](); err != nil {
 			slog.Error("closing error", "n", i, "err", err)
 		}
 	}
