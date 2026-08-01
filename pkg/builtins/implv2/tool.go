@@ -153,8 +153,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
 		{
-			tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
-			newstate := *chatmessages.NewSystemEphemeral(tmpmsg)
+			newstate := *chatmessages.NewSystemEphemeral("")
+			newstate.Content = strings.Join([]string{card, session.SystemMessage()}, "\n")
 			newstate.ThreadID = threadID
 			newusermsg := *chatmessages.NewFromRole("auto", "user", "What is the next action? Use a single operator command.")
 			newusermsg.ThreadID = threadID
