@@ -85,14 +85,13 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	var tools otool.Tools
 	err := tools.FromMarshalers(e.Tools)
 	if err != nil {
-		fail()
+		fail(genID, err, e)
 		return
 	}
-	if err == nil {
-		err = cmdpkg.ChatWith(e.Context, e.ChatMessages, tools, ext2)
-	}
-	if err != nil { // ensure a Done is received
-		slog.Error("RunChatTools failed", "err", err, "id", genID)
+	err = cmdpkg.ChatWith(e.Context, e.ChatMessages, tools, ext2)
+	if err != nil {
+		fail(genID, err, e)
+		return
 	}
 }
 
@@ -101,7 +100,8 @@ func Postfunc(genID uuid.UUID, c chan<- hgr2.ResponseWrap) func(err error) error
 	return nil
 }
 
-func fail() {
+func fail(genID uuid.UUID, err error, e XE) {
+	slog.Error("RunChatTools failed", "err", err, "id", genID)
 	if err := e.Send(hgr2.ResponseWrap{
 		GenID: genID,
 		V: llm.ChatResponse{
