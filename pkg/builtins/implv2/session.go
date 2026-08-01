@@ -25,7 +25,7 @@ const HowTo = `
 
 ### For inserting a line *after* another line, two rounds:
 
-Given a file such as:
+Given a file source-view such as:
 
 --------- example -------------
 4. The sun rises
@@ -35,11 +35,14 @@ Given a file such as:
 8. To start today
 --------- example -------------
 
-	Send the "LOCK 3" operation first
+	Send the "LOCK 6" operation first
 	(wait for lock verification)
 	Send a raw reply with two lines: 
-
-The lines would become:
+` + "```" + `
+Casting a light
+A golden glow
+` + "```" + `
+The source-view would become:
 
 --------- example -------------
 4. The sun rises
@@ -54,7 +57,7 @@ The lines would become:
 
 Inserting a line *before* another line, is similar
 
-`)
+`
 
 type Session struct {
 	editor      *EditorTool
@@ -114,7 +117,7 @@ func (s Session) SystemMessage() string {
 }
 
 func (s Session) SystemMessageForEdit() string {
-	normal := s.SystemMessageForBoth() +  HowTo 
+	normal := s.SystemMessageForBoth() + HowTo
 	nlocked := s.NumLinesLocked()
 	lockmodetext := fmt.Sprintf(
 		`
