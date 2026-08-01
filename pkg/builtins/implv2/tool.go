@@ -189,6 +189,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			if err := e.Ext.PreFunc(creq); err != nil {
 				return nil, err
 			}
+		} else {
+			slog.Warn("no prefunc")
 		}
 
 		/*
