@@ -478,7 +478,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		case len(cm.ToolCalls) == 1:
 			content = "Tool Call"
 		case len(cm.ToolCalls) != 0:
-			content = fmt.Sprintf("Tool Calls: %d", len(cm.ToolCalls))
+			content = fmt.Sprintf("Tool Calls: %d (%q)", len(cm.ToolCalls), cm.ToolCalls.GetNames())
 		}
 	}
 	if ShowThoughts && cm.Thinking != "" {
