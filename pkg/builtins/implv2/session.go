@@ -11,6 +11,12 @@ import (
 	"github.com/aerth/mostly/stackerr"
 )
 
+const HowTo = `
+
+## Editor Examples
+
+`)
+
 type Session struct {
 	editor      *EditorTool
 	ActiveFile  string   // Selected filename
