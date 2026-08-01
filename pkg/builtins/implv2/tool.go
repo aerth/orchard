@@ -207,7 +207,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			}
 		}
 		creq.Think = false
-		if session.NumLinesLocked() != 0 {
+		if session.NumLinesLocked() > 20 {
 			creq.Think = "low"
 		}
 		err := llm.New().Chat(ctx, creq, handlers...)
