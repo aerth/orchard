@@ -9,7 +9,6 @@ import (
 	"slices"
 	"strings"
 
-	"m/cmdpkg"
 	"m/pkg/builtins/implv1/bashtooler"
 	"m/pkg/builtins/implv2"
 	"m/pkg/chat"
@@ -52,6 +51,9 @@ func (a anymap) IsToolArgument() {}
 var previouslyWhitelisted []string // to store one-liners
 
 func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+	if implv2.ConfirmAction == nil {
+		return nil, fmt.Errorf("Bash tool needs a ConfirmAction set in implv2 package")
+	}
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 	if err != nil {
 		return nil, err
@@ -93,9 +95,6 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	}
 	if strings.HasPrefix(code, "rm ") {
 		return nil, stackerr.Errorf("you may not use bash to rm files") // TODO: real
-	}
-	if implv2.ConfirmAction == nil {
-		implv2.ConfirmAction = cmdpkg.Cheatcode
 	}
 
 	if !isOkBashCode(code) {
