@@ -128,16 +128,9 @@ Note: Asterisks ('*') mark LOCKed lines
 - To return to the conversation to ask user a question, use CANCEL.
 - Zero leading whitespace allowed. Follow your command with exactly ONE space.
 - Protocol Commands are sent directly to the chat, and interpreted by this session.
-- To begin EDIT mode, LOCK a range.
 
-### AVAILABLE PROTOCOL COMMANDS (VIEW-MODE):
-SELECT_FILE <filename> - Open/switch workspace file.
-NEXT_CHUNK            - Scroll view window down by %d lines.
-PREV_CHUNK            - Scroll view window up by %d lines.
-GOTO <string>         - Search target string and center view window around it.
-LOCK <start>-<end>    - Lock target coordinates to start editing.
+### AVAILABLE PROTOCOL COMMANDS (all modes):
 
-### ALWAYS AVAILABLE
 CANCEL                - Unlock coordinates and return to search navigation.
 
 ### There are no undocumented protocol commands ###
@@ -154,7 +147,7 @@ CANCEL                - Unlock coordinates and return to search navigation.
 	return normal
 }
 
-func ViewOnlyChunk = `- To begin EDIT mode, LOCK a range.
+var ViewOnlyChunk = `- To begin EDIT mode, LOCK a range.
 
 ### AVAILABLE PROTOCOL COMMANDS (VIEW-MODE):
 SELECT_FILE <filename> - Open/switch workspace file.
