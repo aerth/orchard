@@ -157,6 +157,7 @@ NEXT_CHUNK            - Scroll view window down by ` + fmt.Sprint(DefaultChunkSi
 PREV_CHUNK            - Scroll view window up by ` + fmt.Sprint(DefaultChunkSize) + ` lines.
 GOTO <string>         - Search target string and center view window around it.
 LOCK <start>-<end>    - Lock target coordinates to start editing.
+DELETE_LINES <start>-<end>   - Delete the specified line range.
 
 ### ALWAYS AVAILABLE
 CANCEL                - Return to conversation with user.
@@ -181,6 +182,7 @@ func (s *Session) Peek(content string) error {
 	case "GOTO":
 	case "LOCK":
 	case "CANCEL":
+	case "DELETE_LINES":
 	default:
 		return fmt.Errorf("unknown operator keyword %q. did you mean to send a message? to exit file editor, use plain CANCEL", first)
 	}
