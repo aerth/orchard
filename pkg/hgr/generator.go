@@ -75,7 +75,7 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 		Append:           e.Append,
 		Prepend:          e.Prepend,
 		PreTools:         e.PreTools,
-		PreFunc:          e.Ext.PreFunc,        // TODO: check     //   Prefunc(genID, e.ThreadID, e.From, c),
+		PreFunc:          Prefunc(genID, e.ThreadID, e.From, c),
 		NonStreamHandler: hh.HandleToolOutputs, // method
 		Handlers:         handlers,
 		AfterGen:         e.AfterGen,
