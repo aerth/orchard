@@ -38,7 +38,12 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
 	}
-	if strings.Contains(code, "rm ") {
+	// TODO: actual
+	if strings.Contains(code, "&rm ") || strings.Contains(code, "& rm ") ||
+		strings.Contains(code, "|rm ") || strings.Contains(code, "| rm ") {
+		return nil, fmt.Errorf("you may not use bash to rm files") // TODO: real
+	}
+	if strings.HasPrefix(code, "rm ") {
 		return nil, fmt.Errorf("you may not use bash to rm files") // TODO: real
 	}
 	if implv2.ConfirmAction == nil {
