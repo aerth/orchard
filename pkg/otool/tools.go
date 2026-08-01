@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
+	"slices"
 	"strings"
 
 	"github.com/aerth/mostly/stackerr"
@@ -29,6 +30,13 @@ func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 		slog.Info("detected finish-only hiding", "mid", cm.MessageID)
 	}
 	return isFinishToolONLY
+}
+
+func WithoutFinishCall(cm *chatmessages.ChatMessage) {
+	i := slices.Index(cm.ToolCalls.GetNames(), FinishLoopToolName)
+	if i < 0 {
+		return
+	}
 }
 
 type (
