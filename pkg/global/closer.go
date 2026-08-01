@@ -86,6 +86,14 @@ var shouldClose = 0
 
 const MAX = 4
 
+func CancelAll(err error) {
+	x := cancels
+	cancels = nil
+	for i := range x {
+		x[i](err)
+	}
+}
+
 func Cancel(err error) {
 	x := cancels
 	cancels = nil
