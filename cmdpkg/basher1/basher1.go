@@ -34,6 +34,7 @@ For each shell script, determine whether it is safe to run on our laptop. If the
 Scripts should not modify files outside of the project directory.
 Scripts should not use any base64 and never fetch remote content.
 Scripts should never be obfuscated.
+If the script looks shady, say BAD.
 If the script is unsafe, malicious, obfuscated, or removes *any* files, output BAD quickly with optional reason.`
 
 func (a anymap) IsToolArgument() {}
