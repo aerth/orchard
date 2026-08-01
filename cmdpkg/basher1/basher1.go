@@ -111,7 +111,7 @@ func isOkBashCode(code string) bool {
 	if strings.Contains(code, "../") {
 		return false
 	}
-	if strings.HasPrefix(code, "cat <<EOF >") {
+	if strings.HasPrefix(code, "cat <<'EOF' >") {
 		return strings.Count(code, "EOF") == 2 && strings.HasSuffix(code, "\nEOF\n")
 	}
 	if strings.HasPrefix(code, "cat << 'EOF' >") {
