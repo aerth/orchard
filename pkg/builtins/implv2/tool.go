@@ -213,7 +213,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			if len(actionsParsed) != 0 {
 				newmsg.Aux = actionsParsed
 			}
-			if len(actionsParsed) == 1 && actionsParsed[0].Op == "DELETE_LINES" {
+			if len(actionsParsed) == 1 && actionsParsed[0].Op == OpDeleteLines {
 				isEditMode = true
 				n1, n2, err := ParseRange(session, actionsParsed[0].Content)
 				if err != nil {
