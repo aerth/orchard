@@ -140,10 +140,6 @@ Chat:
 			newcaller.Content += " (this reply was cancelled by user before it finished)"
 		}
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
-		if !shouldBreak {
-			stack = append(stack, *newcaller) // for this thread only
-			newcaller = &stack[len(stack)-1]  // fix ptr
-		}
 		// handle tools
 		if strings.HasPrefix(newcaller.Content, "SELECT_FILE ") { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
 			newcaller.Ephemeral = true
