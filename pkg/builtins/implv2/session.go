@@ -153,6 +153,7 @@ Best practices:
 		Use CANCEL to ask the user a question.
 		Make a single change. You may return to edit mode after the edit was successfully applied.
 To return to NORMAL mode, begin or end your message with the word: "CANCEL".
+If you meant to delete these locked lines, use CANCEL, then DELETE_LINES operator command from normal mode.
 
 			`,
 		nlocked,
