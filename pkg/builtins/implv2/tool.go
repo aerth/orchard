@@ -1,3 +1,4 @@
+// Package implv2 implements an [EditorTool.EditTool]
 package implv2
 
 import (
@@ -44,9 +45,12 @@ type EditorTool struct {
 	Ext     chat.Ext
 }
 
-func NewEditTool() *EditorTool {
+func NewEditTool(session *Session) *EditorTool {
+	if session == nil {
+		session = &Session{}
+	}
 	edit := &EditorTool{
-		session: &Session{},
+		session: session,
 	}
 	edit.session.editor = edit
 	return edit
