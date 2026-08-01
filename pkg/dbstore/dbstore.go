@@ -57,19 +57,17 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 		if v == nil {
 			return true
 		}
-		should := v.DBID != 0 || v.Ephemeral
-		if !should {
-			return false
+		if v.DBID != 0 {
+			return true
 		}
-		if v.DBID == 0 && !v.Ephemeral {
-			already, err := s.GetMessage(ctx, threadID, v.MessageID)
-			if err == nil {
-				slog.Warn("Add skipping", "dbid", v.DBID, "is_ephemeral", v.Ephemeral, "'s", v.String(), "content", v.Content, "already", already.Content)
-			} else {
-				slog.Error("bad err", "err", err)
-			}
+		if v.Ephemeral {
+			return true
 		}
-		return true
+		if v.ThreadID == uuid.Nil {
+			slog.Warn("Add skipping no threadID", "dbid", v.DBID, "is_ephemeral", v.Ephemeral, "'s", v.String(), "content", v.Content, "already", already.Content)
+			return true
+		}
+		return false
 	})
 	if len(msgs) == 0 {
 		slog.Warn("no valid storable messages", "in", len(msgsInput))
