@@ -40,6 +40,8 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	if slices.Compare(s.Lines, updatedLines) == 0 {
 		return stackerr.Errorf("editor error: no lines were modified")
 	}
+	s.oldlines = s.Lines
 	s.Lines = updatedLines
+
 	return nil
 }
