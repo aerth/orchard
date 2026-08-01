@@ -15,11 +15,25 @@ const HowTo = `
 
 ## Editor Examples
 
-### If the intention is to delete a single line, a single round:
+--------- example -------------
+4. The sun rises
+5. Over the hills
+6. Casting a light
+7. Across the valley
+8. To start today
+--------- example -------------
+
+### Enter EDIT (line-replacement) mode
+Lets change line 7's "valley" to "village"
+	LOCK 7
+	(wait for lock verification)
+	Across the village
+
+### If the intention is to delete a single line, a single round without LOCK:
 
 	DELETE_LINES 4
 
-### If the intention is to delete a line range, a single round:
+### If the intention is to delete a line range, a single round without LOCK:
 
 	DELETE_LINES 4-5
 
