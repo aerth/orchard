@@ -99,7 +99,7 @@ var NotifyClosing = func(remaining int) {
 	slog.Info("Press Ctrl+C again to close", "remaining", remaining)
 }
 
-func Cancel(err error) {
+func CancelCtrlC(err error) {
 	if len(cancels) == 0 {
 		shouldClose++
 		NotifyClosing(MAX - shouldClose)
