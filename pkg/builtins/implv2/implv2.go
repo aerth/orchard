@@ -60,8 +60,9 @@ var AllOperations = []string{OpFilename, OpGoTo, OpNextChunk, OpPrevChunk, OpDel
 type Result struct {
 	Message string
 	E       error
-	Code    int
+	Code    CodeInt
 }
+type CodeInt int
 
 type ActionRunner interface {
 	RunAction(Action) Result
