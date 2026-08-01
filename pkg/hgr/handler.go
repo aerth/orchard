@@ -3,11 +3,12 @@ package hgr
 import (
 	"fmt"
 	"log/slog"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
 	"time"
 
-	"oc/pkg/hgr/hgr2"
+	"m/pkg/chatmessages"
+	"m/pkg/llm"
+
+	"m/pkg/hgr/hgr2"
 
 	"github.com/google/uuid"
 )
