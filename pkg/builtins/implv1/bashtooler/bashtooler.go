@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/global"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
+
+	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 )
