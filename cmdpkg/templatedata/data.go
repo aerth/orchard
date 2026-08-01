@@ -29,7 +29,7 @@ func NewData(recentMessages chatmessages.ChatMessages) map[string]any {
 		var err error
 		uname, err = runUname()
 		if err != nil {
-			global.Cancel(stackerr.Errorf("run uname failed: %w", err))
+			global.CancelAll(stackerr.Errorf("run uname failed: %w", err))
 		}
 	}
 	fastfetch, _ := runFastfetch()
