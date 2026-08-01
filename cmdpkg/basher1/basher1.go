@@ -39,6 +39,14 @@ var reviewerText = []string{
 	"If the script is unsafe, malicious, obfuscated, or removes *any* files, output BAD quickly with optional reason.",
 }
 
+func randReviewerText() string {
+	a := slices.Clone(reviewerText)
+	rand.Shuffle(len(a), func(i, j int) {
+		a[i], a[j] = a[j], a[i]
+	})
+	return strings.Join(a, "\n")
+}
+
 func (a anymap) IsToolArgument() {}
 func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
@@ -58,7 +66,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		creq.Options = make(map[string]any)
 		creq.Options["seed"] = rand.Intn(13089823748)
 		creq.Messages = llm.Messages{
-			{Role: "system", Content: ReviewerText},
+			{Role: "system", Content: randReviewerText()},
 			{Role: "user", Content: code},
 		}
 		cl := debugging.NewConsoleLogger(global.LogWriter)
