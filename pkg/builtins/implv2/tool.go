@@ -133,6 +133,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	if e, ok := ctx.Value(toolrunner.CtxExt).(chat.Ext); ok {
 		ext = e
 	}
+	ext.From = EditorName
 	e.Ext = ext
 
 	for ctx.Err() == nil {
