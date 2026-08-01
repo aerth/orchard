@@ -349,6 +349,10 @@ func (cm ChatMessages) Raw() llm.Messages {
 		mx := cm[i].MaxDistance // eg: 4
 		if mx > distance {
 			slog.Warn("skipping raw(maxdistance)", "i", i)
+			x := cm[i].Message
+
+			a = append(a, x)
+
 			continue
 		}
 		if cm[i].Aux != nil {
