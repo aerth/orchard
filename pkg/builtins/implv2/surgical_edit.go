@@ -38,7 +38,7 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	updatedLines = append(updatedLines, s.Lines[endIdx:]...)
 
 	if slices.Compare(s.Lines, updatedLines) == 0 {
-		return stackerr.Errorf("")
+		return stackerr.Errorf("editor error: no lines were modified")
 	}
 	s.Lines = updatedLines
 
