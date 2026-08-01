@@ -184,16 +184,16 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			break
 		}
 		stack = append(stack, *newmsg)
-		var x []Action
+		var actionsParsed []Action
 		if !isEditMode {
-			x, err = session.Parse(newmsg.Content)
+			actionsParsed, err = session.Parse(newmsg.Content)
 			if rounds > 1 && errors.Is(err, ErrNot) && !isEditMode {
 				// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
-				slog.Info("Finished editing")
+				slog.Info("Finished editing", "message", newmsg.Content)
 				break
 			}
 		}
-		if errors.Is(err, ErrNot) && session.LockEnd != 0 { // this is the raw reply that will replace the locked lines in memory
+		if isEditMode { // this is the raw reply that will replace the locked lines in memory
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
 			if err != nil {
 				errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
@@ -245,10 +245,10 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			continue
 		}
 		responseWriter := GetSender
-		for i := range x {
-			slog.Info("running action", "op", x[i].Op)
-			operators = append(operators, x[i].Op)
-			resp := session.RunAction(x[i])
+		for i := range actionsParsed {
+			slog.Info("running action", "op", actionsParsed[i].Op)
+			operators = append(operators, actionsParsed[i].Op)
+			resp := session.RunAction(actionsParsed[i])
 			if responseWriter == nil && handler != nil {
 				handler.HandleToolOutputs(NewResultMessage(threadID, resp))
 			}
