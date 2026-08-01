@@ -19,10 +19,12 @@ func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 	funcnames := cm.ToolCalls.GetNames()
 	switch {
 	// // TODO: sync with otool package that imports this package NVM
-	case len(cm.ToolCalls) == 1 && cm.Content == "" && names[0] == FinishLoopToolName:
+	case len(cm.ToolCalls) == 1 && cm.Content == "" && funcnames[0] == FinishLoopToolName:
 		isFinishToolONLY = true
 	case len(cm.ToolCalls) == 0 && strings.TrimSpace(cm.Content) == FinishLoopToolName:
 		isFinishToolONLY = true
+	default:
+		slog.Info("is not finish only", "x", funcnames, "x", cm)
 	}
 	return isFinishToolONLY
 }
