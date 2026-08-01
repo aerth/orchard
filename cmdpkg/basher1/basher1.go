@@ -3,6 +3,7 @@ package basher1
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"maps"
 	"slices"
 	"strings"
@@ -42,13 +43,15 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
 		creq := llm.NewChatRequest()
 		creq.Messages = llm.Messages{
-			{Role: "system", Content: ""},
+			{Role: "system", Content: "You are a reviewer to perform safety checks on shell scripts. For each shell script, determine whether it is safe to run. If the script is safe, output only OK on a single line. If the script is unsafe, output BAD."},
+			{Role: "user", Content: code},
 		}
 		err = llm.New().Chat(ctx, creq, gr.GatherChatResponse)
 		if err != nil {
 			return nil, err
 		}
 		gr.Content = strings.TrimSpace(gr.Content)
+		slog.Info("bash reviewer", "output", gr.Content)
 		fields := strings.Fields(gr.Content)
 		if len(fields) == 0 || fields[0] != "OK" {
 			return nil, fmt.Errorf("shell reviewer said no")
