@@ -25,6 +25,10 @@ const HowTo = `
 
 ### For inserting a line after line 4, two rounds:
 
+	2: hello
+	3: world
+	4: !
+
 	LOCK 4
 
 `)
