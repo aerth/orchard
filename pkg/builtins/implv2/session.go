@@ -151,6 +151,7 @@ Replying with >%d lines will insert additional lines.
 File line numbers are added for your convienence only. Do not prepend lines. Output only the raw changed lines.
 Any lines that were not targeted by lock will remain unmodified.
 Best practices:
+		Be quick. Do one thing in this round.
 		Lock only the lines you will modify.
 		Use CANCEL to ask the user a question.
 		Make a single change. You may return to line replacement mode after the edit was successfully applied.
