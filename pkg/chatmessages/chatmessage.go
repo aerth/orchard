@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -362,7 +361,7 @@ func (cm ChatMessages) Raw() llm.Messages {
 			mx = GetMaxDistance(cm[i])
 		}
 		if mx != 0 && mx < distance {
-			slog.Warn("skipping raw(maxdistance)", "i", i)
+			slog.Warn("skipping raw(maxdistance)", "i", i, "msg", cm[i].String())
 			x := cm[i].Message
 			x.Content = "(this message has disappeared for brevity)" // worth noting that typical write-operations are small/empty content while read-operations are large content (eg. cat or touch)
 			a = append(a, x)
