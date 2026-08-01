@@ -125,8 +125,9 @@ Note: Asterisks ('*') mark LOCKed lines
 ### PROTOCOL INSTRUCTIONS:
 - You must output exactly ONE command keyword.
 - No markdown wrappers (no backticks `+"`"+`, no asterisks **). No chit-chat.
+- To return to the conversation to ask user a question, use CANCEL.
 - Zero leading whitespace allowed. Follow your command with exactly ONE space.
-- To begin EDIT mode, LOCK a range.
+- To begin EDIT mode, LOCK a range. To exit any mode, use CANCEL.
 - Protocol Commands are sent directly to the chat, and interpreted by this session.
 
 ### AVAILABLE PROTOCOL COMMANDS (VIEW-MODE):
@@ -138,7 +139,7 @@ LOCK <start>-<end>    - Lock target coordinates to start editing.
 
 ### ALWAYS AVAILABLE
 CANCEL                - Unlock coordinates and return to search navigation.
-### There are no more PROTOCOL COMMANDS ###
+### There are no undocumented protocol commands ###
 `,
 		s.ActiveFile,
 		lockStatus,
