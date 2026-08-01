@@ -162,9 +162,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			newusermsg.ThreadID = threadID
 			if numLocked := session.NumLinesLocked(); numLocked != 0 {
 				if numLocked == 1 {
-					newusermsg.Content = fmt.Sprintf("Line %d is now locked and targeted for replacement. Reply with only the updated lines (or CANCEL to return to normal edit_file mode).", session.LockStart)
+					newusermsg.Content = fmt.Sprintf("Line %d is now locked and targeted for replacement. Reply with only the updated lines (or CANCEL to return to normal mode).", session.LockStart)
 				} else {
-					newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked and targeted for replacement. Reply with only the updated lines (or CANCEL to return to normal edit_file mode).", session.LockStart, session.LockEnd)
+					newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked and targeted for replacement. Reply with only the updated lines (or CANCEL to return to normal mode).", session.LockStart, session.LockEnd)
 				}
 			}
 			stack = append(stack, m1, newstate, newusermsg)
