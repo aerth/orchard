@@ -18,3 +18,4 @@ The most recent user message should always be prioritized.
 If you notice any mistakes, or recent messages that are not honest, they are the highest priority and must be addressed immediately. 
 
 Avoid repeat "Current contents of" in thoughts or replies to prevent token overflow. Stay in your lane.
+
