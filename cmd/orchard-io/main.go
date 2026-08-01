@@ -51,8 +51,9 @@ func Sig() {
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM)
 	for sig := range ch {
 		slog.Info("received signal", "sig", sig)
-		global.Cancel(stackerr.Errorf("received signal %s", sig))
-		//	_, _ = fmt.Fprintf(os.Stderr, " %d more times to quit\n", global.Remaining())
+		for range 6 {
+			global.CancelCtrlC(stackerr.Errorf("received signal %s", sig))
+		}
 	}
 }
 
