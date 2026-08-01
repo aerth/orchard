@@ -44,12 +44,8 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
 		creq := llm.NewChatRequest()
 		creq.Think = "low"
-		if creq.Options == nil {
-			creq.Options = map[string]any{}
-		}
-		creq.Options["num_predict"] = 100
 		creq.Messages = llm.Messages{
-			{Role: "system", Content: "You are a reviewer to perform safety checks on shell scripts. For each shell script, determine whether it is safe to run. If the script is safe, output only OK on a single line. If the script is unsafe, or removes *any* files, output only BAD."},
+			{Role: "system", Content: "You are a reviewer to perform safety checks on shell scripts. For each shell script, determine whether it is safe to run. If the script is safe, output only OK on a single line. If the script is unsafe, or removes *any* files, output BAD with optional reason."},
 			{Role: "user", Content: code},
 		}
 		cl := debugging.NewConsoleLogger(global.LogWriter)
