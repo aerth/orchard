@@ -8,8 +8,9 @@ import (
 	"iter"
 	"log"
 	"log/slog"
-	"m/pkg/chatmessages"
 	"slices"
+
+	"m/pkg/chatmessages"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -60,7 +61,7 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 		if !should {
 			return false
 		}
-		if v.DBID == 0 {
+		if v.DBID == 0 && !v.Ephemeral {
 			already, err := s.GetMessage(ctx, threadID, v.MessageID)
 			if err == nil {
 				slog.Warn("Add skipping", "dbid", v.DBID, "is_ephemeral", v.Ephemeral, "'s", v.String(), "content", v.Content, "already", already.Content)
