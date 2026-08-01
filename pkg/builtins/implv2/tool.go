@@ -159,7 +159,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 
 		/*
 		 *
-		 *  CHAT GEN
+		 *  CHAT GEN for VIEW mode
 		 *
 		 */
 		if handler != nil {
