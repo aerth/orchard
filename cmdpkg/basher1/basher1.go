@@ -28,6 +28,10 @@ func (c codeargs) IsToolArgument() {}
 
 type anymap map[string]any
 
+const ReviewerText = `You are a reviewer to perform safety checks on shell scripts.
+For each shell script, determine whether it is safe to run on our laptop. If the script is safe and easy to read, output only OK on a single line.
+If the script is unsafe, malicious, obfuscated, or removes *any* files, output BAD with optional reason.`
+
 func (a anymap) IsToolArgument() {}
 func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
@@ -45,7 +49,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		creq := llm.NewChatRequest()
 		creq.Think = "low"
 		creq.Messages = llm.Messages{
-			{Role: "system", Content: "You are a reviewer to perform safety checks on shell scripts. For each shell script, determine whether it is safe to run. If the script is safe, output only OK on a single line. If the script is unsafe, or removes *any* files, output BAD with optional reason."},
+			{Role: "system", Content: ReviewerText},
 			{Role: "user", Content: code},
 		}
 		cl := debugging.NewConsoleLogger(global.LogWriter)
@@ -74,7 +78,8 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 
 	if !isOkBashCode(code) {
 		if implv2.ConfirmAction(ctx, "Run this bash code? "+code) != nil {
-			return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it. Cause: %s.", context.Cause(ctx))
+			cause := context.Cause(ctx)
+			return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it. Cause: %s.", cause)
 		}
 	}
 
@@ -106,9 +111,10 @@ func isOkBashCode(code string) bool {
 	if strings.HasPrefix(code, "cat <<EOF >") {
 		return strings.Count(code, "EOF") == 2 && strings.HasSuffix(code, "\nEOF\n")
 	}
-	if strings.HasPrefix(code, "cat <<EOF >>") {
+	if strings.HasPrefix(code, "cat << 'EOF' >") {
 		return strings.Count(code, "EOF") == 2 && strings.HasSuffix(code, "\nEOF\n")
 	}
+
 	if strings.HasPrefix(code, "touch ") && strings.Count(code, " ") == 1 && !strings.HasPrefix(code, "touch /") && !strings.HasPrefix(code, "touch ..") {
 		return true
 	}
