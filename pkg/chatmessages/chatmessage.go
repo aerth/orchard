@@ -434,6 +434,10 @@ func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname 
 	return str.String(), nil
 }
 
+func fencedJson(s string) string {
+	return "\n```json\n" + s + "\n```\n"
+}
+
 func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc, username string, botname string) error {
 	var err error
 	var content string
@@ -450,7 +454,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 			content = ("\n\n" + italicMarkdown("Note: "+v) + "\n")
 		case json.Marshaler:
 
-			content = ("\n\n" + italicMarkdown("Aux %T: "+toJSONIndent(v)) + "\n")
+			content = ("\n\n" + italicMarkdown("Aux %T") + fencedJson(toJSONIndent(v)) + "\n")
 		default:
 			content = fmt.Sprintf("Aux %T: %v", v, v)
 		}
