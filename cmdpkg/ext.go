@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"m/pkg/global"
 	"os"
 	"os/exec"
+
+	"m/pkg/global"
 )
 
 var NumConfirm = 1
