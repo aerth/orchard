@@ -29,9 +29,9 @@ const HowTo = `
 	3: world
 	4: !
 
-	send the "LOCK 3" operation
+	send the "LOCK 3" operation first
 	(wait for lock verification)
-	send a reply: "internet"
+	send a reply: "internet" (without quotations)
 
 	The example would become
 
