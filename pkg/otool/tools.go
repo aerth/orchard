@@ -5,10 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"strings"
-
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -17,6 +16,7 @@ const FinishLoopToolName = "yield_control"
 
 func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 	isFinishToolONLY := false
+	funcnames := cm.ToolCalls.GetNames()
 	switch {
 	// // TODO: sync with otool package that imports this package NVM
 	case len(cm.ToolCalls) == 1 && cm.Content == "" && cm.ToolCalls.GetNames()[0] == FinishLoopToolName:
