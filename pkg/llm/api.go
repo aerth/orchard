@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
@@ -18,8 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -238,6 +237,9 @@ func shorten(s string, n int, x bool) string {
 }
 
 func (tc ToolCalls) GetNames() []string {
+	if len(tc) == 0 {
+		return nil
+	}
 	a := make([]string, len(tc))
 	for i := range tc {
 		call := struct {
