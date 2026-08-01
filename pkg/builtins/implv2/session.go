@@ -84,7 +84,7 @@ File line numbers are added for your convienence only. Do not prepend lines. Out
 		nlocked,
 		nlocked,
 	)
-	return normal + lockmodetext
+	return normal + "\n\n" + lockmodetext
 	//return normal
 }
 
