@@ -39,6 +39,8 @@ var reviewerText = []string{
 	"If the script is unsafe, malicious, obfuscated, or removes *any* files, output BAD quickly with optional reason.",
 }
 
+var previouslyWhitelisted []string
+
 func randReviewerText() string {
 	a := slices.Clone(reviewerText)
 	rand.Shuffle(len(a), func(i, j int) {
