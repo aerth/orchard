@@ -29,7 +29,7 @@ Lets change line 7's "valley" to "village"
 	(wait for lock verification)
 	Across the village
 
-After the change is made, syntax will be checked and the file will be updated on the disk.
+After the replacement message is sent, the change is made in our in-memory session, syntax will be checked and the file will be updated on the disk.
 
 ### If the intention is to delete a single line, a single round without LOCK:
 
