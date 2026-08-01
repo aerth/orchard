@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"maps"
+	"math/rand"
 	"slices"
 	"strings"
 
@@ -45,10 +46,12 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
 	}
-	{
+	for range 3 {
 		gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
 		creq := llm.NewChatRequest()
 		creq.Think = "low"
+		creq.Options = make(map[string]any)
+		creq.Options["seed"] = rand.Intn(13089823748)
 		creq.Messages = llm.Messages{
 			{Role: "system", Content: ReviewerText},
 			{Role: "user", Content: code},
