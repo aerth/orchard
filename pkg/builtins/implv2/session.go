@@ -138,9 +138,9 @@ func (s Session) SystemMessageForEdit() string {
 
 ### AVAILABLE PROTOCOL COMMANDS (targeted lines locked, we are in edit mode):
 
-CANCEL                - Unlock coordinates and return to search navigation.
+CANCEL                - Unlock target coordinates, returning to normal mode.
 
-### Edit Mode Instructions
+### Line Replacement Instructions
 All output will directly replace the targeted (locked) lines.
 The entire targeted lines range will be replaced by your entire raw reply, byte-by-byte, without string-replacement of any kind.
 Currently locked: %d lines
