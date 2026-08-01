@@ -87,6 +87,7 @@ Any lines that were not targeted by lock will remain unmodified.
 Best practices:
 		Lock only the lines you will modify.
 		Use CANCEL to ask the user a question.
+		Make a single change. You may return to edit mode after the edit was successfully applied.
 To return to VIEW mode, begin or end your message with the word: "CANCEL".
 
 			`,
