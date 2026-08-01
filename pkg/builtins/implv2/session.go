@@ -23,11 +23,10 @@ const HowTo = `
 
 	DELETE_LINES 4-5
 
-### For deleting multiple line ranges, separate with commas:
+### For inserting a line after line 4, two rounds:
 
-	DELETE_LINES 4-5,7,9-20
+	LOCK 4
 
-### For inserting a line after line 4: 
 `)
 
 type Session struct {
