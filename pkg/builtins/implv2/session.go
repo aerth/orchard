@@ -13,6 +13,7 @@ type Session struct {
 	editor      *EditorTool
 	ActiveFile  string   // Selected filename
 	Lines       []string // The cached file content split by line
+	oldlines    []string // pre edit
 	CurrentLine int      // The top line number currently visible in the chunk window
 	ChunkSize   int      // How many lines to send in a chunk (e.g., 50)
 
