@@ -397,13 +397,13 @@ func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname 
 func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, username string, botname string) error {
 	var err error
 	var content string
-	const finishTool = "yield_control"
+	//const finishTool = "yield_control" // TODO: sync with otool package that imports this package
 	switch {
-	case len(cm.ToolCalls) == 1 && cm.Content == "" && cm.ToolCalls.GetNames()[0] == finishTool:
-		// skip
-		return nil
-	case len(cm.ToolCalls) == 0 && strings.TrimSpace(cm.Content) == finishTool:
-		return nil
+	// case len(cm.ToolCalls) == 1 && cm.Content == "" && cm.ToolCalls.GetNames()[0] == finishTool:
+	// skip
+	//	return nil
+	// case len(cm.ToolCalls) == 0 && strings.TrimSpace(cm.Content) == finishTool:
+	//	return nil
 	case cm.Aux != nil:
 		switch v := cm.Aux.(type) {
 		case error:
