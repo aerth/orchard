@@ -67,7 +67,7 @@ func (s Session) SystemMessage() string {
 
 func (s Session) SystemMessageForEdit() string {
 	normal := s.SystemMessageForBoth()
-	nlocked := (s.LockEnd - s.LockStart) + 1
+	nlocked := s.NumLinesLocked()
 	lockmodetext := fmt.Sprintf(
 		`
 You are currently in EDIT mode. All output will directly replace the targeted lines.
