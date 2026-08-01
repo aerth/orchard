@@ -273,9 +273,10 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 					Role:    "system",
 					Content: "The file edits were applied to the filesystem\n " + fmt.Sprintf("The file currently has %d lines.", len(session.Lines)),
 				}))
-				break
+				handler.HandleToolOutputs(stack[len(stack)-1])
+				numberFilesEdited++
+				continue
 			}
-			numberFilesEdited++
 
 		}
 		if err != nil {
