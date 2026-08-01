@@ -141,7 +141,7 @@ func ProcessMessages(a chatmessages.A) error {
 			continue
 		}
 		if len(a[i].Content) > MaxKeeper {
-			a[i].MaxDistance = 5 // auto maxdistance
+			a[i].MaxDistance = 6 // auto maxdistance
 		}
 	}
 	return nil
