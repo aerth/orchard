@@ -141,22 +141,24 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			break
 		}
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
-		tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
-		newstate := *chatmessages.NewSystemEphemeral(tmpmsg)
-		newstate.ThreadID = threadID
-		newusermsg := *chatmessages.NewFromRole("auto", "user", "What is the next action? Use a single operator command.")
-		newusermsg.ThreadID = threadID
-		if numLocked := session.NumLinesLocked(); numLocked != 0 {
-			if numLocked == 1 {
-				newusermsg.Content = fmt.Sprintf("Line %d is locked. Reply with only the updated lines (or CANCEL).", session.LockStart)
-			} else {
-				newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked. Reply with only the updated lines (or CANCEL).", session.LockStart, session.LockEnd)
+		{
+			tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
+			newstate := *chatmessages.NewSystemEphemeral(tmpmsg)
+			newstate.ThreadID = threadID
+			newusermsg := *chatmessages.NewFromRole("auto", "user", "What is the next action? Use a single operator command.")
+			newusermsg.ThreadID = threadID
+			if numLocked := session.NumLinesLocked(); numLocked != 0 {
+				if numLocked == 1 {
+					newusermsg.Content = fmt.Sprintf("Line %d is locked. Reply with only the updated lines (or CANCEL).", session.LockStart)
+				} else {
+					newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked. Reply with only the updated lines (or CANCEL).", session.LockStart, session.LockEnd)
+				}
 			}
+			stack = append(stack, newstate)
+			handler.HandleToolOutputs(newstate)
+			stack = append(stack, newusermsg)
+			handler.HandleToolOutputs(newusermsg)
 		}
-		stack = append(stack, newstate)
-		handler.HandleToolOutputs(newstate)
-		stack = append(stack, newusermsg)
-		handler.HandleToolOutputs(newusermsg)
 		creq.Messages = stack.Raw()
 		card = ""
 		newmsg := chatmessages.NewFromRole("editor_agent", "assistant", "")
