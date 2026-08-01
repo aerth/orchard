@@ -215,6 +215,14 @@ func (s *Session) Refresh() Result {
 	return Result{}
 }
 
+func (s *Session) PromptFileHasLines() string {
+	return fmt.Sprintf("File currently has %d lines.", len(s.Lines))
+}
+
+func (s *Session) PromptEdited() string {
+	return fmt.Sprintf("Successfully replaced %d lines.", s.NumLinesLocked())
+}
+
 func (s *Session) NumLinesLocked() int {
 	if s.LockEnd == 0 {
 		return 0
