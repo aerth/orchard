@@ -183,25 +183,27 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			operators = append(operators, "no output")
 			break
 		}
-		stack = append(stack, *newmsg)
 		var actionsParsed []Action
 		if !isEditMode {
 			actionsParsed, err = session.Parse(newmsg.Content)
 			if rounds > 1 && errors.Is(err, ErrNot) && !isEditMode {
 				// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
 				slog.Info("Finished editing", "message", newmsg.Content)
+				stack = append(stack, *newmsg)
 				break
 			}
 			if len(actionsParsed) != 0 {
 				newmsg.Aux = actionsParsed
 			}
 		}
+		stack = append(stack, *newmsg)
 		if isEditMode { // this is the raw reply that will replace the locked lines in memory
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
 			if err != nil {
 				errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 				errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
 				stack = append(stack, errmsg)
+				handler.HandleToolOutputs(errmsg)
 				continue
 			}
 			// in memory still. check lint
@@ -213,6 +215,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 						errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 						errmsg.Content = fmt.Sprintf("ValidateFileSyntax failed: %+v", err)
 						stack = append(stack, errmsg)
+						handler.HandleToolOutputs(errmsg)
 						continue
 					}
 				}
@@ -223,6 +226,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 					errmsg.Content = fmt.Sprintf("ConfirmAction failed: %+v", err)
 					stack = append(stack, errmsg)
+					handler.HandleToolOutputs(errmsg)
 					continue
 				}
 			}
@@ -245,6 +249,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			msg := *chatmessages.NewSystemEphemeral("Error: " + err.Error() + "\n\nTry again or use CANCEL to return to conversation")
 			msg.ThreadID = threadID
 			stack = append(stack, msg)
+			handler.HandleToolOutputs(msg)
 			continue
 		}
 		responseWriter := GetSender
