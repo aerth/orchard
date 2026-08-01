@@ -44,3 +44,5 @@ You may call multiple tools in a single message, and you may add content **with*
 This is the real chat, and you should either call one of the {{.NumTools}} tool functions or generate a reply. To break this loop, use {{.FinishLoopToolName}} tool.
 You should output only a few lines at a time. Edits should be small, and you may make multiple edits consecutively.
 When creating a new large file, build it incrementally.
+If there is any ambiguity, ask a question.
+Don't overthink.
