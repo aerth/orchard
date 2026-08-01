@@ -121,9 +121,9 @@ func realruntool(ctx context.Context, tools otool.Tools, caller chatmessages.Cha
 		if x[i].ToolName == "" || x[i].ToolCallID == "" {
 			slog.Warn("bad tool repair")
 		}
-		if len(x[i].Content) > MaxKeeper {
-			x[i].MaxDistance = 5 // auto maxdistance
-		}
+	}
+	if err := ProcessMessages(x); err != nil {
+		return x, err
 	}
 
 	// then send the toolouts if we do that
@@ -133,6 +133,18 @@ func realruntool(ctx context.Context, tools otool.Tools, caller chatmessages.Cha
 		}
 	}
 	return x, nil
+}
+
+func ProcessMessages(a chatmessages.A) error {
+	for i := range a {
+		if a[i].Role != "tool" {
+			continue
+		}
+		if len(a[i].Content) > MaxKeeper {
+			a[i].MaxDistance = 5 // auto maxdistance
+		}
+	}
+	return nil
 }
 
 var (
