@@ -158,7 +158,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			newstate := *chatmessages.NewSystemEphemeral("")
 			newstate.Content = strings.Join([]string{card, session.SystemMessage()}, "\n")
 			newstate.ThreadID = threadID
-			newusermsg := *chatmessages.NewFromRole("auto", "user", "What is the next action? Use a single edit_file operator command.")
+			newusermsg := *chatmessages.NewFromRole("auto", "user", "What is the next action? Use a single edit_file protocol command.")
 			newusermsg.ThreadID = threadID
 			if numLocked := session.NumLinesLocked(); numLocked != 0 {
 				if numLocked == 1 {
