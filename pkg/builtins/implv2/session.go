@@ -29,8 +29,9 @@ const HowTo = `
 	3: world
 	4: !
 
-	LOCK 3
-	internet
+	send the "LOCK 3" operation
+	(wait for lock verification)
+	send a reply: "internet"
 
 	The example would become
 
