@@ -443,7 +443,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		case error:
 			content = fmt.Sprintf("<span style=\"color:red\">⚠️ Error: %s</span>\n", v.Error())
 		case string: // e.g., Notes
-			content = fmt.Sprintf("\n\n*Note: %s*\n", v)
+			content = ("\n\n" + italicMarkdown("Note: "+v) + "\n")
 		default:
 			content = fmt.Sprintf("Aux %T: %v", v, v)
 		}
