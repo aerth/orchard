@@ -25,8 +25,11 @@ const HowTo = `
 
 ### For inserting a line *after* line 3, two rounds:
 
-	2: hello
-	3: world
+4. The sun rises
+5. Over the hills
+6. Casting a light
+7. Across the valley
+8. To start today
 
 	Send the "LOCK 3" operation first
 	(wait for lock verification)
@@ -38,7 +41,7 @@ const HowTo = `
 	The example would become
 
 	2: hello
-	3: internet
+	3: 
 	4: world
 
 ### Other examples
