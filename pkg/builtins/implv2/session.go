@@ -260,6 +260,8 @@ func (s *Session) ApplyAction(action Action) Result {
 	}
 
 	switch action.Op {
+	default:
+		return Result{E: errors.New("unhandled driver operator"), Code: CodeError}
 	case OpFilename:
 		if s.ActiveFile == action.Content {
 			return Result{Message: "The file was already selected."}
@@ -339,8 +341,6 @@ func (s *Session) ApplyAction(action Action) Result {
 		s.LockStart, s.LockEnd = 0, 0
 		return Result{Code: CodeCancelled}
 	}
-
-	return Result{E: errors.New("unhandled driver operator"), Code: CodeError}
 }
 
 var MaxLinesLocked = 12
