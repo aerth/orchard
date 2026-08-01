@@ -447,12 +447,6 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		default:
 			content = fmt.Sprintf("Aux %T: %v", v, v)
 		}
-	case strings.HasPrefix(cm.Content, "```json\n"):
-		//	slog.Info("detected json", "msg", cm.Content)
-		content = cm.Content + "\n\n(JSON ACTUAL FENCED)\n"
-	case cm.Content != "" && cm.Content[0] == '{':
-		//	slog.Info("detected json", "msg", cm.Content)
-		content = "```json\n" + cm.Content + "\n```\n(JSON ACTUAL)\n"
 	case cm.Role == "tool" && cm.ToolName == "":
 		content = fmt.Sprintf("### tool %q call output\n```\n", "!MISSING!") + cm.Content + "\n```\n"
 	case cm.Role == "tool" && ShowToolOutputs:
@@ -466,6 +460,10 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		content = ""
 	case ShowThoughts && cm.Content == "" && cm.Thinking != "":
 		content = ""
+	case strings.HasPrefix(cm.Content, "```json\n"):
+		content = cm.Content + "\n\n(JSON ACTUAL FENCED)\n"
+	case cm.Content != "" && cm.Content[0] == '{':
+		content = "```json\n" + cm.Content + "\n```\n(JSON ACTUAL)\n"
 	case cm.Content != "":
 		content = cm.Content
 	default:
