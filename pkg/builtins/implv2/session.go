@@ -112,7 +112,7 @@ func (s Session) SystemMessageForBoth() string {
 	//isLocked := false
 	if s.LockStart > 0 && s.LockEnd > 0 {
 		//	isLocked = true
-		lockStatus = fmt.Sprintf("LOCKED FOR EDIT: Lines %d-%d (use CANCEL to return to READ mode) ", s.LockStart, s.LockEnd)
+		lockStatus = fmt.Sprintf("%d TARGETED LINES LOCKED FOR EDIT: Lines %d-%d (use CANCEL to return to READ mode) ", s.NumLinesLocked(), s.LockStart, s.LockEnd)
 	} else {
 		lockStatus = "NORMAL MODE (ALL OPERATORS AVAILABLE. Use LOCK <start>-<end> to target those lines, use CANCEL to return to conversation)"
 	}
