@@ -104,6 +104,9 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 			return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it. Cause: %s.", cause)
 		}
 	}
+	if !strings.Contains(code, "\n") {
+		previouslyWhitelisted = append(previouslyWhitelisted, code)
+	}
 
 	var got string
 	//weird := "sfjhsdf98sd7fus98fs89fsf98sf"
