@@ -79,10 +79,10 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	}
 
 	var got string
-	weird := "sfjhsdf98sd7fus98fs89fsf98sf"
-	code = strings.ReplaceAll(code, "\\`", weird)                 // prevent EOF heredoc markdown mistakes (when writing for `Example` to a new markdown file)
-	code = "ogr=$'`'\n" + strings.ReplaceAll(code, "`", "${ogr}") // prevent EOF heredoc markdown mistakes (when writing for `Example` to a new markdown file)
-	code = strings.ReplaceAll(code, weird, "\\`")                 // prevent EOF heredoc markdown mistakes (when writing for `Example` to a new markdown file)
+	//weird := "sfjhsdf98sd7fus98fs89fsf98sf"
+	//code = strings.ReplaceAll(code, "\\`", weird)                 // prevent EOF heredoc markdown mistakes (when writing for `Example` to a new markdown file)
+	//code = "ogr=$'`'\n" + strings.ReplaceAll(code, "`", "${ogr}") // prevent EOF heredoc markdown mistakes (when writing for `Example` to a new markdown file)
+	//code = strings.ReplaceAll(code, weird, "\\`")                 // prevent EOF heredoc markdown mistakes (when writing for `Example` to a new markdown file)
 	got, err = bashtooler.RunBashScript(ctx, strings.NewReader(code), bashtooler.RunParams{})
 	if err != nil {
 		if got != "" {
