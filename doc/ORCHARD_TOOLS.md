@@ -22,43 +22,7 @@ Orchard's tool execution (`pkg/loaders/toolboxes/toolbox_exec.go`) supports both
 - **Optimization Note:** Future iterations should implement explicit file type filtering (`-t`) to reduce token consumption in the orchestration loop.
 
 #### `generate_embeddings.bash`
-- **Type:** Bash Wrapper for [?25l[?2004hOllama 0.32.3
-
-  Chat, Code, & Work
-    Chat with models, code, search the web, and delegate real work
-
-  Launch Claude Code
-    Anthropic's coding tool with subagents
-
-▸ Launch OpenCode (gpt-oss:20b)
-    Anomaly's open-source coding agent
-
-  Launch Hermes Agent (install)
-    Self-improving AI agent built by Nous Research
-
-  Launch OpenClaw (install)
-    Personal AI with 100+ skills
-
-
-↑/↓ navigate • enter launch • → configure • esc quit[18A
-
-
-
-
-▸ Launch Claude Code
-
-
-  Launch OpenCode
-
-
-
-
-
-
-
-
-
-[2K[?2004l[?25h[?1002l[?1003l[?1006l.
+- **Type:** Bash Wrapper for Ollama
 - **Functionality:** Generates 256-dimension JSON embeddings using `nomic-embed-text:v1.5`.
 - **Input Strategy:** Utilizes the pattern `INPUT="${1:-$INPUT_FILE}"` to support both direct positional arguments and environment-based injection for large text blocks.
 - **Required Tool Definition Schema:**
