@@ -58,10 +58,17 @@ func (s Session) Current() []byte {
 var ErrNot = errors.New("not an operator keyword and no LOCK range selected")
 
 func (s Session) SystemMessage() string {
+	isLocked := s.LockStart > 0 && s.LockEnd > s.LockStart
+	if isLocked {
+		return s.SystemMessageForEdit()
+	}
+	return s.SystemMessageForView()
+}
 
 func (s Session) SystemMessageForEdit() string {
 	return ""
 }
+
 func (s Session) SystemMessageForView() string {
 	// 1. Calculate boundaries for the active viewing chunk window
 
