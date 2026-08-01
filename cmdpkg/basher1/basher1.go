@@ -44,6 +44,8 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	if err != nil {
 		return nil, err
 	}
+	gr.Content = strings.TrimSpace(gr.Content)
+	fields := strings.Fields(gr.Content)
 	// TODO: actual
 	if strings.Contains(code, "&rm ") || strings.Contains(code, "& rm ") ||
 		strings.Contains(code, "|rm ") || strings.Contains(code, "| rm ") {
