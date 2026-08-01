@@ -398,14 +398,16 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	var err error
 	var content string
 
+	const finishTool = "yield_control"
+	isFinishToolONLY := false
+	switch {
 	// // TODO: sync with otool package that imports this package NVM
-	// const finishTool = "yield_control"
-	// case len(cm.ToolCalls) == 1 && cm.Content == "" && cm.ToolCalls.GetNames()[0] == finishTool:
-	// skip
-	// return nil
-	// case len(cm.ToolCalls) == 0 && strings.TrimSpace(cm.Content) == finishTool:
+	case len(cm.ToolCalls) == 1 && cm.Content == "" && cm.ToolCalls.GetNames()[0] == finishTool:
+		isFinishToolONLY = true
+	case len(cm.ToolCalls) == 0 && strings.TrimSpace(cm.Content) == finishTool:
+		isFinishToolONLY = true
+	}
 	//	return nil
-
 	switch {
 	case cm.Aux != nil:
 		switch v := cm.Aux.(type) {
