@@ -6,6 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"os"
+	"strconv"
+	"strings"
+
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
@@ -14,9 +18,6 @@ import (
 	"m/pkg/loaders/treesitters"
 	"m/pkg/otool"
 	"m/pkg/toolrunner"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -57,8 +58,15 @@ func (s *Session) EditTool() otool.ExecFunc {
 	return s.editor.EditTool
 }
 
-func EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-	return nil, fmt.Errorf("wrong tool")
+func NewResultMessage(threadID uuid.UUID, resp Result) chatmessages.ChatMessage {
+	msg := *chatmessages.NewAux(resp)
+	msg.From = EditorName
+	msg.ThreadID = threadID
+	return msg
+}
+
+var ConfirmAction = func(ctx context.Context, s string) error {
+	return fmt.Errorf("there is no ConfirmAction function provided by the main package")
 }
 
 func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
@@ -357,15 +365,4 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 		return 0, 0, fmt.Errorf("coordinates are too big and the edit should be broken into smaller pieces (%d > max %d)", (end+1)-start, len(s.Lines))
 	}
 	return start, end, nil
-}
-
-func NewResultMessage(threadID uuid.UUID, resp Result) chatmessages.ChatMessage {
-	msg := *chatmessages.NewAux(resp)
-	msg.From = EditorName
-	msg.ThreadID = threadID
-	return msg
-}
-
-var ConfirmAction = func(ctx context.Context, s string) error {
-	return fmt.Errorf("there is no ConfirmAction function provided")
 }
