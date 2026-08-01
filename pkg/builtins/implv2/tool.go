@@ -161,7 +161,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		creq.Messages = stack.Raw()
 		card = ""
-		newmsg := chatmessages.NewFromRole("editor_agent", "assistant", "")
+		newmsg := chatmessages.NewFromRole(ext.From, "assistant", "")
 		newmsg.ThreadID = threadID
 		handlers := []chat.Handler{cl.HandleChatResponse, newmsg.GatherChatResponse}
 		if handler != nil {
