@@ -234,7 +234,7 @@ func (s *Session) NumLinesLocked() int {
 
 const always = "Use CANCEL to exit the file editor, or use LOCK <from>-<to> to lock existing lines for targeting."
 
-// RunAction implements [ActionRunner]
+// RunAction implements [ActionRunner] for [RunAction]
 func (s *Session) RunAction(action Action) Result {
 	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
 		return Result{E: ErrNoFilename}
