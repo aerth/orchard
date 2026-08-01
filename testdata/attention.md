@@ -1,1 +1,1 @@
-Attention! There is an urgent message for you waiting in your terminal.
+Attention! There is an urgent message waiting for you in your terminal.
