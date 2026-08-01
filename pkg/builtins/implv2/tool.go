@@ -35,6 +35,8 @@ var (
 	PreFunc    = func() {}
 )
 
+const EditorName = "editor_agent"
+
 func (h haspath) IsToolArgument() {}
 
 type EditorTool struct {
@@ -269,6 +271,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 
 func NewResultMessage(threadID uuid.UUID, resp Result) chatmessages.ChatMessage {
 	msg := *chatmessages.NewAux(resp)
+	msg.From = EditorName
 	msg.ThreadID = threadID
 	return msg
 }
