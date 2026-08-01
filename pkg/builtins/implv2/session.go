@@ -137,7 +137,6 @@ CANCEL                - Unlock coordinates and return to search navigation.
 `,
 		s.ActiveFile,
 		lockStatus,
-		len(s.Lines),
 		s.CurrentLine,
 		s.CurrentLine+s.ChunkSize,
 		viewportview,
