@@ -172,9 +172,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			handler.HandleToolOutputs(newusermsg)
 		}
 		creq.Messages = stack.Raw()
-		creq.Think = false
-		if session.NumLinesLocked() != 0 {
-		}
 
 		card = ""
 		newmsg := chatmessages.NewFromRole(ext.From, "assistant", "")
@@ -203,6 +200,10 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 					return nil, err
 				}
 			}
+		}
+		creq.Think = false
+		if session.NumLinesLocked() != 0 {
+			creq.Think = "low"
 		}
 		err := llm.New().Chat(ctx, creq, handlers...)
 		cl.Reset()
