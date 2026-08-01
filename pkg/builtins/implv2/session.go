@@ -171,10 +171,10 @@ CANCEL                - Return to conversation with user.
 
 // Global integer status codes for clear systemic orchestration
 const (
-	CodeNavigated = 200
-	CodeLocked    = 201
-	CodeCancelled = 202
-	CodeError     = 400
+	CodeNavigated CodeInt = 200
+	CodeLocked    CodeInt = 201
+	CodeCancelled CodeInt = 202
+	CodeError     CodeInt = 400
 )
 
 var ErrNoFilename = fmt.Errorf("no active file yet, use %q first", OpFilename)
