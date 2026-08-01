@@ -93,7 +93,7 @@ Best practices:
 }
 
 func (s Session) SystemMessageForView() string {
-	return s.SystemMessageForBoth()
+	return s.SystemMessageForBoth() + "\n" + ViewOnlyChunk
 }
 
 func (s Session) SystemMessageForBoth() string {
@@ -129,19 +129,15 @@ Note: Asterisks ('*') mark LOCKed lines
 - Zero leading whitespace allowed. Follow your command with exactly ONE space.
 - Protocol Commands are sent directly to the chat, and interpreted by this session.
 
-### AVAILABLE PROTOCOL COMMANDS (all modes):
-
-CANCEL                - Unlock coordinates and return to search navigation.
 
 ### There are no undocumented protocol commands ###
 `,
 		s.ActiveFile,
 		lockStatus,
+		len(s.Lines),
 		s.CurrentLine,
 		s.CurrentLine+s.ChunkSize,
 		viewportview,
-		s.ChunkSize,
-		s.ChunkSize,
 	)
 	return normal
 }
