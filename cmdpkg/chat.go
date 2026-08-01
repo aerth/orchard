@@ -170,6 +170,9 @@ Chat:
 		if len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool {
 			return nil
 		}
+		if numRounds == 1 && len(newcaller.ToolCalls) == 0 {
+			break
+		}
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
 			if isAuto {
 				return nil // max 2 consecutive
@@ -232,6 +235,5 @@ Chat:
 		stack = append(stack, toolouts...)
 		continue Chat
 	}
-
-	return nil
+	return ctx.Err()
 }
