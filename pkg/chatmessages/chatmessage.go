@@ -442,7 +442,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	default:
 		content = "UNKNOWN"
 	}
-	if content == "" {
+	if content == "" && !isFinishToolONLY {
 		switch {
 		case len(cm.ToolCalls) == 1:
 			content = "Tool Call"
