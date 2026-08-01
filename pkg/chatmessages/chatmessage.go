@@ -338,6 +338,13 @@ func (cm ChatMessages) Clone() ChatMessages {
 
 type A = ChatMessages
 
+var GetMaxDistance = func(cm ChatMessage) int {
+	if cm.ToolName == "read_file_v2" {
+		return 4
+	}
+	return 0
+}
+
 func (cm ChatMessages) Raw() llm.Messages {
 	a := make(llm.Messages, 0, len(cm))
 
@@ -347,6 +354,9 @@ func (cm ChatMessages) Raw() llm.Messages {
 	for i := range cm {
 		distance = l - (i + 1)  // 4
 		mx := cm[i].MaxDistance // eg: 4
+		if mx == 0 {
+			mx = GetMaxDistance(cm[i])
+		}
 		if mx > distance {
 			slog.Warn("skipping raw(maxdistance)", "i", i)
 			x := cm[i].Message
