@@ -170,6 +170,14 @@ func (s *Session) Parse(content string) ([]Action, error) {
 func (s *Session) Refresh() Result {
 	// Read file safely into memory snapshot
 	data, err := os.ReadFile(s.ActiveFile)
+	if errors.Is(err, os.ErrNotExist) {
+		var f *os.File
+		f, err = os.Create(s.ActiveFile)
+		if err == nil {
+			data = []byte("\n\n")
+			_, err = f.Write(data)
+		}
+	}
 	if err != nil {
 		return Result{E: fmt.Errorf("failed to open file: %w", err), Code: CodeError}
 	}
