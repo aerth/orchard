@@ -41,6 +41,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	{
 		gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
 		creq := llm.NewChatRequest()
+		creq.Messages = llm.Messages{}
 		err = llm.New().Chat(ctx, creq, gr.GatherChatResponse)
 		if err != nil {
 			return nil, err
