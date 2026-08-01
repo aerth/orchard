@@ -23,6 +23,9 @@ If the intention is to delete a line range (lines 4 and 5), a single round:
 
 	DELETE_LINES 4-5
 
+For deleting multiple line ranges, separate with commas..
+
+	DELETE_LINES 4-5,7,9-20
 `)
 
 type Session struct {
