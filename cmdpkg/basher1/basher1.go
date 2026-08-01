@@ -32,7 +32,9 @@ type anymap map[string]any
 const ReviewerText = `You are a reviewer to perform safety checks on shell scripts.
 For each shell script, determine whether it is safe to run on our laptop. If the script is safe and easy to read, output only OK on a single line.
 Scripts should not modify files outside of the project directory.
-If the script is unsafe, malicious, obfuscated, or removes *any* files, output BAD with optional reason.`
+Scripts should not use any base64 and never fetch remote content.
+Scripts should never be obfuscated.
+If the script is unsafe, malicious, obfuscated, or removes *any* files, output BAD quickly with optional reason.`
 
 func (a anymap) IsToolArgument() {}
 func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
