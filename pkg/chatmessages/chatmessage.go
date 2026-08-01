@@ -148,11 +148,11 @@ type MessageOptions struct {
 	MaxDistance int    // will be removed from mem stack after N messages
 	CreatedBy   string // internal, caller func
 
-	Model   string
-	Summary any
-	Metrics llm.Metrics
-	Style   int
-	Hidden  bool
+	Model        string
+	Summary      any
+	Metrics      llm.Metrics
+	Style        int
+	RenderHidden bool
 }
 
 func (cm ChatMessage) TableName() string {
@@ -402,7 +402,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 
 	//	return nil
 	switch {
-	case cm.Hidden && renderfuncMaybe != nil: // hide from rendered but not the raw display
+	case cm.RenderHidden && renderfuncMaybe != nil: // hide from rendered but not the raw display
 		return nil
 	case cm.Aux != nil:
 		switch v := cm.Aux.(type) {
