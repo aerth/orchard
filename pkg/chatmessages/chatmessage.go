@@ -118,7 +118,7 @@ func NewFrom(from string, m llm.Message) *ChatMessage {
 
 func NewFromEphemeral(from string, m llm.Message) *ChatMessage {
 	t := time.Now().UTC()
-	return &ChatMessage{From: from, Message: m, CreatedAt: t, MessageID: uuid.New(), UpdatedAt: t, MessageOptions: MessageOptions{Ephemeral: true}}
+	return &ChatMessage{From: from, Message: m, DBMODEL: DBMODEL{CreatedAt: t, UpdatedAt: t}, MessageID: uuid.New(), MessageOptions: MessageOptions{Ephemeral: true}}
 }
 
 func NewSystemEphemeral(content string) *ChatMessage {
