@@ -29,7 +29,7 @@ func IsCommand(content string) bool {
 	return first == "exit" || first == "quit" || first[0] == '!' || first[0] == '/'
 }
 
-func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmessages.ChatMessages) (chatmessages.A, error) {
+func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmessages.ChatMessages, startAt *int) (chatmessages.A, error) {
 	panic("wrong HandleCommand")
 	fields := strings.Fields(newmsg.Content)
 	cmd := strings.TrimPrefix(fields[0], "/")
@@ -50,9 +50,10 @@ func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmes
 			}
 			return nil, nil*/
 	case "reset":
-		err := global.GetStore[*dbstore.Store]().DeleteThread(context.TODO(), e.ThreadID)
-		//	*stack = nil
-		return nil, err
+		if startAt != nil {
+			*startAt = len(*stack) - 1
+		}
+		return nil, nil
 	case "clear":
 		err := global.GetStore[*dbstore.Store]().DeleteThread(context.TODO(), e.ThreadID)
 		*stack = nil
