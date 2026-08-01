@@ -19,7 +19,7 @@ func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 	isFinishToolONLY := false
 	funcnames := cm.ToolCalls.GetNames()
 	switch {
-	// // TODO: sync with otool package that imports this package NVM
+	// // TODO: sync with otool package that imports this package
 	case len(cm.ToolCalls) == 1 && cm.Content == "" && funcnames[0] == FinishLoopToolName:
 		isFinishToolONLY = true
 	case len(cm.ToolCalls) == 0 && strings.TrimSpace(cm.Content) == FinishLoopToolName:
@@ -33,6 +33,12 @@ func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 }
 
 func WithoutFinishCall(cm *chatmessages.ChatMessage) {
+	if IsFinishOnly(*cm) {
+		cm.RenderHidden = true
+		cm.ToolCalls = nil
+		cm.Thinking = ""
+		return
+	}
 	i := slices.Index(cm.ToolCalls.GetNames(), FinishLoopToolName)
 	if i < 0 {
 		return
