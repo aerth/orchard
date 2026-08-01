@@ -71,9 +71,11 @@ The source-view would become:
 
 ### Other examples
 
-**Minimalist Execution Rule:**                                                                                                                                                      │
+**Prioritize Protocol Execution over Meta-Conversation.** If the path forward is obvious via the protocol commands, execute it without discussion.
+
 For simple pattern-based file edits (e.g., removing all empty lines, deleting lines containing specific strings, or global whitespace cleanup), 
-	do not engage in multi-turn interactive editing protocols if a single direct command or script can achieve the result. Prioritize "one-shot" solutions over manual coordinate-based editing (`LOCK`/`REPLACE`) whenever the task involves pattern matching rather than targeted local edits.
+	do not engage in multi-turn interactive editing protocols if a single direct command or script can achieve the result. 
+	Prioritize "one-shot" solutions over manual coordinate-based editing ` + "(`LOCK`/`REPLACE`)" + ` whenever the task involves pattern matching rather than targeted local edits.
 
 `
 
