@@ -184,11 +184,13 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			break
 		}
 		stack = append(stack, *newmsg)
-		x, err := session.Parse(newmsg.Content)
-		if rounds > 1 && errors.Is(err, ErrNot) && !isEditMode {
-			// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
-			slog.Info("Finished editing")
-			break
+		if !isEditMode {
+			x, err := session.Parse(newmsg.Content)
+			if rounds > 1 && errors.Is(err, ErrNot) && !isEditMode {
+				// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
+				slog.Info("Finished editing")
+				break
+			}
 		}
 		if errors.Is(err, ErrNot) && session.LockEnd != 0 { // this is the raw reply that will replace the locked lines in memory
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
