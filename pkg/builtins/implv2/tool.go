@@ -137,8 +137,11 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			break
 		}
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
-		creq.Messages = stack.Raw()
 		tmpmsg := strings.Join([]string{card, session.SystemMessage()}, "\n")
+		newstate := *chatmessages.NewSystemEphemeral(tmpmsg)
+		newstate.MaxDistance = 4
+		stack = append(stack, newstate)
+		creq.Messages = stack.Raw()
 		card = ""
 		log.Printf("TMEPMSG:\n%s", tmpmsg)
 		creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: tmpmsg})
