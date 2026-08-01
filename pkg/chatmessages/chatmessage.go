@@ -433,10 +433,9 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfunc RendererFunc, use
 		content = ""
 	case len(cm.ToolCalls) != 0 && cm.Content != "":
 		slog.Info("FOUND A TOOL CALL WITH CONTENT", "d1", cm.CreatedAt, "by", cm.CreatedBy) // it exists!
-
-		content = strings.TrimSpace(strings.TrimSuffix(cm.Content, "finish_turn")) // TODO: other place
+		content = cm.Content
 	case cm.Content != "":
-		content = strings.TrimSpace(strings.TrimSuffix(cm.Content, "finish_turn")) // TODO: other place
+		content = cm.Content
 	default:
 		content = "UNKNOWN"
 	}
