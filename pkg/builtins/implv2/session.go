@@ -25,6 +25,7 @@ const HowTo = `
 
 ### For inserting a line *after* line 3, two rounds:
 
+Given a file such as:
 4. The sun rises
 5. Over the hills
 6. Casting a light
@@ -40,9 +41,12 @@ const HowTo = `
 
 	The example would become
 
-	2: hello
-	3: 
-	4: world
+4. The sun rises
+5. Over the hills
+6. Casting a light
+7. A golden glow
+8. Across the valley
+9. To start today
 
 ### Other examples
 
