@@ -210,7 +210,7 @@ Note: Asterisks ('*') mark LOCKed lines
 		s.CurrentLine+s.ChunkSize,
 		viewportview,
 	)
-	return normal
+	return normal + HowTo
 }
 
 var ViewOnlyChunk = `- To begin EDIT mode, LOCK a range to target replacement.
