@@ -27,19 +27,23 @@ const HowTo = `
 
 	2: hello
 	3: world
-	4: !
 
-	send the "LOCK 3" operation first
+	Send the "LOCK 3" operation first
 	(wait for lock verification)
-	send a reply: "internet" (without quotations)
+	Send a raw reply with two lines: 
+		internet
+		world
+		
 
 	The example would become
 
 	2: hello
 	3: internet
 	4: world
-	5: !
 
+### Other examples
+
+	Inserting a line before 
 
 `)
 
