@@ -16,3 +16,5 @@ The time is {{.Now.Format "2006-01-02 15:04:05 MST"}} and the conversation histo
 It has been {{.SinceRecent}} since the most recent message (all the way at the bottom), which was sent by {{.RecentFrom}}.
 The most recent user message should always be prioritized.
 If you notice any mistakes, or recent messages that are not honest, they are the highest priority and must be addressed immediately. 
+
+Avoid repeat "Current contents of" in thoughts or replies to prevent token overflow. Stay in your lane.
