@@ -131,7 +131,7 @@ func (s Session) SystemMessage() string {
 }
 
 func (s Session) SystemMessageForEdit() string {
-	normal := s.SystemMessageForBoth() + HowTo
+	normal := s.SystemMessageForBoth()
 	nlocked := s.NumLinesLocked()
 	lockmodetext := fmt.Sprintf(
 		`
