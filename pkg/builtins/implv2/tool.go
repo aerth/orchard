@@ -126,11 +126,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		return nil, fmt.Errorf("no conversation memory")
 	}
 	{
-		m1 := *chatmessages.NewSystemEphemeral(SystemInstruction() + "\n\n# Intent\n" + intent) // global no state
-		m1.ThreadID = threadID
-		stack = append(stack, chatmessages.A{
-			m1,
-		}...)
+		//	stack = append(stack, chatmessages.A{
+		//		m1,
+		//	}...)
 	}
 	var operators []string
 	creq := llm.NewChatRequest()
@@ -146,6 +144,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	ext.From = EditorName
 	e.Ext = ext
 
+	m1 := *chatmessages.NewSystemEphemeral(SystemInstruction() + "\n\n# Intent\n" + intent) // global no state
+	m1.ThreadID = threadID
+	handler.HandleToolOutputs(m1) // for display
 	for ctx.Err() == nil {
 		rounds++
 		if rounds > MaxRounds {
@@ -153,6 +154,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
 		{
+
 			newstate := *chatmessages.NewSystemEphemeral("")
 			newstate.Content = strings.Join([]string{card, session.SystemMessage()}, "\n")
 			newstate.ThreadID = threadID
@@ -165,9 +167,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 					newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked and targeted for replacement. Reply with only the updated lines (or CANCEL to return to normal mode).", session.LockStart, session.LockEnd)
 				}
 			}
-			stack = append(stack, newstate)
+			stack = append(stack, m1, newstate, newusermsg)
 			handler.HandleToolOutputs(newstate)
-			stack = append(stack, newusermsg)
 			handler.HandleToolOutputs(newusermsg)
 		}
 		creq.Messages = stack.Raw()
