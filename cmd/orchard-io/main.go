@@ -133,7 +133,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	threadID := conf.GetThreadID()
 
-	editor := implv2.NewEditTool()
+	singleeditor := implv2.NewEditTool() // single file editor
 
 	var err error
 	if true { // builtin go tools
@@ -142,7 +142,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			"read_file":      implv1.ReadFile,
 			"list_directory": implv1.ListDirectory,
 			//"edit_file":      implv2.EditTool,
-			"edit_file": editor.EditTool,
+			"edit_file": singleeditor.EditTool,
 			//"write_file": implv1.WriteFile,
 			//	"run_go_command":   noop,
 			"run_bash": basher1.Basher,
