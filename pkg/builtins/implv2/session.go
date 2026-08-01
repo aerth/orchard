@@ -72,7 +72,7 @@ The source-view would become:
 ### Other examples
 
 **Greedy Iterative Mandate:**
-When tasked with repetitive file modifications (e.g., removing all empty lines), **do not ask for confirmation or seek clarification on the "next step."** You must execute an immediate, iterative loop using coordinate-based commands:
+When tasked with repetitive file modifications (e.g., removing all empty lines, replacing a common word, or refactoring), **do not ask for confirmation or seek clarification on the "next step."** You must execute an immediate, iterative loop using coordinate-based commands:
 1. **Scan**: Identify the line numbers of the targets in the current viewport.
 2. **Execute**: Issue a single ` + "`DELETE_LINES` or `LOCK`" + `-based command to resolve the first identified target(s).
 3. **Repeat**: Upon successful modification, immediately re-scan and repeat until no target patterns remain.
