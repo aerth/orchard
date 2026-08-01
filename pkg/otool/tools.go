@@ -37,6 +37,12 @@ func WithoutFinishCall(cm *chatmessages.ChatMessage) {
 	if i < 0 {
 		return
 	}
+	l := len(cm.ToolCalls)
+	if i != l-1 {
+		slog.Warn("detected a finish call but, it wasnt the last one")
+		return
+	}
+	cm.ToolCalls = cm.ToolCalls[:i] // remove last element
 }
 
 type (
