@@ -39,7 +39,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
 	}
 	if strings.Contains(code, "rm ") {
-		return nil, fmt.Errorf("you may not use bash to rm files")
+		return nil, fmt.Errorf("you may not use bash to rm files") // TODO: real
 	}
 	if implv2.ConfirmAction == nil {
 		implv2.ConfirmAction = cmdpkg.Cheatcode
