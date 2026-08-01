@@ -37,7 +37,7 @@ var (
 
 const EditorName = "editor_agent"
 
-func (h haspath) IsToolArgument() {}
+func (h haspath) IsToolArgument() {} // implements [otool.Tool]
 
 type EditorTool struct {
 	session *Session
