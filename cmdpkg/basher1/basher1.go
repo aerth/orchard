@@ -33,6 +33,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		return nil, err
 	}
 	code := call.Function.Arguments.Code
+	code = "ogr=$'`'\n" + strings.Replace(code, "`", "${ogr}")
 	if code == "" {
 		call2, _ := chat.ReadToolCall[anymap](ctx, caller, toolCallIndex)
 		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
