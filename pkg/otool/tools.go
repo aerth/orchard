@@ -24,7 +24,6 @@ func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 	case len(cm.ToolCalls) == 0 && strings.TrimSpace(cm.Content) == FinishLoopToolName:
 		isFinishToolONLY = true
 	default:
-		slog.Info("is not finish only", "x", funcnames, "x", cm)
 	}
 	return isFinishToolONLY
 }
