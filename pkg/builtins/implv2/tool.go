@@ -192,6 +192,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				slog.Info("Finished editing", "message", newmsg.Content)
 				break
 			}
+			if len(actionsParsed) != 0 {
+				newmsg.Aux = actionsParsed
+			}
 		}
 		if isEditMode { // this is the raw reply that will replace the locked lines in memory
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
