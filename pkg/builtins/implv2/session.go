@@ -69,6 +69,9 @@ func (s Session) SystemMessageForEdit() string {
 	return ""
 }
 
+func (s Session) SystemMessageForBoth() string {
+}
+
 func (s Session) SystemMessageForView() string {
 	// 1. Calculate boundaries for the active viewing chunk window
 
