@@ -95,9 +95,14 @@ func CancelAll(err error) {
 	}
 }
 
+var NotifyClosing = func(remaining int) {
+	slog.Info("Press Ctrl+C again to close", "remaining", remaining)
+}
+
 func Cancel(err error) {
 	if len(cancels) == 0 {
 		shouldClose++
+		NotifyClosing(MAX - shouldClose)
 		if shouldClose >= MAX {
 			slog.Error("max cancels, shutting down", "cause", err)
 			Close()
