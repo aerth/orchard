@@ -25,6 +25,9 @@ func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 		isFinishToolONLY = true
 	default:
 	}
+	if isFinishToolONLY {
+		slog.Info("detected finish-only hiding", "mid", cm.MessageID)
+	}
 	return isFinishToolONLY
 }
 
