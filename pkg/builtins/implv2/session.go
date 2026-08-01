@@ -15,15 +15,15 @@ const HowTo = `
 
 ## Editor Examples
 
-### If the intention is to delete a line, a single round:
+### If the intention is to delete a single line, a single round:
 
 	DELETE_LINES 4
 
-### If the intention is to delete a line range (lines 4 and 5), a single round:
+### If the intention is to delete a line range, a single round:
 
 	DELETE_LINES 4-5
 
-### For inserting a line *after* line 3, two rounds:
+### For inserting a line *after* another line, two rounds:
 
 Given a file such as:
 4. The sun rises
@@ -35,8 +35,8 @@ Given a file such as:
 	Send the "LOCK 3" operation first
 	(wait for lock verification)
 	Send a raw reply with two lines: 
-		internet
-		world
+		
+		
 		
 
 	The example would become
