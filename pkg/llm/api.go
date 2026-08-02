@@ -183,6 +183,10 @@ type Message struct {
 	Images     [][]byte `json:"images,omitempty" gorm:"-"`
 }
 
+func (m Message) IsEmpty() bool {
+	return m.Content == "" && m.Thinking == "" && len(m.ToolCalls) == 0
+}
+
 func (m Message) String() string {
 	if len(m.ToolCalls) == 0 && m.Content == "" && m.Thinking == "" {
 		if m.Role == "" {
