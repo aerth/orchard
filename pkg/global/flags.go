@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"m/cmdpkg/spinner"
+
 	"github.com/google/uuid"
 )
 
@@ -75,6 +77,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		flag.BoolVar(clearfirst, "clear", *clearfirst, "clear thread from DB first")
 	}
 	flag.Parse()
+	spinner.NoSpin = cfg.NoSpin
 	wd, _ := os.Getwd()
 	if cfg.Dir != "." && cfg.Dir != "" && cfg.Dir != wd {
 		if err := os.Chdir(cfg.Dir); err != nil {
