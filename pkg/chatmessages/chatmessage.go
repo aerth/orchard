@@ -387,6 +387,9 @@ func (cm ChatMessages) Raw() llm.Messages {
 
 		//	slog.Warn("got raw", "i", i, "msg", cm[i].Message)
 		a = append(a, cm[i].Message)
+		if suffix != "" {
+			a = append(a, msg)
+		}
 	}
 	return a
 }
