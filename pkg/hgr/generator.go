@@ -125,7 +125,7 @@ func fail(genID uuid.UUID, err error, e XE) {
 	slog.Error("RunChatTools failed", "err", err, "cause", context.Cause(e.Context))
 	cause := context.Cause(e.Context)
 	if cause == nil {
-		cause = fmt.Sprintf("%+v", err)
+		cause = err
 	}
 	if err := e.Send(hgr2.ResponseWrap{
 		GenID: genID,
