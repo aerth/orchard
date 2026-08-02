@@ -148,7 +148,9 @@ Chat:
 		switch {
 		case len(newcaller.ToolCalls) == 1 && newcaller.Content == "" && newcaller.ToolCalls.GetNames()[0] == finishLoopTool:
 			newcaller.Ephemeral = true
+			shouldBreak = true
 		case len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool:
+			shouldBreak = true
 			newcaller.Ephemeral = true
 		default:
 		}
