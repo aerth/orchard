@@ -6,6 +6,7 @@ import (
 
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
+	"m/pkg/debugging"
 	"m/pkg/llm"
 
 	"github.com/google/uuid"
@@ -22,8 +23,11 @@ func TestFoo(t *testing.T) {
 	usermsg := chatmessages.NewFromRole("Chief", "user", prompt)
 	stack := chatmessages.A{*usermsg}
 	threadID := uuid.UUID{}
-	sysmsg := []llm.Message{}
-	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{Prepend: sysmsg, Handlers: chat.Handlers{}})
+	sysmsg := []llm.Message{{Role: "system", Content: "you are grug"}}
+	cl := debugging.NewConsoleLogger()
+	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{Prepend: sysmsg, Handlers: chat.Handlers{
+		cl.HandleChatResponse,
+	}})
 	if err != nil {
 		t.Fatal(err)
 	}
