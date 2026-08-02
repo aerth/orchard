@@ -30,12 +30,12 @@ func (h *Handler) Send(r hgr2.ResponseWrap) error {
 		select {
 		case <-time.After(time.Second * 3):
 			slog.Warn("no sendo after", "d", time.Since(t1))
-		case h.C <- r:
+		case h.C <- r: // send to chan
 			if l := len(h.C); l > 200 {
 				slog.Info("uhoh", "chanbuf", l)
 			}
 			return nil
-		default:
+		default: // could not send
 			slog.Error("COULD NOT SEND TO CHANNEL", "str", r.V.String())
 			return fmt.Errorf("could not send it")
 		}
