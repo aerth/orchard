@@ -29,7 +29,7 @@ type ConfigInput struct {
 	AddSystemPrompt   string
 	InitialUserPrompt string
 	Dir               string
-	HideThinking      bool
+	ShowThinking      bool
 }
 type cfginput = ConfigInput
 
@@ -57,6 +57,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.StringVar(&cfg.Logfilename, "logfile", cfg.Logfilename, "path to log file")
 	flag.BoolVar(&cfg.JsonOutput, "json", cfg.JsonOutput, "json output")
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
+	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
 	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
 	flag.Func("thread", "uuid", func(s string) error {
