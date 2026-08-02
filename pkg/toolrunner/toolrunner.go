@@ -26,7 +26,7 @@ const (
 type cx string
 
 // Runtools calls and gathers each tool call's responses into one list, stopping at the first error.
-// All outputs will match the stack[l-1].ThreadID
+// Caller is (stack[l-1]) and all toolouts will match caller.ThreadID
 func Runtools(ctx context.Context, stack chatmessages.A, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	// should have Ext already, but stack/tools are more volatile (they may change *in* a round if a tool adds/removes tools)
 	if len(stack) != 0 {
