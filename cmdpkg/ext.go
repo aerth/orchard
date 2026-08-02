@@ -19,8 +19,8 @@ func Cheatcode(ctx context.Context, s string) error {
 	sctx := global.NewCancel(ctx)
 	for i := 1; i <= max(1, NumConfirm); i++ {
 		slog.Warn("asking", "q", s)
-		fmt.Fprintf(os.Stdout, "%s", debugging.ColorReset)
-		fmt.Fprintf(os.Stderr, "%s", debugging.ColorReset)
+		fmt.Fprintf(os.Stdout, "\r%s", debugging.ColorReset)
+		fmt.Fprintf(os.Stderr, "\r%s", debugging.ColorReset)
 		cmd := exec.CommandContext(sctx, "/usr/bin/gum", "confirm", "--default=no", "--padding=\"10 10\"", "--prompt.background=#FF0000", s)
 		cmd.Stdin = os.Stdin
 		cmd.Stderr = os.Stderr
