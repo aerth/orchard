@@ -24,20 +24,22 @@ func TestBasicUsage(t *testing.T) {
 	tools, err := builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 		"read_file": implv1.ReadFile,
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	prompt := "summarize ./Makefile"
 	stack := chatmessages.A{
 		*chatmessages.NewFromRole("Chief", "user", prompt),
 	}
 	threadID := uuid.UUID{}
-	//cl := debugging.NewConsoleLogger()
 	err = cmdpkg.ChatWith(t.Context(), stack, tools, chat.Ext{
 		ThreadID: threadID,
-		Handlers: chat.Handlers{
-			//	cl.HandleChatResponse,
-		},
+		Handlers: chat.Handlers{},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	//_ = got
 }
+
+func TestPrimitive(t *testing.T)
