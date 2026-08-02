@@ -10,7 +10,6 @@ import (
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
-	"m/pkg/llm"
 	"m/pkg/otool"
 
 	"github.com/google/uuid"
@@ -27,16 +26,12 @@ func TestBasicUsage(t *testing.T) {
 		"read_file": implv1.ReadFile,
 	})
 	prompt := "summarize ./Makefile"
-	usermsg := chatmessages.NewFromRole("Chief", "user", prompt)
-	stack := chatmessages.A{*usermsg}
-	threadID := uuid.UUID{}
-	sysmsg := []llm.Message{{Role: "system", Content: "you are grug"}}
-	if err != nil {
-		t.Fatal(err)
+	stack := chatmessages.A{
+		*chatmessages.NewFromRole("Chief", "user", prompt),
 	}
+	threadID := uuid.UUID{}
 	cl := debugging.NewConsoleLogger()
 	err = cmdpkg.ChatWith(t.Context(), stack, tools, chat.Ext{
-		Prepend:  sysmsg,
 		ThreadID: threadID,
 		Handlers: chat.Handlers{
 			cl.HandleChatResponse,
