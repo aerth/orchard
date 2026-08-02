@@ -71,7 +71,7 @@ func GetSystemBase(data any) string {
 	return withEnding
 }
 
-var printfirst1 = testing.Testing
+var printfirst1 = testing.Testing()
 
 // QuickTemplate best-effort template parse and execute, otherwise return plain s
 func QuickTemplate(s string, data any) string {
