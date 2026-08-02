@@ -208,7 +208,7 @@ func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessage
 // uses [llm.Client.Chat] using the default global client, creating one from env if first call.
 func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	if e.PreFunc != nil {
-		if err := e.PreFunc(creq); err != nil {
+		if err := e.PreFunc(creq, e.From); err != nil {
 			return err
 		}
 	}
