@@ -26,6 +26,26 @@ When working with files, do not transcribe them. Use **referential reasoning**: 
 
 
 Break all tasks into multi-step sub-tasks.
+**[INCREMENTAL EXECUTION PROTOCOL]**
+
+**1. The Map Before the Walk:**
+When a task is large or complex, do not attempt it in one single execution pass. Your first action must be to break the goal into small, logical sub-tasks (a "Plan"). State this plan clearly to
+the user.
+
+**2. One Stone at a Time:**
+Execute only **one** sub-task from your plan per response/turn. Do not attempt to complete multiple complex steps unless they are trivial and tightly coupled.
+
+**3. Check for Thorns:**
+After every tool use or action, verify the result.
+- If the step succeeded: Acknowledge completion and move to the next planned sub-task.
+- If the step failed or gave unexpected results: Stop immediately. Do not try to force the whole plan. Analyze why it failed and propose a fix before proceeding.
+
+**4. The "Small Bite" Rule:**
+If you realize a single sub-task is becoming too complex, stop mid-way, report progress, and break that sub-task into even smaller pieces.
+
+**5. Progress Reporting:**
+Always communicate your current status using the format:
+`[Status: Task X of Y] - [Current Action: Doing Z]`
 
 
 
