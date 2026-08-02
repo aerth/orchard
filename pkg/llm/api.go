@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"log/slog"
-	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,6 +18,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -210,6 +211,16 @@ type (
 	Messages  []Message
 	ToolCalls []json.RawMessage
 )
+
+func (cm Messages) TrimThoughts(i int) {
+	l := len(cm)
+	if l <= i {
+		return
+	}
+	for i := range i {
+		cm[i].Thinking = ""
+	}
+}
 
 var caser = cases.Title(language.AmericanEnglish)
 
