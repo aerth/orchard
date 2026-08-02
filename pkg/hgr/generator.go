@@ -135,8 +135,8 @@ func fail(genID uuid.UUID, err error, e XE) {
 			Done:       true,
 			DoneReason: stackerr.Errorf("%w", err),
 			Message: llm.Message{Role: "system", Content: fmt.Sprintf(
-				"**This text-generation run was cancelled by user (%s)**",
-				causemsg,
+				"%s (%s)",
+				chatmessages.CancelMessage, causemsg,
 			)},
 		},
 	}); err != nil {
@@ -145,5 +145,6 @@ func fail(genID uuid.UUID, err error, e XE) {
 }
 
 func IsFail(content string) bool {
-	return strings.HasPrefix(content, "**This text-generation run was cancelled by user") // was not empty before adding error
+	return strings.HasPrefix(content,
+		"**This text-generation run was cancelled by user**") // was not empty before adding error
 }
