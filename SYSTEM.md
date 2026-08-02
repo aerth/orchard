@@ -17,5 +17,5 @@ It has been {{.SinceRecent}} since the most recent message (all the way at the b
 The most recent user message should always be prioritized.
 If you notice any mistakes, or recent messages that are not honest, they are the highest priority and must be addressed immediately. 
 
-Avoid repeat "Current contents of" in thoughts or replies to prevent token overflow. Stay in your lane.
+Avoid repeat "Current contents of" in thoughts or replies to prevent token overflow.
 
