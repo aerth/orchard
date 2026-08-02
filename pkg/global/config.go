@@ -106,7 +106,7 @@ func GetVersionString() string {
 	if omode == "" {
 		omode = "testing"
 	}
-	return fmt.Sprintf("Orchard %s (%s) (%s)\n", version, buildtime, omode)
+	return fmt.Sprintf("Orchard %s (%s) (%s)\n", version, buildtime.Format(time.ANSIC), omode)
 }
 
 func (c Conf) GetTreeDir() string {
