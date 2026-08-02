@@ -374,7 +374,6 @@ func (cm ChatMessages) Raw() llm.Messages {
 			x := cm[i].Message
 			x.Content = "(this message has disappeared for brevity)" // worth noting that typical write-operations are small/empty content while read-operations are large content (eg. cat or touch)
 			a = append(a, x)
-
 			continue
 		}
 		if cm[i].Aux != nil {
