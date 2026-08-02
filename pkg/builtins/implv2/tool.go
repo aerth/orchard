@@ -73,6 +73,8 @@ var ConfirmAction = func(ctx context.Context, s string) error {
 	return fmt.Errorf("there is no ConfirmAction function provided by the main package")
 }
 
+// EditTool main entrypoint for the EditorTool. Called by an LLM as a tool function with two parameters ("path" and "intent")
+// Described in [../builtins.tools.json] embedded schema file, this is the Exec function called by [toolrunner] package.
 func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	if ConfirmAction == nil {
 		return nil, fmt.Errorf("no ConfirmAction available for EditTool")
