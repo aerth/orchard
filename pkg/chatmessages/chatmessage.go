@@ -350,7 +350,7 @@ var GetMaxDistance = func(cm ChatMessage) int {
 }
 
 func (cm ChatMessages) Raw() llm.Messages {
-	a := make(llm.Messages, 0, len(cm))
+	a := make(llm.Messages, 0, len(cm)*2) // worst case scenario allocate double
 
 	// [1 2 3 4 5]
 	l := len(cm) // 5
@@ -361,11 +361,12 @@ func (cm ChatMessages) Raw() llm.Messages {
 		if mx == 0 {
 			mx = GetMaxDistance(cm[i])
 		}
+		var suffix string
 		if mx != 0 {
 			if mx < distance {
-				prefix = fmt.Sprintf("( forgotten after %d (currently %d)", mx, distance)
+				suffix = fmt.Sprintf("( forgotten after %d (currently %d)", mx, distance)
 			} else {
-				prefix = fmt.Sprintf("( will be forgotten after %d more messages)", mx-distance)
+				suffix = fmt.Sprintf("( will be forgotten after %d more messages)", mx-distance)
 			}
 		}
 		if mx != 0 && mx < distance {
