@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 
+	"m/pkg/debugging"
 	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
@@ -18,7 +19,7 @@ func Cheatcode(ctx context.Context, s string) error {
 	sctx := global.NewCancel(ctx)
 	for i := 1; i <= max(1, NumConfirm); i++ {
 		slog.Warn("asking", "q", s)
-		println()
+		println(debugging.ColorReset)
 		println()
 		cmd := exec.CommandContext(sctx, "/usr/bin/gum", "confirm", "--default=no", "--padding=\"10 10\"", "--prompt.background=#FF0000", s)
 		cmd.Stdin = os.Stdin
