@@ -62,8 +62,9 @@ func GetSystemBase(data any) string {
 	got := strings.TrimSpace(strings.Join([]string{buf.String(), pre}, "\n"))
 	slog.Info("sticky system instruction", "size", len(got))
 	withEnding := strings.Join(append([]string{Get().Get().AddSystemPrompt, got}, endingMessage...), "\n")
-	if printfirst1 {
+	if !printfirst1 {
 		slog.Info("sticky:\n" + withEnding)
+		printfirst1 = true
 	}
 	//_, _ = fmt.Fprintf(log.Writer(), "%s\n", got)
 	return withEnding
