@@ -153,7 +153,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 				slog.Error("oops", "err", err)
 			}
 
-			_, err = fmt.Fprintf(w, "%s\ntool\n```json\n%s(args=%s)\n```\n", c.pre, wraps[0].Function.Name, string(wraps[0].Function.Arguments))
+			_, err = fmt.Fprintf(w, "%s\ntoolcall\n```json\n%s(args=%s)\n```\n", c.pre, wraps[0].Function.Name, string(wraps[0].Function.Arguments))
 			if err != nil {
 				return stackerr.Errorf("%w", err)
 			}
