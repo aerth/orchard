@@ -40,7 +40,23 @@ func Prefunc(genID uuid.UUID, threadID uuid.UUID, from string, c chan<- hgr2.Res
 	}
 }
 
-func (h *Handler) PreFunc(creq *llm.ChatRequest) error {
+func (h *Handler) PreFunc(creq *llm.ChatRequest, from string) error {
+	h.callnum++
+	top := creq.Messages[len(creq.Messages)-1]
+	almost := *chatmessages.NewFromRole(rom, "assistant", "")
+	slog.Info("Prefunc PREFUNC", "top", top, "callnum", h.callnum, "message_id", almost.MessageID)
+	almost.ThreadID = h.ThreadID
+	wrapped := hgr2.ResponseWrap{
+		V:     almost,
+		GenID: h.GenID,
+	}
+	select {
+	case h.C <- wrapped:
+		slog.Info("launched new wrap")
+		return nil
+	default:
+		return fmt.Errorf("could not send new wrapped")
+	}
 }
 
 // GeneratorFoo takes elements of e and starts a multi-message round with tool runs
