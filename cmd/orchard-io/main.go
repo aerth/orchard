@@ -255,7 +255,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			}
 			if enc != nil {
 				_ = enc.Encode(cm)
-			} else if conf.Get().ShowToolOutputs
+			} else if conf.Get().ShowToolOuts {
+				cl.PrintMessage(os.Stdout, os.Stderr, cm.Message)
+			}
 		}, AfterGen: func(cm *chatmessages.ChatMessage) error {
 			if store != nil {
 				if err = store.Add(ctx, threadID, cm); err != nil {
