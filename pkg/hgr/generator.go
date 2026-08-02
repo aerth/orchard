@@ -129,8 +129,8 @@ func fail(genID uuid.UUID, err error, e XE) {
 			Done:       true,
 			DoneReason: stackerr.Errorf("%w", err),
 			Message: llm.Message{Role: "system", Content: fmt.Sprintf(
-				"**This text-generation run was cancelled by user (%v)**\n```\nError: %+v\n```\n",
-				context.Cause(e.Context), err,
+				"**This text-generation run was cancelled by user (%v)**",
+				context.Cause(e.Context),
 			)},
 		},
 	}); err != nil {
