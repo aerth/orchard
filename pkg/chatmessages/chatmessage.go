@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -480,6 +481,8 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	case len(cm.ToolCalls) != 0 && cm.Content == "":
 		content = ""
 	case ShowThoughts && cm.Content == "" && cm.Thinking != "":
+		content = ""
+	case !ShowThoughts && cm.Content == "" && cm.Thinking != "":
 		content = ""
 	case strings.HasPrefix(cm.Content, "```json\n"):
 		content = cm.Content + "\n\n(JSON ACTUAL FENCED)\n"
