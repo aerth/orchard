@@ -20,6 +20,10 @@ type Handler struct {
 	HandleToolOutputs2 func(cm chatmessages.ChatMessage)
 }
 
+func (h *Handler) PreFunc(creq *llm.ChatRequest) error {
+	return nil
+}
+
 // Send to CHANNEL that is read periodically by calling [hgr2.PlainChannelWrap.GatherQuickly]
 func (h *Handler) Send(r hgr2.ResponseWrap) error {
 	t1 := time.Now()
