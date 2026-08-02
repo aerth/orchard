@@ -3,6 +3,7 @@ package orchard
 import (
 	"embed"
 	"io/fs"
+	"log/slog"
 	"os"
 )
 
@@ -19,6 +20,7 @@ func init() {
 			x = os.ExpandEnv("$HOME/src/orchard")
 		}
 		if _, err := os.Stat(x); err == nil {
+			slog.Info("using file-system instead of embedded prompts", "orchard_dir", x)
 			Embedded = os.DirFS(x)
 		}
 	}
