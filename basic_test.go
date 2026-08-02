@@ -22,15 +22,15 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestFoo(t *testing.T) {
+func TestBasicUsage(t *testing.T) {
+	tools, err := builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
+		"read_file": implv1.ReadFile,
+	})
 	prompt := "summarize ./Makefile"
 	usermsg := chatmessages.NewFromRole("Chief", "user", prompt)
 	stack := chatmessages.A{*usermsg}
 	threadID := uuid.UUID{}
 	sysmsg := []llm.Message{{Role: "system", Content: "you are grug"}}
-	tools, err := builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
-		"read_file": implv1.ReadFile,
-	})
 	if err != nil {
 		t.Fatal(err)
 	}
