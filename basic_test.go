@@ -40,6 +40,7 @@ func TestBasicUsage(t *testing.T) {
 		*chatmessages.NewFromRole("Chief", "user", prompt),
 	}
 	threadID := uuid.UUID{}
+	// cmdpkg.ChatWith calls chat.Chat
 	err := cmdpkg.ChatWith(t.Context(), stack, testtools, chat.Ext{
 		ThreadID: threadID,
 		Handlers: chat.Handlers{},
