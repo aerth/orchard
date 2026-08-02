@@ -30,12 +30,13 @@ var okenvs = map[string]bool{
 	"OLLAMA_THINK":  true,
 
 	// XDG/Filesystem (Standard for modern apps)
-	"XDG_CACHE_HOME":  true,
-	"XDG_DATA_HOME":   true,
-	"XDG_CONFIG_DIRS": true,
-	"XDG_CONFIG_HOME": true,
-	"XDG_RUNTIME_DIR": true,
-	// "DBUS_SESSION_BUS_ADDRESS": true,
+	"XDG_CACHE_HOME":           true,
+	"XDG_DATA_HOME":            true,
+	"XDG_CONFIG_DIRS":          true,
+	"XDG_CONFIG_HOME":          true,
+	"XDG_RUNTIME_DIR":          true,
+	"DBUS_SESSION_BUS_ADDRESS": true,
+	"WAYLAND_DISPLAY":          true,
 }
 
 func EnvDeleteFunc(s string) bool {
