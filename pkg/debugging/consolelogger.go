@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+
 	"m/pkg/global"
 	"m/pkg/llm"
-	"os"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -53,6 +54,9 @@ func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
 
 	if w == nil {
 		w = io.Discard
+	}
+	if hidetoolcall {
+		slog.Warn("hiding tool calls")
 	}
 	return &ConsoleLogger{w: w, tw: tw, pre: "", NoColor: nocolor, HideToolCalls: hidetoolcall}
 }
@@ -116,6 +120,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 		_, _ = fmt.Fprintf(tw, "%s", m.Thinking)
 	}
 	if m.Content != "" {
+		slog.Info("content", "text", m.Content)
 		if c.emode != xCONTENT {
 			if !c.HideThinking && c.emode == xGO {
 				_, _ = fmt.Fprintf(tw, "\n")
@@ -127,10 +132,10 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 				}
 			}
 			c.emode = xCONTENT
-			_, err := fmt.Fprintf(w, "%s\n", m.Content)
-			if err != nil {
-				return stackerr.Errorf("%w", err)
-			}
+		}
+		_, err := fmt.Fprintf(w, "%s\n", m.Content)
+		if err != nil {
+			return stackerr.Errorf("%w", err)
 		}
 	}
 	if len(m.ToolCalls) != 0 { // ollama api returns a full, parsed tool call(s). TODO: future: reimplement chat template for streaming the building of the tool call
@@ -168,7 +173,10 @@ func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) error {
 	//if cr.DebugInfo != nil {
 	//	fmt.Fprintf(os.Stderr, "%s", cr.DebugInfo.RenderedTemplate)
 	//}
-	if !c.HideToolCalls || len(cr.Message.ToolCalls) == 0 {
+	//if !c.HideToolCalls || len(cr.Message.ToolCalls) == 0 {
+	//
+	if !cr.Message.IsEmpty() {
+		slog.Info("printing", "text", cr.Message.Content, "is_done", cr.Done)
 		if err := c.PrintMessage(w, tw, cr.Message); err != nil {
 			slog.Error("printing message failed", "err", err)
 			if cr.Done {
@@ -176,10 +184,13 @@ func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) error {
 			}
 			return stackerr.Errorf("%w", err)
 		}
+	} else {
+		slog.Info("notprinting", "text", cr.Message.Content, "is_done", cr.Done)
 	}
+	//}
 	var err error
 	if cr.Done {
-		defer c.Reset()
+		defer c.Reset() // auto reset thinking colors after Done
 		_, err = fmt.Fprintf(w, "%s", ColorReset)
 		if err != nil {
 			return stackerr.Errorf("%w", err)
