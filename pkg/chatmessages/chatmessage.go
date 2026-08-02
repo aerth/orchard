@@ -361,6 +361,13 @@ func (cm ChatMessages) Raw() llm.Messages {
 		if mx == 0 {
 			mx = GetMaxDistance(cm[i])
 		}
+		if mx != 0 {
+			if mx < distance {
+				prefix = fmt.Sprintf("( forgotten after %d (currently %d)", mx, distance)
+			} else {
+				prefix = fmt.Sprintf("( will be forgotten after %d more messages)", mx-distance)
+			}
+		}
 		if mx != 0 && mx < distance {
 			slog.Warn("skipping raw(maxdistance)", "i", i, "msg", cm[i].String())
 			x := cm[i].Message
