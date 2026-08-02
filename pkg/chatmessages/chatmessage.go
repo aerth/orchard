@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -268,7 +267,7 @@ func (cm ChatMessages) TopAttachment() ChatMessage {
 func (cm ChatMessages) TopRole(role string) ChatMessage {
 	l := len(cm) - 1
 	for i := range cm {
-		if cm[l-i].Role == role {
+		if cm[l-i].Role == role && !cm[l-i].IsEmpty() {
 			return cm[l-i]
 		}
 	}
