@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
 	"slices"
 	"strings"
+
+	"m/pkg/chatmessages"
+	"m/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -60,6 +61,16 @@ type (
 	ToolRunnerFunc = func(ctx context.Context, tools Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error)
 	Tools          []Tool
 )
+
+func (t Tools) ByName(param any) Tool {
+	for _, t := range tools {
+		if t.Name == call.Function.Name {
+			tool = t
+			break
+		}
+	}
+	return Tool{}
+}
 
 // ToMarshaler for api requests
 func (t Tools) ToMarshaler() []json.Marshaler {
