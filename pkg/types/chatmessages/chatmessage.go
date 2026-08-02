@@ -504,7 +504,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	if ShowThoughts && cm.Thinking != "" {
 		content = strings.Join([]string{italicMarkdown(cm.Thinking), content}, "\n\n")
 	}
-	if len(cm.ToolCalls) != 0 {
+	if len(cm.ToolCalls) != 0 && ShowCallJSON {
 		content += fmt.Sprintf("\n```json\n%s\n```\n", toJSONIndent(cm.ToolCalls))
 	}
 	content = strings.TrimSpace(content)
