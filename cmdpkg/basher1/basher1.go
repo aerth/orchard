@@ -72,7 +72,10 @@ func doShellReview(ctx context.Context, ch chan error, code string) {
 	slog.Info("bash reviewer", "output", gr.Content)
 	fields := strings.Fields(gr.Content)
 	if len(fields) == 0 {
+		ch <- stackerr.Errorf("shell reviewer said no (%q)", context.Cause(ctx))
+		return
 
+	}
 	if fields[0] != "OK" || len(fields) != 1 {
 		ch <- stackerr.Errorf("shell reviewer said no (%q)", gr.Content)
 		return
@@ -95,9 +98,14 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
 	}
 	ch := make(chan error)
-	for range 3 {
-		go doShellReview(ctx, ch)
+	numReviews := 3
+	for range numReviews {
+		go doShellReview(ctx, ch, code)
 	}
+	pass := true
+	for range numReviews {
+	}
+
 	// TODO: actual
 	if strings.Contains(code, "&rm ") || strings.Contains(code, "& rm ") ||
 		strings.Contains(code, "|rm ") || strings.Contains(code, "| rm ") {
