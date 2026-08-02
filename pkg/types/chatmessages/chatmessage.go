@@ -18,6 +18,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var CancelMessage = "**This text-generation run was cancelled by user**"
+
 func (cm ChatMessage) GetID() uint {
 	return cm.DBID
 }
