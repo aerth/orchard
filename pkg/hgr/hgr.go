@@ -66,6 +66,7 @@ type XE struct { // immutable. sends api.Response to channel
 		})
 	}
 */
+
 func (e XE) Send(r hgr2.ResponseWrap) error {
 	select {
 	case e.ch <- r:
