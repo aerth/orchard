@@ -27,10 +27,9 @@ func GetSystemBase(data any) string {
 		slog.Info("loading system", "f", endingMessage[0])
 		tpl, err = tpl.ParseFiles(endingMessage...)
 		if errors.Is(err, os.ErrNotExist) {
-			slog.Error("system prompt file does not exist")
-		}
-		if err != nil {
-			panic(err.Error()) // invariant
+			slog.Error("system prompt file does not exist", "path", endingMessage[0])
+		} else if err != nil {
+			panic(err.Error()) // crash hard fast
 		}
 	} else {
 		tpl, err = tpl.ParseFS(orchard.Embedded, "SYSTEM.md")
