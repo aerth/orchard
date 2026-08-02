@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 	"text/template"
 
 	"m/pkg/loaders/mdloaders"
@@ -70,7 +71,7 @@ func GetSystemBase(data any) string {
 	return withEnding
 }
 
-var printfirst1 = false
+var printfirst1 = testing.Testing
 
 // QuickTemplate best-effort template parse and execute, otherwise return plain s
 func QuickTemplate(s string, data any) string {
