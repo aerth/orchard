@@ -39,7 +39,7 @@ func GetSystemBase(data any) string {
 		panic("template SYSTEM.md failed: " + err.Error())
 	}
 	if err != nil {
-		slog.Warn("NO SYSTEM.md FOUND")
+		slog.Warn("NO SYSTEM.md FOUND", "err", err)
 		return "You are a helpful assistant who speaks only nadsat hacker slang. Keep it simple and quick replies only."
 	}
 	if tpl == nil {
@@ -62,7 +62,7 @@ func GetSystemBase(data any) string {
 	}
 	got := strings.TrimSpace(strings.Join([]string{buf.String(), pre}, "\n"))
 	slog.Info("sticky system instruction", "size", len(got))
-	withEnding := strings.Join(append([]string{Get().Get().AddSystemPrompt, got}, endingMessage...), "\n")
+	withEnding := strings.Join(append([]string{Get().Get().AddSystemPrompt, got}, endingMessage), "\n")
 	if !printfirst1 {
 		slog.Info("sticky:\n" + withEnding)
 		printfirst1 = true
