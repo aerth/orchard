@@ -18,6 +18,7 @@ type Handler struct {
 	GenID              uuid.UUID
 	C                  chan<- hgr2.ResponseWrap
 	HandleToolOutputs2 func(cm chatmessages.ChatMessage)
+	callnum            int
 }
 
 // Send to CHANNEL that is read periodically by calling [hgr2.PlainChannelWrap.GatherQuickly]
