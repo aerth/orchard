@@ -41,11 +41,13 @@ func Runtools(ctx context.Context, stack chatmessages.A, tools otool.Tools, call
 
 func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	if len(caller.ToolCalls) == 0 {
-		return nil, fmt.Errorf("no tool calls in this caller")
+		return nil, fmt.Errorf("no tool calls in this caller") // should not have gotten this far with no calls
 	}
 	var finishedtoolouts chatmessages.ChatMessages // outputs from all calls
 	for toolCallIndex := range caller.ToolCalls {
-		x, err := realruntool(ctx, tools, caller, toolCallIndex)
+
+		// gather from runner
+		x, err := RealRunner(ctx, tools, caller, toolCallIndex)
 		slog.Info("realruntool got", "toolouts", len(x), "err", err)
 		finishedtoolouts = append(finishedtoolouts, x...) // outputs from *this* message's toolcall
 		if err != nil {
@@ -56,7 +58,8 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 	return finishedtoolouts, nil
 }
 
-func realruntool(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage, toolCallIndex int) (chatmessages.ChatMessages, error) {
+// runner
+func RealRunner(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	var call struct {
 		ID       string `json:"id"`
 		Function struct {
