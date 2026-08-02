@@ -359,6 +359,9 @@ func (cm ChatMessages) Raw() llm.Messages {
 	var distance int
 	maxThink := max(0, l-3)
 	for i := range cm {
+		if i < maxThink && cm[i].Content != "" { // keep for toolcalls
+			cm[i].Thinking = ""
+		}
 		if cm[i].Content == CancelMessage { // skip purely cancelled messages
 			continue
 		}
