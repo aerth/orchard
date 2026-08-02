@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -496,7 +497,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	if content == "" {
 		switch {
 		case len(cm.ToolCalls) == 1:
-			content = "Tool Call"
+			content = fmt.Sprintf("Tool Call: %q", cm.ToolCalls.GetNames()[0])
 		case len(cm.ToolCalls) != 0:
 			content = fmt.Sprintf("Tool Calls: %d (%q)", len(cm.ToolCalls), cm.ToolCalls.GetNames())
 		}
