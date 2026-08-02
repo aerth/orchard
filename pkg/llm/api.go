@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
@@ -18,8 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -172,6 +171,7 @@ type EmbedResponse struct {
 	PromptEvalCount int           `json:"prompt_eval_count,omitempty"`
 }
 
+// Message
 type Message struct {
 	Role      string    `json:"role"`
 	Thinking  string    `json:"thinking,omitempty" gorm:"null"`
