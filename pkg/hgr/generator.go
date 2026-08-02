@@ -67,18 +67,20 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	}
 	ext2 := chat.Ext{
 		//	PostFunc: Postfunc(genID, c),
-		ShowRequests:     e.ShowRequests,
-		ThreadID:         e.ThreadID,
-		From:             e.From,
-		Tools:            e.Tools,
-		PostFunc:         e.PostFunc,
-		Append:           e.Append,
-		Prepend:          e.Prepend,
-		PreTools:         e.PreTools,
+		ShowRequests: e.ShowRequests,
+		ThreadID:     e.ThreadID,
+		From:         e.From,
+		Tools:        e.Tools,
+		PostFunc:     e.PostFunc,
+		Append:       e.Append,
+		Prepend:      e.Prepend,
+		PreTools:     e.PreTools,
+		Handlers:     handlers,
+		AfterGen:     e.AfterGen,
+
+		// Both these utlize the chan
 		PreFunc:          Prefunc(genID, e.ThreadID, e.From, c), // add new empty assistant message to caller's message stack
-		NonStreamHandler: hh.HandleToolOutputs,                  // method
-		Handlers:         handlers,
-		AfterGen:         e.AfterGen,
+		NonStreamHandler: hh.HandleToolOutputs,                  // add tool outputs (or system messages) to caller's message stack
 	}
 
 	var tools otool.Tools
