@@ -65,28 +65,30 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
 	}
 	for range 3 {
-		gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
-		creq := llm.NewChatRequest()
-		creq.Think = "low"
-		if creq.Options == nil {
-			creq.Options = make(map[string]any)
-		}
-		creq.Options["seed"] = rand.Intn(13089823748)
-		creq.Messages = llm.Messages{
-			{Role: "system", Content: randReviewerText()},
-			{Role: "user", Content: code},
-		}
-		cl := debugging.NewConsoleLogger(global.LogWriter)
-		err = llm.New().Chat(ctx, creq, gr.GatherChatResponse, cl.HandleChatResponse)
-		if err != nil {
-			return nil, stackerr.Errorf("shell review generation failed: %w", err)
-		}
-		gr.Content = strings.TrimSpace(gr.Content)
-		slog.Info("bash reviewer", "output", gr.Content)
-		fields := strings.Fields(gr.Content)
-		if len(fields) == 0 || fields[0] != "OK" {
-			return nil, stackerr.Errorf("shell reviewer said no (%q)", gr.Content)
-		}
+		go func() {
+			gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
+			creq := llm.NewChatRequest()
+			creq.Think = "low"
+			if creq.Options == nil {
+				creq.Options = make(map[string]any)
+			}
+			creq.Options["seed"] = rand.Intn(13089823748)
+			creq.Messages = llm.Messages{
+				{Role: "system", Content: randReviewerText()},
+				{Role: "user", Content: code},
+			}
+			cl := debugging.NewConsoleLogger(global.LogWriter)
+			err = llm.New().Chat(ctx, creq, gr.GatherChatResponse, cl.HandleChatResponse)
+			if err != nil {
+				return nil, stackerr.Errorf("shell review generation failed: %w", err)
+			}
+			gr.Content = strings.TrimSpace(gr.Content)
+			slog.Info("bash reviewer", "output", gr.Content)
+			fields := strings.Fields(gr.Content)
+			if len(fields) == 0 || fields[0] != "OK" {
+				return nil, stackerr.Errorf("shell reviewer said no (%q)", gr.Content)
+			}
+		}()
 	}
 	// TODO: actual
 	if strings.Contains(code, "&rm ") || strings.Contains(code, "& rm ") ||
