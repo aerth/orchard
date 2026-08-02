@@ -40,6 +40,9 @@ func Prefunc(genID uuid.UUID, threadID uuid.UUID, from string, c chan<- hgr2.Res
 	}
 }
 
+func (h *Handler) PreFunc(creq *llm.ChatRequest) error {
+}
+
 // GeneratorFoo takes elements of e and starts a multi-message round with tool runs
 func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	if e.Context == nil {
