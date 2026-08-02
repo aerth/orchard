@@ -30,6 +30,7 @@ import (
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/dbstore"
+	"m/pkg/debugging"
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/loaders/toolboxes"
@@ -109,6 +110,11 @@ func main1(ctx context.Context) error {
 	slog.Info("STORE ENABLED")
 	global.SetStore(store)
 	global.SetConf(*conf)
+
+	global.AddCloser(func() error {
+		os.Exit(1)
+		return nil
+	})
 	err = runmain(ctx, conf)
 	if err != nil {
 		return stackerr.Errorf("runmain: %w", err)
@@ -225,6 +231,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	if conf.Get().JsonOutput {
 		enc = json.NewEncoder(os.Stdout)
 	}
+	cl := debugging.NewConsoleLogger(os.Stdout, os.Stderr)
 	// GENERATE ROUNDS
 	e := chat.Ext{
 		PreTools: func(ctx context.Context, newcaller *chatmessages.ChatMessage, names []string) error {
@@ -256,6 +263,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			}
 			return nil
 		},
+		Handlers: chat.Handlers{cl.HandleChatResponse},
 	}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
@@ -276,7 +284,7 @@ func ReadMessage(r io.Reader, from, role string, newmsg **chatmessages.ChatMessa
 	// read stdin until EOF
 	var buf []byte
 	buf, err = io.ReadAll(r)
-	x = string(buf)
+	x = strings.TrimSpace(string(buf))
 	if x != "" && errors.Is(err, io.EOF) {
 		err = nil
 	}
@@ -286,7 +294,9 @@ func ReadMessage(r io.Reader, from, role string, newmsg **chatmessages.ChatMessa
 
 	//
 	if *newmsg == nil {
-		*newmsg = chatmessages.New(llm.Message{})
+		slog.Info("creating new pending gen message")
+		*newmsg = chatmessages.NewFromRole(from, role, x)
+		return nil
 	}
 	if (*newmsg).From != from {
 		(*newmsg).From = from
