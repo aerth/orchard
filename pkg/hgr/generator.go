@@ -145,5 +145,5 @@ func fail(genID uuid.UUID, err error, e XE) {
 }
 
 func IsFail(content string) bool {
-	return strings.HasPrefix(content, "This text-generation run was cancelled by user")
+	return strings.HasPrefix(content, "**This text-generation run was cancelled by user") // was not empty before adding error
 }
