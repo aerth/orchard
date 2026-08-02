@@ -24,8 +24,6 @@ type Refresher struct {
 	DoneReason any
 }
 
-//type Finisher struct{ GenID uuid.UUID }
-
 // NewG runs generatorFN in a goroutine, then closes channel and sends Finisher.
 // NOTE: generatorFn should not close channel
 func NewG[T any](genID uuid.UUID, size int, generatorFn func(uuid.UUID, chan<- T)) <-chan T {
