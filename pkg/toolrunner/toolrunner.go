@@ -8,8 +8,8 @@ import (
 	"log/slog"
 	"time"
 
-	"m/pkg/chatmessages"
-	"m/pkg/otool"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"

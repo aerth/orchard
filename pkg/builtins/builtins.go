@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"io/fs"
 	"log/slog"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
-	"m/pkg/otool"
 	"path/filepath"
+
+	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
 )
 
 //go:embed *.json

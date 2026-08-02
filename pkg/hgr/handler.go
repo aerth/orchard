@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"time"
 
-	"m/pkg/chatmessages"
 	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
 
 	"m/pkg/hgr/hgr2"
 

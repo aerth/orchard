@@ -8,7 +8,8 @@ import (
 	"strings"
 
 	"m/pkg/chat"
-	"m/pkg/chatmessages"
+	"m/pkg/types/chatmessages"
+
 	"m/pkg/dbstore"
 	"m/pkg/global"
 	"m/pkg/llm"

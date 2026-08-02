@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"m/pkg/llm"
-	"m/pkg/vector256"
+	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"

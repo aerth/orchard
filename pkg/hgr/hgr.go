@@ -7,7 +7,7 @@ import (
 	"log/slog"
 
 	"m/pkg/chat"
-	"m/pkg/chatmessages"
+	"m/pkg/types/chatmessages"
 
 	"m/pkg/hgr/hgr2"
 

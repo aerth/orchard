@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"m/pkg/chat"
-	"m/pkg/chatmessages"
 	"m/pkg/global"
 	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
 )
 
 type fileArgs struct {

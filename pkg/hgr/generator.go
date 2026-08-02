@@ -7,9 +7,9 @@ import (
 
 	"m/cmdpkg"
 	"m/pkg/chat"
-	"m/pkg/chatmessages"
 	"m/pkg/llm"
-	"m/pkg/otool"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
 
 	"m/pkg/hgr/hgr2"
 

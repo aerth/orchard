@@ -1,3 +1,4 @@
+// splitter TODO: needs work
 package splitter
 
 import (

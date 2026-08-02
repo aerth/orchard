@@ -11,10 +11,11 @@ import (
 	"os"
 	"strings"
 
-	"m/pkg/chatmessages"
 	"m/pkg/global"
 	"m/pkg/llm"
-	"m/pkg/otool"
+
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/joho/godotenv"

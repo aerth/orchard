@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"m/pkg/chat"
-	"m/pkg/chatmessages"
+	"m/pkg/types/chatmessages"
 )
 
 func DoReview(ctx context.Context, convo chatmessages.A, e chat.Ext) (string, error) {

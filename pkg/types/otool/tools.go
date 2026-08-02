@@ -8,8 +8,8 @@ import (
 	"slices"
 	"strings"
 
-	"m/pkg/chatmessages"
 	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
 
 	"github.com/aerth/mostly/stackerr"
 )

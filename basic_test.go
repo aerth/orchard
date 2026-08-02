@@ -9,9 +9,9 @@ import (
 	"m/pkg/builtins"
 	"m/pkg/builtins/implv1"
 	"m/pkg/chat"
-	"m/pkg/chatmessages"
 	"m/pkg/debugging"
-	"m/pkg/otool"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
 
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"

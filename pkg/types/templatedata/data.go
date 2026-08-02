@@ -5,9 +5,9 @@ import (
 	"os/exec"
 	"time"
 
-	"m/pkg/chatmessages"
 	"m/pkg/global"
-	"m/pkg/otool"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
 
 	"github.com/aerth/mostly/stackerr"
 )

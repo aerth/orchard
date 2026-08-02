@@ -9,17 +9,17 @@ import (
 	"iter"
 	"log"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
+	"m/pkg/yoke"
 	"maps"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 
-	rege "m/cmdpkg/regexx"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
-	"m/pkg/otool"
-	"m/pkg/yoke"
+	rege "m/pkg/regexx"
 )
 
 func (t *ToolboxManager) AllTools() Tools {

@@ -12,13 +12,13 @@ import (
 	"strings"
 
 	"m/pkg/chat"
-	"m/pkg/chatmessages"
 	"m/pkg/debugging"
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/loaders/treesitters"
-	"m/pkg/otool"
 	"m/pkg/toolrunner"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"

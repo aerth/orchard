@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"m/pkg/builtins/implv1/bashtooler"
+	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
 	"os"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/builtins/implv1/bashtooler"
-	"m/pkg/chatmessages"
-	"m/pkg/llm"
 )
 
 type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)

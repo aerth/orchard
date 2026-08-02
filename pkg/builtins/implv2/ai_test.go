@@ -12,8 +12,8 @@ import (
 
 	"m/cmdpkg"
 	"m/pkg/builtins/implv2"
-	"m/pkg/chatmessages"
 	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
 
 	"github.com/joho/godotenv"
 	sitter "github.com/smacker/go-tree-sitter"
