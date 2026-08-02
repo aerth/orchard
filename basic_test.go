@@ -19,6 +19,8 @@ import (
 var testtools otool.Tools
 
 func TestMain(m *testing.M) {
+	_ = godotenv.Load()
+	// tools must be initialized (read json spec from embedded fs, apply Exec funcs)
 	tools, err := builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 		"read_file": implv1.ReadFile,
 	})
@@ -26,7 +28,6 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 	testtools = tools
-	_ = godotenv.Load()
 	os.Exit(m.Run())
 }
 
