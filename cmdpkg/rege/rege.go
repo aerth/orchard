@@ -30,7 +30,7 @@ func CleanForTTS(s string) string {
     // 1. Remove big chunks: YAML, HTML comments, and Code Blocks
     s = regexp.MustCompile(`(?s)^---.*?^---`).ReplaceAllString(s, "")        // YAML
     s = regexp.MustCompile(`(?s)<!--.*?-->`).ReplaceAllString(s, "")          // HTML Comments
-    s = regexp.MustCompile(`(?m)^(?:```|~~~).*?(?:\n|$)[\s\S]*?(?:^```|^~~~)`).ReplaceAllString(s, "") // Code blocks
+    s = regexp.MustCompile(`(?m)^(?:\`\`\`|~~~).*?(?:\n|$)[\s\S]*?(?:^```|^~~~)`).ReplaceAllString(s, "") // Code blocks
 
     // 2. Extract text from formatting: Links, Images, Wiki-links, Bold/Italic
     s = regexp.MustCompile(`!\[([^\]]*)\]\([^\)]+\)`).ReplaceAllString(s, "$1") // Image alt text
