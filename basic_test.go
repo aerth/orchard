@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"m/cmdpkg"
 	"m/pkg/builtins"
 	"m/pkg/builtins/implv1"
 	"m/pkg/chat"
@@ -34,9 +35,9 @@ func TestFoo(t *testing.T) {
 		t.Fatal(err)
 	}
 	cl := debugging.NewConsoleLogger()
-	err = chat.Chat(t.Context(), threadID, stack, chat.Ext{
-		Prepend: sysmsg,
-		Tools:   tools.ToMarshaler(),
+	err = cmdpkg.ChatWith(t.Context(), stack, tools, chat.Ext{
+		Prepend:  sysmsg,
+		ThreadID: threadID,
 		Handlers: chat.Handlers{
 			cl.HandleChatResponse,
 		},
