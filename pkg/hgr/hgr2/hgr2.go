@@ -14,12 +14,12 @@ var (
 	DEBUG          = false
 )
 
-type channelWrap[T any] struct {
+type PlainChannelWrap[T any] struct {
 	GenID uuid.UUID
 	C     <-chan T
 }
 type (
-	ChannelWrapper = channelWrap[ResponseWrap] // channel with UUID
+	ChannelWrapper = PlainChannelWrap[ResponseWrap] // channel with UUID
 	ResponseWrap   struct {
 		GenID uuid.UUID    // this generator, where multiple generators may operating simultaneously.
 		V     fmt.Stringer // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
@@ -29,7 +29,7 @@ type (
 
 // GatherQuickly is for Update function, and should quickly gather whatever is in the channels buffer.
 // Returns isDone true if the channel is closed (meaning the caller should remove and no longer check this genID's chan)
-func (c channelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) {
+func (c PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) {
 	var a []T
 	for ctx.Err() == nil { // limit for this Update call in the ~30fps loop
 		select {
