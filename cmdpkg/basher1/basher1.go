@@ -50,7 +50,7 @@ func (a anymap) IsToolArgument() {}
 
 var previouslyWhitelisted []string // to store one-liners
 
-func doShellReview(ctx.Context, ch chan error, code string) {
+func doShellReview(ctx context.Context, ch chan error, code string) {
 	gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
 	creq := llm.NewChatRequest()
 	creq.Think = "low"
