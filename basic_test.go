@@ -25,9 +25,13 @@ func TestFoo(t *testing.T) {
 	threadID := uuid.UUID{}
 	sysmsg := []llm.Message{{Role: "system", Content: "you are grug"}}
 	cl := debugging.NewConsoleLogger()
-	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{Prepend: sysmsg, Handlers: chat.Handlers{
-		cl.HandleChatResponse,
-	}})
+	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{
+		Prepend: sysmsg,
+		Tools:   tools,
+		Handlers: chat.Handlers{
+			cl.HandleChatResponse,
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
