@@ -120,7 +120,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 		_, _ = fmt.Fprintf(tw, "%s", m.Thinking)
 	}
 	if m.Content != "" {
-		if c.emode != xCONTENT {
+		if c.emode != xCONTENT { // first content chunk of this stream since last Reset
 			if !c.HideThinking && c.emode == xGO {
 				slog.Info("newline")
 				_, _ = fmt.Fprintf(tw, "\n")
