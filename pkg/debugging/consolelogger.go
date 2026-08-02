@@ -123,6 +123,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 		slog.Info("content", "text", m.Content)
 		if c.emode != xCONTENT {
 			if !c.HideThinking && c.emode == xGO {
+				slog.Info("newline")
 				_, _ = fmt.Fprintf(tw, "\n")
 			}
 			if !c.NoColor {
@@ -133,7 +134,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 			}
 			c.emode = xCONTENT
 		}
-		_, err := fmt.Fprintf(w, "%s\n", m.Content)
+		_, err := fmt.Fprintf(w, "%s", m.Content)
 		if err != nil {
 			return stackerr.Errorf("%w", err)
 		}
