@@ -15,7 +15,7 @@ import (
 	"slices"
 	"strings"
 
-	"m/cmdpkg/rege"
+	rege "m/cmdpkg/regexx"
 	"m/pkg/chatmessages"
 	"m/pkg/llm"
 	"m/pkg/otool"
