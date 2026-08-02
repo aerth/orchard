@@ -27,7 +27,7 @@ type cx string
 
 func Runtools(ctx context.Context, stack chatmessages.A, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	// should have Ext already, but stack/tools are more volatile
-	if stack != nil {
+	if len(stack) != 0 {
 		ctx = context.WithValue(ctx, CtxStack, stack)
 	}
 	if len(tools) != 0 {
