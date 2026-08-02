@@ -30,7 +30,7 @@ func GetSystemBase(data any) string {
 			slog.Error("system prompt file does not exist")
 		}
 		if err != nil {
-			panic(err.Error())
+			panic(err.Error()) // invariant
 		}
 	} else {
 		tpl, err = tpl.ParseFS(orchard.Embedded, "SYSTEM.md")
