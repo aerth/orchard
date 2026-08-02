@@ -133,6 +133,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 			}
 			c.emode = xCONTENT
 		}
+		// already in content mode
 		_, err := fmt.Fprintf(w, "%s", m.Content)
 		if err != nil {
 			return stackerr.Errorf("%w", err)
