@@ -2,6 +2,7 @@ package basher1
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"maps"
@@ -85,7 +86,7 @@ func doShellReview(ctx context.Context, ch chan error, code string) {
 
 func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	if implv2.ConfirmAction == nil {
-		return nil, fmt.Errorf("Bash tool needs a ConfirmAction set in implv2 package")
+		return nil, stackerr.Errorf("bash tool needs a ConfirmAction set in implv2 package (from main package)")
 	}
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 	if err != nil {
@@ -99,29 +100,21 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	}
 	ch := make(chan error)
 	numReviews := 3
+	if ctx.Err() != nil {
+		return nil, context.Cause(ctx)
+	}
 	for range numReviews {
 		go doShellReview(ctx, ch, code)
 	}
-	pass := true
 	for range numReviews {
 		e := <-ch
 		if e != nil {
 			slog.Error("got err", "err", e)
-			pass = false
-			err = e
+			err = errors.Join(err, e)
 		}
 	}
 	if err != nil {
 		return nil, err
-	}
-
-	// TODO: actual
-	if strings.Contains(code, "&rm ") || strings.Contains(code, "& rm ") ||
-		strings.Contains(code, "|rm ") || strings.Contains(code, "| rm ") {
-		return nil, stackerr.Errorf("you may not use bash to rm files") // TODO: real
-	}
-	if strings.HasPrefix(code, "rm ") {
-		return nil, stackerr.Errorf("you may not use bash to rm files") // TODO: real
 	}
 
 	if !isOkBashCode(code) {
