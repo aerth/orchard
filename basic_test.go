@@ -9,7 +9,6 @@ import (
 	"m/pkg/builtins/implv1"
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
-	"m/pkg/debugging"
 	"m/pkg/otool"
 
 	"github.com/google/uuid"
@@ -30,11 +29,11 @@ func TestBasicUsage(t *testing.T) {
 		*chatmessages.NewFromRole("Chief", "user", prompt),
 	}
 	threadID := uuid.UUID{}
-	cl := debugging.NewConsoleLogger()
+	//cl := debugging.NewConsoleLogger()
 	err = cmdpkg.ChatWith(t.Context(), stack, tools, chat.Ext{
 		ThreadID: threadID,
 		Handlers: chat.Handlers{
-			cl.HandleChatResponse,
+			//	cl.HandleChatResponse,
 		},
 	})
 	if err != nil {
