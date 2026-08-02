@@ -123,10 +123,10 @@ func Postfunc(genID uuid.UUID, c chan<- hgr2.ResponseWrap) func(err error) error
 func fail(genID uuid.UUID, err error, e XE) {
 	slog := slog.With("gen_id", genID, "from", e.From, "ntools", len(e.Tools))
 	slog.Error("RunChatTools failed", "err", err, "cause", context.Cause(e.Context))
-	cause := context.Cause(e.Context)
 	causemsg := fmt.Sprintf("%+v", err)
-	if cause == nil {
-		cause = err
+	cause := context.Cause(e.Context)
+	if cause != nil {
+		causemsg = cause.Error()
 	}
 	if err := e.Send(hgr2.ResponseWrap{
 		GenID: genID,
