@@ -15,6 +15,7 @@ import (
 
 // Handler that sends stream ChatResponse and Tool Output messages to a channel
 type Handler struct {
+	ThreadID           uuid.UUID
 	GenID              uuid.UUID
 	C                  chan<- hgr2.ResponseWrap
 	HandleToolOutputs2 func(cm chatmessages.ChatMessage)
