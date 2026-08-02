@@ -29,6 +29,7 @@ type ConfigInput struct {
 	AddSystemPrompt   string
 	InitialUserPrompt string
 	Dir               string
+	HideThinking      bool
 }
 type cfginput = ConfigInput
 
