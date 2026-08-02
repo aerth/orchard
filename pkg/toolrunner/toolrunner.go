@@ -58,7 +58,7 @@ func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.Ch
 	return finishedtoolouts, nil
 }
 
-// runner
+// RealRunner
 func RealRunner(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	var call struct {
 		ID       string `json:"id"`
@@ -75,16 +75,13 @@ func RealRunner(ctx context.Context, tools otool.Tools, caller chatmessages.Chat
 	if call.Function.Name == "" {
 		return nil, stackerr.Errorf("call is missing call.function.name")
 	}
-	var tool otool.Tool
-	for _, t := range tools {
-		if t.Name == call.Function.Name {
-			tool = t
-			break
-		}
-	}
-	if tool.Name != call.Function.Name {
+	var tool otool.Tool = tools.ByName(call.Function.Name)
+	if tool.Name == "" {
 		slog.Warn("Not Running tools...", "i", toolCallIndex, "call", call)
 		return nil, stackerr.Errorf("cant find tool named %s in %d tools", call.Function.Name, len(tools))
+	}
+	if tool.Name != call.Function.Name {
+		return nil, stackerr.Errorf("tool named %q is also %q in %d tools", tool.Name, call.Function.Name, len(tools))
 	}
 	slog.Info("Running tools...", "caller", caller.String(), "i", toolCallIndex, "call", call)
 	x, err := tool.Exec(ctx, caller.Message, toolCallIndex)
@@ -139,7 +136,9 @@ func RealRunner(ctx context.Context, tools otool.Tools, caller chatmessages.Chat
 	return x, nil
 }
 
-func ProcessMessages(a chatmessages.A) error {
+var ProcessMessages = DefaultProcessMessages
+
+func DefaultProcessMessages(a chatmessages.A) error {
 	for i := range a {
 		if a[i].Role != "tool" {
 			continue
