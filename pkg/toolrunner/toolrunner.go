@@ -37,7 +37,7 @@ func Runtools(ctx context.Context, stack chatmessages.A, tools otool.Tools, call
 	return toolouts, err
 }
 
-// realruntools handles all calls
+// realruntools calls and gathers each tool call's responses into one list, stopping at the first error.
 func realruntools(ctx context.Context, tools otool.Tools, caller chatmessages.ChatMessage) (chatmessages.ChatMessages, error) {
 	if len(caller.ToolCalls) == 0 {
 		return nil, fmt.Errorf("no tool calls in this caller")
