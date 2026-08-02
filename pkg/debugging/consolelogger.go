@@ -120,7 +120,6 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 		_, _ = fmt.Fprintf(tw, "%s", m.Thinking)
 	}
 	if m.Content != "" {
-		slog.Info("content", "text", m.Content)
 		if c.emode != xCONTENT {
 			if !c.HideThinking && c.emode == xGO {
 				slog.Info("newline")
