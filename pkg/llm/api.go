@@ -173,9 +173,10 @@ type EmbedResponse struct {
 
 // Message
 type Message struct {
-	Role      string    `json:"role"`
-	Thinking  string    `json:"thinking,omitempty" gorm:"null"`
-	Content   string    `json:"content,omitempty"`
+	Role     string `json:"role"`
+	Thinking string `json:"thinking,omitempty" gorm:"null"`
+	Content  string `json:"content,omitempty"`
+	// optional toolcalls for assistant message
 	ToolCalls ToolCalls `json:"tool_calls,omitempty" gorm:"type:jsonb;null"`
 	// tool outputs
 	ToolName   string `json:"tool_name,omitempty" gorm:"null"`
