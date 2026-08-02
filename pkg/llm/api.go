@@ -177,10 +177,11 @@ type Message struct {
 	Thinking  string    `json:"thinking,omitempty" gorm:"null"`
 	Content   string    `json:"content,omitempty"`
 	ToolCalls ToolCalls `json:"tool_calls,omitempty" gorm:"type:jsonb;null"`
-	//
-	ToolName   string   `json:"tool_name,omitempty" gorm:"null"`
-	ToolCallID string   `json:"tool_call_id,omitempty" gorm:"null"`
-	Images     [][]byte `json:"images,omitempty" gorm:"-"`
+	// tool outputs
+	ToolName   string `json:"tool_name,omitempty" gorm:"null"`
+	ToolCallID string `json:"tool_call_id,omitempty" gorm:"null"`
+	// optional image attachment for user message
+	Images [][]byte `json:"images,omitempty" gorm:"-"`
 }
 
 func (m Message) IsEmpty() bool {
