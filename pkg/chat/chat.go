@@ -32,7 +32,7 @@ type Ext struct {
 
 	// PreFunc current streaming output for DISPLAY
 	// Called right before llm.Chat call, may be used to cancel
-	PreFunc func(creq *llm.ChatRequest) error
+	PreFunc func(creq *llm.ChatRequest, from string) error
 	// PostFunc should return nil
 	PostFunc func(err error) error
 	Handlers []ChatHandler                         // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
