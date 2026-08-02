@@ -218,7 +218,9 @@ func (cm Messages) TrimThoughts(i int) {
 		return
 	}
 	for i := range i {
-		cm[i].Thinking = ""
+		if len(cm[i].ToolCalls) == 0 {
+			cm[i].Thinking = ""
+		}
 	}
 }
 
