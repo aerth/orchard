@@ -24,6 +24,7 @@ import (
 
 	"m/cmdpkg"
 	"m/cmdpkg/basher1"
+	"m/cmdpkg/spinner"
 	"m/pkg/builtins"
 	"m/pkg/builtins/implv1"
 	"m/pkg/builtins/implv2"
@@ -115,6 +116,8 @@ func main1(ctx context.Context) error {
 		os.Exit(1)
 		return nil
 	})
+
+	spinner.NoSpin = conf.Get().NoSpin
 	err = runmain(ctx, conf)
 	if err != nil {
 		return stackerr.Errorf("runmain: %w", err)
