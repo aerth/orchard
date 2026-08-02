@@ -62,13 +62,13 @@ type (
 	Tools          []Tool
 )
 
-func (t Tools) ByName(param any) Tool {
-	for _, t := range tools {
-		if t.Name == call.Function.Name {
-			tool = t
-			break
+func (t Tools) ByName(name string) Tool {
+	for _, tool := range t {
+		if tool.Name == name {
+			return tool
 		}
 	}
+	slog.Warn("tool not found by name", "tool", name)
 	return Tool{}
 }
 
