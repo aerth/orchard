@@ -4,10 +4,13 @@ import (
 	"os"
 	"testing"
 
+	"m/pkg/builtins"
+	"m/pkg/builtins/implv1"
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
 	"m/pkg/debugging"
 	"m/pkg/llm"
+	"m/pkg/otool"
 
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
@@ -24,6 +27,9 @@ func TestFoo(t *testing.T) {
 	stack := chatmessages.A{*usermsg}
 	threadID := uuid.UUID{}
 	sysmsg := []llm.Message{{Role: "system", Content: "you are grug"}}
+	tools := builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
+		"read_file": implv1.ReadFile,
+	})
 	cl := debugging.NewConsoleLogger()
 	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{
 		Prepend: sysmsg,
