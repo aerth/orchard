@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"m/cmdpkg"
 	"m/pkg/builtins"
 	"m/pkg/builtins/implv1"
 	"m/pkg/chat"
@@ -38,8 +39,7 @@ func TestBasicUsage(t *testing.T) {
 		*chatmessages.NewFromRole("Chief", "user", prompt),
 	}
 	threadID := uuid.UUID{}
-	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{
-		Tools:    testtools.ToMarshaler(),
+	err := cmdpkg.ChatWith(t.Context(), stack, testtools, chat.Ext{
 		ThreadID: threadID,
 		Handlers: chat.Handlers{},
 	})
@@ -49,5 +49,20 @@ func TestBasicUsage(t *testing.T) {
 	//_ = got
 }
 
+// TestPrimitive does not call tools
 func TestPrimitive(t *testing.T) {
+	prompt := "summarize ./Makefile"
+	stack := chatmessages.A{
+		*chatmessages.NewFromRole("Chief", "user", prompt),
+	}
+	threadID := uuid.UUID{}
+	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{
+		Tools:    testtools.ToMarshaler(),
+		ThreadID: threadID,
+		Handlers: chat.Handlers{},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	//_ = got
 }
