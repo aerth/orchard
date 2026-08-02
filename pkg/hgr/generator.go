@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"m/cmdpkg"
 	"m/pkg/chat"
@@ -141,4 +142,8 @@ func fail(genID uuid.UUID, err error, e XE) {
 	}); err != nil {
 		slog.Warn("Could not finish up after error", "err", err)
 	}
+}
+
+func IsFail(content string) bool {
+	return strings.HasPrefix(content, "This text-generation run was cancelled by user")
 }
