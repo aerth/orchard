@@ -79,8 +79,8 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 		AfterGen:     e.AfterGen,
 
 		// Both these utlize the chan
-		PreFunc:          Prefunc(genID, e.ThreadID, e.From, c), // add new empty assistant message to caller's message stack
-		NonStreamHandler: hh.HandleToolOutputs,                  // add tool outputs (or system messages) to caller's message stack
+		PreFunc:          hh.PreFunc(),         // Prefunc(genID, e.ThreadID, e.From, c), // add new empty assistant message to caller's message stack
+		NonStreamHandler: hh.HandleToolOutputs, // add tool outputs (or system messages) to caller's message stack
 	}
 
 	var tools otool.Tools
