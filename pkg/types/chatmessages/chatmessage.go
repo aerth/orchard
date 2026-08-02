@@ -470,11 +470,11 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 			content = fmt.Sprintf("Aux %T: %v", v, v)
 		}
 	case cm.Role == "tool" && cm.ToolName == "":
-		content = fmt.Sprintf("### tool %q call output\n```\n", "!MISSING!") + cm.Content + "\n```\n"
+		content = fmt.Sprintf("### tool %q output\n```\n", "!MISSING!") + cm.Content + "\n```\n"
 	case cm.Role == "tool" && ShowToolOutputs:
-		content = fmt.Sprintf("### tool %q call output\n```\n", cm.ToolName) + cm.Content + "\n```\n"
+		content = fmt.Sprintf("### tool %q output\n```\n", cm.ToolName) + cm.Content + "\n```\n"
 	case cm.Role == "tool":
-		content = fmt.Sprintf("### tool %q call output (%d bytes)\n", cm.ToolName, len(cm.Content))
+		content = fmt.Sprintf("### tool %q output (%d bytes)\n", cm.ToolName, len(cm.Content))
 	case len(cm.ToolCalls) != 0 && cm.Content != "":
 		slog.Info("FOUND A TOOL CALL WITH CONTENT", "d1", cm.CreatedAt, "by", cm.CreatedBy) // it exists!
 		content = cm.Content
