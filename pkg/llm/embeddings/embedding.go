@@ -9,9 +9,9 @@ import (
 	"os"
 	"strings"
 
-	"m/pkg/chatmessages"
 	"m/pkg/llm"
-	"m/pkg/vector256"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
