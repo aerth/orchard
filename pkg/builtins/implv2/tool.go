@@ -188,7 +188,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			handlers = append(handlers, handler.Handle) // stream to channel
 		}
 		if e.Ext.PreFunc != nil {
-			if err := e.Ext.PreFunc(creq); err != nil {
+			if err := e.Ext.PreFunc(creq, ext.From); err != nil {
 				return nil, err
 			}
 		} else {
