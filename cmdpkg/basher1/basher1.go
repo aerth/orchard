@@ -71,7 +71,9 @@ func doShellReview(ctx context.Context, ch chan error, code string) {
 	gr.Content = strings.TrimSpace(gr.Content)
 	slog.Info("bash reviewer", "output", gr.Content)
 	fields := strings.Fields(gr.Content)
-	if len(fields) == 0 || fields[0] != "OK" {
+	if len(fields) == 0 {
+
+	if fields[0] != "OK" || len(fields) != 1 {
 		ch <- stackerr.Errorf("shell reviewer said no (%q)", gr.Content)
 		return
 	}
