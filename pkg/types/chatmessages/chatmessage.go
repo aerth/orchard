@@ -367,12 +367,12 @@ func (cm ChatMessages) Raw() llm.Messages {
 			mx = GetMaxDistance(cm[i])
 		}
 		var suffix string
-		if mx != 0 {
-			if mx < distance {
-				suffix = fmt.Sprintf("was forgotten after %d (currently %d)", mx, distance)
-			} else {
-				suffix = fmt.Sprintf("will be forgotten after %d more messages", mx-distance)
-			}
+		switch {
+		case mx == 0:
+		case mx < distance:
+			suffix = fmt.Sprintf("was forgotten after %d (currently %d)", mx, distance)
+		case mx != 0:
+			suffix = fmt.Sprintf("will be forgotten after %d more messages", mx-distance)
 		}
 		if mx != 0 && mx < distance {
 			slog.Warn("skipping raw(maxdistance)", "i", i, "msg", cm[i].String())
