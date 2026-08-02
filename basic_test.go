@@ -10,6 +10,7 @@ import (
 	"m/pkg/builtins/implv1"
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
+	"m/pkg/llm"
 	"m/pkg/otool"
 
 	"github.com/google/uuid"
@@ -32,7 +33,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// TestBasicUsage does not call tools
+// TestBasicUsage runs tool calls
 func TestBasicUsage(t *testing.T) {
 	prompt := "summarize ./Makefile"
 	stack := chatmessages.A{
@@ -57,6 +58,7 @@ func TestPrimitive(t *testing.T) {
 	}
 	threadID := uuid.UUID{}
 	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{
+		Prepend:  []llm.Message{{Role: "system", Content: "Keep all replies short."}},
 		Tools:    testtools.ToMarshaler(),
 		ThreadID: threadID,
 		Handlers: chat.Handlers{},
