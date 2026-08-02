@@ -177,7 +177,7 @@ func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) error {
 	//if !c.HideToolCalls || len(cr.Message.ToolCalls) == 0 {
 	//
 	if !cr.Message.IsEmpty() {
-		slog.Info("printing", "text", cr.Message.Content, "is_done", cr.Done)
+		//	slog.Info("printing", "text", cr.Message.Content, "is_done", cr.Done)
 		if err := c.PrintMessage(w, tw, cr.Message); err != nil {
 			slog.Error("printing message failed", "err", err)
 			if cr.Done {
