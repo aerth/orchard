@@ -27,13 +27,16 @@ func TestFoo(t *testing.T) {
 	stack := chatmessages.A{*usermsg}
 	threadID := uuid.UUID{}
 	sysmsg := []llm.Message{{Role: "system", Content: "you are grug"}}
-	tools := builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
+	tools, err := builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 		"read_file": implv1.ReadFile,
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	cl := debugging.NewConsoleLogger()
-	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{
+	err = chat.Chat(t.Context(), threadID, stack, chat.Ext{
 		Prepend: sysmsg,
-		Tools:   tools,
+		Tools:   tools.ToMarshaler(),
 		Handlers: chat.Handlers{
 			cl.HandleChatResponse,
 		},
