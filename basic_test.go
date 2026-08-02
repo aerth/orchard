@@ -10,6 +10,7 @@ import (
 	"m/pkg/builtins/implv1"
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
+	"m/pkg/debugging"
 	"m/pkg/otool"
 
 	"github.com/google/uuid"
@@ -58,11 +59,12 @@ func TestPrimitive(t *testing.T) {
 	}
 	threadID := uuid.UUID{}
 	// [chat.Chat] calls underlying [llm.Client.Chat]
+	cl := debugging.NewConsoleLogger(t.Output())
 	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{
 		//	Prepend:  []llm.Message{{Role: "system", Content: "Keep all replies short."}},
 		Tools:    testtools.ToMarshaler(),
 		ThreadID: threadID,
-		Handlers: chat.Handlers{},
+		Handlers: chat.Handlers{cl.HandleChatResponse},
 	})
 	if err != nil {
 		t.Fatal(err)
