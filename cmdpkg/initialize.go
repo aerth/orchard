@@ -9,7 +9,6 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"slices"
 	"strings"
 
 	"m/pkg/chatmessages"
@@ -24,74 +23,53 @@ import (
 
 // See Also: [global.ConfigInput.Flags]
 
-var okenvs = map[string]bool{
-	"INPUT_FILE":          true,
-	"LANG":                true,
-	"PATH":                true,
-	"HOME":                true,
-	"XDG_CACHE_HOME":      true,
-	"XDG_DATA_HOME":       true,
-	"XDG_CONFIG_DIRS":     true,
-	"XDG_CONFIG_HOME":     true,
-	"XDG_CURRENT_DESKTOP": true,
-	"XDG_RUNTIME_DIR":     true,
-	"XDG_DATA_DIRS":       true,
-	"USER":                true,
-	"SHELL":               true,
-	"REQUESTS_CA_BUNDLE":  true, //=/etc/ssl/certs/ca-certificates.crt"
-	"PWD":                 true,
-	"OLLAMA_HOST":         true,
-	"OLLAMA_MODEL":        true,
-	"OLLAMA_THINK":        true,
-	"TERM":                true,
-	// experiments
-	"DISPLAY":    true,
-	"__MISE_EXE": true,
-}
+//var okenvs = map[string]bool{
+//}
 
-func isbad(s string) bool {
-	if okenvs[s] {
-		return false
+/*
+	func isbad(s string) bool {
+		if okenvs[s] {
+			return false
+		}
+		if strings.HasPrefix(s, "OLLAMA_") || strings.HasPrefix(s, "ORCHARD_") || strings.HasPrefix(s, "LLM_") {
+			return false
+		}
+		return true
 	}
-	if strings.HasPrefix(s, "OLLAMA_") || strings.HasPrefix(s, "ORCHARD_") || strings.HasPrefix(s, "LLM_") {
-		return false
-	}
-	return true
-}
 
-func NewCleanEnviron() []string {
-	env := slices.DeleteFunc(os.Environ(), func(s string) bool {
-		x := strings.Split(s, "=")[0]
-		return isbad(x)
-	})
-	if !slices.ContainsFunc(env, func(e string) bool {
-		return strings.HasPrefix(e, "REQUESTS_CA_BUNDLE")
-	}) {
-		env = append(env, "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt")
+	func NewCleanEnviron() []string {
+		env := slices.DeleteFunc(os.Environ(), func(s string) bool {
+			x := strings.Split(s, "=")[0]
+			return isbad(x)
+		})
+		if !slices.ContainsFunc(env, func(e string) bool {
+			return strings.HasPrefix(e, "REQUESTS_CA_BUNDLE")
+		}) {
+			env = append(env, "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt")
+		}
+		//for i := range env {
+		//		log.Printf("using python with env %s", env[i])
+		//	}
+		return env
 	}
-	//for i := range env {
-	//		log.Printf("using python with env %s", env[i])
-	//	}
-	return env
-}
 
-func ResetEnvClean() {
-	// clear env, then replace with clean env -- this new, cleaned env is passed to tool calls for python/bash tools
-	{
-		customEnv := NewCleanEnviron()
-		os.Clearenv()
-		for _, env := range customEnv {
-			before, after, _ := strings.Cut(env, "=")
-			if before == "" {
-				continue
-			}
-			if err := os.Setenv(before, after); err != nil {
-				panic(err.Error())
+	func ResetEnvClean() {
+		// clear env, then replace with clean env -- this new, cleaned env is passed to tool calls for python/bash tools
+		{
+			customEnv := NewCleanEnviron()
+			os.Clearenv()
+			for _, env := range customEnv {
+				before, after, _ := strings.Cut(env, "=")
+				if before == "" {
+					continue
+				}
+				if err := os.Setenv(before, after); err != nil {
+					panic(err.Error())
+				}
 			}
 		}
 	}
-}
-
+*/
 func ActivateTools(tools otool.Tools) error {
 	for i := range tools {
 		if tools[i].Name == "foo" {
