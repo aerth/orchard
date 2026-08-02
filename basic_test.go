@@ -40,7 +40,7 @@ func TestBasicUsage(t *testing.T) {
 		*chatmessages.NewFromRole("Chief", "user", prompt),
 	}
 	threadID := uuid.UUID{}
-	// cmdpkg.ChatWith calls chat.Chat
+	// [cmdpkg.ChatWith] calls [chat.Chat]
 	err := cmdpkg.ChatWith(t.Context(), stack, testtools, chat.Ext{
 		ThreadID: threadID,
 		Handlers: chat.Handlers{},
@@ -58,6 +58,7 @@ func TestPrimitive(t *testing.T) {
 		*chatmessages.NewFromRole("Chief", "user", prompt),
 	}
 	threadID := uuid.UUID{}
+	// [chat.Chat] calls underlying [llm.Client.Chat]
 	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{
 		Prepend:  []llm.Message{{Role: "system", Content: "Keep all replies short."}},
 		Tools:    testtools.ToMarshaler(),
