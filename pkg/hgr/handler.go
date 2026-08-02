@@ -20,7 +20,7 @@ type Handler struct {
 	HandleToolOutputs2 func(cm chatmessages.ChatMessage)
 }
 
-// Send to CHANNEL
+// Send to CHANNEL that is read periodically by calling [hgr2.ChannelWrapper.GatherQuickly]
 func (h *Handler) Send(r hgr2.ResponseWrap) error {
 	t1 := time.Now()
 	if r.GenID == uuid.Nil {
