@@ -31,7 +31,7 @@ func (h *Handler) Send(r hgr2.ResponseWrap) error {
 		case <-time.After(time.Second * 3):
 			slog.Warn("no sendo after", "d", time.Since(t1))
 		case h.C <- r:
-			if l := len(h.C); l > 40 {
+			if l := len(h.C); l > 200 {
 				slog.Info("uhoh", "chanbuf", l)
 			}
 			return nil
