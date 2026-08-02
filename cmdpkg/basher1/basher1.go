@@ -87,8 +87,10 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 			slog.Info("bash reviewer", "output", gr.Content)
 			fields := strings.Fields(gr.Content)
 			if len(fields) == 0 || fields[0] != "OK" {
-				return nil, stackerr.Errorf("shell reviewer said no (%q)", gr.Content)
+				ch <- stackerr.Errorf("shell reviewer said no (%q)", gr.Content)
+				return
 			}
+			ch <- nil
 		}()
 	}
 	// TODO: actual
