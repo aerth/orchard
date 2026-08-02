@@ -14,7 +14,12 @@ var Embedded fs.FS = embedded
 
 func init() {
 	if true {
-		os.ExpandEnv("$HOME/src/orchard")
-		Embedded = os.DirFS()
+		x := os.Getenv("ORCHARD_DIR")
+		if x == "" {
+			x = os.ExpandEnv("$HOME/src/orchard")
+		}
+		if _, err := os.Stat(x); err == nil {
+			Embedded = os.DirFS(x)
+		}
 	}
 }
