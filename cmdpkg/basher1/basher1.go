@@ -102,7 +102,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	for range numReviews {
 		go doShellReview(ctx, ch, code)
 	}
-	failed := true
+	pass := true
 	var err error
 	for range numReviews {
 		e := <-ch
