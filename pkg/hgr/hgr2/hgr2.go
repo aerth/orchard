@@ -46,7 +46,7 @@ func (c channelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []
 			if len(a) == 0 {
 				a = nil
 			}
-			slog.Debug("gatehring is DONE, caller should stop checking", "todo", len(ch), "cap", cap(ch))
+			slog.Debug("gathering is DONE, caller should stop checking", "todo", len(ch), "cap", cap(ch))
 			return a, true // channel is closed, caller should stop checking
 		default: // not yet
 			if len(a) == 0 {
