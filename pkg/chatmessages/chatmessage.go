@@ -364,9 +364,9 @@ func (cm ChatMessages) Raw() llm.Messages {
 		var suffix string
 		if mx != 0 {
 			if mx < distance {
-				suffix = fmt.Sprintf("( forgotten after %d (currently %d)", mx, distance)
+				suffix = fmt.Sprintf("was forgotten after %d (currently %d)", mx, distance)
 			} else {
-				suffix = fmt.Sprintf("( will be forgotten after %d more messages)", mx-distance)
+				suffix = fmt.Sprintf("will be forgotten after %d more messages", mx-distance)
 			}
 		}
 		if mx != 0 && mx < distance {
@@ -388,6 +388,7 @@ func (cm ChatMessages) Raw() llm.Messages {
 		//	slog.Warn("got raw", "i", i, "msg", cm[i].Message)
 		a = append(a, cm[i].Message)
 		if suffix != "" {
+			msg := llm.Message{Role: "system", Content: "The previous message " + suffix}
 			a = append(a, msg)
 		}
 	}
