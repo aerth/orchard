@@ -358,6 +358,9 @@ func (cm ChatMessages) Raw() llm.Messages {
 	l := len(cm) // 5
 	var distance int
 	for i := range cm {
+		if cm[i].Content == CancelMessage { // skip purely cancelled messages
+			continue
+		}
 		distance = l - (i + 1)  // 4
 		mx := cm[i].MaxDistance // eg: 4
 		if mx == 0 {
