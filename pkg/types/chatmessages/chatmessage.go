@@ -361,6 +361,14 @@ func (cm ChatMessages) Raw() llm.Messages {
 		if cm[i].Content == CancelMessage { // skip purely cancelled messages
 			continue
 		}
+		if cm[i].Aux != nil {
+			slog.Warn("skipping raw(aux)", "i", i)
+			continue
+		}
+		if cm[i].IsEmpty() {
+			slog.Warn("skipping raw(empty)", "i", i)
+			continue
+		}
 		distance = l - (i + 1)  // 4
 		mx := cm[i].MaxDistance // eg: 4
 		if mx == 0 {
@@ -381,16 +389,6 @@ func (cm ChatMessages) Raw() llm.Messages {
 			a = append(a, x)
 			continue
 		}
-		if cm[i].Aux != nil {
-			slog.Warn("skipping raw(aux)", "i", i)
-			continue
-		}
-		if cm[i].IsEmpty() {
-			slog.Warn("skipping raw(empty)", "i", i)
-			continue
-		}
-
-		//	slog.Warn("got raw", "i", i, "msg", cm[i].Message)
 		a = append(a, cm[i].Message)
 		if suffix != "" {
 			msg := llm.Message{Role: "system", Content: "The previous message " + suffix}
