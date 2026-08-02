@@ -124,6 +124,7 @@ func fail(genID uuid.UUID, err error, e XE) {
 	slog := slog.With("gen_id", genID, "from", e.From, "ntools", len(e.Tools))
 	slog.Error("RunChatTools failed", "err", err, "cause", context.Cause(e.Context))
 	cause := context.Cause(e.Context)
+	causemsg := fmt.Sprintf("%+v", err)
 	if cause == nil {
 		cause = err
 	}
