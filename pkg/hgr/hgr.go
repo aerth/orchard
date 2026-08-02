@@ -4,6 +4,7 @@ package hgr
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
@@ -50,22 +51,20 @@ type XE struct { // immutable. sends api.Response to channel
 	ch                 chan<- hgr2.ResponseWrap
 }
 
-/*
-	func (e XE) Encoder(msgptr *chatmessages.ChatMessage) error {
-		msg := *msgptr
-		if msg.ThreadID == uuid.Nil {
-			msg.ThreadID = e.ThreadID
-		}
-		if false && msg.Role == "assistant" {
-			slog.Warn("encoder: skipping assistant", "m", msg.String())
-			return nil
-		}
-		return e.Send(hgr2.ResponseWrap{
-			GenID: e.GenID,
-			V:     msg,
-		})
+func (e XE) Encoder(msgptr *chatmessages.ChatMessage) error {
+	msg := *msgptr
+	if msg.ThreadID == uuid.Nil {
+		msg.ThreadID = e.ThreadID
 	}
-*/
+	if false && msg.Role == "assistant" {
+		slog.Warn("encoder: skipping assistant", "m", msg.String())
+		return nil
+	}
+	return e.Send(hgr2.ResponseWrap{
+		GenID: e.GenID,
+		V:     msg,
+	})
+}
 
 func (e XE) Send(r hgr2.ResponseWrap) error {
 	select {
