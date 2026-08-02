@@ -19,8 +19,8 @@ var okenvs = map[string]bool{
 
 	// Tooling (Mise/Python/Cuda)
 	"__MISE_EXE":         true,
-	"REQUESTS_CA_BUNDLE": true,
-	"CUDA_PATH":          true, // Added: Since you have /opt/cuda in PATH
+	"REQUESTS_CA_BUNDLE": true, //=/etc/ssl/certs/ca-certificates.crt"
+	"CUDA_PATH":          true,
 
 	// Orchard Specifics
 	"ORCHARD_TOOLS": true, // Added: Vital for your project structure
@@ -37,6 +37,12 @@ var okenvs = map[string]bool{
 	"XDG_RUNTIME_DIR":          true,
 	"DBUS_SESSION_BUS_ADDRESS": true,
 	"WAYLAND_DISPLAY":          true,
+	//
+	"INPUT_FILE":          true,
+	"XDG_CURRENT_DESKTOP": true,
+	"XDG_DATA_DIRS":       true,
+	// experiments
+	"DISPLAY": true,
 }
 
 func EnvDeleteFunc(s string) bool {
