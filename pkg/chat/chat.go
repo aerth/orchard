@@ -225,6 +225,8 @@ func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	if e.ShowRequests {
 		_ = PrintMessages(creq)
 	}
+
+	creq.Messages.TrimThoughts(2)
 	err := client.Chat(ctx, creq, e.Handlers...)
 	if err != nil {
 		slog.Error("Chatting error", "err", err, "cause", context.Cause(ctx))
