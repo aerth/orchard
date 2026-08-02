@@ -6,6 +6,7 @@ import (
 
 	"m/pkg/chat"
 	"m/pkg/chatmessages"
+	"m/pkg/llm"
 
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
@@ -21,7 +22,8 @@ func TestFoo(t *testing.T) {
 	usermsg := chatmessages.NewFromRole("Chief", "user", prompt)
 	stack := chatmessages.A{*usermsg}
 	threadID := uuid.UUID{}
-	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{Handlers: chat.Handlers{}})
+	sysmsg := []llm.Message{}
+	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{Prepend: sysmsg, Handlers: chat.Handlers{}})
 	if err != nil {
 		t.Fatal(err)
 	}
