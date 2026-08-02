@@ -63,7 +63,7 @@ func RealRunner(ctx context.Context, tools otool.Tools, caller chatmessages.Chat
 	var call struct {
 		ID       string `json:"id"`
 		Function struct {
-			Name string `json:"name"`
+			Name string `json:"name"` // name only, to fetch exec
 		} `json:"function"`
 	}
 	if err := json.Unmarshal(caller.ToolCalls[toolCallIndex], &call); err != nil {
