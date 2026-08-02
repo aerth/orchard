@@ -17,17 +17,17 @@ import (
 
 // GetSystemBase where data is [templatedata.NewData]
 func GetSystemBase(data any) string {
-	endingMessage := []string{Get().Get().SystemPrompt}
+	endingMessage := Get().Get().SystemPrompt
 
 	tpl := template.New("").Funcs(mdloaders.FuncMap())
 	var err error
 	name := "SYSTEM.md"
-	if len(endingMessage) == 1 && endingMessage[0] != "" {
-		name = filepath.Base(endingMessage[0])
-		slog.Info("loading system", "f", endingMessage[0])
-		tpl, err = tpl.ParseFiles(endingMessage...)
+	if len(endingMessage) == 1 && endingMessage != "" {
+		name = filepath.Base(endingMessage)
+		slog.Info("loading system", "f", endingMessage)
+		tpl, err = tpl.ParseFiles(endingMessage)
 		if errors.Is(err, os.ErrNotExist) {
-			slog.Error("system prompt file does not exist", "path", endingMessage[0])
+			slog.Error("system prompt file does not exist", "path", endingMessage)
 		} else if err != nil {
 			panic(err.Error()) // crash hard fast
 		}
