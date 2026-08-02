@@ -81,3 +81,20 @@ func SetNewEnv(env []string) {
 func ClearEnv() {
 	os.Clearenv()
 }
+
+func ResetEnvClean() {
+	// clear env, then replace with clean env -- this new, cleaned env is passed to tool calls for python/bash tools
+	{
+		customEnv := NewCleanEnviron()
+		os.Clearenv()
+		for _, env := range customEnv {
+			before, after, _ := strings.Cut(env, "=")
+			if before == "" {
+				continue
+			}
+			if err := os.Setenv(before, after); err != nil {
+				panic(err.Error())
+			}
+		}
+	}
+}
