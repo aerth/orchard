@@ -32,6 +32,7 @@ func GetSystemBase(data any) string {
 			panic(err.Error()) // crash hard fast
 		}
 	} else {
+		// embedded SYSTEM.md
 		tpl, err = tpl.ParseFS(orchard.Embedded, "SYSTEM.md")
 	}
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
