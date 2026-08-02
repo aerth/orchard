@@ -94,7 +94,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	}
 	ch := make(chan error)
 	for range 3 {
-		go doShellReview(ch)
+		go doShellReview(ctx, ch)
 	}
 	// TODO: actual
 	if strings.Contains(code, "&rm ") || strings.Contains(code, "& rm ") ||
