@@ -526,4 +526,15 @@ func NewChatRequest() *ChatRequest {
 	return x
 }
 
-var DefaultOptions = func() map[string]any { return nil }
+var (
+	x1111          = os.Getenv("X1") == "1"
+	DefaultOptions = func() map[string]any {
+		if !x1111 {
+			return nil // normal
+		}
+		temp := 0.1
+		numCtx := 16192
+		m := map[string]any{"temperature": temp, "num_ctx": numCtx}
+		return m
+	}
+)
