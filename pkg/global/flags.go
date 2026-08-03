@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"m/pkg/builtins/basher1"
-
 	"github.com/google/uuid"
 )
 
@@ -58,7 +56,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.StringVar(&cfg.AddSystemPrompt, "addsystem", cfg.AddSystemPrompt, "a string or path to filename")
 	flag.StringVar(&cfg.Logfilename, "logfile", cfg.Logfilename, "path to log file")
 	flag.BoolVar(&cfg.JsonOutput, "json", cfg.JsonOutput, "json output")
-	flag.StringVar(&basher1.ExtraReviewText, "extra-review-text", basher1.ExtraReviewText, "extra review text for the basher tool")
+	flag.StringVar(&extraReviewText, "extra-review-text", extraReviewText, "extra review text for the basher tool")
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
