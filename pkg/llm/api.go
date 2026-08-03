@@ -509,8 +509,6 @@ func NewChatRequest() *ChatRequest {
 		Stream:    new(true),
 		Verbose:   true,
 		KeepAlive: -1,
-		//	DebugRenderOnly: os.Getenv("OLLAMA_DEBUG_RENDER") == "1",
-		//	TopLogprobs:     0,
 		//	Options: map[string]any{"temperature": temp}, // "num_ctx": numCtx},
 	}
 	if s := os.Getenv("OLLAMA_NUM_CTX"); s != "" {
