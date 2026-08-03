@@ -41,7 +41,7 @@ var reviewerText = []string{
 
 func randReviewerText() string {
 	a := slices.Clone(reviewerText)
-	if extraReviewText != "" {
+	if extraReviewText := global.ExtraReviewText(); extraReviewText != "" {
 		a = append(a, extraReviewText)
 	}
 	rand.Shuffle(len(a), func(i, j int) {
