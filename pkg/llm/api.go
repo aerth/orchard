@@ -509,7 +509,7 @@ func NewChatRequest() *ChatRequest {
 		Stream:    new(true),
 		Verbose:   true,
 		KeepAlive: -1,
-		//	Options: map[string]any{"temperature": temp}, // "num_ctx": numCtx},
+		Options:   DefaultOptions(),
 	}
 	if s := os.Getenv("OLLAMA_NUM_CTX"); s != "" {
 		n, err := strconv.ParseInt(s, 10, 64)
@@ -525,3 +525,5 @@ func NewChatRequest() *ChatRequest {
 	}
 	return x
 }
+
+var DefaultOptions = func() map[string]any { return nil }
