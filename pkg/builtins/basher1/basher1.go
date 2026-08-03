@@ -5,6 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"maps"
+	"math/rand"
+	"slices"
+	"strings"
+
 	"m/pkg/builtins/implv1/bashtooler"
 	"m/pkg/builtins/implv2"
 	"m/pkg/chat"
@@ -12,10 +17,6 @@ import (
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/types/chatmessages"
-	"maps"
-	"math/rand"
-	"slices"
-	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 )
