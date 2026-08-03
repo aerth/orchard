@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"log/slog"
-	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,6 +18,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -492,10 +493,6 @@ func NewChatRequest() *ChatRequest {
 	if model == "" {
 		model = DefaultModel
 	}
-	//temp := 0.1
-	//if strings.HasPrefix(model, "gemma") {
-	//	temp = 1.0
-	//}
 	var think any = os.Getenv("OLLAMA_THINK")
 	if think == "" {
 		think = DefaultThink
