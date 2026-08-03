@@ -12,6 +12,12 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
+func ExtraReviewText() string {
+	return extraReviewText
+}
+
+var extraReviewText string
+
 func Dir() string {
 	wd, err := os.Getwd()
 	if err != nil {
