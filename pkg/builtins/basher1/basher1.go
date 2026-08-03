@@ -29,6 +29,8 @@ func (c codeargs) IsToolArgument() {}
 
 type anymap map[string]any
 
+var ExtraReviewText string
+
 var reviewerText = []string{
 	"You are a reviewer to perform safety checks on shell scripts.",
 	"For each shell script, determine whether it is safe to run on our laptop. If the script is safe and easy to read, output only OK on a single line.",
