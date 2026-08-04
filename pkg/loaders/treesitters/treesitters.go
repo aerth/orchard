@@ -30,6 +30,15 @@ func New(lang string) (*sitter.Parser, error) {
 
 var langs = map[string]*sitter.Language{}
 
+func MustGetlang(s string) *sitter.Language {
+	l, name, err := Getlang(s)
+	if err != nil {
+		panic(err.Error())
+	}
+	_ = name
+	return l
+}
+
 func Getlang(s string) (*sitter.Language, string, error) {
 	if !strings.Contains(s, ".") {
 		return nil, "", fmt.Errorf("no dot")
