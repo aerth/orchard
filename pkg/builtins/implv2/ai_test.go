@@ -13,16 +13,10 @@ import (
 	"m/cmdpkg"
 	"m/pkg/builtins/implv2"
 	"m/pkg/llm"
+	"m/pkg/loaders/treesitters"
 	"m/pkg/types/chatmessages"
 
 	"github.com/joho/godotenv"
-	sitter "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/css"
-	"github.com/smacker/go-tree-sitter/golang"
-	"github.com/smacker/go-tree-sitter/html"
-	"github.com/smacker/go-tree-sitter/javascript"
-	"github.com/smacker/go-tree-sitter/python"
-	"github.com/smacker/go-tree-sitter/typescript/typescript"
 )
 
 func TestMain(t *testing.M) {
@@ -132,7 +126,7 @@ func TestAi(t *testing.T) {
 					continue
 				}
 				if err == nil && !strings.HasSuffix(session.ActiveFile, ".txt") {
-					lang, langname, _ := getlang(session.ActiveFile)
+					lang, langname, _ := treesitters.Getlang(session.ActiveFile)
 					if lang != nil {
 						err = implv2.ValidateFileSyntax(string(session.Current()), langname, lang)
 					}
@@ -184,29 +178,5 @@ func TestAi(t *testing.T) {
 		if string(now) != tc.FileOut {
 			t.Fatalf("expected fixed.want:\n%q\ngot:\n%q", tc.FileOut, now)
 		}
-	}
-}
-
-func getlang(s string) (*sitter.Language, string, error) {
-	if !strings.Contains(s, ".") {
-		return nil, "", fmt.Errorf("no dot")
-	}
-	ss := strings.Split(s, ".")
-	ext := ss[len(ss)-1]
-	switch ext {
-	case "go":
-		return golang.GetLanguage(), ext, nil
-	case "py":
-		return python.GetLanguage(), ext, nil
-	case "html":
-		return html.GetLanguage(), ext, nil
-	case "ts":
-		return typescript.GetLanguage(), ext, nil
-	case "js":
-		return javascript.GetLanguage(), ext, nil
-	case "css":
-		return css.GetLanguage(), ext, nil
-	default:
-		return nil, ext, fmt.Errorf("not implemented yet")
 	}
 }
