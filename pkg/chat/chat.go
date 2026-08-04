@@ -48,6 +48,7 @@ type Ext struct {
 	Tools   []json.Marshaler // Tool specs available
 	//
 	ShowRequests bool // from conf
+	H            ChatHandlerPlus
 }
 
 // FromA (internal) combines variadic Exts into one
