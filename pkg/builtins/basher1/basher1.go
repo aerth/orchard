@@ -87,6 +87,19 @@ func doShellReview(ctx context.Context, ch chan error, code string) {
 	ch <- nil
 }
 
+var gnumReview = 3
+
+func SetNumReviews(i int) {
+	if i < 1 {
+		return
+	}
+	gnumReview = i
+}
+
+func GetNumReviews() int {
+	return gnumReview
+}
+
 func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	if implv2.ConfirmAction == nil {
 		return nil, stackerr.Errorf("bash tool needs a ConfirmAction set in implv2 package (from main package)")
@@ -102,7 +115,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
 	}
 	ch := make(chan error)
-	numReviews := 3
+	numReviews := GetNumReviews()
 	if ctx.Err() != nil {
 		return nil, context.Cause(ctx)
 	}
