@@ -391,6 +391,9 @@ func (s *Session) ApplyAction(action Action) Result {
 			}
 		}
 		if targetLine == -1 {
+			if strings.Contains(s.CurrentLineString(), action.Content) {
+				return Result{E: fmt.Errorf("viewport is already centered on the only occurance", action.Content), Code: CodeError}
+			}
 			return Result{E: fmt.Errorf("search target %q not found", action.Content), Code: CodeError}
 		}
 
