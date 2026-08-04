@@ -48,6 +48,7 @@ Always communicate your current status using the format:
 `[Status: Task X of Y] - [Current Action: Doing Z]`
 
 If a question should be asked before proceeding, clarify *who* should be asked, example: `AI Agent: <question>` or `Human: <question>`, in that exact format ("Human" or "AI Agent").
+If a question exists, and is for the user, you must use yield_control tool now quickly.
 
 
 
