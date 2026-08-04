@@ -258,10 +258,12 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		if isEditMode { // this is the raw reply that will replace the locked lines in memory
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
 			if err != nil {
+				slog.Error("surgical edit failed", "err", err)
 				errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 				errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
 				stack = append(stack, errmsg)
 				handler.HandleToolOutputs(errmsg)
+				err = nil
 				continue
 			}
 			// in memory still. check lint
