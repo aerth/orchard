@@ -364,7 +364,7 @@ func (s *Session) ApplyAction(action Action) Result {
 
 	case OpGoTo:
 		if s.ActiveFile == "" {
-			return Result{E: errors.New("no active file selected"), Code: CodeError}
+			return Result{E: errors.New("no active file selected, use " + OpFilename + " first."), Code: CodeError}
 		}
 		// Search the file slice for the exact matching code text
 		targetLine := -1
