@@ -325,6 +325,9 @@ func (s *Session) RunAction(action Action) Result {
 }
 
 func (s *Session) ApplyAction(action Action) Result {
+	if s.CurrentLine < 1 {
+		s.CurrentLine = 1
+	}
 	if s.ActiveFile == "" && action.Op != OpFilename && action.Op != OpCancel {
 		return Result{E: fmt.Errorf("no active file selected, cant %s yet. use %s first", action.Op, OpFilename), Code: CodeError}
 	}
