@@ -51,13 +51,14 @@ Given a file source-view such as:
 8. To start today
 --------- example -------------
 
-	Send the "LOCK 6-6" operation first
-	(wait for verification)
-	Send a raw reply with two lines: 
+	1. Send the "LOCK 6-6" operation first
+	2. Wait for verification, then send a raw reply with two lines: 
+
 ` + "```" + `
 Casting a light
 A golden glow
 ` + "```" + `
+
 The source-view would become:
 
 --------- example -------------
