@@ -138,7 +138,10 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	cl := debugging.NewConsoleLogger(global.LogWriter, global.LogWriter)
 	rounds := 0
 	numberFilesEdited := 0
-	handler := GetHandler()
+	handler := e.Ext.Handler
+	if handler == nil {
+		handler = GetHandler()
+	}
 	ext := e.Ext
 	if e, ok := ctx.Value(toolrunner.CtxExt).(chat.Ext); ok {
 		ext = e
