@@ -51,7 +51,7 @@ Given a file source-view such as:
 8. To start today
 --------- example -------------
 
-	Send the "LOCK 6" operation first
+	Send the "LOCK 6-6" operation first
 	(wait for lock verification)
 	Send a raw reply with two lines: 
 ` + "```" + `
