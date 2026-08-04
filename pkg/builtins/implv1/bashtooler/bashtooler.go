@@ -7,12 +7,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/global"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
-
-	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -62,6 +61,9 @@ func RunBashScript(ctx context.Context, stdinReal io.Reader, params RunParams) (
 	}
 	if err := ValidateCommand(stdin.String()); err != nil {
 		return "", stackerr.Errorf("command validation failed: %w", err)
+	}
+	if DisableScripts {
+		return "The toolcall was parsed and would have ran, but is currently disabled.", nil
 	}
 	args := params.Args
 	cmd := exec.CommandContext(ctx, bashExec, args...)
@@ -158,7 +160,10 @@ func ValidateCommand(command string) error {
 	return nil
 }
 
-var EchoPython = false
+var (
+	EchoPython     = false
+	DisableScripts = os.Getenv("NO_SCRIPTS") != ""
+)
 
 // RunPyStdin runs a script (stdin reader) using a specific venv python path and returns stdout as a string
 func RunPyStdin(ctx context.Context, stdin io.Reader, params RunParams) (string, error) {
@@ -169,6 +174,9 @@ func RunPyStdin(ctx context.Context, stdin io.Reader, params RunParams) (string,
 	if err != nil {
 		slog.Warn("uhoh ", "err", err)
 		return "", fmt.Errorf("finding python failed: %w", err)
+	}
+	if DisableScripts {
+		return "The toolcall was parsed and would have ran, but is currently disabled.", nil
 	}
 	cmd := exec.CommandContext(ctx, abs, args...)
 	var buf bytes.Buffer
