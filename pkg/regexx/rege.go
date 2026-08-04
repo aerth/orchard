@@ -6,8 +6,9 @@ import (
 	"strings"
 )
 
-// imageAttachmentRegex = regexp.MustCompile(`\[/[^\]]+\.(jpg|png)\]`)
+// var imageAttachmentRegex = regexp.MustCompile(`\[/[^\]]+\.(jpg|png)\]`)
 // var imageAttachmentRegex = regexp.MustCompile(`\[/?[^\]]+\.(?i)(jpg|jpeg|png)\]`)
+
 var imageAttachmentRegex = regexp.MustCompile(`\[/?([^\]]+\.(?i)(jpg|jpeg|png))\]`)
 
 // FindImagePaths searches for strings matching patterns like [/path/to/file.jpg] or [/path/to/file.png]
@@ -16,7 +17,7 @@ func FindImagePaths(s string) []string {
 	paths := make([]string, 0, len(matches))
 	for _, match := range matches {
 		if len(match) > 1 {
-			paths = append(paths, match[1])
+			paths = append(paths, "/"+match[1]) // TODO: fix slash removing bug from imageAttachmentRegex
 		}
 	}
 	return paths
