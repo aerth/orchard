@@ -69,7 +69,7 @@ var tcs = []TC{
 // TestAi is lagging behind. see tool.go
 func TestAi(t *testing.T) {
 	if testing.Short() {
-		t.SkipNow()
+		t.Skipf("skipping ai slow test because -short flag was found")
 		return
 	}
 	t.Chdir(t.TempDir())
