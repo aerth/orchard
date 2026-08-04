@@ -420,4 +420,8 @@ func (s *Session) ApplyAction(action Action) Result {
 	}
 }
 
+func (s *Session) CurrentLineString() string {
+	return s.Lines[s.CurrentLine]
+}
+
 var MaxLinesLocked = 12
