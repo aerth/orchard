@@ -370,7 +370,7 @@ func (s *Session) ApplyAction(action Action) Result {
 		if s.ActiveFile == "" {
 			return Result{E: fmt.Errorf("no active file selected, use %s first", OpFilename), Code: CodeError}
 		}
-		// Search the file slice for the exact matching code text
+		// Search the lines slice for the exact matching code text
 		targetLine := -1
 		ext := ""
 		for idx, line := range s.Lines[s.CurrentLine:] { // get NEXT
