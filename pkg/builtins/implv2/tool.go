@@ -145,7 +145,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	}
 	ext := e.Ext
 	if e, ok := ctx.Value(toolrunner.CtxExt).(chat.Ext); ok {
-		ext = e
+		ext = e.FromA(ext)
 	}
 	ext.From = EditorName
 	e.Ext = ext
