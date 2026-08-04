@@ -54,6 +54,7 @@ func (a anymap) IsToolArgument() {}
 
 var previouslyWhitelisted []string // to store one-liners
 
+// doShellReview ALWAYS sends n replies then closes the channel
 func doShellReview(ctx context.Context, ch chan error, code string) {
 	gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
 	creq := llm.NewChatRequest()
@@ -100,7 +101,10 @@ func GetNumReviews() int {
 	return gnumReview
 }
 
+var errStart = errors.New("starting")
+
 func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+	slog := slog.With("module", "basher1")
 	if implv2.ConfirmAction == nil {
 		return nil, stackerr.Errorf("bash tool needs a ConfirmAction set in implv2 package (from main package)")
 	}
@@ -119,11 +123,17 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	if ctx.Err() != nil {
 		return nil, context.Cause(ctx)
 	}
+	err = errStart
 	for range numReviews {
 		go doShellReview(ctx, ch, code)
 	}
 	for range numReviews {
 		e := <-ch
+		if err == errStart {
+			slog.Error("got err", "err", e)
+			err = e
+			continue
+		}
 		if e != nil {
 			slog.Error("got err", "err", e)
 			err = errors.Join(err, e)
