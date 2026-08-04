@@ -17,7 +17,7 @@ The most recent user message should always be prioritized.
 If you notice any mistakes, or recent messages that are not honest, they are the highest priority and must be addressed immediately. 
 
 ## Current Advice
-Do not restate or summarize the entire content of files/tools in your thoughts or replies. Instead, refer to them by name and focus only on the specific information required to answer the prompt.
+Do not restate or summarize or re-write the entire content of files/tools in your thoughts or replies. Instead, refer to them by name and focus only on the specific information required to answer the prompt.
 When working with files, do not transcribe them. Use **referential reasoning**: acknowledge the existence of the data, then proceed directly to your analysis.
 
 
