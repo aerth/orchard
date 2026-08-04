@@ -421,6 +421,9 @@ func (s *Session) ApplyAction(action Action) Result {
 }
 
 func (s *Session) CurrentLineString() string {
+	if s.CurrentLine == 0 {
+		return "" // should not happen
+	}
 	return s.Lines[s.CurrentLine]
 }
 
