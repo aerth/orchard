@@ -143,7 +143,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		ext = e.FromA(ext)
 	}
 	ext.From = EditorName
-	e.Ext = ext
+	//e.Ext = ext
 
 	handler := e.Ext.H
 	if handler == nil {
