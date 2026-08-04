@@ -39,7 +39,7 @@ After the replacement message is sent, the change is made in our in-memory sessi
 
 	DELETE_LINES 4-5
 
-### For inserting a line *after* another line, two rounds:
+### Inserting text *before* or *after* another line requires two rounds:
 
 Given a file source-view such as:
 
