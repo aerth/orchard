@@ -84,6 +84,9 @@ func (e Ext) FromA(exts ...Ext) Ext {
 		if exts[i].NonStreamHandler != nil {
 			temp.NonStreamHandler = exts[i].NonStreamHandler
 		}
+		if exts[i].H != nil {
+			temp.H = exts[i].H
+		}
 	}
 	return temp
 }
