@@ -380,8 +380,9 @@ func (s *Session) ApplyAction(action Action) Result {
 				break
 			}
 		}
+		// If no matches, wrap file.
 		if targetLine == -1 {
-			for idx, line := range s.Lines {
+			for idx, line := range s.Lines[:s.CurrentLine] {
 				if strings.Contains(line, action.Content) {
 					targetLine = idx + 1 // Convert to 1-based indexing
 					ext = " around " + action.Content
