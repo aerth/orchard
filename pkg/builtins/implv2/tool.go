@@ -138,17 +138,18 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	cl := debugging.NewConsoleLogger(global.LogWriter, global.LogWriter)
 	rounds := 0
 	numberFilesEdited := 0
-	handler := e.Ext.H
-	if handler == nil {
-		slog.Warn("making new handler")
-		handler = GetHandler()
-	}
 	ext := e.Ext
 	if e, ok := ctx.Value(toolrunner.CtxExt).(chat.Ext); ok {
 		ext = e.FromA(ext)
 	}
 	ext.From = EditorName
 	e.Ext = ext
+
+	handler := e.Ext.H
+	if handler == nil {
+		slog.Warn("making new handler")
+		handler = GetHandler()
+	}
 
 	m1 := *chatmessages.NewSystemEphemeral(SystemInstruction() + "\n\n# Intent\n" + intent) // global no state
 	m1.ThreadID = threadID
