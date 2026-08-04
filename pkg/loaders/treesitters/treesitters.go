@@ -2,6 +2,7 @@ package treesitters
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/aerth/mostly/stackerr"
@@ -40,10 +41,10 @@ func MustGetlang(s string) *sitter.Language {
 }
 
 func Getlang(s string) (*sitter.Language, string, error) {
-	if !strings.Contains(s, ".") {
-		return nil, "", fmt.Errorf("no dot")
-	}
 	ss := strings.Split(s, ".")
+	if !strings.Contains(s, ".") {
+	}
+	slog.Warn("checking", "s", ss)
 	ext := ss[len(ss)-1]
 	switch ext {
 	case "go":
