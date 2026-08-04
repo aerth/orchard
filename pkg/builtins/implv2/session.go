@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/aerth/mostly/stackerr"
@@ -371,6 +372,9 @@ func (s *Session) ApplyAction(action Action) Result {
 			return Result{E: fmt.Errorf("no active file selected, use %s first", OpFilename), Code: CodeError}
 		}
 		targetLine := -1
+		if n, err := strconv.Atoi(action.Content); err == nil && n > 1 {
+			targetLine = n
+		}
 		// Search the lines slice for the NEXT exact matching code text
 		ext := ""
 		for idx, line := range s.Lines[s.CurrentLine:] { // get NEXT
