@@ -138,8 +138,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	cl := debugging.NewConsoleLogger(global.LogWriter, global.LogWriter)
 	rounds := 0
 	numberFilesEdited := 0
-	handler := e.Ext.Handler
+	handler := e.Ext.H
 	if handler == nil {
+		slog.Warn("making new handler")
 		handler = GetHandler()
 	}
 	ext := e.Ext
