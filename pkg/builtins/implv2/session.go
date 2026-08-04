@@ -408,7 +408,7 @@ func (s *Session) ApplyAction(action Action) Result {
 		}
 		s.LockStart = start
 		s.LockEnd = end
-		return Result{Code: CodeLocked, Message: fmt.Sprintf("Lines are locked and line replacement mode is active. Your raw reply output will replace %d lines, or use CANCEL to return to viewing/conversation", s.NumLinesLocked())}
+		return Result{Code: CodeLocked, Message: fmt.Sprintf("Lines %d-%d are locked and line replacement mode is active. Your raw reply output will replace %d lines, or use CANCEL to return to viewing/conversation", s.LockStart, s.LockEnd, s.NumLinesLocked())}
 	}
 }
 
