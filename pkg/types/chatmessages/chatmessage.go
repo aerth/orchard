@@ -147,10 +147,10 @@ func NewToolReply(caller ChatMessage, i int, content string) *ChatMessage {
 // MessageOptions are not saved to DB
 type MessageOptions struct {
 	Aux         any
-	Attachments []string // Attachments filenames
+	Attachments []string // Attachments filenames, for UI display only
 	Ephemeral   bool
 	GenDuration time.Duration
-	MaxDistance int    // will be removed from mem stack after N messages
+	MaxDistance int    // if nonzero, will be removed from mem stack after N messages
 	CreatedBy   string // internal, caller func
 
 	Model        string
