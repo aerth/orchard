@@ -36,5 +36,10 @@ push:
 	git -C ../otools push
 .PHONY += clean cleaninstall push
 
+complexity:
+	for i in ./pkg/*; do echo$ $i; scc $$i; done
+
+test:
+	go test -v -short -count=0 ./...  |& grep -v -e 'no test files' -e "no tests to run"
 
 
