@@ -52,7 +52,7 @@ Given a file source-view such as:
 --------- example -------------
 
 	Send the "LOCK 6-6" operation first
-	(wait for lock verification)
+	(wait for verification)
 	Send a raw reply with two lines: 
 ` + "```" + `
 Casting a light
