@@ -282,7 +282,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 					err = ValidateFileSyntax(string(session.Current()), langname, lang)
 					if err != nil {
 						errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
-						errmsg.Content = fmt.Sprintf("ValidateFileSyntax failed: %+v", err)
+						errmsg.Content = fmt.Sprintf("%s\nValidateFileSyntax failed: %+v", strings.Join(messagesGathered, "\n"), err)
 						stack = append(stack, errmsg)
 						handler.HandleToolOutputs(errmsg)
 						continue
@@ -295,6 +295,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				if err != nil {
 					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 					errmsg.Content = fmt.Sprintf("ConfirmAction failed: %+v", err)
+					errmsg.Content = fmt.Sprintf("%s\nValidateFileSyntax failed: %+v", strings.Join(messagesGathered, "\n"), err)
 					stack = append(stack, errmsg)
 					handler.HandleToolOutputs(errmsg)
 					continue
