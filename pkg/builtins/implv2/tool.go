@@ -272,6 +272,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				err = nil
 				continue
 			}
+			messagesGathered = append(messagesGathered, "")
 			// in memory still. check lint
 			if !strings.HasSuffix(session.ActiveFile, ".txt") {
 				lang, langname, _ := treesitters.Getlang(session.ActiveFile)
