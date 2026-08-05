@@ -395,7 +395,7 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 		return 0, 0, errors.New("coordinates out of file range boundaries (start)")
 	}
 	if end > len(s.Lines) {
-		return 0, 0, fmt.Errorf("coordinates out of file range boundaries (end %d is greater than number of lines %d)", end, len(s.Lines))
+		return 0, 0, fmt.Errorf("coordinates out of file range boundaries (end line number %d is greater than number of lines %d)", end, len(s.Lines))
 	}
 	numLines := end - start + 1
 	if numLines > MaxLinesLocked {
