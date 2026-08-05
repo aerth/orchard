@@ -56,8 +56,9 @@ const (
 	OpFilename    OP = "SELECT_FILE"
 	OpDeleteLines OP = "DELETE_LINES"
 	// NEW
+	OpJump          OP = "JUMP" // <number>
 	OpDisableLint   OP = "NOLINT"
-	OpWriteFile     OP = "WRITE_FILE"
+	OpWriteFile     OP = "WRITE_FILE" // <void>
 	OpRevertChanges OP = "REVERT_ALL"
 	OpUndo          OP = "UNDO" // undo single change
 )
