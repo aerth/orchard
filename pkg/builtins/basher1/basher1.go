@@ -204,14 +204,36 @@ func isOkBashCode(code string) bool {
 	if strings.HasPrefix(code, "touch ") && strings.Count(code, " ") == 1 && !strings.HasPrefix(code, "touch /") && !strings.HasPrefix(code, "touch ..") {
 		return true
 	}
-	if strings.Count(code, "\n") == 0 && strings.Count(code, " ") == 1 {
+	if strings.Count(code, "\n") == 0 && strings.Count(code, " ") < 4 {
+		// eg: go test ./foo/bar
 		return isOkArg(strings.Split(code, " "))
 	}
 	return false
 }
 
 func isOkArg(s []string) bool {
-	if len(s) != 2 {
+	l := len(s)
+	if l == 0 {
 		return false
 	}
+	if l > 3 {
+		return false
+	}
+
+	var first, second, third string
+	first = s[0]
+	if l > 1 {
+		second = s[1]
+	}
+	if l > 2 {
+		third = s[2]
+	}
+	switch first {
+	case "go":
+		switch second {
+		case "test":
+			return !strings.Contains(third, "../")
+		}
+	}
+	return false
 }
