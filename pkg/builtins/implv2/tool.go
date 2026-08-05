@@ -174,7 +174,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			newusermsg.ThreadID = threadID
 			if numLocked := session.NumLinesLocked(); numLocked != 0 {
 				if numLocked == 1 {
-					newusermsg.Content = fmt.Sprintf("Line %d is now locked and targeted for replacement. Reply with only the updated lines (or CANCEL to return to normal mode).", session.LockStart)
+					newusermsg.Content = fmt.Sprintf("Line %d is now locked and targeted for replacement."+
+						"Your reply will directly replace this line, and inserting additional lines if your reply contains more than 1 line. (or CANCEL to return to normal mode).",
+						session.LockStart)
 				} else {
 					newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked and targeted for replacement. "+
 						"Your reply will directly replace this line range, inserting/deleting lines. (or CANCEL to return to normal mode).",
@@ -241,9 +243,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				stack = append(stack, *newmsg)
 				break
 			}
-			if len(actionsParsed) != 0 {
-				newmsg.Aux = actionsParsed
-			}
+			//if len(actionsParsed) != 0 {
+			//			newmsg.Aux = actionsParsed
+			//	}
 			if len(actionsParsed) == 1 && actionsParsed[0].Op == OpDeleteLines {
 				isEditMode = true
 				n1, n2, err := ParseRange(session, actionsParsed[0].Content)
@@ -310,12 +312,12 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				session.LockEnd = 0
 				messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem. Available operators: "+fmt.Sprintf("%q", AllOperations))
 				slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
-				msg := *chatmessages.NewThread(threadID, llm.Message{Role: "system", Content: "ACTION LOG:\n" + strings.Join(messagesGathered, "\n")})
-				stack = append(stack, msg)
-				handler.HandleToolOutputs(msg)
-				numberFilesEdited++
-				continue // done
 			}
+			msg := *chatmessages.NewThread(threadID, llm.Message{Role: "system", Content: "ACTION LOG:\n" + strings.Join(messagesGathered, "\n")})
+			stack = append(stack, msg)
+			handler.HandleToolOutputs(msg)
+			numberFilesEdited++
+			continue // done
 		}
 		if err != nil {
 			slog.Error("parsing edit TODO", "err", err)
