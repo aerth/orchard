@@ -296,20 +296,21 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				if err != nil {
 					messagesGathered = append(messagesGathered, fmt.Sprintf("The reviewer has denied this particular code and you should send a new better version now.", len(session.Lines)))
 					slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
-					continue
 				}
 			}
-			slog.Info("WRITING FILE")
-			err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
-			if err != nil {
-				return nil, stackerr.Errorf("WriteFile after editing failed: %w", err)
+			if err == nil {
+				slog.Info("WRITING FILE")
+				err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
+				if err != nil {
+					return nil, stackerr.Errorf("WriteFile after editing failed: %w", err)
+				}
+				session.LockStart = 0
+				session.LockEnd = 0
+				messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem.")
+				slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
+				numberFilesEdited++
+				continue // done
 			}
-			session.LockStart = 0
-			session.LockEnd = 0
-			messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem.")
-			slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
-			numberFilesEdited++
-			continue // done
 		}
 		if err != nil {
 			slog.Error("parsing edit TODO", "err", err)
