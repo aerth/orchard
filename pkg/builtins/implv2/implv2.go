@@ -56,6 +56,7 @@ const (
 	OpFilename    OP = "SELECT_FILE"
 	OpDeleteLines OP = "DELETE_LINES"
 	// NEW
+	OpDisableLint   OP = "NOLINT"
 	OpWriteFile     OP = "WRITE_FILE"
 	OpRevertChanges OP = "REVERT_ALL"
 	OpUndo          OP = "UNDO" // undo single change
