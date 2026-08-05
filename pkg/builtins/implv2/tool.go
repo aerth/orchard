@@ -271,6 +271,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				err = nil
 				continue
 			}
+			linesmsg := fmt.Sprintf("The file currently has %d lines.", len(session.Lines))
 			var messagesGathered []string
 			messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory.")
 			// in memory still. check lint
@@ -305,13 +306,12 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			if err != nil {
 				return nil, stackerr.Errorf("WriteFile after editing failed: %w", err)
 			}
-			linesmsg := fmt.Sprintf("The file currently has %d lines.", len(session.Lines))
 			session.LockStart = 0
 			session.LockEnd = 0
 			messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem.")
 			stack = append(stack, *chatmessages.NewThread(threadID, llm.Message{
 				Role:    "system",
-				Content: "The file edits were applied to the filesystem\n " + linesmsg,
+				Content: "T + linesmsg,
 			}))
 			handler.HandleToolOutputs(stack[len(stack)-1])
 			numberFilesEdited++
