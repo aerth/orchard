@@ -44,8 +44,6 @@ type Lang = sitter.Language
 
 func Getlang(s string) (*Lang, string, error) {
 	ss := strings.Split(s, ".")
-	if !strings.Contains(s, ".") {
-	}
 	slog.Warn("checking", "s", ss)
 	ext := ss[len(ss)-1]
 	switch ext {
