@@ -261,7 +261,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		stack = append(stack, *newmsg)
 		if isEditMode { // this is the raw reply that will replace the locked lines in memory
-			var messagesGathered []string
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
 			if err != nil {
 				slog.Error("surgical edit failed", "err", err)
@@ -272,6 +271,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				err = nil
 				continue
 			}
+			var messagesGathered []string
 			messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory.")
 			// in memory still. check lint
 			langname := ""
