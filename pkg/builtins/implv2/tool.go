@@ -303,7 +303,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			slog.Info("WRITING FILE")
 			err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
 			if err != nil {
-				return nil, err
+				return nil, stackerr.Errorf("WriteFile after editing failed: %w", err)
 			}
 			if err == nil {
 				session.LockStart = 0
