@@ -346,7 +346,7 @@ type A = ChatMessages
 
 var GetMaxDistance = func(cm ChatMessage) int {
 	if cm.ToolName == "read_file_v2" || cm.ToolName == "edit_file" {
-		return 4
+		return 10
 	}
 	return 0
 }
