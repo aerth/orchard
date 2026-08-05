@@ -28,7 +28,7 @@ type ConfigInput struct {
 	SystemPrompt      string
 	AddSystemPrompt   string
 	InitialUserPrompt string
-	TempDir           string // known good location (["./tmp/" or /tmp/foo or 'none' for no tempdir.])
+	TempDir           string // known good location (["./tmp/" or /tmp/foo or, 'none' for no tempdir.])
 	Dir               string // the Working Directory
 	ShowThinking      bool
 }
