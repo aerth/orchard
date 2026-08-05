@@ -271,9 +271,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				err = nil
 				continue
 			}
-			linesmsg := fmt.Sprintf("The file currently has %d lines.", len(session.Lines))
 			var messagesGathered []string
-			messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory.")
+			messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory." )
+			messagesGathered = append(messagesGathered, fmt.Sprintf("The file currently has %d lines.", len(session.Lines)))
 			// in memory still. check lint
 			langname := ""
 			if !strings.HasSuffix(session.ActiveFile, ".txt") {
