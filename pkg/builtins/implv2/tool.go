@@ -289,7 +289,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				messagesGathered = append(messagesGathered, "Linter has no issues to report.")
 			}
 			if AskBeforeWriting {
-				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```\n%s\n```", session.CurrentView()))
+				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```%s\n%s\n```", langname, session.CurrentView()))
 				if err != nil {
 					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
 					errmsg.Content = fmt.Sprintf("ConfirmAction failed: %+v", err)
