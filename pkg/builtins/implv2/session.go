@@ -110,7 +110,7 @@ func (s Session) CurrentView() string {
 		for i := startIdx; i < endIdx; i++ {
 			marked := " "
 			if i+1 >= s.LockStart && i+1 <= s.LockEnd {
-				marked = "*" // astrisk
+				marked = "*" // astrisk lock line indicator
 			}
 			fmt.Fprintf(&chunkBuilder, "%s%d: %s", marked, i+1, s.Lines[i])
 			if i != endIdx-1 {
