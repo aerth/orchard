@@ -305,11 +305,12 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			if err != nil {
 				return nil, stackerr.Errorf("WriteFile after editing failed: %w", err)
 			}
+			linesmsg := fmt.Sprintf("The file currently has %d lines.", len(session.Lines))
 			session.LockStart = 0
 			session.LockEnd = 0
 			stack = append(stack, *chatmessages.NewThread(threadID, llm.Message{
 				Role:    "system",
-				Content: "The file edits were applied to the filesystem\n " + fmt.Sprintf("The file currently has %d lines.", len(session.Lines)),
+				Content: "The file edits were applied to the filesystem\n " + linesmsg,
 			}))
 			handler.HandleToolOutputs(stack[len(stack)-1])
 			numberFilesEdited++
