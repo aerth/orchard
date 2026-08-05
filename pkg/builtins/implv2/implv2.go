@@ -45,17 +45,19 @@ type Action struct {
 	Content string
 }
 
+type OP string
+
 const (
-	OpNextChunk   = "NEXT_CHUNK"
-	OpPrevChunk   = "PREV_CHUNK"
-	OpGoTo        = "GOTO"
-	OpLockIn      = "LOCK"
-	OpCancel      = "CANCEL"
-	OpFilename    = "SELECT_FILE"
-	OpDeleteLines = "DELETE_LINES"
+	OpNextChunk   OP = "NEXT_CHUNK"
+	OpPrevChunk   OP = "PREV_CHUNK"
+	OpGoTo        OP = "GOTO"
+	OpLockIn      OP = "LOCK"
+	OpCancel      OP = "CANCEL"
+	OpFilename    OP = "SELECT_FILE"
+	OpDeleteLines OP = "DELETE_LINES"
 )
 
-var AllOperations = []string{OpFilename, OpGoTo, OpNextChunk, OpPrevChunk, OpDeleteLines, OpCancel, OpLockIn}
+var AllOperations = []OP{OpFilename, OpGoTo, OpNextChunk, OpPrevChunk, OpDeleteLines, OpCancel, OpLockIn}
 
 type Result struct {
 	Message string
@@ -87,7 +89,7 @@ func OutputParser(content string) ([]Action, error) {
 		if !strings.HasPrefix(content, op) {
 			return nil, errors.New("leading whitespace is strictly forbidden")
 		}
-		if !slices.Contains(AllOperations, op) {
+		if !slices.Contains(AllOperations, OP(op)) {
 			return nil, stackerr.Errorf("editor operator not found: %q %w", content, ErrNot)
 		}
 		// Remove the operator prefix cleanly
@@ -96,7 +98,7 @@ func OutputParser(content string) ([]Action, error) {
 		}
 	}
 
-	switch op {
+	switch OP(op) {
 	default:
 		return nil, stackerr.Errorf("editor operator not found: %q  %w", content, ErrNot)
 	case OpNextChunk, OpPrevChunk, OpCancel: // no args
