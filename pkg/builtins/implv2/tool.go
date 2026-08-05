@@ -275,7 +275,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory.")
 			// in memory still. check lint
 			if !strings.HasSuffix(session.ActiveFile, ".txt") {
-				lang, langname, _ := treesitters.Getlang(session.ActiveFile)
+				var lang *treesitters.Lang
+				lang, langname, _ = treesitters.Getlang(session.ActiveFile)
 				if lang != nil {
 					err = ValidateFileSyntax(string(session.Current()), langname, lang)
 					if err != nil {
