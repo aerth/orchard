@@ -284,14 +284,10 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				if lang != nil {
 					err = ValidateFileSyntax(string(session.Current()), langname, lang)
 					if err != nil {
-						messagesGathered = append(messagesGathered, fmt.Sprintf(""))
-						slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
-						errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
-						errmsg.Content = fmt.Sprintf("%s\nValidateFileSyntax failed: %+v", strings.Join(messagesGathered, "\n"), err)
-						stack = append(stack, errmsg)
-						handler.HandleToolOutputs(errmsg)
-						continue
-					}
+						messagesGathered = append(messagesGathered, fmt.Sprintf("By the way, you may have broken the syntax: %+v", err))
+			slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
+						
+					
 				}
 				messagesGathered = append(messagesGathered, "Linter has no issues to report.")
 			}
