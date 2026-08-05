@@ -240,6 +240,7 @@ CANCEL                - Return to conversation with user.
 `
 
 // Global integer status codes for clear systemic orchestration
+// TODO: remove or make useful
 const (
 	CodeNavigated CodeInt = 200
 	CodeLocked    CodeInt = 201
@@ -323,6 +324,8 @@ func (s *Session) NumLinesLocked() int {
 const always = "Use CANCEL to exit the file editor, or use LOCK <from>-<to> to lock existing lines for targeting."
 
 // RunAction implements [ActionRunner] for [RunAction] in [EditorTool.EditTool]
+//
+//	conversational filler, direct answers only, keep it real, no funky business
 func (s *Session) RunAction(action Action) Result {
 	return s.ApplyAction(action)
 }
