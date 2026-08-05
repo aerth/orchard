@@ -272,7 +272,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				err = nil
 				continue
 			}
-			messagesGathered = append(messagesGathered, "")
+			messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory.")
 			// in memory still. check lint
 			if !strings.HasSuffix(session.ActiveFile, ".txt") {
 				lang, langname, _ := treesitters.Getlang(session.ActiveFile)
@@ -286,6 +286,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 						continue
 					}
 				}
+				messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory.")
 			}
 			if AskBeforeWriting {
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```\n%s\n```", newmsg.Content))
