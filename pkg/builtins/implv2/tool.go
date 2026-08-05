@@ -273,7 +273,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			}
 			var messagesGathered []string
 			messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory." )
+			slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
 			messagesGathered = append(messagesGathered, fmt.Sprintf("The file currently has %d lines.", len(session.Lines)))
+			slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
 			// in memory still. check lint
 			langname := ""
 			if !strings.HasSuffix(session.ActiveFile, ".txt") {
