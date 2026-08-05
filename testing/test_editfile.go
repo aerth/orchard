@@ -7,3 +7,7 @@ func TestFileExists(t *testing.T) {
         t.Error("This should not happen")
     }
 }
+
+func TestFileExists_Real(t *testing.T) {
+    // TODO: Implement real check
+}
