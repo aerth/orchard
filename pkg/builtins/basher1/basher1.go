@@ -204,5 +204,6 @@ func isOkBashCode(code string) bool {
 	if strings.HasPrefix(code, "touch ") && strings.Count(code, " ") == 1 && !strings.HasPrefix(code, "touch /") && !strings.HasPrefix(code, "touch ..") {
 		return true
 	}
+	if strings.Count(code, "\n") == 0 && strings.Count(code, " ") == 1
 	return false
 }
