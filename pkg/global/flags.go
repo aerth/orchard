@@ -28,7 +28,7 @@ type ConfigInput struct {
 	SystemPrompt      string
 	AddSystemPrompt   string
 	InitialUserPrompt string
-	TempDir           string
+	TempDir           string // known good location
 	Dir               string
 	ShowThinking      bool
 }
