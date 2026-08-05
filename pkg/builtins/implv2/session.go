@@ -439,4 +439,4 @@ func (s *Session) CurrentLineString() string {
 	return s.Lines[s.CurrentLine]
 }
 
-var MaxLinesLocked = 12
+var MaxLinesLocked = 6
