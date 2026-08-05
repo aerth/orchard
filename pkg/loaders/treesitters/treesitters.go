@@ -40,7 +40,9 @@ func MustGetlang(s string) *sitter.Language {
 	return l
 }
 
-func Getlang(s string) (*sitter.Language, string, error) {
+type Lang = sitter.Language
+
+func Getlang(s string) (*Lang, string, error) {
 	ss := strings.Split(s, ".")
 	if !strings.Contains(s, ".") {
 	}
