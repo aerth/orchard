@@ -75,6 +75,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		return cfg.ThreadID.UnmarshalText([]byte(s))
 	})
 	flag.StringVar(&cfg.Dir, "C", cfg.Dir, "change dir after loading stuff")
+	flag.StringVar(&cfg.TempDir, "tempdir", cfg.TempDir, "temporary scratch dir (should have lots of space)")
 	if clearfirst != nil {
 		flag.BoolVar(clearfirst, "clear", *clearfirst, "clear thread from DB first")
 	}
