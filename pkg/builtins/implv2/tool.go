@@ -308,13 +308,13 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			linesmsg := fmt.Sprintf("The file currently has %d lines.", len(session.Lines))
 			session.LockStart = 0
 			session.LockEnd = 0
+			messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem.")
 			stack = append(stack, *chatmessages.NewThread(threadID, llm.Message{
 				Role:    "system",
 				Content: "The file edits were applied to the filesystem\n " + linesmsg,
 			}))
 			handler.HandleToolOutputs(stack[len(stack)-1])
 			numberFilesEdited++
-			messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem.")
 			continue // done
 		}
 		if err != nil {
