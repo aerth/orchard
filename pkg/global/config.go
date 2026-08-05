@@ -178,12 +178,12 @@ func DefaultConfigInput() ConfigInput {
 	}
 	noColor := os.Getenv("NO_COLOR") != "" || !isatty.IsTerminal(os.Stdout.Fd())
 	return ConfigInput{
-		TempDir:       dir,
 		ThreadID:      threadID,
 		Logfilename:   logfilename,
 		Username:      username,
 		Botname:       botname,
 		Dir:           dir,
+		TempDir:       tmpdir,
 		Treedir:       treedir,
 		Tooldir:       tooldir,
 		NoColor:       noColor,
