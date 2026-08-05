@@ -272,7 +272,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				continue
 			}
 			var messagesGathered []string
-			messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory." )
+			messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory.")
 			slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
 			messagesGathered = append(messagesGathered, fmt.Sprintf("The file currently has %d lines.", len(session.Lines)))
 			slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
@@ -285,19 +285,15 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 					err = ValidateFileSyntax(string(session.Current()), langname, lang)
 					if err != nil {
 						messagesGathered = append(messagesGathered, fmt.Sprintf("By the way, you may have broken the syntax: %+v", err))
-			slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
-						
-					
+						slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
+					}
+					messagesGathered = append(messagesGathered, "Linter has no issues to report.")
 				}
-				messagesGathered = append(messagesGathered, "Linter has no issues to report.")
+
 			}
 			if AskBeforeWriting {
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```%s\n%s\n```", langname, session.CurrentView()))
 				if err != nil {
-					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
-					errmsg.Content = fmt.Sprintf("%s\nConfirmAction failed: %+v", strings.Join(messagesGathered, "\n"), err)
-					stack = append(stack, errmsg)
-					handler.HandleToolOutputs(errmsg)
 					continue
 				}
 			}
@@ -309,11 +305,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			session.LockStart = 0
 			session.LockEnd = 0
 			messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem.")
-			stack = append(stack, *chatmessages.NewThread(threadID, llm.Message{
-				Role:    "system",
-				Content: "T + linesmsg,
-			}))
-			handler.HandleToolOutputs(stack[len(stack)-1])
+			slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
 			numberFilesEdited++
 			continue // done
 		}
