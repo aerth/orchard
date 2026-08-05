@@ -9,7 +9,7 @@ func TestOutputParser_StrictCases(t *testing.T) {
 	tests := []struct {
 		name        string
 		input       string
-		wantOp      string
+		wantOp      OP
 		wantContent string
 		wantErr     bool
 	}{
