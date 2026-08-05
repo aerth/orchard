@@ -267,7 +267,10 @@ func (c CodeInt) String() string {
 var ErrNoFilename = fmt.Errorf("no active file yet, use %q first", OpFilename)
 
 func (s *Session) Peek(content string) error {
-	first := strings.Fields(content)[0]
+	first := OP(strings.Fields(content)[0])
+	if first == "" {
+		return fmt.Errorf("empty peek")
+	}
 	if slices.Contains(AllOperations, first) {
 		return nil
 	}
