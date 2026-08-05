@@ -59,8 +59,8 @@ const (
 	OpJump          OP = "JUMP" // <number>
 	OpDisableLint   OP = "NOLINT"
 	OpWriteFile     OP = "WRITE_FILE" // <void>
-	OpRevertChanges OP = "REVERT_ALL"
-	OpUndo          OP = "UNDO" // undo single change
+	OpRevertChanges OP = "REVERT_ALL" // <void>
+	OpUndo          OP = "UNDO"       // <void> undo single change
 )
 
 var AllOperations = []OP{OpFilename, OpGoTo, OpNextChunk, OpPrevChunk, OpDeleteLines, OpCancel, OpLockIn}
