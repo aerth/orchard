@@ -311,6 +311,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				}))
 				handler.HandleToolOutputs(stack[len(stack)-1])
 				numberFilesEdited++
+				messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem.")
 				continue
 			}
 
