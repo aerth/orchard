@@ -30,6 +30,8 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 		return stackerr.Errorf("line range error: coordinate bounds %d-%d are out of file range", s.LockStart, s.LockEnd)
 	}
 
+	start := slices.Clone(s.Lines)
+
 	// 2. Perform the in-memory surgical splice
 	// Combine the prefix slice, new replacement array lines, and the suffix slice
 	updatedLines := make([]string, 0, startIdx+len(replacementLines)+(len(s.Lines)-endIdx))
@@ -37,7 +39,7 @@ func (s *Session) ApplySurgicalEdit(replacementLines []string) error {
 	updatedLines = append(updatedLines, replacementLines...)
 	updatedLines = append(updatedLines, s.Lines[endIdx:]...)
 
-	if slices.Compare(s.Lines, updatedLines) == 0 {
+	if slices.Compare(start, updatedLines) == 0 {
 		return stackerr.Errorf("editor error: there were no edits applied, did you send the same content?")
 	}
 	s.oldlines = s.Lines
