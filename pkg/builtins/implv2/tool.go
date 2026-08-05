@@ -321,7 +321,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		responseWriter := GetSender
 		for i := range actionsParsed {
 			slog.Info("running action", "op", actionsParsed[i].Op)
-			operators = append(operators, actionsParsed[i].Op)
+			operators = append(operators, string(actionsParsed[i].Op))
 			resp := session.RunAction(actionsParsed[i])
 			if responseWriter == nil && handler != nil {
 				handler.HandleToolOutputs(NewResultMessage(threadID, resp))
