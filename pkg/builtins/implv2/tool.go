@@ -294,6 +294,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			if AskBeforeWriting {
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```%s\n%s\n```", langname, session.CurrentView()))
 				if err != nil {
+					messagesGathered = append(messagesGathered, fmt.Sprintf("The file currently has %d lines.", len(session.Lines)))
+					slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
 					continue
 				}
 			}
