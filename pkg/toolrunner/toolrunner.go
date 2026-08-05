@@ -154,4 +154,5 @@ var (
 	AfterTool          = func(ctx context.Context, cm *chatmessages.ChatMessage) error { return nil }
 	MaxKeeper          = 200
 	DefaultMaxDistance = 6
+	distsentinal       = -3
 )
