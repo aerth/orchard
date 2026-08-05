@@ -93,7 +93,7 @@ type Session struct {
 
 	// Lock bounds (1-based line numbers)
 	LockStart int
-	LockEnd   int
+	LockEnd   int // if set, is in line-replacement mode
 
 	Intent string
 }
