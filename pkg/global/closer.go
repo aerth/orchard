@@ -1,4 +1,4 @@
-// Package global readonly things
+// Package global for now
 package global
 
 import (
