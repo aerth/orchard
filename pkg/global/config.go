@@ -168,6 +168,7 @@ func DefaultConfigInput() ConfigInput {
 	if logfilename == "" {
 		logfilename = filepath.Join("/tmp/orchard.log")
 	}
+	tmpdir := filepath.Join(os.TempDir(), "orchard-chat", "1")
 	//
 	treedir, _ = filepath.Abs(os.ExpandEnv(treedir))
 	tooldir, _ = filepath.Abs(os.ExpandEnv(tooldir))
@@ -177,6 +178,7 @@ func DefaultConfigInput() ConfigInput {
 	}
 	noColor := os.Getenv("NO_COLOR") != "" || !isatty.IsTerminal(os.Stdout.Fd())
 	return ConfigInput{
+		TempDir:       dir,
 		ThreadID:      threadID,
 		Logfilename:   logfilename,
 		Username:      username,
