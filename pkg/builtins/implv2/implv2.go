@@ -55,7 +55,9 @@ const (
 	OpCancel      OP = "CANCEL"
 	OpFilename    OP = "SELECT_FILE"
 	OpDeleteLines OP = "DELETE_LINES"
-	OpWriteFile   OP = "WRITE_FILE"
+	// NEW
+	OpWriteFile     OP = "WRITE_FILE"
+	OpRevertChanges OP = "REVERT_ALL"
 )
 
 var AllOperations = []OP{OpFilename, OpGoTo, OpNextChunk, OpPrevChunk, OpDeleteLines, OpCancel, OpLockIn}
