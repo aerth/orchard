@@ -144,13 +144,14 @@ func DefaultProcessMessages(a chatmessages.A) error {
 			continue
 		}
 		if len(a[i].Content) > MaxKeeper {
-			a[i].MaxDistance = 6 // auto maxdistance
+			a[i].MaxDistance = DefaultMaxDistance // auto maxdistance
 		}
 	}
 	return nil
 }
 
 var (
-	AfterTool = func(ctx context.Context, cm *chatmessages.ChatMessage) error { return nil }
-	MaxKeeper = 200
+	AfterTool          = func(ctx context.Context, cm *chatmessages.ChatMessage) error { return nil }
+	MaxKeeper          = 200
+	DefaultMaxDistance = 6
 )
