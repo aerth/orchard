@@ -368,7 +368,7 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 	var err error
 
 	if len(parts) == 0 || len(parts) > 2 {
-		return 0, 0, errors.New("invalid coordinate format")
+		return 0, 0, errors.New("invalid coordinate format (need either <number> or <number>-<number>")
 	}
 	l := len(parts)
 	switch {
@@ -397,8 +397,9 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 	if end > len(s.Lines) {
 		return 0, 0, fmt.Errorf("coordinates out of file range boundaries (end %d is greater than number of lines %d)", end, len(s.Lines))
 	}
-	if end-start > MaxLinesLocked {
-		return 0, 0, fmt.Errorf("coordinates are too big and the edit should be broken into smaller pieces (%d > max %d)", (end+1)-start, len(s.Lines))
+	numLines := end - start + 1
+	if numLines > MaxLinesLocked {
+		return 0, 0, fmt.Errorf("coordinates are too big and the edit should be broken into smaller pieces (%d > max %d)", numLines, len(s.Lines))
 	}
 	return start, end, nil
 }
