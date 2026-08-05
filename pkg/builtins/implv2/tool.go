@@ -286,7 +286,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 						continue
 					}
 				}
-				messagesGathered = append(messagesGathered, "Surgical edit applied successfully in-memory.")
+				messagesGathered = append(messagesGathered, "Linter has no issues to report.")
 			}
 			if AskBeforeWriting {
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```\n%s\n```", newmsg.Content))
