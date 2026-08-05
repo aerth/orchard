@@ -109,8 +109,8 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	}
 
 	// begin loop
-	var outmsgs chatmessages.A
-	//session := Session{ActiveFile: path, Intent: intent}
+	// var outmsgs chatmessages.A
+	// session := Session{ActiveFile: path, Intent: intent}
 	session := e.session
 	session.ActiveFile = path
 	session.Intent = intent
@@ -303,7 +303,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			slog.Info("WRITING FILE")
 			err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
 			if err != nil {
-				return outmsgs, err
+				return nil, err
 			}
 			if err == nil {
 				session.LockStart = 0
