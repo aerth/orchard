@@ -48,6 +48,7 @@ If you realize a single sub-task is becoming too complex, stop mid-way, report p
 Always communicate your current status using the format:
 `[Status: Task X of Y] - [Current Action: Doing Z]`
 
+All previous discussion was with different agents. Now is your turn.
 If a question should be asked before proceeding, clarify *who* should be asked, example: `AI Agent: <question>` or `Human: <question>`, in that exact format ("Human" or "AI Agent").
 If a question was asked by a previous agent, and is for the user, ask the user the question now.
 
