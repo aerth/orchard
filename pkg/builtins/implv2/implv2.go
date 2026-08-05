@@ -58,6 +58,7 @@ const (
 	// NEW
 	OpWriteFile     OP = "WRITE_FILE"
 	OpRevertChanges OP = "REVERT_ALL"
+	OpUndo          OP = "UNDO" // undo single change
 )
 
 var AllOperations = []OP{OpFilename, OpGoTo, OpNextChunk, OpPrevChunk, OpDeleteLines, OpCancel, OpLockIn}
