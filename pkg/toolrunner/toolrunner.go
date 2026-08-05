@@ -15,6 +15,19 @@ import (
 	"github.com/google/uuid"
 )
 
+func init() {
+	chatmessages.GetMaxDistance = func(cm chatmessages.ChatMessage) int {
+		if cm.Role != "tool" && cm.Role != "assistant" {
+			return 0
+		}
+		l := len(cm.Content)
+		if l < 200 {
+			return 0
+		}
+		return DefaultMaxDistance
+	}
+}
+
 var ErrFatalToolResult = errors.New("unrecoverable error")
 
 const (
