@@ -88,7 +88,7 @@ func domatches(cursor *sitter.QueryCursor, codeBytes []byte) []string {
 			// hunt down the actual inner ERROR or MISSING leaf node child
 			if targetNode.Type() == "source_file" {
 				count := int(targetNode.ChildCount())
-				for i := 0; i < count; i++ {
+				for i := range count {
 					child := targetNode.Child(i)
 					if child != nil && (child.IsError() || child.IsMissing() || child.Type() == "ERROR") {
 						targetNode = child
@@ -111,10 +111,12 @@ func domatches(cursor *sitter.QueryCursor, codeBytes []byte) []string {
 				codeSnippet = strings.TrimSpace(codeSnippet)
 			}
 
-			errMessages = append(errMessages, fmt.Sprintf(
-				"syntax error found near line %d (type: %s) fragment: %q",
-				errLine, targetNode.Type(), codeSnippet,
-			))
+			if capture.Node.HasError() {
+				errMessages = append(errMessages, fmt.Sprintf(
+					"syntax error found near line %d (type: %s) fragment: %q",
+					errLine, targetNode.Type(), codeSnippet,
+				))
+			}
 		}
 	}
 	return errMessages
