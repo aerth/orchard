@@ -28,6 +28,7 @@ type ConfigInput struct {
 	SystemPrompt      string
 	AddSystemPrompt   string
 	InitialUserPrompt string
+	TempDir           string
 	Dir               string
 	ShowThinking      bool
 }
