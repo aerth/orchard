@@ -29,7 +29,7 @@ type ConfigInput struct {
 	AddSystemPrompt   string
 	InitialUserPrompt string
 	TempDir           string // known good location
-	Dir               string
+	Dir               string // the Working Directory
 	ShowThinking      bool
 }
 type cfginput = ConfigInput
