@@ -310,6 +310,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
 				msg := *chatmessages.NewThread(threadID, llm.Message{Role: "system", Content: "ACTION LOG:\n" + strings.Join(messagesGathered, "\n")})
 				stack = append(stack, msg)
+				handler.HandleToolOutputs(msg)
 				numberFilesEdited++
 				continue // done
 			}
