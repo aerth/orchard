@@ -370,8 +370,8 @@ func (cm ChatMessages) Raw() llm.Messages {
 			continue
 		}
 		distance = l - (i + 1)  // 4
-		mx := cm[i].MaxDistance // eg: 4
-		if mx == 0 {
+		mx := cm[i].MaxDistance // eg: 4 or sentinal -3
+		if mx < 1 {
 			mx = GetMaxDistance(cm[i])
 		}
 		var suffix string
