@@ -113,7 +113,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		return nil, err
 	}
 	code := call.Function.Arguments.Code
-	if code == "" {
+	if strings.TrimSpace(code) == "" {
 		call2, _ := chat.ReadToolCall[anymap](ctx, caller, toolCallIndex)
 		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
@@ -176,10 +176,23 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	return chatmessages.ChatMessages{*gotmsg}, nil
 }
 
+var oneliners = []string{
+	"make",
+}
+
 // not a security check. let it touch and cat eof heredoc without bugging user with confirmation modal popup. (TODO: more accurate)
 func isOkBashCode(code string) bool {
+	if code == "" {
+		return false
+	}
 	if strings.Contains(code, "../") {
 		return false
+	}
+	if slices.Contains(oneliners, code) {
+		return true
+	}
+	if strings.HasPrefix(code, "make ") && strings.Count(code, " ") == 1 {
+		return true
 	}
 	if strings.HasPrefix(code, "cat <<'EOF' >") {
 		return strings.Count(code, "EOF") == 2 && strings.HasSuffix(code, "\nEOF\n")
