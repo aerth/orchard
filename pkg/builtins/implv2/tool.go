@@ -294,8 +294,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```%s\n%s\n```", langname, session.CurrentView()))
 				if err != nil {
 					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
-					errmsg.Content = fmt.Sprintf("ConfirmAction failed: %+v", err)
-					errmsg.Content = fmt.Sprintf("%s\nValidateFileSyntax failed: %+v", strings.Join(messagesGathered, "\n"), err)
+					errmsg.Content = fmt.Sprintf("%s\nConfirmAction failed: %+v", strings.Join(messagesGathered, "\n"), err)
 					stack = append(stack, errmsg)
 					handler.HandleToolOutputs(errmsg)
 					continue
