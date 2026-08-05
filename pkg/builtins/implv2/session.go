@@ -99,6 +99,9 @@ type Session struct {
 }
 
 func (s Session) CurrentView() string {
+	if s.CurrentLine < 1 {
+		return "(no current view)"
+	}
 	startIdx := max(s.CurrentLine-1, 0)
 	endIdx := min(startIdx+s.ChunkSize, len(s.Lines))
 	// 2. Build the visual representation of the active file chunk
