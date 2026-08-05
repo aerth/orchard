@@ -156,3 +156,7 @@ var (
 	DefaultMaxDistance = 6
 	distsentinal       = -3
 )
+
+func DistSentinal() int {
+	return distsentinal
+}
