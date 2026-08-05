@@ -306,7 +306,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				}
 				session.LockStart = 0
 				session.LockEnd = 0
-				messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem.")
+				messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem. Available operators: "+fmt.Sprintf("%q", AllOperations))
 				slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
 				numberFilesEdited++
 				continue // done
