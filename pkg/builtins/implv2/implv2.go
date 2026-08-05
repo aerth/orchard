@@ -41,7 +41,7 @@ func SystemInstruction() string {
 }
 
 type Action struct {
-	Op      string
+	Op      OP
 	Content string
 }
 
@@ -76,7 +76,7 @@ func RunAction(runner ActionRunner, action Action) (Result, error) {
 }
 
 func OutputParser(content string) ([]Action, error) {
-	var op string
+	var op OP
 	var remainder string
 	var actions []Action
 	{
@@ -85,8 +85,8 @@ func OutputParser(content string) ([]Action, error) {
 			return nil, errors.New("empty LLM response")
 		}
 		// 1. Strict Leading Space Check: Content must start exactly with the first field
-		op = fields[0]
-		if !strings.HasPrefix(content, op) {
+		op = OP(fields[0])
+		if !strings.HasPrefix(content, string(op)) {
 			return nil, errors.New("leading whitespace is strictly forbidden")
 		}
 		if !slices.Contains(AllOperations, OP(op)) {
@@ -103,13 +103,13 @@ func OutputParser(content string) ([]Action, error) {
 		return nil, stackerr.Errorf("editor operator not found: %q  %w", content, ErrNot)
 	case OpNextChunk, OpPrevChunk, OpCancel: // no args
 		if remainder != "" {
-			return nil, errors.New("editor operator" + op + " does not accept arguments or trailing formatting")
+			return nil, errors.New("editor operator" + string(op) + " does not accept arguments or trailing formatting")
 		}
 		actions = append(actions, Action{Op: op})
 
 	case OpGoTo, OpLockIn, OpFilename, OpDeleteLines:
 		if remainder == "" {
-			return nil, errors.New("editor operator " + op + " must be followed by exactly one space and a target (line number or variable/function/phrase search query")
+			return nil, errors.New("editor operator " + string(op) + " must be followed by exactly one space and a target (line number or variable/function/phrase search query")
 		}
 
 		// these accept ranges which should be numbers
