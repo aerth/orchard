@@ -265,6 +265,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			}
 		}
 		stack = append(stack, *newmsg)
+		if ctx.Err() != nil {
+			break
+		}
 		if isEditMode { // this is the raw reply that will replace the locked lines in memory
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
 			if err != nil {
@@ -330,6 +333,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		}
 		responseWriter := GetSender
 		for i := range actionsParsed {
+			if ctx.Err() != nil {
+				break
+			}
 			slog.Info("running action", "op", actionsParsed[i].Op)
 			operators = append(operators, string(actionsParsed[i].Op))
 			resp := session.RunAction(actionsParsed[i])
