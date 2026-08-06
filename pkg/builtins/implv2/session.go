@@ -224,7 +224,7 @@ Note: Asterisks ('*') mark LOCKed lines
 		lockStatus,
 		len(s.Lines),
 		s.CurrentLine,
-		s.CurrentLine+s.ChunkSize,
+		min(s.CurrentLine+s.ChunkSize, len(s.Lines)),
 		viewportview,
 	)
 	return normal + HowTo
