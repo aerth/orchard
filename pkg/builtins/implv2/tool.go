@@ -317,7 +317,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			stack = append(stack, msg)
 			handler.HandleToolOutputs(msg)
 			numberFilesEdited++
-			continue // done
+			break
 		}
 		if err != nil {
 			slog.Error("parsing edit TODO", "err", err)
