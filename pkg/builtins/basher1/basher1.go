@@ -129,7 +129,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	}
 	for range numReviews {
 		e := <-ch
-		if err == errStart { // first error, even nil
+		if err == errStart { // err has not been assigned. this is first error, even nil
 			if e != nil {
 				slog.Error("got err", "err", err)
 			}
