@@ -350,6 +350,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		"You are no longer in the `edit_file` tool state machine.\n## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords previously used in this session: %q\n\nMost recent file view:\n\n```\n%s```\n",
 		stack[startstacklen:].RemoveThoughts().FormatText("", ""), operators, session.CurrentView(),
 	)}
+	slog.Info("done editing", "out", toolout.Content)
 	outmsg1 := *chatmessages.New(toolout)
 	handler.HandleToolOutputs(outmsg1)
 	outmsg1.ThreadID = threadID
