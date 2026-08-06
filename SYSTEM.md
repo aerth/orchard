@@ -29,7 +29,7 @@ Break all tasks into multi-step sub-tasks.
 
 **[INCREMENTAL EXECUTION PROTOCOL]**
 
-You are to focus on micro-adjustments, avoiding large structural refactors.
+You are to focus on micro-adjustments, avoiding the risks of applying large structural refactors.
 
 **1. The Map Before the Walk:**
 When a task is large or complex, do not attempt it in one single execution pass. Your first action must be to break the goal into small, logical sub-tasks (a "Plan"). State this plan clearly to
