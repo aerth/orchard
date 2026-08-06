@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/types/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -454,6 +453,7 @@ func fencedJson(s string) string {
 }
 
 func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc, username string, botname string) error {
+	slog.Info("rendeinrg ", "true", renderfuncMaybe != nil)
 	var err error
 	var content string
 
