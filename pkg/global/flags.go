@@ -67,8 +67,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		if s == "test" {
 			cfg.ThreadID = SingleThreadID
 		}
-		if strings.Count(s, "-") != 4 {
-
+		if strings.Count(s, "-") != 4 { // is a word
 			hashed := sha256.Sum256([]byte(s)) // 32
 			copy(cfg.ThreadID[:], hashed[:])   // 16
 			threadIdSet = true
@@ -83,6 +82,8 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		flag.BoolVar(clearfirst, "clear", *clearfirst, "clear thread from DB first")
 	}
 	flag.Parse()
+	if !threadIdSet && cfg.ThreadID == uuid.Nil {
+	}
 	wd, _ := os.Getwd()
 	if cfg.Dir != "." && cfg.Dir != "" && cfg.Dir != wd {
 		if err := os.Chdir(cfg.Dir); err != nil {
