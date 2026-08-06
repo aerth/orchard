@@ -352,6 +352,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	)}
 	var outmsgs chatmessages.A
 	outmsg1 := *chatmessages.New(toolout)
+	handler.HandleToolOutputs(outmsg1)
 	outmsg1.ThreadID = threadID
 	outmsgs = append(outmsgs, outmsg1)
 	outmsgs = outmsgs.RemoveThoughts()
