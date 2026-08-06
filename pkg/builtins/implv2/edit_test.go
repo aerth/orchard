@@ -170,3 +170,68 @@ func TestSession_ApplySurgicalEdit(t *testing.T) {
 		})
 	}
 }
+
+func TestOutputParser(t *testing.T) {
+	tests := []struct {
+		name       string
+		input      string
+		wantRanges [][]int // [start, end]
+		wantErr    bool
+	}{
+		{
+			name:  "Valid single line range",
+			input: "1-5: content",
+			wantRanges: [][]int{
+				{1, 5},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Valid multi-line range with non-digit characters",
+			input: "10-20: some text\n30-40: more text",
+			wantRanges: [][]int{
+				{10, 20},
+				{30, 40},
+			},
+			wantErr: false,
+		},
+		{
+			name:  "Invalid operator (unwhitelisted)",
+			input: "1-5 @ content",
+			wantRanges: nil,
+			wantErr:    true,
+		},
+		{
+			name:       "Missing arguments",
+			input:      "1-: content",
+			wantRanges: nil,
+			wantErr:    true,
+		},
+		{
+			name:       "Leading whitespace in command",
+			input:      " 1-5: content",
+			wantRanges: nil,
+			wantErr:    true,
+		},
+		{
+			name: "Invalid range (start > end)",
+			input: "5-1: content",
+			wantRanges: nil,
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Assuming ParseOutput is defined in the package being tested
+			ranges, err := ParseOutput(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseOutput() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(ranges, tt.wantRanges) {
+				t.Errorf("ParseOutput() got = %v, want %v", ranges, tt.wantRanges)
+			}
+		})
+	}
+}
