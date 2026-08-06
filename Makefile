@@ -40,6 +40,6 @@ complexity:
 	for i in ./pkg/*; do echo$ $i; scc $$i; done
 
 test:
-	go test -v -short -count=0 ./...  |& grep -v -e 'no test files' -e "no tests to run"
+	go test -v -short -count=0 ./...  |& grep -E '^ok|^FAIL|\?'
 
 
