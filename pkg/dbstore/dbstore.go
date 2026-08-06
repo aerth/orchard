@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"iter"
-	"log"
 	"log/slog"
 	"slices"
 
@@ -138,7 +137,7 @@ func (s *Store) LoadThread(ctx context.Context, threadID uuid.UUID, limit int) (
 		//		err = stackerr.Errorf("uhoh: %s", string(ToJSON(msgs[i])))
 		//	}
 
-		log.Printf("recalled message: %d: %s", i, msgs[i])
+		//	log.Printf("recalled message: %d: %s", i, msgs[i])
 		msgs[i].ThreadID = threadID
 	}
 	return msgs, err
