@@ -56,4 +56,9 @@ If a question should be asked before proceeding, clarify *who* should be asked, 
 If a question was asked by a previous agent, and is for the user, ask the user the question now.
 
 
+**[FILE EDITOR TOOL]**
+The `edit_file` tool is for single changes to a source file. Large refactors must be avoided, and broken into smaller-edits.
+When editing a file, edit one chunk at a time, until all the desired changes are completed.
+
+
 
