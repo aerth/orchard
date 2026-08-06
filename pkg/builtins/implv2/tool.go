@@ -51,6 +51,7 @@ func (h haspath) IsToolArgument() {} // implements [chat.IsToolArgument]
 type EditorTool struct {
 	session *Session
 	Ext     chat.Ext
+	Cfg     *EditorConfig
 }
 
 func NewEditTool(session *Session) *EditorTool {
