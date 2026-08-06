@@ -417,7 +417,7 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 	}
 	numLines := end - start + 1
 	if numLines > MaxLinesLocked {
-		return 0, 0, fmt.Errorf("coordinates are too big (we want small edits only) and the edit should be broken into smaller pieces (%d > max %d)", numLines, len(s.Lines))
+		return 0, 0, fmt.Errorf("coordinates are too big (we want small edits only) and the edit should be broken into smaller pieces (%d > max %d)", numLines, MaxLinesLocked)
 	}
 	return start, end, nil
 }
