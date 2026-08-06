@@ -129,12 +129,14 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	}
 	for range numReviews {
 		e := <-ch
-		if err == errStart { // first error
-			slog.Error("got err", "err", err)
+		if err == errStart { // first error, even nil
+			if e != nil {
+				slog.Error("got err", "err", err)
+			}
 			err = e // not errStart anymore
 			continue
 		}
-		if e != nil {
+		if e != nil { // join with previous errors
 			slog.Error("got err", "err", e)
 			err = errors.Join(err, e)
 		}
