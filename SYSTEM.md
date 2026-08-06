@@ -26,6 +26,7 @@ When working with files, do not transcribe them. Use **referential reasoning**: 
 
 
 Break all tasks into multi-step sub-tasks.
+
 **[INCREMENTAL EXECUTION PROTOCOL]**
 
 **1. The Map Before the Walk:**
