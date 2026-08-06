@@ -83,6 +83,9 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	}
 	flag.Parse()
 	if !threadIdSet && cfg.ThreadID == uuid.Nil {
+		hashed := sha256.Sum256([]byte(basename)) // 32
+		copy(cfg.ThreadID[:], hashed[:])          // 16
+
 	}
 	wd, _ := os.Getwd()
 	if cfg.Dir != "." && cfg.Dir != "" && cfg.Dir != wd {
