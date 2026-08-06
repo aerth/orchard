@@ -157,7 +157,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	handler := e.Ext.H
 	if handler == nil {
 		slog.Warn("making new handler")
-		handler = GetHandler()
+		handler = e.Cfg.GetHandler()
 	}
 
 	m1 := *chatmessages.NewSystemEphemeral(SystemInstruction() + "\n\n# Intent\n" + intent) // global no state
@@ -307,7 +307,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 				}
 
 			}
-			if AskBeforeWriting {
+			if e.Cfg.AskBeforeWriting {
 				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```%s\n%s\n```", langname, session.CurrentView()))
 				if err != nil {
 					messagesGathered = append(messagesGathered, fmt.Sprintf("The reviewer has denied this particular code and you should send a new better version now.\nError: %+v", err))
@@ -339,7 +339,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			handler.HandleToolOutputs(msg)
 			continue
 		}
-		responseWriter := GetSender
+		responseWriter := e.Cfg.GetSender
 		for i := range actionsParsed {
 			if ctx.Err() != nil {
 				break
