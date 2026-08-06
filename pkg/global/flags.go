@@ -94,8 +94,8 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 
 	if !threadIdSet && cfg.ThreadID == uuid.Nil {
 		basename := filepath.Base(wd)
-		slog.Info("using thread", "thread", basename)
 		hashed := sha256.Sum256([]byte(basename)) // 32
 		copy(cfg.ThreadID[:], hashed[:])          // 16
+		slog.Info("using thread", "thread_flag", basename, "thread", cfg.ThreadID)
 	}
 }
