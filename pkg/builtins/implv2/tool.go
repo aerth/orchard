@@ -30,12 +30,19 @@ type haspath struct {
 	Intent string `json:"intent,omitempty"`
 }
 
-var AskBeforeWriting = false
-var (
-	GetHandler = func() chat.ChatHandlerPlus { return nil }
-	GetSender  = func(Result) {}
-	PreFunc    = func() {}
-)
+type EditorConfig struct {
+	AskBeforeWriting bool
+	GetHandler       func() chat.ChatHandlerPlus
+	GetSender        func(Result)
+	PreFunc          func(*llm.ChatRequest, string) error
+}
+
+var DefaultEditorConfig = &EditorConfig{
+	AskBeforeWriting: false,
+	GetHandler:       func() chat.ChatHandlerPlus { return nil },
+	GetSender:        func(Result) {},
+	PreFunc:          func(creq *llm.ChatRequest, from string) error { return nil },
+}
 
 const EditorName = "editor_agent"
 
