@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -82,11 +83,6 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		flag.BoolVar(clearfirst, "clear", *clearfirst, "clear thread from DB first")
 	}
 	flag.Parse()
-	if !threadIdSet && cfg.ThreadID == uuid.Nil {
-		hashed := sha256.Sum256([]byte(basename)) // 32
-		copy(cfg.ThreadID[:], hashed[:])          // 16
-
-	}
 	wd, _ := os.Getwd()
 	if cfg.Dir != "." && cfg.Dir != "" && cfg.Dir != wd {
 		if err := os.Chdir(cfg.Dir); err != nil {
@@ -94,5 +90,11 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		}
 		slog.Info("now in dir", "dir", cfg.Dir, "from", wd)
 		time.Sleep(time.Second)
+	}
+
+	if !threadIdSet && cfg.ThreadID == uuid.Nil {
+		basename := filepath.Base(wd)
+		hashed := sha256.Sum256([]byte(basename)) // 32
+		copy(cfg.ThreadID[:], hashed[:])          // 16
 	}
 }
