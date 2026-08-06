@@ -46,6 +46,7 @@ func NewConfigFlags(clearfirst *bool) *Conf {
 }
 
 func (cfg *ConfigInput) Flags(clearfirst *bool) {
+	threadIdSet := false
 	flag.StringVar(&cfg.Username, "username", cfg.Username, "username like Bob or Chief")
 	flag.StringVar(&cfg.Botname, "bot", cfg.Botname, "username like Alice or project_manager")
 	flag.StringVar(&cfg.Treedir, "tree", cfg.Treedir, "tree for markdown files for system messages (employee descriptions and task templates)")
@@ -70,8 +71,10 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 
 			hashed := sha256.Sum256([]byte(s)) // 32
 			copy(cfg.ThreadID[:], hashed[:])   // 16
+			threadIdSet = true
 			return nil
 		}
+		threadIdSet = true
 		return cfg.ThreadID.UnmarshalText([]byte(s))
 	})
 	flag.StringVar(&cfg.Dir, "C", cfg.Dir, "change dir after loading stuff")
