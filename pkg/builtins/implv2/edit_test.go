@@ -187,7 +187,7 @@ func TestOutputParser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Valid multi-line range with non-digit characters",
+			name:  "Valid multi-line range with non-digit characters",
 			input: "10-20: some text\n30-40: more text",
 			wantRanges: [][]int{
 				{10, 20},
@@ -196,8 +196,8 @@ func TestOutputParser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:  "Invalid operator (unwhitelisted)",
-			input: "1-5 @ content",
+			name:       "Invalid operator (unwhitelisted)",
+			input:      "1-5 @ content",
 			wantRanges: nil,
 			wantErr:    true,
 		},
@@ -214,8 +214,8 @@ func TestOutputParser(t *testing.T) {
 			wantErr:    true,
 		},
 		{
-			name: "Invalid range (start > end)",
-			input: "5-1: content",
+			name:       "Invalid range (start > end)",
+			input:      "5-1: content",
 			wantRanges: nil,
 			wantErr:    true,
 		},
@@ -224,7 +224,7 @@ func TestOutputParser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Assuming ParseOutput is defined in the package being tested
-			ranges, err := ParseOutput(tt.input)
+			ranges, err := OutputParser(tt.input)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ParseOutput() error = %v, wantErr %v", err, tt.wantErr)
 				return
