@@ -406,3 +406,22 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 	}
 	return start, end, nil
 }
+
+// writeAtomic writes data to a temporary file and then renames it to the target path.
+func writeAtomic(path string, data []byte) error {
+	dir := filepath.Dir(path)
+	tempFile, err := os.CreateTemp(dir, "atomic-")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tempFile.Name())
+
+	if _, err := tempFile.Write(data); err != nil {
+		return err
+	}
+	if err := tempFile.Close(); err != nil {
+		return err
+	}
+
+	return os.Rename(tempFile.Name(), path)
+}
