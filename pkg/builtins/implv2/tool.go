@@ -350,11 +350,10 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		"## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords previously used in this session: %q\n\nMost recent file view:\n\n```\n%s```\n",
 		stack[startstacklen:].RemoveThoughts().FormatText("", ""), operators, session.CurrentView(),
 	)}
-	var outmsgs chatmessages.A
 	outmsg1 := *chatmessages.New(toolout)
 	handler.HandleToolOutputs(outmsg1)
 	outmsg1.ThreadID = threadID
-	outmsgs = append(outmsgs, outmsg1)
+	outmsgs := chatmessages.A{outmsg1}
 	outmsgs = outmsgs.RemoveThoughts()
 	_ = json.NewEncoder(global.LogWriter).Encode(stack[startstacklen:])
 	slog.Info("editor returning messages", "n", len(outmsgs))
