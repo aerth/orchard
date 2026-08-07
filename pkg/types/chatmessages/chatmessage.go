@@ -1,4 +1,4 @@
-// Package chatmessages strictly for [ChatMessage] and [ChatMessages] methods
+// Package chatmessages strictly for [ChatMessage] initializers and [ChatMessages] methods
 // extensions of [llm.Message]
 package chatmessages
 
