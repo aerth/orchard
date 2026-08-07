@@ -531,11 +531,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		content += fmt.Sprintf("\n```json\n%s\n```\n", toJSONIndent(cm.ToolCalls))
 	}
 	content = strings.TrimSpace(content)
-	//if cm.Role == "tool" {
-	//	content = "\n```markdown\n" + content + "\n```\n"
-	//}
 	if content != "" && renderfuncMaybe != nil {
-		//		content += "\n\n---\n"
 		content, err = renderfuncMaybe(content, cm.GetMessageStyle())
 		if err != nil {
 			return err
