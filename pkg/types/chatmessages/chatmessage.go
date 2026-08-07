@@ -1,3 +1,4 @@
+// package chatpackage ...
 package chatmessages
 
 import (
@@ -168,7 +169,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		panic("GatherChatResponse for nil")
 	}
 	if !cm.Ephemeral {
-		if cr.Message.Content != "" && strings.HasSuffix(cm.Message.Content, cr.Message.Content) {
+		if cr.Message.Content != "" && strings.HasSuffix(cm.Content, cr.Message.Content) {
 			slog.Info("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo(1), "caller3", stackerr.GetFuncCallerInfo(2))
 			cr.Message.Content = strings.ToUpper(cr.Message.Content)
 		}
@@ -460,7 +461,7 @@ func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname 
 	return str.String(), nil
 }
 
-func fencedJson(s string) string {
+func fencedJSON(s string) string {
 	return "\n```json\n" + s + "\n```\n"
 }
 
@@ -485,7 +486,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 			content = ("\n\n" + italicMarkdown("Note: "+v) + "\n")
 		case json.Marshaler:
 
-			content = ("\n\n" + italicMarkdown("Aux %T") + fencedJson(toJSONIndent(v)) + "\n")
+			content = ("\n\n" + italicMarkdown("Aux %T") + fencedJSON(toJSONIndent(v)) + "\n")
 		default:
 			content = fmt.Sprintf("Aux %T: %v", v, v)
 		}
