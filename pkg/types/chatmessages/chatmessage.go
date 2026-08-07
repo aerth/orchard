@@ -545,7 +545,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	}
 	name := cm.GetName(username, botname)
 	if name == "" {
-		_, err := w.Write([]byte(content))
+		_, err := w.Write([]byte(content + MarkdownSuffix))
 		return err
 	}
 	_, err = fmt.Fprintf(w, "%s: %s", name, strings.TrimSpace(content))
