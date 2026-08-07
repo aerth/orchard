@@ -471,7 +471,6 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		// skip
 		return nil
 	}
-	slog.Info("rendeinrg ", "true", renderfuncMaybe != nil)
 	var err error
 	var content string
 
