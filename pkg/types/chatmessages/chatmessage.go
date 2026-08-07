@@ -499,6 +499,10 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		content = fmt.Sprintf("### tool %q output\n```\n", cm.ToolName) + cm.Content + "\n```\n"
 	case cm.Role == "tool":
 		content = fmt.Sprintf("### tool %q output (%d bytes)\n", cm.ToolName, len(cm.Content))
+	case cm.Content != "" && cm.Content[0] == '{':
+		content = "```json\n" + cm.Content + "\n```\n(JSON ACTUAL)\n"
+	case strings.HasPrefix(cm.Content, "```json\n"):
+		content = cm.Content + "\n\n(JSON ACTUAL FENCED)\n"
 	case len(cm.ToolCalls) != 0 && cm.Content != "":
 		//slog.Info("FOUND A TOOL CALL WITH CONTENT", "d1", cm.CreatedAt, "by", cm.CreatedBy) // it exists!
 		content = cm.Content
@@ -508,10 +512,6 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		content = ""
 	case !ShowThoughts && cm.Content == "" && cm.Thinking != "":
 		content = ""
-	case strings.HasPrefix(cm.Content, "```json\n"):
-		content = cm.Content + "\n\n(JSON ACTUAL FENCED)\n"
-	case cm.Content != "" && cm.Content[0] == '{':
-		content = "```json\n" + cm.Content + "\n```\n(JSON ACTUAL)\n"
 	case cm.Content != "":
 		content = cm.Content
 	case cm.IsEmpty():
