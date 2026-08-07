@@ -427,6 +427,8 @@ func NewAux(aux any) *ChatMessage {
 	return x
 }
 
+// FormatMarkdownTry ...
+// Deprecated: use [ChatMessage.FormatMarkdownTo]
 func (cm ChatMessage) FormatMarkdownTry(renderfunc RendererFunc, username, botname string) string {
 	got, err := cm.FormatMarkdown(renderfunc, username, botname)
 	if err != nil {
