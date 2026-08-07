@@ -1,5 +1,5 @@
 // Package chatmessages strictly for [ChatMessage] methods and initializers, [ChatMessages] methods
-// ChatMessage is an extension of [llm.Message]
+// ChatMessage is an extension of [llm.Message] for better organization and recordkeeping
 package chatmessages
 
 import (
