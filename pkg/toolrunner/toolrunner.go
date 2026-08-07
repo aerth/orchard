@@ -6,10 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"time"
-
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
+	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -166,7 +165,7 @@ func DefaultProcessMessages(a chatmessages.A) error {
 var (
 	AfterTool          = func(ctx context.Context, cm *chatmessages.ChatMessage) error { return nil }
 	MaxKeeper          = 200
-	DefaultMaxDistance = 6
+	DefaultMaxDistance = 10
 	distsentinal       = -3
 )
 
