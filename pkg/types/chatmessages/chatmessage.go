@@ -512,6 +512,8 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		content = "```json\n" + cm.Content + "\n```\n(JSON ACTUAL)\n"
 	case cm.Content != "":
 		content = cm.Content
+	case cm.IsEmpty():
+		content = "[empty]"
 	default:
 		content = "UNKNOWN"
 	}
