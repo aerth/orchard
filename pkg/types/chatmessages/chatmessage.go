@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -545,7 +546,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		_, err := w.Write([]byte(content))
 		return err
 	}
-	_, err = fmt.Fprintf(w, "%s: %s", name, content)
+	_, err = fmt.Fprintf(w, "%s: %s", name, strings.TrimSpace(content))
 	if err != nil {
 		return err
 	}
