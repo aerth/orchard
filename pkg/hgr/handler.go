@@ -24,6 +24,7 @@ type Handler struct {
 
 // Send to CHANNEL that is read periodically by calling [hgr2.PlainChannelWrap.GatherQuickly]
 func (h *Handler) Send(r hgr2.ResponseWrap) error {
+	slog := slog.With("gen_id", h.GenID, "call_num", h.callnum)
 	t1 := time.Now()
 	if r.GenID == uuid.Nil {
 		r.GenID = h.GenID
