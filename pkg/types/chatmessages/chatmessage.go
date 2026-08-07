@@ -465,6 +465,10 @@ func fencedJson(s string) string {
 }
 
 func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc, username string, botname string) error {
+	if w == io.Discard || w == nil {
+		// skip
+		return nil
+	}
 	slog.Info("rendeinrg ", "true", renderfuncMaybe != nil)
 	var err error
 	var content string
