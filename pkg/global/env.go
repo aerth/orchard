@@ -50,6 +50,8 @@ func EnvDeleteFunc(s string) bool {
 	return !okenvs[x]
 }
 
+var shownWarningCA = false
+
 func NewCleanEnviron() []string {
 	env := slices.DeleteFunc(os.Environ(), EnvDeleteFunc)
 	if !slices.ContainsFunc(env, func(e string) bool {
