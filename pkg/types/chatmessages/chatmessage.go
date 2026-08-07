@@ -1,4 +1,5 @@
-// package chatpackage ...
+// Package chatmessages strictly for [ChatMessage] and [ChatMessages] methods
+// extensions of [llm.Message]
 package chatmessages
 
 import (
