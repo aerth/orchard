@@ -515,7 +515,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	case cm.IsEmpty():
 		content = "[empty]"
 	default:
-		content = "UNKNOWN"
+		content = cm.Content + " ??"
 	}
 	if content == "" {
 		switch {
