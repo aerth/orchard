@@ -34,7 +34,7 @@ func (h *Handler) Send(r hgr2.ResponseWrap) error {
 			slog.Warn("no sendo after", "d", time.Since(t1))
 		case h.C <- r: // send to chan
 			if l := len(h.C); l > 200 {
-				slog.Info("uhoh", "chanbuf", l)
+				slog.Info("uhoh, channel receiver is lagging", "chanbuf", l)
 			}
 			return nil
 		default: // could not send
