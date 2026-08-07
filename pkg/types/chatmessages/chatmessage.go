@@ -234,6 +234,16 @@ func (cm ChatMessages) Contents() string {
 
 type ChatMessages []ChatMessage
 
+func (cm ChatMessages) FindID(id uuid.UUID) (*ChatMessage, int) {
+	top := len(cm) - 1
+	for i := range cm {
+		if cm[top-i].MessageID == id {
+			return &cm[top-i], top - i
+		}
+	}
+	return nil, -1
+}
+
 func (cm ChatMessages) FormatRolesFrom() []string {
 	a := make([]string, len(cm))
 	for i := range cm {
