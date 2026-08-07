@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
+	"time"
+
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
-	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -20,7 +22,8 @@ func init() {
 			return 0
 		}
 		l := len(cm.Content)
-		if l < 200 {
+		words := strings.Count(cm.Content, " ")
+		if l < 200 || words < 200 {
 			return 0
 		}
 		return DefaultMaxDistance
