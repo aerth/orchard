@@ -467,7 +467,7 @@ func fencedJSON(s string) string {
 	return "\n```json\n" + s + "\n```\n"
 }
 
-var MarkdownSuffix string
+var MarkdownSuffix string = "\n\n"
 
 func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc, username string, botname string) error {
 	if w == io.Discard || w == nil {
@@ -548,7 +548,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		_, err := w.Write([]byte(content + MarkdownSuffix))
 		return err
 	}
-	_, err = fmt.Fprintf(w, "%s: %s", name, strings.TrimSpace(content))
+	_, err = fmt.Fprintf(w, "%s: %s%s", name, strings.TrimSpace(content), MarkdownSuffix)
 	if err != nil {
 		return err
 	}
