@@ -33,7 +33,10 @@
       "type": "object",
       "properties": {
         "path": { "type": "string" },
-		"intent": { "type": "string", "description": "detailed, clear plan for this file-editing session to be parsed by the Editor Agent that will persist during the editing session."}
+        "intent": {
+          "type": "string",
+          "description": "detailed, clear plan for this file-editing session to be parsed by the Editor Agent that will persist during the editing session."
+        }
       }
     }
   },
@@ -45,7 +48,7 @@
       "code": {
         "type": "string",
         "description": "bash source to execute"
-	  }
+      }
     }
   },
   {
@@ -59,13 +62,13 @@
       }
     }
   },
+  { "name": "gitlog", "description": "Executes `git --no-pager log -n 30 --reverse  -p`", "required": [], "parameters": {} },
   {
     "name": "get_package_info",
     "description": "Retrieves information about a specific Go module or package version.",
     "required": ["module_path"],
     "parameters": {
-      "module_path": "string"
+      "module_path": { "type": "string" }
     }
   }
 ]
-
