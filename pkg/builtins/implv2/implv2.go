@@ -73,7 +73,7 @@ type Result struct {
 type CodeInt int
 
 type ActionRunner interface {
-	RunAction(Action) Result
+	ApplyAction(Action) Result
 }
 
 /*
