@@ -14,24 +14,26 @@ import (
 )
 
 type ConfigInput struct {
-	Username          string
-	Botname           string
-	Treedir           string
-	Tooldir           string
-	Logfilename       string
-	ThreadID          uuid.UUID
-	HideToolCalls     bool
-	ShowToolOuts      bool
-	ShowRequests      bool
-	JsonOutput        bool
-	NoColor           bool
-	NoSpin            bool
-	SystemPrompt      string
-	AddSystemPrompt   string
-	InitialUserPrompt string
-	TempDir           string // known good location (["./tmp/" or /tmp/foo or, 'none' for no tempdir.])
-	Dir               string // the Working Directory
-	ShowThinking      bool
+	Username              string
+	Botname               string
+	Treedir               string
+	Tooldir               string
+	Logfilename           string
+	ThreadID              uuid.UUID
+	HideToolCalls         bool
+	ShowToolOuts          bool
+	ShowRequests          bool
+	JsonOutput            bool
+	NoColor               bool
+	NoSpin                bool
+	SystemPrompt          string
+	AddSystemPrompt       string
+	InitialUserPrompt     string
+	TempDir               string // known good location (["./tmp/" or /tmp/foo or, 'none' for no tempdir.])
+	Dir                   string // the Working Directory
+	ShowThinking          bool
+	SidebarDuration       time.Duration
+	StreamRefreshDuration time.Duration
 }
 type cfginput = ConfigInput
 
