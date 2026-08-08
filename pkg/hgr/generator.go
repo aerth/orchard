@@ -111,7 +111,7 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	}
 	err = cmdpkg.ChatWith(e.Context, e.ChatMessages, tools, ext2)
 	if err != nil {
-		fail(genID, err, e)
+		fail(genID, stackerr.Errorf("ChatWith failed: %w", err), e)
 		return
 	}
 }
