@@ -159,7 +159,7 @@ func TestAi(t *testing.T) {
 					return
 				}
 				slog.Info("got action", "i", i, "s", actions[i].Op, "x", strings.Split(actions[i].Content, "\n")[0])
-				res := session.RunAction(actions[i])
+				res := session.ApplyAction(actions[i])
 				if res.E != nil {
 					t.Fatalf("error: %+v", err)
 				}
