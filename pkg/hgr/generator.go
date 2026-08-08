@@ -19,9 +19,9 @@ import (
 )
 
 // Prefunc simply sends signal that a new message will be streaming to this channel (receiver should append a new blank)
-func Prefunc(genID uuid.UUID, threadID uuid.UUID, from string, c chan<- hgr2.ResponseWrap) func(creq *llm.ChatRequest) error {
+func Prefunc(genID uuid.UUID, threadID uuid.UUID, c chan<- hgr2.ResponseWrap) func(creq *llm.ChatRequest, from string) error {
 	callnum := 0
-	return func(creq *llm.ChatRequest) error {
+	return func(creq *llm.ChatRequest, from string) error {
 		callnum++
 		top := creq.Messages[len(creq.Messages)-1]
 		almost := *chatmessages.NewFromRole(from, "assistant", "")
