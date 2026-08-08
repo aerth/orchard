@@ -147,9 +147,9 @@ var (
 	SingleThreadID = TestThreadID
 )
 
-var GetDefaultConfigInput = DefaultConfigInput
+var DefaultConfigInput = FreshDefaultConfigInput
 
-func DefaultConfigInput() ConfigInput {
+func FreshDefaultConfigInput() ConfigInput {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err.Error())
