@@ -130,10 +130,13 @@ Chat:
 			return stackerr.Errorf("gen: %w", err)
 		}
 		if errors.Is(err, context.Canceled) && newcaller.Content == "" {
+			if ctx.Err() != nil {
+				err = context.Cause(ctx) // get our underlying error like 'ctrl+c pressed'
+			}
 			return err
 		}
 		if errors.Is(err, context.Canceled) {
-			if errors.Is(err, context.Canceled) && ctx.Err() != nil {
+			if ctx.Err() != nil {
 				err = context.Cause(ctx) // get our underlying error like 'ctrl+c pressed'
 			}
 			newcaller.Content += " (this reply was cancelled by user before it finished: " + err.Error() + ")"
