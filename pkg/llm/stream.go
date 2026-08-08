@@ -137,9 +137,10 @@ func (c *Client) stream(ctx context.Context, method, path string, data any, fn f
 			slog.Error("ERROR GOT FNERR", "raw", string(err.Error()))
 			return stackerr.Errorf("%w", err)
 		}
-		if ctx.Err() != nil {
-			return ctx.Err()
-		}
+		/*
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}*/
 	}
 
 	return nil
