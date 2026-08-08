@@ -25,6 +25,9 @@ func IsCommand(content string) bool {
 		first = s
 		break
 	}
+	if len(first) < 2 {
+		return false
+	}
 	return first == "exit" || first == "quit" || first[0] == '!' || (first[0] == '/' && first[1] != '/')
 }
 
