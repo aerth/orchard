@@ -49,7 +49,7 @@ func LoadBuiltinTools(execs map[string]otool.ExecFunc) (otool.Tools, error) {
 				}
 			}
 
-			// Bind the actual Go function based on the name found in JSON
+			// newtools dont have exec functions. we use this function's execs map param
 			for _, tool := range newtools {
 				if fn, ok := execs[tool.Name]; ok {
 					tool = tool.WithExec(fn)
