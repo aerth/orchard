@@ -41,12 +41,13 @@ func Prefunc(genID uuid.UUID, threadID uuid.UUID, c chan<- hgr2.ResponseWrap) fu
 	}
 }
 
+// PreFunc newer version
 func (h *Handler) PreFunc(creq *llm.ChatRequest, from string) error {
 	h.callnum++
 	top := creq.Messages[len(creq.Messages)-1]
 	almost := *chatmessages.NewFromRole(from, "assistant", "")
-	slog.Info("Prefunc PREFUNC", "top", top, "callnum", h.callnum, "message_id", almost.MessageID)
 	almost.ThreadID = h.ThreadID
+	slog.Info("Prefunc PREFUNC", "top", top, "callnum", h.callnum, "message_id", almost.MessageID, "thread", almost.ThreadID)
 	wrapped := hgr2.ResponseWrap{
 		V:     almost,
 		GenID: h.GenID,
