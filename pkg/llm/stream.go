@@ -84,8 +84,9 @@ func (c *Client) stream(ctx context.Context, method, path string, data any, fn f
 	if err != nil {
 		urlerr := new(url.Error)
 		if errors.As(err, &urlerr) {
+			return stackerr.Errorf("http: %w", urlerr.Err)
 		}
-		return stackerr.Errorf("%w", err)
+		return stackerr.Errorf("http: %w", err)
 	}
 	defer func() { _ = response.Body.Close() }()
 
@@ -95,9 +96,6 @@ func (c *Client) stream(ctx context.Context, method, path string, data any, fn f
 	scanner.Buffer(scanBuf, maxBufferSize)
 	for scanner.Scan() {
 
-		if ctx.Err() != nil {
-			return ctx.Err()
-		}
 		var errorResponse struct {
 			Error string `json:"error,omitempty"`
 			//		SigninURL string `json:"signin_url,omitempty"`
