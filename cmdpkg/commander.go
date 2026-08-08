@@ -28,7 +28,7 @@ func IsCommand(content string) bool {
 	if len(first) < 2 {
 		return false
 	}
-	return first == "exit" || first == "quit" || first[0] == '!' || (first[0] == '/' && first[1] != '/')
+	return first == "exit" || first == "quit" || first[0] == '!' || (first[0] == '/' && (first[1] != '/' && first[1] != '*'))
 }
 
 func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmessages.ChatMessages, startAt *int) (chatmessages.A, error) {
