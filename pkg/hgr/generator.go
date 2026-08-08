@@ -106,7 +106,7 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	var tools otool.Tools
 	err := tools.FromMarshalers(e.Tools)
 	if err != nil {
-		fail(genID, err, e)
+		fail(genID, stackerr.Errorf("unmarshalers: %w", err), e)
 		return
 	}
 	err = cmdpkg.ChatWith(e.Context, e.ChatMessages, tools, ext2)
