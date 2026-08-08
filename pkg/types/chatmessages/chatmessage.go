@@ -540,6 +540,11 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	}
 	content = strings.TrimSpace(content)
 	if content != "" && renderfuncMaybe != nil {
+		defer func() {
+			if r := recover(); r != nil {
+				panic(r)
+			}
+		}()
 		content, err = renderfuncMaybe(content, cm.GetMessageStyle())
 		if err != nil {
 			return err
