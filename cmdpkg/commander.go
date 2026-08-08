@@ -4,15 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"os"
-	"strings"
-
 	"m/pkg/chat"
-	"m/pkg/types/chatmessages"
-
 	"m/pkg/dbstore"
 	"m/pkg/global"
 	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
+	"os"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -27,7 +25,7 @@ func IsCommand(content string) bool {
 		first = s
 		break
 	}
-	return first == "exit" || first == "quit" || first[0] == '!' || first[0] == '/'
+	return first == "exit" || first == "quit" || first[0] == '!' || (first[0] == '/' && first[1] != '/')
 }
 
 func HandleCommand(newmsg *chatmessages.ChatMessage, e *chat.Ext, stack *chatmessages.ChatMessages, startAt *int) (chatmessages.A, error) {
