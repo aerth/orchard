@@ -130,7 +130,12 @@ func NewSystemEphemeral(content string) *ChatMessage {
 }
 
 // NewToolReply with matching Call ID and ToolName for the given i index.
-func NewToolReply(caller ChatMessage, i int, content string) *ChatMessage {
+func NewToolReplyPlain(caller llm.Message, i int, content string) *ChatMessage {
+	return NewToolReply("", caller, i, content)
+}
+
+// NewToolReply with matching Call ID and ToolName for the given i index.
+func NewToolReply(from string, caller llm.Message, i int, content string) *ChatMessage {
 	var call Call[json.RawMessage]
 	err := json.Unmarshal(caller.ToolCalls[i], &call)
 	if err != nil {
@@ -143,7 +148,7 @@ func NewToolReply(caller ChatMessage, i int, content string) *ChatMessage {
 		ToolName:   call.Function.Name,
 		Content:    content,
 	}
-	return NewFrom(caller.From, toolmsg)
+	return NewFrom(from, toolmsg)
 }
 
 // MessageOptions are not saved to DB
