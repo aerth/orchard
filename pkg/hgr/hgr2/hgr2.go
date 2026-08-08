@@ -49,14 +49,14 @@ func (c PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (ne
 			if len(a) == 0 {
 				a = nil
 			}
-			slog.Debug("gathering is DONE, caller should stop checking", "todo", len(ch), "cap", cap(ch))
+			slog.Debug("GatherQuickly: gathering is DONE, caller should stop checking", "todo", len(ch), "cap", cap(ch), "genID", c.GenID)
 			return a, true // channel is closed, caller should stop checking
 		default: // prevent blocking
 			if len(a) == 0 {
 				return nil, false // none since last call
 			}
 			if len(a) > ((SmallArraySize * 10) / 12) {
-				slog.Warn("gathered lots in one frame, check faster!", "got", len(a))
+				slog.Warn("GatherQuickly: gathered lots in one frame, check faster!", "got", len(a), "genID", c.GenID)
 			}
 			return a, false // some since last call
 		}
