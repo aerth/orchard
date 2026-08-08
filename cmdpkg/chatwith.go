@@ -115,6 +115,9 @@ Chat:
 			}
 			e.ShowRequests = conf.Get().ShowRequests
 			err = chat.Chat(ctx, conf.GetThreadID(), stack.TopN(20), e)
+			if errors.Is(err, context.Canceled) && ctx.Err() != nil {
+				err = context.Cause(ctx)
+			}
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
 			}
