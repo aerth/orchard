@@ -38,6 +38,8 @@ func (c PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (ne
 			if len(a) == 0 {
 				a = nil
 			}
+			cause := context.Cause(ctx)
+			slog.Error("ctx done", "cause", cause, "err", ctx.Err())
 			return a, false
 		case newmsg, hasRemaining := <-ch:
 			if hasRemaining {
