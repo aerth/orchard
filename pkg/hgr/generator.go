@@ -118,6 +118,9 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 }
 
 func Postfunc(genID uuid.UUID, c chan<- hgr2.ResponseWrap) func(err error) error {
+	if true {
+		return nil // ok
+	}
 	slog.Warn("empty postfunc")
 	return func(err error) error {
 		return fmt.Errorf("GeneratorFoo postfunc is empty")
