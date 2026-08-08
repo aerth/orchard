@@ -239,5 +239,5 @@ Chat:
 		stack = append(stack, toolouts...)
 		continue Chat
 	}
-	return ctx.Err()
+	return context.Cause(ctx)
 }
