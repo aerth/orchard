@@ -6,11 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"slices"
-
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/types/chatmessages"
+	"slices"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -32,23 +31,23 @@ type Ext struct {
 
 	// PreFunc current streaming output for DISPLAY
 	// Called right before llm.Chat call, may be used to cancel
-	PreFunc func(creq *llm.ChatRequest, from string) error
+	PreFunc func(creq *llm.ChatRequest, from string) error `json:"-"`
 	// PostFunc should return nil
-	PostFunc func(err error) error
-	Handlers []ChatHandler                         // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
-	AfterGen func(*chatmessages.ChatMessage) error // after generation is complete (assistant, toolcalls) for applying modifications or exit early or store to DB
+	PostFunc func(err error) error                 `json:"-"`
+	Handlers []ChatHandler                         `json:"-"` // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
+	AfterGen func(*chatmessages.ChatMessage) error `json:"-"` // after generation is complete (assistant, toolcalls) for applying modifications or exit early or store to DB
 	// NonStreamHandler for any toolouts or temporary system messages for DISPLAY
 	// for tool/system (not generated assistant stream)
-	NonStreamHandler func(chatmessages.ChatMessage)
+	NonStreamHandler func(chatmessages.ChatMessage) `json:"-"`
 
-	PreTools func(ctx context.Context, newcaller *chatmessages.ChatMessage, functionNames []string) error // for example, a confirmation, or whitelist
+	PreTools func(ctx context.Context, newcaller *chatmessages.ChatMessage, functionNames []string) error `json:"-"` // for example, a confirmation, or whitelist
 
 	Prepend []llm.Message    // prepended to messages (tmp)
 	Append  []llm.Message    // appended to messages (tmp)
 	Tools   []json.Marshaler // Tool specs available
 	//
-	ShowRequests bool // from conf
-	H            ChatHandlerPlus
+	ShowRequests bool            // from conf
+	H            ChatHandlerPlus `json:"-"`
 }
 
 // FromA (internal) combines variadic Exts into one
