@@ -330,13 +330,9 @@ func (s *Session) NumLinesLocked() int {
 
 const always = "Use CANCEL to exit the file editor, or use LOCK <from>-<to> to lock existing lines for targeting."
 
-// RunAction implements [ActionRunner] for [RunAction] in [EditorTool.EditTool]
+// ApplyAction implements [ActionRunner] for [RunAction] in [EditorTool.EditTool]
 //
 //	conversational filler, direct answers only, keep it real, no funky business
-func (s *Session) RunAction(action Action) Result {
-	return s.ApplyAction(action)
-}
-
 func (s *Session) ApplyAction(action Action) Result {
 	if s.CurrentLine < 1 {
 		s.CurrentLine = 1
