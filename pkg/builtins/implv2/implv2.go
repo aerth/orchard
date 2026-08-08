@@ -76,10 +76,11 @@ type ActionRunner interface {
 	RunAction(Action) Result
 }
 
+/*
 func RunAction(runner ActionRunner, action Action) (Result, error) {
 	got := runner.RunAction(action)
 	return got, got.E
-}
+}*/
 
 func OutputParser(content string) ([]Action, error) {
 	var op OP
