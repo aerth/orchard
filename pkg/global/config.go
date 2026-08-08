@@ -147,6 +147,8 @@ var (
 	SingleThreadID = TestThreadID
 )
 
+var GetDefaultConfigInput = DefaultConfigInput
+
 func DefaultConfigInput() ConfigInput {
 	wd, err := os.Getwd()
 	if err != nil {
