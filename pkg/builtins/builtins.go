@@ -33,13 +33,13 @@ func LoadBuiltinTools(execs map[string]otool.ExecFunc) (otool.Tools, error) {
 		}
 		// Only process .json files
 		if !d.IsDir() && filepath.Ext(path) == ".json" {
-			data, err := Embedded.ReadFile(path)
+			data, err := Embedded.ReadFile(path) // ie: builtins.tools.json
 			if err != nil {
 				return fmt.Errorf("failed to read %s: %w", path, err)
 			}
 
 			var newtools otool.Tools
-			// This uses your custom UnmarshalJSON which extracts the Name and Spec
+			// extracts the Name and Spec
 			if err := json.Unmarshal(data, &newtools); err != nil {
 				var tool otool.Tool
 				if err := json.Unmarshal(data, &tool); err == nil {
