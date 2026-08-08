@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"m/pkg/types/spinner"
+
 	"github.com/google/uuid"
 )
 
@@ -25,7 +27,6 @@ type ConfigInput struct {
 	ShowRequests      bool
 	JsonOutput        bool
 	NoColor           bool
-	NoSpin            bool
 	SystemPrompt      string
 	AddSystemPrompt   string
 	InitialUserPrompt string
@@ -62,7 +63,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.StringVar(&extraReviewText, "extra-review-text", extraReviewText, "extra review text for the basher tool")
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
-	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
+	flag.BoolVar(&spinner.NoSpin, "nospin", spinner.NoSpin, "disable spin")
 	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
 	flag.Func("thread", "uuid", func(s string) error {
 		if s == "test" {
