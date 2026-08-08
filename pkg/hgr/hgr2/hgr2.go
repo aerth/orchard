@@ -31,7 +31,7 @@ type (
 // Returns isDone true if the channel is closed (meaning the caller should remove and no longer check this genID's chan)
 func (c PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) {
 	var a []T
-	for ctx.Err() == nil { // limit for this Update call in the ~30fps loop
+	for ctx.Err() == nil { // limit for this Update call in the ~2fps loop
 		select {
 		case <-ctx.Done():
 			if len(a) == 0 {
