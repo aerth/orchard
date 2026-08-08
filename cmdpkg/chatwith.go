@@ -47,7 +47,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	copy(stack, stackInput)
 	conf := global.Get()
 	if len(stack) == 0 {
-		slog.Warn("noop convo")
+		slog.Warn("conversation is empty, (noop)")
 		return nil
 	}
 	var cl *debugging.ConsoleLogger
