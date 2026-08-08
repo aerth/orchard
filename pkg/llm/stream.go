@@ -10,6 +10,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime"
 
@@ -81,6 +82,9 @@ func (c *Client) stream(ctx context.Context, method, path string, data any, fn f
 	}
 	response, err := c.http.Do(request)
 	if err != nil {
+		urlerr := new(url.Error)
+		if errors.As(err, &urlerr) {
+		}
 		return stackerr.Errorf("%w", err)
 	}
 	defer func() { _ = response.Body.Close() }()
