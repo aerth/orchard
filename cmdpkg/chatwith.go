@@ -126,6 +126,9 @@ Chat:
 		}
 		shouldBreak := err != nil
 
+		if errors.Is(err, context.Canceled) && ctx.Err() != nil {
+			err = context.Cause(ctx) // get our underlying error like 'ctrl+c pressed'
+		}
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
