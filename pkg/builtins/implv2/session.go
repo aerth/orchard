@@ -98,6 +98,10 @@ type Session struct {
 	Intent string
 }
 
+func (s *Session) GetEditor() *EditorTool {
+	return s.editor
+}
+
 func (s Session) CurrentView() string {
 	if s.CurrentLine < 1 {
 		return "(no current view)"
