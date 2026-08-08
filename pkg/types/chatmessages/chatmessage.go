@@ -542,6 +542,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	if content != "" && renderfuncMaybe != nil {
 		defer func() {
 			if r := recover(); r != nil {
+				slog.Error("panic in Render func", "err", r)
 				panic(r)
 			}
 		}()
