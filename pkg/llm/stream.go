@@ -77,11 +77,11 @@ func (c *Client) stream(ctx context.Context, method, path string, data any, fn f
 	}
 
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return stackerr.Errorf("cancelled before we began: %w", ctx.Err())
 	}
 	response, err := c.http.Do(request)
 	if err != nil {
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 	defer func() { _ = response.Body.Close() }()
 
