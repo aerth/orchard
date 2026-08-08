@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"m/pkg/global"
 	"m/pkg/llm"
 )
 
@@ -33,7 +34,7 @@ var (
 
 // Start kicks off the spinner in a background goroutine, writing to Out
 func Start(ctx context.Context) *Spinner {
-	if NoSpin || Out == nil || Out == io.Discard {
+	if NoSpin || Out == nil || Out == io.Discard || global.Get().Get().NoSpin {
 		return &Spinner{stopChan: nil}
 	}
 	s := &Spinner{
