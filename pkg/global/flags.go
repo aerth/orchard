@@ -14,26 +14,26 @@ import (
 )
 
 type ConfigInput struct {
-	Username              string
-	Botname               string
-	Treedir               string
-	Tooldir               string
-	Logfilename           string
-	ThreadID              uuid.UUID
-	HideToolCalls         bool
-	ShowToolOuts          bool
-	ShowRequests          bool
-	JsonOutput            bool
-	NoColor               bool
-	NoSpin                bool
-	SystemPrompt          string
-	AddSystemPrompt       string
-	InitialUserPrompt     string
-	TempDir               string // known good location (["./tmp/" or /tmp/foo or, 'none' for no tempdir.])
-	Dir                   string // the Working Directory
-	ShowThinking          bool
-	SidebarDuration       time.Duration
-	StreamRefreshDuration time.Duration
+	Username           string
+	Botname            string
+	Treedir            string
+	Tooldir            string
+	Logfilename        string
+	ThreadID           uuid.UUID
+	HideToolCalls      bool
+	ShowToolOuts       bool
+	ShowRequests       bool
+	JsonOutput         bool
+	NoColor            bool
+	NoSpin             bool
+	SystemPrompt       string
+	AddSystemPrompt    string
+	InitialUserPrompt  string
+	TempDir            string // known good location (["./tmp/" or /tmp/foo or, 'none' for no tempdir.])
+	Dir                string // the Working Directory
+	ShowThinking       bool
+	SidebarRefreshRate time.Duration
+	StreamRefreshRate  time.Duration
 }
 type cfginput = ConfigInput
 
@@ -66,8 +66,8 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
 	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
-	flag.DurationVar(&cfg.StreamRefreshDuration, "stream-rate", cfg.StreamRefreshDuration, "rate of stream refresh (UI)")
-	flag.DurationVar(&cfg.SidebarRefreshRate, "stream-rate", cfg.StreamRefreshDuration, "rate of stream refresh (UI)")
+	flag.DurationVar(&cfg.StreamRefreshRate, "stream-rate", cfg.StreamRefreshRate, "rate of stream refresh (UI)")
+	flag.DurationVar(&cfg.SidebarRefreshRate, "sidebar-rate", cfg.SidebarRefreshRate, "rate of sidebar refresh (UI)")
 	flag.Func("thread", "uuid", func(s string) error {
 		if s == "test" {
 			cfg.ThreadID = SingleThreadID
