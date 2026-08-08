@@ -126,9 +126,6 @@ Chat:
 		}
 		shouldBreak := err != nil
 
-		if errors.Is(err, context.Canceled) && ctx.Err() != nil {
-			err = context.Cause(ctx) // get our underlying error like 'ctrl+c pressed'
-		}
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
@@ -136,7 +133,10 @@ Chat:
 			return err
 		}
 		if errors.Is(err, context.Canceled) {
-			newcaller.Content += " (this reply was cancelled by user before it finished)"
+			if errors.Is(err, context.Canceled) && ctx.Err() != nil {
+				err = context.Cause(ctx) // get our underlying error like 'ctrl+c pressed'
+			}
+			newcaller.Content += " (this reply was cancelled by user before it finished: " + err.Error() + ")"
 		}
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
 		// handle tools
