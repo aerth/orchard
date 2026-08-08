@@ -5,11 +5,9 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-
 	"m/pkg/chat"
-	"m/pkg/types/chatmessages"
-
 	"m/pkg/hgr/hgr2"
+	"m/pkg/types/chatmessages"
 
 	"github.com/google/uuid"
 )
