@@ -66,6 +66,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
 	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
+	flag.DurationVar(&cfg.StreamRefreshDuration, "stream-rate", cfg.StreamRefreshDuration, "rate of stream refresh (UI)")
 	flag.Func("thread", "uuid", func(s string) error {
 		if s == "test" {
 			cfg.ThreadID = SingleThreadID
