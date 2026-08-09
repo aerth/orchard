@@ -25,7 +25,6 @@ type PreReview struct {
 
 func DoReview(ctx context.Context, info PreReview, e chat.Ext) (string, error) {
 	reviewID := uuid.New()
-	_ = chat.Chat
 	return "", fmt.Errorf("review not implemented here yet")
 }
 
