@@ -206,7 +206,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 						session.LockStart)
 				} else {
 					newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked and targeted for replacement.\n"+
-						"Your reply will directly replace this line range, inserting/deleting lines. (or CANCEL to return to normal mode).",
+						"Your reply will directly replace this line range, inserting/deleting lines if your reply contains a different number of lines. (or CANCEL to return to normal mode).",
 						session.LockStart, session.LockEnd)
 				}
 			}
