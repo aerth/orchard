@@ -184,6 +184,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 		session.LockStart = 0
 		session.LockEnd = 0
 	}()
+	var filesModifiedList []string
 	for ctx.Err() == nil {
 		rounds++
 		if rounds > MaxRounds {
