@@ -1,6 +1,7 @@
 package implv2
 
 import (
+	"strings"
 	"testing"
 
 	"m/pkg/types/chatmessages"
@@ -33,6 +34,12 @@ def greeting():
 		*chatmessages.NewFromRole("", "assistant", "Hi, how can I help you?"),
 		*chatmessages.NewFromRole("", "user", "Capitalize the words in the function"),
 	}.WithThreadID(threadID)
-	DoReview(t.Context(), PreReview{History: convo, Work: nil, Before: strings.Split(before,"\n"),
-		After: strings.Split(after,  "\n")}, e chat.Ext)
+	DoReview(
+		t.Context(), PreReview{
+			History: convo,
+			Work:    nil,
+			Before:  strings.Split(before, "\n"),
+			After:   strings.Split(after, "\n"),
+		},
+	)
 }
