@@ -346,6 +346,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			stack = append(stack, msg)
 			handler.HandleToolOutputs(msg)
 			numberFilesEdited++
+			filesModifiedList = append(filesModifiedList, session.ActiveFile)
 			break
 		}
 		if err != nil {
