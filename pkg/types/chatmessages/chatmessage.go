@@ -294,6 +294,19 @@ func (cm ChatMessages) TopRole(role string) ChatMessage {
 	return ChatMessage{}
 }
 
+func (cm ChatMessages) FormatTextIf(username, botname string) string {
+	var str strings.Builder
+	for _, v := range cm {
+
+		u, b := username, botname
+		if v.From != "" {
+			u, b = "", ""
+		}
+		str.WriteString(v.FormatText(u, b))
+	}
+	return str.String()
+}
+
 func (cm ChatMessages) FormatText(username, botname string) string {
 	var str strings.Builder
 	for _, v := range cm {
