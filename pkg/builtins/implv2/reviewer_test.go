@@ -38,7 +38,7 @@ def greeting():
 		*chatmessages.NewFromRole("", "user", "Capitalize the words in the function"),
 	}.WithThreadID(threadID)
 	cl := debugging.NewConsoleLogger(os.Stderr)
-	DoReview(
+	got, err := DoReview(
 		t.Context(), PreReview{
 			History:  convo,
 			Work:     nil,
