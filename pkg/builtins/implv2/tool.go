@@ -114,7 +114,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	return got, err
 }
 
-func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, toolCallIndex int, call chatmessages.Call[haspath], threadID uuid.UUID) (chatmessages.ChatMessages, error) {
+func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, toolCallIndex int, call chatmessages.Call[haspath], parentThreadID uuid.UUID) (chatmessages.ChatMessages, error) {
 	path := call.Function.Arguments.Path
 	intent := call.Function.Arguments.Intent
 	{
