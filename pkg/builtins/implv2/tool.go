@@ -95,8 +95,6 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	if err != nil {
 		return nil, stackerr.Errorf("%w", err)
 	}
-	path := call.Function.Arguments.Path
-	intent := call.Function.Arguments.Intent
 	threadID := e.Ext.ThreadID
 	if threadID == uuid.Nil {
 		threadID = e.Cfg.ThreadID
@@ -104,14 +102,16 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	if threadID == uuid.Nil {
 		threadID = global.Get().Get().ThreadID
 	}
-	got, err := e.editToolInner(ctx, caller, toolCallIndex)
+	got, err := e.editToolInner(ctx, caller, toolCallIndex, call)
 	for i := range got {
 		got[i].ThreadID = threadID
 	}
 	return got, err
 }
 
-func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, toolCallIndex int, call chatmessages.Call[haspath]) (chatmessages.ChatMessages, error) {
+	path := call.Function.Arguments.Path
+	intent := call.Function.Arguments.Intent
 	{
 		errmsg := llm.Message{
 			Role:     "system",
