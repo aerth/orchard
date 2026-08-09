@@ -7,11 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
-
 	"m/pkg/chat"
 	"m/pkg/debugging"
 	"m/pkg/global"
@@ -20,6 +15,10 @@ import (
 	"m/pkg/toolrunner"
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -35,6 +34,7 @@ type EditorConfig struct {
 	GetHandler       func() chat.ChatHandlerPlus
 	GetSender        func(Result)
 	PreFunc          func(*llm.ChatRequest, string) error
+	ThreadID         uuid.UUID
 }
 
 var DefaultEditorConfig = &EditorConfig{
