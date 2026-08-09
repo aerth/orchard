@@ -185,6 +185,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 	for ctx.Err() == nil {
 		rounds++
 		if rounds > MaxRounds {
+			slog.Warn("hit max rounds")
 			break
 		}
 		slog := slog.With("lock", fmt.Sprintf("%d-%d", session.LockStart, session.LockEnd))
