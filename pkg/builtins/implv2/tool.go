@@ -174,8 +174,10 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 		handler = e.Cfg.GetHandler()
 	}
 
+	sessionThreadID := uuid.New() // new threadID for this work
+
 	m1 := *chatmessages.NewSystemEphemeral(SystemInstruction() + "\n\n# Intent\n" + intent) // global no state
-	m1.ThreadID = threadID
+	m1.ThreadID = sessionThreadID
 	handler.HandleToolOutputs(m1) // for display
 
 	defer func() {
@@ -193,9 +195,9 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 
 			newstate := *chatmessages.NewSystemEphemeral("")
 			newstate.Content = strings.Join([]string{card, session.SystemMessage()}, "\n")
-			newstate.ThreadID = threadID
+			newstate.ThreadID = sessionThreadID
 			newusermsg := *chatmessages.NewFromRole("auto", "user", "What is the next action? Use a single edit_file protocol command.")
-			newusermsg.ThreadID = threadID
+			newusermsg.ThreadID = sessionThreadID
 			if numLocked := session.NumLinesLocked(); numLocked != 0 {
 				if numLocked == 1 {
 					newusermsg.Content = fmt.Sprintf("Line %d is now locked and targeted for replacement."+
@@ -215,7 +217,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 
 		card = ""
 		newmsg := chatmessages.NewFromRole(ext.From, "assistant", "")
-		newmsg.ThreadID = threadID
+		newmsg.ThreadID = sessionThreadID
 		handlers := []chat.Handler{cl.HandleChatResponse, newmsg.GatherChatResponse}
 		if handler != nil {
 			handlers = append(handlers, handler.Handle) // stream to channel
@@ -275,7 +277,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 				n1, n2, err := ParseRange(session, actionsParsed[0].Content)
 				slog.Warn("deleting lines", "from", n1, "to", n2, "err", err)
 				if err != nil {
-					errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
+					errmsg := *chatmessages.NewThread(sessionThreadID, llm.Message{Role: "system"})
 					errmsg.Content = fmt.Sprintf("Delete Lines failed: %+v", err)
 					stack = append(stack, errmsg)
 					handler.HandleToolOutputs(errmsg)
@@ -295,7 +297,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
 			if err != nil {
 				slog.Error("surgical edit failed", "err", err)
-				errmsg := *chatmessages.NewThread(threadID, llm.Message{Role: "system"})
+				errmsg := *chatmessages.NewThread(sessionThreadID, llm.Message{Role: "system"})
 				errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
 				stack = append(stack, errmsg)
 				handler.HandleToolOutputs(errmsg)
@@ -340,7 +342,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 				messagesGathered = append(messagesGathered, "The file was successfully updated on the filesystem. Available operators: "+fmt.Sprintf("%q", AllOperations))
 				slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
 			}
-			msg := *chatmessages.NewThread(threadID, llm.Message{Role: "system", Content: "ACTION LOG:\n" + strings.Join(messagesGathered, "\n")})
+			msg := *chatmessages.NewThread(sessionThreadID, llm.Message{Role: "system", Content: "ACTION LOG:\n" + strings.Join(messagesGathered, "\n")})
 			stack = append(stack, msg)
 			handler.HandleToolOutputs(msg)
 			numberFilesEdited++
@@ -349,7 +351,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 		if err != nil {
 			slog.Error("parsing edit TODO", "err", err)
 			msg := *chatmessages.NewSystemEphemeral("Error: " + err.Error() + "\n\nTry again or use CANCEL to return to conversation")
-			msg.ThreadID = threadID
+			msg.ThreadID = sessionThreadID
 			stack = append(stack, msg)
 			handler.HandleToolOutputs(msg)
 			continue
@@ -363,7 +365,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			operators = append(operators, string(actionsParsed[i].Op))
 			resp := session.ApplyAction(actionsParsed[i])
 			if responseWriter == nil && handler != nil {
-				handler.HandleToolOutputs(NewResultMessage(threadID, resp))
+				handler.HandleToolOutputs(NewResultMessage(sessionThreadID, resp))
 			}
 			if responseWriter != nil {
 				responseWriter(resp)
@@ -382,7 +384,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 	)}
 	slog.Info("done editing", "out", toolout.Content)
 	outmsg1 := *chatmessages.New(toolout)
-	outmsg1.ThreadID = threadID
+	outmsg1.ThreadID = parentThreadID
 	handler.HandleToolOutputs(outmsg1)
 	outmsgs := chatmessages.A{outmsg1}
 	outmsgs = outmsgs.RemoveThoughts()
