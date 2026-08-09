@@ -377,7 +377,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 
 	toolout := llm.Message{Role: "tool", Content: fmt.Sprintf(
 		"You are no longer in the `edit_file` tool state machine.\n## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords previously used in this session: %q\n\nMost recent file view:\n\n```\n%s```\n",
-		stack[startstacklen:].RemoveThoughts().TopN(20).FormatText("", ""), operators, session.CurrentView(),
+		stack[startstacklen:].RemoveThoughts().TopN(20).FormatTextIf(EditorName, EditorName), operators, session.CurrentView(),
 	)}
 	slog.Info("done editing", "out", toolout.Content)
 	outmsg1 := *chatmessages.New(toolout)
