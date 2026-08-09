@@ -102,7 +102,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	if threadID == uuid.Nil {
 		threadID = global.Get().Get().ThreadID
 	}
-	got, err := e.editToolInner(ctx, caller, toolCallIndex, call)
+	got, err := e.editToolInner(ctx, caller, toolCallIndex, call, threadID)
 	for i := range got {
 		got[i].ThreadID = threadID
 		if got[i].MessageID == uuid.Nil {
@@ -112,7 +112,7 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	return got, err
 }
 
-func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, toolCallIndex int, call chatmessages.Call[haspath]) (chatmessages.ChatMessages, error) {
+func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, toolCallIndex int, call chatmessages.Call[haspath], threadID uuid.UUID) (chatmessages.ChatMessages, error) {
 	path := call.Function.Arguments.Path
 	intent := call.Function.Arguments.Intent
 	{
