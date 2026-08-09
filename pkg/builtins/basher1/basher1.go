@@ -35,6 +35,7 @@ var reviewerText = []string{
 	"Scripts should not modify files outside of the project directory.",
 	"Scripts should not use any base64 and never fetch remote content.",
 	"Scripts should never be obfuscated.",
+	"Typical repository-management one-liners such as mv,cp,cat,rg,grep,sed that **do not escape this directory** are allowed quickly.",
 	"If the script looks shady, say BAD.",
 	"If the script is unsafe, malicious, obfuscated, or removes *any* files, output BAD quickly with optional reason.",
 }
@@ -118,44 +119,48 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 		calls := slices.Collect(maps.Keys(call2.Function.Arguments))
 		return nil, stackerr.Errorf("empty 'code' function argument, got %q instead, but this function only requires 'code' parameter", calls)
 	}
-	ch := make(chan error)
-	numReviews := GetNumReviews()
-	if ctx.Err() != nil {
-		return nil, context.Cause(ctx)
-	}
-	err = errStart
-	for range numReviews {
-		go doShellReview(ctx, ch, code)
-	}
-	for range numReviews {
-		e := <-ch
-		if err == errStart { // err has not been assigned. this is first error, even nil
-			if e != nil {
-				slog.Error("got err", "err", err)
-			}
-			err = e // not errStart anymore
-			continue
-		}
-		if e != nil { // join with previous errors
-			slog.Error("got err", "err", e)
-			err = errors.Join(err, e)
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	if !isOkBashCode(code) {
-		if err := implv2.ConfirmAction(ctx, "Run this bash code? "+code); err != nil {
-			cause := err.Error()
+	// PRE_RUN
+	{
+		if !isGoDoc(code) {
+			ch := make(chan error)
+			numReviews := GetNumReviews()
 			if ctx.Err() != nil {
-				cause = context.Cause(ctx).Error()
+				return nil, context.Cause(ctx)
 			}
-			return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it. Cause: %s.", cause)
+			err = errStart
+			for range numReviews {
+				go doShellReview(ctx, ch, code)
+			}
+			for range numReviews {
+				e := <-ch
+				if err == errStart { // err has not been assigned. this is first error, even nil
+					if e != nil {
+						slog.Error("got err", "err", err)
+					}
+					err = e // not errStart anymore
+					continue
+				}
+				if e != nil { // join with previous errors
+					slog.Error("got err", "err", e)
+					err = errors.Join(err, e)
+				}
+			}
+			if err != nil {
+				return nil, err
+			}
 		}
-	}
-	if !strings.Contains(code, "\n") {
-		previouslyWhitelisted = append(previouslyWhitelisted, code)
+		if !isOkBashCode(code) {
+			if err := implv2.ConfirmAction(ctx, "Run this bash code? "+code); err != nil {
+				cause := err.Error()
+				if ctx.Err() != nil {
+					cause = context.Cause(ctx).Error()
+				}
+				return nil, stackerr.Errorf("the User denied this code, provide a different bash command or ask why they denied it. Cause: %s.", cause)
+			}
+		}
+		if !strings.Contains(code, "\n") {
+			previouslyWhitelisted = append(previouslyWhitelisted, code)
+		}
 	}
 
 	var got string
@@ -178,8 +183,48 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	return chatmessages.ChatMessages{*gotmsg}, nil
 }
 
-var oneliners = []string{
-	"make",
+var oneliners = [][]string{
+	{"make"},
+}
+
+func isOneliner(code string) bool {
+	cmdline, plain := getPlain(code)
+	if !plain {
+		return false
+	}
+	l := len(cmdline)
+	if l == 2 && slices.Contains([]string{""}, cmdline[0]) {
+		return true
+	}
+
+	for i := range oneliners {
+		if slices.Equal(oneliners[i], cmdline) {
+			return true
+		}
+	}
+	return false
+}
+
+func getPlain(code string) ([]string, bool) {
+	fields := strings.Fields(code)
+
+	npipe := strings.Count(code, "|")
+	if npipe == 1 && strings.Contains(code, "| grep") {
+		npipe = 0
+	}
+	plain := !strings.Contains(code, ";") && !strings.Contains(code, "&") && npipe == 0
+
+	return fields, plain
+}
+
+func isGoDoc(code string) bool {
+	fields, plain := getPlain(code)
+	if plain && len(fields) > 0 && fields[0] == "go" && fields[1] == "doc" {
+		return true
+	}
+	//
+
+	return false
 }
 
 // not a security check. let it touch and cat eof heredoc without bugging user with confirmation modal popup. (TODO: more accurate)
@@ -187,10 +232,14 @@ func isOkBashCode(code string) bool {
 	if code == "" {
 		return false
 	}
+
 	if strings.Contains(code, "../") {
 		return false
 	}
-	if slices.Contains(oneliners, code) {
+	if isOneliner(code) {
+		return true
+	}
+	if isGoDoc(code) {
 		return true
 	}
 	if strings.HasPrefix(code, "make ") && strings.Count(code, " ") == 1 {
