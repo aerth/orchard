@@ -102,12 +102,12 @@ When tasked with repetitive file modifications (e.g., removing all empty lines, 
 `
 
 type Session struct {
-	editor      *EditorTool
-	ActiveFile  string   // Selected filename
-	Lines       []string // The cached file content split by line
-	oldlines    []string // pre edit
-	CurrentLine int      // The top line number currently visible in the chunk window
-	ChunkSize   int      // How many lines to send in a chunk (e.g., 50)
+	editor       *EditorTool
+	ActiveFile   string   // Selected filename
+	Lines        []string // The cached file content split by line
+	oldlines     []string // pre edit
+	CurrentLine  int      // The top line number currently visible in the chunk window
+	ViewportSize int      // How many lines to send in a chunk (e.g., 50)
 
 	// Lock bounds (1-based line numbers)
 	LockStart int
@@ -125,7 +125,7 @@ func (s Session) CurrentView() string {
 		return "(no current view)"
 	}
 	startIdx := max(s.CurrentLine-1, 0)
-	endIdx := min(startIdx+s.ChunkSize, len(s.Lines))
+	endIdx := min(startIdx+s.ViewportSize, len(s.Lines))
 	// 2. Build the visual representation of the active file chunk
 	var chunkBuilder strings.Builder
 	if s.ActiveFile == "" {
@@ -246,7 +246,7 @@ Note: Asterisks ('*') mark LOCKed lines
 		lockStatus,
 		len(s.Lines),
 		s.CurrentLine,
-		min(s.CurrentLine+s.ChunkSize, len(s.Lines)),
+		min(s.CurrentLine+s.ViewportSize, len(s.Lines)),
 		viewportview,
 	)
 	return normal + HowTo
@@ -325,8 +325,8 @@ func (s *Session) Refresh() Result {
 	s.Lines = strings.Split(string(data), "\n")
 	s.CurrentLine = 1 // Reset viewport tracking
 	s.LockStart, s.LockEnd = 0, 0
-	if s.ChunkSize == 0 {
-		s.ChunkSize = DefaultChunkSize
+	if s.ViewportSize == 0 {
+		s.ViewportSize = DefaultChunkSize
 	}
 	return Result{}
 }
@@ -382,8 +382,8 @@ func (s *Session) ApplyAction(action Action) Result {
 		if s.ActiveFile == "" {
 			return Result{E: fmt.Errorf("no active file selected, use %s first", OpFilename), Code: CodeError}
 		}
-		if s.CurrentLine+s.ChunkSize <= len(s.Lines) {
-			s.CurrentLine += s.ChunkSize
+		if s.CurrentLine+s.ViewportSize <= len(s.Lines) {
+			s.CurrentLine += s.ViewportSize
 		}
 		return Result{Code: CodeNavigated}
 
@@ -391,7 +391,7 @@ func (s *Session) ApplyAction(action Action) Result {
 		if s.ActiveFile == "" {
 			return Result{E: fmt.Errorf("no active file selected, use %s first", OpFilename), Code: CodeError}
 		}
-		s.CurrentLine -= s.ChunkSize
+		s.CurrentLine -= s.ViewportSize
 		if s.CurrentLine < 1 {
 			s.CurrentLine = 1
 		}
@@ -432,7 +432,7 @@ func (s *Session) ApplyAction(action Action) Result {
 		}
 
 		// Shift viewport to center around the found line target
-		newline := max(targetLine-(s.ChunkSize/2), 1)
+		newline := max(targetLine-(s.ViewportSize/2), 1)
 		if s.CurrentLine == newline {
 			return Result{Code: CodeNavigated, Message: fmt.Sprintf("We have already centered the viewport at line %d. %s", newline, always)}
 		}
