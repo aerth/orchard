@@ -68,7 +68,7 @@ func Differ(id uuid.UUID, before, after string) (string, error) {
 		}
 		defer func() {
 			if err := os.Remove(file1); err != nil {
-				slog.Error("could not remove temp file", "path", file1, "err", err)
+				slog.Error("could not remove temp file A", "path", file1, "err", err)
 			}
 		}()
 	}
@@ -79,8 +79,8 @@ func Differ(id uuid.UUID, before, after string) (string, error) {
 			return "", stackerr.Errorf("%w", err)
 		}
 		defer func() {
-			if err := os.Remove(file1); err != nil {
-				slog.Error("could not remove temp file", "path", file1, "err", err)
+			if err := os.Remove(file2); err != nil {
+				slog.Error("could not remove temp file B", "path", file2, "err", err)
 			}
 		}()
 	}
