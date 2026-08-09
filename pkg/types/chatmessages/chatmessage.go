@@ -248,10 +248,11 @@ func WithThreadID(threadID uuid.UUID, cm ChatMessages) ChatMessages {
 	}
 	return cm
 }
-}
 
 func (cm ChatMessages) WithThreadID(threadID uuid.UUID) ChatMessages {
 	cm = slices.Clone(cm)
+	return WithThreadID(threadID, cm)
+}
 
 func (cm ChatMessages) RemoveNonThread(d uuid.UUID) A {
 	a := slices.DeleteFunc(slices.Clone(cm), func(v ChatMessage) bool {
