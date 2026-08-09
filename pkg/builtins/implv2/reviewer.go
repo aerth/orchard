@@ -9,13 +9,12 @@ import (
 	"path/filepath"
 
 	"m/pkg/chat"
-	"m/pkg/types/chatmessages"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )
 
-func DoReview(ctx context.Context, prev chatmessages.A, e chat.Ext) (string, error) {
+func DoReview(ctx context.Context, info PreReview, e chat.Ext) (string, error) {
 	reviewID := uuid.New()
 	_ = chat.Chat
 	return "", fmt.Errorf("review not implemented here yet")
