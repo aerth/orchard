@@ -378,9 +378,11 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 		}
 	}
 
-	toolout := llm.Message{Role: "tool", Content: fmt.Sprintf(
+	newer := stack[startstacklen:].RemoveThoughts().TopN(20)
+	FirstLineSystemOnly(newer)
+	toolout := llm.Message{Role: "tool", ToolName: call.Function.Name, ToolCallID: call.ID, Content: fmt.Sprintf(
 		"You are no longer in the `edit_file` tool state machine.\n## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords previously used in this session: %q\n\nMost recent file view:\n\n```\n%s```\n",
-		stack[startstacklen:].RemoveThoughts().TopN(20).FormatTextIf(EditorName, EditorName), operators, session.CurrentView(),
+		newer.FormatTextIf(EditorName, EditorName), operators, session.CurrentView(),
 	)}
 	slog.Info("done editing", "out", toolout.Content)
 	outmsg1 := *chatmessages.New(toolout)
@@ -458,4 +460,12 @@ func writeAtomic(path string, data []byte) error {
 	}
 
 	return os.Rename(tempFile.Name(), path)
+}
+
+func FirstLineSystemOnly(a chatmessages.ChatMessages) {
+	for i := range a {
+		if a[i].Role == "system" {
+			a[i].Content = strings.Split(a[i].Content, "\n")[0]
+		}
+	}
 }
