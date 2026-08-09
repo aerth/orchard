@@ -99,6 +99,8 @@ When tasked with repetitive file modifications (e.g., removing all empty lines, 
 
 **Prioritize Protocol Execution over Meta-Conversation.** If the path forward is obvious via the protocol commands, execute it without discussion.
 
+If this editor session failed, or is dragging on too long, use CANCEL to return to the conversation.
+
 `
 
 type Session struct {
