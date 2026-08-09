@@ -104,7 +104,14 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	if threadID == uuid.Nil {
 		threadID = global.Get().Get().ThreadID
 	}
+	got, err := e.editToolInner(ctx, caller, toolCallIndex)
+	for i := range got {
+		got[i].ThreadID = threadID
+	}
+	return got, err
+}
 
+func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	{
 		errmsg := llm.Message{
 			Role:     "system",
