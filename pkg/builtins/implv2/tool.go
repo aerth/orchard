@@ -7,6 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+
 	"m/pkg/chat"
 	"m/pkg/debugging"
 	"m/pkg/global"
@@ -15,10 +20,6 @@ import (
 	"m/pkg/toolrunner"
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -379,8 +380,8 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 	)}
 	slog.Info("done editing", "out", toolout.Content)
 	outmsg1 := *chatmessages.New(toolout)
-	handler.HandleToolOutputs(outmsg1)
 	outmsg1.ThreadID = threadID
+	handler.HandleToolOutputs(outmsg1)
 	outmsgs := chatmessages.A{outmsg1}
 	outmsgs = outmsgs.RemoveThoughts()
 	_ = json.NewEncoder(global.LogWriter).Encode(stack[startstacklen:])
