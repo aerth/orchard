@@ -43,7 +43,7 @@ After the replacement message is sent, the change is made in our in-memory sessi
 ### Moving the viewport
 
 In a large file, we can use GOTO to center the viewport at a line number, or the next occurance of a string.
-For example,
+For example, an example session may use GOTO to navigate line numbers:
 	GOTO 40
 	LOCK 45
 	def greet():
