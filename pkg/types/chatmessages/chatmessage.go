@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -240,6 +241,10 @@ func (cm ChatMessages) Contents() string {
 }
 
 type ChatMessages []ChatMessage
+
+func (cm ChatMessages) WithThreadID(threadID uuid.UUID) any {
+	panic("unimplemented")
+}
 
 func (cm ChatMessages) RemoveNonThread(d uuid.UUID) A {
 	a := slices.DeleteFunc(slices.Clone(cm), func(v ChatMessage) bool {
