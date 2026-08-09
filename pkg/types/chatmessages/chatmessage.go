@@ -428,7 +428,7 @@ func (cm ChatMessages) Raw() llm.Messages {
 		case mx == 0:
 		case mx < distance:
 			suffix = fmt.Sprintf("was forgotten after %d (currently %d)", mx, distance)
-		case mx != 0 && mx < 20:
+		case mx != 0 && (mx-distance) < 4:
 			suffix = fmt.Sprintf("will be forgotten after %d more messages.", mx-distance)
 		}
 		if mx != 0 && mx < distance {
