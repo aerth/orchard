@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"m/pkg/chat"
 	"m/pkg/types/chatmessages"
 
 	"github.com/google/uuid"
@@ -36,10 +37,11 @@ def greeting():
 	}.WithThreadID(threadID)
 	DoReview(
 		t.Context(), PreReview{
-			History: convo,
-			Work:    nil,
-			Before:  strings.Split(before, "\n"),
-			After:   strings.Split(after, "\n"),
-		},
+			History:  convo,
+			Work:     nil,
+			Before:   strings.Split(before, "\n"),
+			After:    strings.Split(after, "\n"),
+			Filename: "/tmp/non124.txt",
+		}, chat.Ext{},
 	)
 }
