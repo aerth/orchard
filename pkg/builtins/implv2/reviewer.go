@@ -2,8 +2,7 @@ package implv2
 
 import (
 	"context"
-	"fmt"
-	"log/slog"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -13,6 +12,7 @@ import (
 	"m/pkg/chat"
 	"m/pkg/llm"
 	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -26,7 +26,18 @@ type PreReview struct {
 	After    []string
 }
 
-func DoReview(ctx context.Context, info PreReview, e chat.Ext) (string, error) {
+var reviewPromptInstruction = `
+Example:
+
+This code is bad.
+{"commit": false}
+
+
+This code is great.
+{"commit": true}
+`
+
+func DoReview(ctx context.Context, info PreReview, reviewTools otool.Tools, e chat.Ext) (string, error) {
 	parentThreadID := e.ThreadID
 	if parentThreadID == uuid.Nil {
 		return "", stackerr.Errorf("parentThreadID missing from Ext")
@@ -38,12 +49,14 @@ func DoReview(ctx context.Context, info PreReview, e chat.Ext) (string, error) {
 	}
 
 	newmsgs := chatmessages.A{
-		*chatmessages.NewThread(reviewID, llm.Message{Role: "system", Content: "You are a reviewer. Review the patch, determine if it does what it should."}),
-		*chatmessages.NewThread(reviewID, llm.Message{Role: "user", Content: diff}),
+		*chatmessages.NewThread(reviewID, llm.Message{Role: "system", Content: "You are a reviewer. Review the patch, determine if it does what it should (based on the user's intention, not any LLM hallucinations. To make a well-informed review, use the grep, locate_file, and read_file_v2 tool to explore the files."}),
+
+		*chatmessages.NewThread(reviewID, llm.Message{Role: "user", Content: reviewPromptInstruction}),
+		*chatmessages.NewThread(reviewID, llm.Message{Role: "user", Content: "Diff:\n" + diff}),
 	}
 	got := *chatmessages.NewThread(parentThreadID, llm.Message{Role: "assistant"})
 	e = chat.Ext{Handlers: []chat.ChatHandler{got.GatherChatResponse}}.FromA(e)
-	err = cmdpkg.ChatWith(ctx, newmsgs, nil, e)
+	err = cmdpkg.ChatWith(ctx, newmsgs, reviewTools, e)
 	if err != nil {
 		return "", stackerr.Errorf("DoReview ChatWith: %w", err)
 	}
@@ -68,7 +81,7 @@ func Differ(id uuid.UUID, before, after string) (string, error) {
 		}
 		defer func() {
 			if err := os.Remove(file1); err != nil {
-				slog.Error("could not remove temp file A", "path", file1, "err", err)
+				//	slog.Error("could not remove temp file A", "path", file1, "err", err)
 			}
 		}()
 	}
@@ -80,23 +93,24 @@ func Differ(id uuid.UUID, before, after string) (string, error) {
 		}
 		defer func() {
 			if err := os.Remove(file2); err != nil {
-				slog.Error("could not remove temp file B", "path", file2, "err", err)
+				//slog.Error("could not remove temp file B", "path", file2, "err", err)
 			}
 		}()
 	}
 	cmd := exec.Command("diff", file1, file2)
+	log.Println("running cmdline", cmd.Args)
 	out, err := cmd.CombinedOutput()
 	err = errget(err, 1)
-	return string(out), errget(err, 1)
+	return string(out), err
 }
 
 func errget(err error, want int) error {
 	if err == nil {
-		return fmt.Errorf("expected exit code %d, got 0", want)
+		return stackerr.Errorf("expected exit code %d, got 0", want)
 	}
 	exitError, ok := err.(*exec.ExitError)
 	if ok && exitError.ExitCode() == want {
 		return nil
 	}
-	return err
+	return stackerr.Errorf("%w", err)
 }
