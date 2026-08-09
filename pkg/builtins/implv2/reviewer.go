@@ -9,10 +9,15 @@ import (
 	"path/filepath"
 
 	"m/pkg/chat"
+	"m/pkg/types/chatmessages"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )
+
+type PreReview struct {
+	A chatmessages.A
+}
 
 func DoReview(ctx context.Context, info PreReview, e chat.Ext) (string, error) {
 	reviewID := uuid.New()
