@@ -50,6 +50,9 @@ For example, an example session may use GOTO to navigate line numbers:
 		hello world
 	GOTO 90
 	DELETE_LINES 94
+Or, use GOTO to find a string:
+	GOTO greet() // this goes to the next occurance of "greet"
+	GOTO greet() // if there is no next occurance, it will wrap the document and return the first.
 	
 
 
