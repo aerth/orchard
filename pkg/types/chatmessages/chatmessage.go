@@ -242,13 +242,16 @@ func (cm ChatMessages) Contents() string {
 
 type ChatMessages []ChatMessage
 
-func (cm ChatMessages) WithThreadID(threadID uuid.UUID) ChatMessages {
-	cm = slices.Clone(cm)
+func WithThreadID(threadID uuid.UUID, cm ChatMessages) ChatMessages {
 	for i := range cm {
 		cm[i].ThreadID = threadID
 	}
 	return cm
 }
+}
+
+func (cm ChatMessages) WithThreadID(threadID uuid.UUID) ChatMessages {
+	cm = slices.Clone(cm)
 
 func (cm ChatMessages) RemoveNonThread(d uuid.UUID) A {
 	a := slices.DeleteFunc(slices.Clone(cm), func(v ChatMessage) bool {
