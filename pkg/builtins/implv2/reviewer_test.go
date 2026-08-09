@@ -49,4 +49,7 @@ def greeting():
 			Handlers: []chat.ChatHandler{cl.HandleChatResponse},
 		},
 	)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
