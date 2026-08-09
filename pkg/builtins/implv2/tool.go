@@ -382,7 +382,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 
 	FirstLineSystemOnly(newer)
 	toolout := llm.Message{Role: "tool", ToolName: call.Function.Name, ToolCallID: call.ID, Content: fmt.Sprintf(
-		"Files were modified: %q. You are no longer in the `edit_file` tool state machine.\n## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords previously used in this session: %q\n\nMost recent file view:\n\n```\n%s```\n",
+		"You have returned from the `edit_file` tool session. Files were modified: %q. You are no longer in the `edit_file` tool state machine.\n## Transcript of editor session (abbreviated, not raw)\n\n```\n%s\n```\n\n### Operation keywords previously used in this session: %q\n\nMost recent file view:\n\n```\n%s```\n",
 		filesModifiedList,
 		newer.FormatTextIf(EditorName, EditorName), operators, session.CurrentView(),
 	)}
