@@ -105,6 +105,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	got, err := e.editToolInner(ctx, caller, toolCallIndex, call)
 	for i := range got {
 		got[i].ThreadID = threadID
+		if got[i].MessageID == uuid.Nil {
+			got[i].MessageID = uuid.New()
+		}
 	}
 	return got, err
 }
