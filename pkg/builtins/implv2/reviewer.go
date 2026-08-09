@@ -16,7 +16,9 @@ import (
 )
 
 type PreReview struct {
-	A chatmessages.A
+	A      chatmessages.A
+	Before []string
+	After  []string
 }
 
 func DoReview(ctx context.Context, info PreReview, e chat.Ext) (string, error) {
