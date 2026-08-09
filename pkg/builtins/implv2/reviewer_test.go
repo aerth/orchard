@@ -3,6 +3,8 @@ package implv2
 import (
 	"testing"
 
+	"m/pkg/types/chatmessages"
+
 	"github.com/google/uuid"
 )
 
@@ -25,4 +27,6 @@ def greeting():
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	convo := chatmessages.NewFromRole("", "", "")
 }
