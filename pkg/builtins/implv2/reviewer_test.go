@@ -52,4 +52,6 @@ def greeting():
 	if err != nil {
 		t.Fatal(err)
 	}
+	println("GOT REVIEW")
+	println(got)
 }
