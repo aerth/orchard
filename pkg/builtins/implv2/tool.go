@@ -210,6 +210,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 						session.LockStart, session.LockEnd)
 				}
 			}
+			newusermsg.MaxDistance = 2
 			stack = append(stack, m1, newstate, newusermsg)
 			handler.HandleToolOutputs(newstate)
 			handler.HandleToolOutputs(newusermsg)
