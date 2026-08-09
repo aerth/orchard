@@ -64,7 +64,7 @@ func Differ(id uuid.UUID, before, after string) (string, error) {
 		file1 = filepath.Join(dir, "A.txt")
 		err = os.WriteFile(file1, []byte(before), 0o600)
 		if err != nil {
-			return "", stackerr.Errorf("%w", err)
+			return "", stackerr.Errorf("writefile A: %w", err)
 		}
 		defer func() {
 			if err := os.Remove(file1); err != nil {
@@ -76,7 +76,7 @@ func Differ(id uuid.UUID, before, after string) (string, error) {
 		file2 = filepath.Join(dir, "B.txt")
 		err = os.WriteFile(file2, []byte(after), 0o600)
 		if err != nil {
-			return "", stackerr.Errorf("%w", err)
+			return "", stackerr.Errorf("writefile B: %w", err)
 		}
 		defer func() {
 			if err := os.Remove(file2); err != nil {
