@@ -25,6 +25,7 @@ SELECT_FILE <filename>  - Select a target file to load its initial memory snapsh
 NEXT_CHUNK             - Move the view window forward by one chunk size.
 PREV_CHUNK             - Move the view window backward by one chunk size.
 GOTO <search_string>   - Jump the view window to center around a literal code string match.
+GOTO <line_number>     - Jump the view window to center around a line number.
 LOCK <start>-<end>     - Lock explicit, 1-based line numbers to prepare for a surgical edit.
 CANCEL                 - Unlock the lines, returning to previous mode.
 
