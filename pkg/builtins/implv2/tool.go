@@ -201,11 +201,11 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			newusermsg.ThreadID = sessionThreadID
 			if numLocked := session.NumLinesLocked(); numLocked != 0 {
 				if numLocked == 1 {
-					newusermsg.Content = fmt.Sprintf("Line %d is now locked and targeted for replacement."+
+					newusermsg.Content = fmt.Sprintf("Line %d is now locked and targeted for replacement.\n"+
 						"Your reply will directly replace this line, and inserting additional lines if your reply contains more than 1 line. (or CANCEL to return to normal mode).",
 						session.LockStart)
 				} else {
-					newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked and targeted for replacement. "+
+					newusermsg.Content = fmt.Sprintf("Lines %d to %d are locked and targeted for replacement.\n"+
 						"Your reply will directly replace this line range, inserting/deleting lines. (or CANCEL to return to normal mode).",
 						session.LockStart, session.LockEnd)
 				}
