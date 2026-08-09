@@ -15,8 +15,9 @@ var (
 )
 
 type PlainChannelWrap[T any] struct {
-	GenID uuid.UUID
-	C     <-chan T
+	ThreadID uuid.UUID
+	GenID    uuid.UUID
+	C        <-chan T
 }
 type (
 	ChannelWrapper = PlainChannelWrap[ResponseWrap] // channel with UUID
