@@ -3,6 +3,7 @@ package global
 import (
 	"crypto/sha256"
 	"flag"
+	"fmt"
 	"log"
 	"log/slog"
 	"os"
@@ -49,7 +50,7 @@ func NewConfigFlags(clearfirst *bool) *Conf {
 }
 
 func (cfg *ConfigInput) Flags(clearfirst *bool) {
-	threadIdSet := false
+	threadIDSet := false // explicitly set from flag
 	flag.StringVar(&cfg.Username, "username", cfg.Username, "username like Bob or Chief")
 	flag.StringVar(&cfg.Botname, "bot", cfg.Botname, "username like Alice or project_manager")
 	flag.StringVar(&cfg.Treedir, "tree", cfg.Treedir, "tree for markdown files for system messages (employee descriptions and task templates)")
@@ -67,6 +68,15 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
 	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
 	flag.DurationVar(&cfg.StreamRefreshRate, "stream-rate", cfg.StreamRefreshRate, "rate of stream refresh (UI)")
+	flag.BoolFunc("help-full", "Show extended help including environment variables", func(s string) error {
+		fmt.Println("\nEnvironment Variables:")
+		fmt.Println("  ORCHARD_TREE     Path to the orchestration tree directory.")
+		fmt.Println("  ORCHARD_TOOLS    Path to the tools library.")
+		fmt.Println("  OLLAMA_MODEL     Model name for LLM requests.")
+		fmt.Println("  POSTGRES_DSN     Connection string for PostgreSQL database.")
+		os.Exit(1)
+		panic("unreachable")
+	})
 	flag.DurationVar(&cfg.SidebarRefreshRate, "sidebar-rate", cfg.SidebarRefreshRate, "rate of sidebar refresh (UI)")
 	flag.Func("thread", "uuid", func(s string) error {
 		if s == "test" {
@@ -75,10 +85,10 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		if strings.Count(s, "-") != 4 { // is a word
 			hashed := sha256.Sum256([]byte(s)) // 32
 			copy(cfg.ThreadID[:], hashed[:])   // 16
-			threadIdSet = true
+			threadIDSet = true
 			return nil
 		}
-		threadIdSet = true
+		threadIDSet = true
 		return cfg.ThreadID.UnmarshalText([]byte(s))
 	})
 	flag.StringVar(&cfg.Dir, "C", cfg.Dir, "change dir after loading stuff")
@@ -96,7 +106,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		time.Sleep(time.Second)
 	}
 
-	if !threadIdSet && cfg.ThreadID == uuid.Nil {
+	if !threadIDSet && cfg.ThreadID == uuid.Nil {
 		basename := filepath.Base(wd)
 		hashed := sha256.Sum256([]byte(basename)) // 32
 		copy(cfg.ThreadID[:], hashed[:])          // 16
