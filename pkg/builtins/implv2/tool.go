@@ -99,6 +99,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	intent := call.Function.Arguments.Intent
 	threadID := e.Ext.ThreadID
 	if threadID == uuid.Nil {
+		threadID = e.Cfg.ThreadID
+	}
+	if threadID == uuid.Nil {
 		threadID = global.Get().Get().ThreadID
 	}
 
