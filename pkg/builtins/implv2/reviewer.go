@@ -45,7 +45,7 @@ func DoReview(ctx context.Context, info PreReview, e chat.Ext) (string, error) {
 	e = chat.Ext{Handlers: []chat.ChatHandler{got.GatherChatResponse}}.FromA(e)
 	err = cmdpkg.ChatWith(ctx, newmsgs, nil, e)
 	if err != nil {
-		return "", stackerr.Errorf("%w", err)
+		return "", stackerr.Errorf("DoReview ChatWith: %w", err)
 	}
 	return got.Content, nil
 }
@@ -54,7 +54,7 @@ func DoReview(ctx context.Context, info PreReview, e chat.Ext) (string, error) {
 func Differ(id uuid.UUID, before, after string) (string, error) {
 	dir, err := os.MkdirTemp("", id.String())
 	if err != nil {
-		return "", stackerr.Errorf("%w", err)
+		return "", stackerr.Errorf("mkdirtemp: %w", err)
 	}
 	var (
 		file1 = "/dev/null"
