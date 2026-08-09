@@ -48,6 +48,10 @@ For example,
 	LOCK 45
 	def greet():
 		hello world
+	GOTO 90
+	DELETE_LINES 94
+	
+
 
 
 
