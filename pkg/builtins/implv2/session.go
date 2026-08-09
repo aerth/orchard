@@ -40,6 +40,17 @@ After the replacement message is sent, the change is made in our in-memory sessi
 
 	DELETE_LINES 4-5
 
+### Moving the viewport
+
+In a large file, we can use GOTO to center the viewport at a line number, or the next occurance of a string.
+For example,
+	GOTO 40
+	LOCK 45
+	def greet():
+		hello world
+
+
+
 ### Inserting text *before* or *after* another line requires two rounds:
 
 Given a file source-view such as:
