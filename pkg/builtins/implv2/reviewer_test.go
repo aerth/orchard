@@ -1,10 +1,12 @@
 package implv2
 
 import (
+	"os"
 	"strings"
 	"testing"
 
 	"m/pkg/chat"
+	"m/pkg/debugging"
 	"m/pkg/types/chatmessages"
 
 	"github.com/google/uuid"
@@ -35,6 +37,7 @@ def greeting():
 		*chatmessages.NewFromRole("", "assistant", "Hi, how can I help you?"),
 		*chatmessages.NewFromRole("", "user", "Capitalize the words in the function"),
 	}.WithThreadID(threadID)
+	cl := debugging.NewConsoleLogger(os.Stderr)
 	DoReview(
 		t.Context(), PreReview{
 			History:  convo,
@@ -42,6 +45,8 @@ def greeting():
 			Before:   strings.Split(before, "\n"),
 			After:    strings.Split(after, "\n"),
 			Filename: "/tmp/non124.txt",
-		}, chat.Ext{},
+		}, chat.Ext{
+			Handlers: []chat.ChatHandler{cl.HandleChatResponse},
+		},
 	)
 }
