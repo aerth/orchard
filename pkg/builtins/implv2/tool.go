@@ -384,9 +384,11 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 	handler.HandleToolOutputs(outmsg1)
 	outmsgs := chatmessages.A{outmsg1}
 	outmsgs = outmsgs.RemoveThoughts()
-	_ = json.NewEncoder(global.LogWriter).Encode(stack[startstacklen:])
 	slog.Info("editor returning messages", "n", len(outmsgs))
-	_ = json.NewEncoder(global.LogWriter).Encode(outmsgs)
+	if false {
+		_ = json.NewEncoder(global.LogWriter).Encode(stack[startstacklen:])
+		_ = json.NewEncoder(global.LogWriter).Encode(outmsgs)
+	}
 	session.LockStart = 0
 	session.LockEnd = 0
 	return outmsgs, nil
