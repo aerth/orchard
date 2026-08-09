@@ -28,5 +28,7 @@ def greeting():
 		t.Fatal(err)
 	}
 
+	convo := chatmessages.NewFromRole("", "user", "Hi")
+	convo := chatmessages.NewFromRole("", "assistant", "Hi, how can I help you?")
 	convo := chatmessages.NewFromRole("", "user", "Capitalize the words in the function")
 }
