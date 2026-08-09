@@ -12,3 +12,13 @@ The `chat.Ext` structure is used to contain Messages, Tools, and Hooks used in t
 
 While some applications may use it with only a single Handler, hook functions are available at every step in the process to customize or short-circuit the process.
 
+
+
+## Configuration
+
+| Variable | Description |
+| :--- | :--- |
+| `ORCHARD_TREE` | Path to the orchestration tree directory. |
+| `ORCHARD_TOOLS` | Path to the tools library. |
+| `OLLAMA_MODEL` | Model name for LLM requests. |
+| `POSTGRES_DSN` | Connection string for PostgreSQL database. |
