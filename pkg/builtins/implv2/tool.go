@@ -132,9 +132,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 	}
 
 	// begin loop
-	// var outmsgs chatmessages.A
-	// session := Session{ActiveFile: path, Intent: intent}
-	session := e.session
+	session := e.session // reuse same session ptr
 	session.ActiveFile = path
 	session.Intent = intent
 	slog := slog.With("filename", path)
