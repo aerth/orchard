@@ -76,6 +76,7 @@ func NewResultMessage(threadID uuid.UUID, resp Result) chatmessages.ChatMessage 
 	msg := *chatmessages.NewAux(resp)
 	msg.From = EditorName
 	msg.ThreadID = threadID
+	msg.Ephemeral = true
 	return msg
 }
 
