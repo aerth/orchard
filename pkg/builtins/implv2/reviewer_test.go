@@ -27,8 +27,10 @@ def greeting():
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	convo := chatmessages.NewFromRole("", "user", "Hi")
-	convo := chatmessages.NewFromRole("", "assistant", "Hi, how can I help you?")
-	convo := chatmessages.NewFromRole("", "user", "Capitalize the words in the function")
+	threadID := uuid.New()
+	convo := chatmessages.A{
+		*chatmessages.NewFromRole("", "user", "Hi"),
+		*chatmessages.NewFromRole("", "assistant", "Hi, how can I help you?"),
+		*chatmessages.NewFromRole("", "user", "Capitalize the words in the function"),
+	}.WithThreadID(threadID)
 }
