@@ -96,7 +96,7 @@ func main() {
 
 func main1(ctx context.Context) error {
 	var clearfirst bool
-	conf, err := cmdpkg.Initialize(&clearfirst)
+	conf, err := cmdpkg.Initialize(true, " ", &clearfirst)
 	if err != nil {
 		return stackerr.Errorf("initialize: %w", err)
 	}
