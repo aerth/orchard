@@ -105,16 +105,16 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	e.GenerateFooStage2(genID, c, ext2)
 }
 
-func (e2 XE) GenerateFooStage2(genID uuid.UUID, c chan<- hgr2.ResponseWrap, ext2 chat.Ext) {
+func (e2 XE) GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.ResponseWrap, ext2 chat.Ext) {
 	var tools otool.Tools
 	err := tools.FromMarshalers(ext2.Tools)
 	if err != nil {
-		fail(genID, stackerr.Errorf("unmarshalers: %w", err), e)
+		fail(ctx, genID, stackerr.Errorf("unmarshalers: %w", err))
 		return
 	}
 	err = cmdpkg.ChatWith(e.Context, e.ChatMessages, tools, ext2)
 	if err != nil {
-		fail(genID, stackerr.Errorf("ChatWith failed: %w", err), e)
+		fail(ctx, genID, stackerr.Errorf("ChatWith failed: %w", err))
 		return
 	}
 }
@@ -129,11 +129,11 @@ func Postfunc(genID uuid.UUID, c chan<- hgr2.ResponseWrap) func(err error) error
 	}
 }
 
-func fail(genID uuid.UUID, err error, e XE) {
-	slog := slog.With("gen_id", genID, "from", e.From, "ntools", len(e.Tools))
-	slog.Error("RunChatTools failed", "err", err, "cause", context.Cause(e.Context))
+func fail(ctx context.Context, genID uuid.UUID, err error) {
+	slog := slog.With("gen_id", genID, "ntools", len(e.Tools))
 	causemsg := fmt.Sprintf("%+v", err)
-	cause := context.Cause(e.Context)
+	cause := context.Cause(ctx)
+	slog.Error("RunChatTools failed", "err", err, "cause", cause)
 	if cause != nil {
 		causemsg = cause.Error()
 	}
