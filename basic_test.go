@@ -60,7 +60,7 @@ func TestPrimitive(t *testing.T) {
 	threadID := uuid.UUID{}
 	// [chat.Chat] calls underlying [llm.Client.Chat]
 	cl := debugging.NewConsoleLogger(os.Stderr)
-	err := chat.Chat(t.Context(), threadID, stack, chat.Ext{
+	err := chat.ChatPlain(t.Context(), threadID, stack, chat.Ext{
 		//	Prepend:  []llm.Message{{Role: "system", Content: "Keep all replies short."}},
 		Tools:    testtools.ToMarshaler(),
 		ThreadID: threadID,
