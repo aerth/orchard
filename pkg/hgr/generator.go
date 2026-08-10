@@ -12,7 +12,6 @@ import (
 	"m/pkg/types/otool"
 	"strings"
 
-	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )
 
@@ -105,16 +104,16 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	e.GenerateFooStage2(e.Context, genID, c, ext2)
 }
 
-func (e2 XE) GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.ResponseWrap, ext2 chat.Ext) {
+func (e2 XE) GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.ResponseWrap, convo chatmessages.A, ext2 chat.Ext) {
 	var tools otool.Tools
 	err := tools.FromMarshalers(ext2.Tools)
 	if err != nil {
-		slog.Error("failed")
+		slog.Error("failed", "err", err)
 		return
 	}
-	err = cmdpkg.ChatWith(e.Context, e.ChatMessages, tools, ext2)
+	err = cmdpkg.ChatWith(ctx, convo, tools, ext2)
 	if err != nil {
-		fail(ctx, genID, stackerr.Errorf("ChatWith failed: %w", err))
+		slog.Error("failed", "err", err)
 		return
 	}
 }
