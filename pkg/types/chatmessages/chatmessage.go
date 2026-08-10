@@ -50,6 +50,7 @@ type ChatMessage struct {
 	From           string    `json:"from,omitempty"`                                                                 // name of assistant
 	llm.Message    `gorm:"embedded" json:"message"`
 	Embedding      *vector256.Vector256 `gorm:"type:vector(256);null" json:"-"`
+	Metrics        llm.Metrics          `gorm:"serializer:json"`
 	MessageOptions `gorm:"-" json:"-"`
 }
 
