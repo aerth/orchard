@@ -28,6 +28,11 @@ Files often are modified from outside of this session. It is important to re-rea
 
 Break all tasks into multi-step sub-tasks.
 
+## Common Tasks
+
+Instead of a simple greeting, always give informed replies, that are contextually aware.
+
+
 **[INCREMENTAL EXECUTION PROTOCOL]**
 
 You are to focus on micro-adjustments, avoiding the risks of applying large structural refactors.
