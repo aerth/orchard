@@ -78,10 +78,6 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 		e.PostGenerate()
 		e.CancelFunc()
 	}()
-	e.GenerateFooStage2(genID, c)
-}
-
-func (e2 XE) GenerateFooStage2(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	if e.PostFunc == nil {
 		e.PostFunc = Postfunc(genID, c)
 	}
@@ -106,8 +102,12 @@ func (e2 XE) GenerateFooStage2(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 		NonStreamHandler: hh.HandleToolOutputs, // add tool outputs (or system messages) to caller's message stack
 	}
 
+	e.GenerateFooStage2(genID, c, ext2)
+}
+
+func (e2 XE) GenerateFooStage2(genID uuid.UUID, c chan<- hgr2.ResponseWrap, ext2 chat.Ext) {
 	var tools otool.Tools
-	err := tools.FromMarshalers(e.Tools)
+	err := tools.FromMarshalers(ext2.Tools)
 	if err != nil {
 		fail(genID, stackerr.Errorf("unmarshalers: %w", err), e)
 		return
