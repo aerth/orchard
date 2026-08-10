@@ -1,4 +1,3 @@
-// Package postgres for running migrate
 package main
 
 import (
