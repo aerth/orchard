@@ -105,7 +105,7 @@ func main1(ctx context.Context) error {
 		c.HideToolCalls = true
 		c.ShowToolOuts = false
 		c.ShowThinking = false
-		c.AddSystemPrompt = "Your final output should not contain status/reporting lines."
+		c.AddSystemPrompt = "Your final output should not contain task status/reporting lines."
 		return c
 	}
 	conf, err := cmdpkg.Initialize(true, " ", &clearfirst)
