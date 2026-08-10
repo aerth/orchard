@@ -48,7 +48,7 @@ var (
 	buildtime = ""
 )
 
-func Sig() { // handle **signals* (not ctrl+c)
+func Sig() { // handle **signals* (may include ctrl+c if not TUI)
 	ch := make(chan os.Signal, 1000)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM)
 	for sig := range ch {
