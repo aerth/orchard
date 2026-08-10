@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-//go:embed *.md prompts/*.md doc/*.md
+//go:embed *.md prompts/*.md doc/*.md prompts/roles/*.md prompts/workflows/*.md
 var embedded embed.FS
 
 // Embedded markdown files (SYSTEM.md template is used as sticky system instruction)
