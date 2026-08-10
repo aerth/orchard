@@ -161,7 +161,10 @@ func Initialize(withSource bool, timeFormat string, clearfirst *bool) (*global.C
 
 var loglevel *slog.LevelVar
 
-var Writer io.Writer = os.Stderr
+var (
+	Writer      io.Writer = os.Stderr
+	ReplaceAttr func(groups []string, attr slog.Attr) slog.Attr
+)
 
 // InitLog color slog
 //
@@ -179,7 +182,8 @@ func InitLog(withSource bool, timeFormat string, loglevel1 ...*slog.LevelVar) *s
 	slog.SetLogLoggerLevel(slog.LevelWarn) // for now to use less
 	slog.SetDefault(slog.New(tint.NewTextHandler(Writer, &tint.Options{
 		AddSource: withSource, Level: loglevel,
-		TimeFormat: timeFormat,
+		TimeFormat:  timeFormat,
+		ReplaceAttr: ReplaceAttr, // nil
 		//
 		//	TimeFormat: "",
 		NoColor: global.Get().Get().NoColor,
