@@ -5,6 +5,10 @@
 // ```bash
 // orchard-io -q -clear <<<"summarize Makefile, then summarize cmd/orchard-chat/main.go" 2>/dev/null
 // ```
+//
+// ```bash
+// orchard-io -q -clear <<<"summarize README.md, then summarize the repository from a birds-eye-view." 2>/dev/null
+// ```
 package main
 
 import (
