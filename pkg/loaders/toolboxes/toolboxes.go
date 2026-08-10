@@ -439,7 +439,9 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 				toolsMap[toolName] = orchTool
 			}
 			alphabeticalToolnames = append(alphabeticalToolnames, toolName)
-			slog.Info("added tool", "box", subDirName, "tool", toolName)
+			if debugToolGen {
+				slog.Info("added tool", "box", subDirName, "tool", toolName)
+			}
 		}
 
 		if len(toolsMap) == 0 {
