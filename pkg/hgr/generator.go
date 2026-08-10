@@ -102,7 +102,7 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 		NonStreamHandler: hh.HandleToolOutputs, // add tool outputs (or system messages) to caller's message stack
 	}
 
-	e.GenerateFooStage2(genID, c, ext2)
+	e.GenerateFooStage2(e.Context, genID, c, ext2)
 }
 
 func (e2 XE) GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.ResponseWrap, ext2 chat.Ext) {
@@ -129,14 +129,7 @@ func Postfunc(genID uuid.UUID, c chan<- hgr2.ResponseWrap) func(err error) error
 	}
 }
 
-func fail(ctx context.Context, genID uuid.UUID, err error) {
-	slog := slog.With("gen_id", genID, "ntools", len(e.Tools))
-	causemsg := fmt.Sprintf("%+v", err)
-	cause := context.Cause(ctx)
-	slog.Error("RunChatTools failed", "err", err, "cause", cause)
-	if cause != nil {
-		causemsg = cause.Error()
-	}
+/*
 	if err := e.Send(hgr2.ResponseWrap{
 		GenID: genID,
 		V: llm.ChatResponse{
@@ -149,8 +142,7 @@ func fail(ctx context.Context, genID uuid.UUID, err error) {
 		},
 	}); err != nil {
 		slog.Warn("Could not finish up after error", "err", err)
-	}
-}
+	}*/
 
 func IsFail(content string) bool {
 	return strings.HasPrefix(content, chatmessages.CancelMessage)
