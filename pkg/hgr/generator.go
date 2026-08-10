@@ -78,15 +78,15 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 		e.PostGenerate()
 		e.CancelFunc()
 	}()
-	hh := NewChatHandler(genID, c)
-	hh.HandleToolOutputs2 = e.NonStreamHandler
-	handlers := append(e.Handlers, hh.Handle) // single handler at this point
 }
 
 func (e XE) GenerateFooStage2(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	if e.PostFunc == nil {
 		e.PostFunc = Postfunc(genID, c)
 	}
+	hh := NewChatHandler(genID, c)
+	hh.HandleToolOutputs2 = e.NonStreamHandler
+	handlers := append(e.Handlers, hh.Handle) // single handler at this point
 	ext2 := chat.Ext{
 		//	PostFunc: Postfunc(genID, c),
 		ShowRequests: e.ShowRequests,
