@@ -156,7 +156,7 @@ func Initialize(clearfirst *bool) (*global.Conf, error) {
 		Writer = f
 		global.LogWriter = f
 	}
-	InitLog(false, "").Set(slog.LevelDebug)
+	InitLog(true, "").Set(slog.LevelDebug)
 	//	for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {}
 	return conf, nil
 }
