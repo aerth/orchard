@@ -101,19 +101,19 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 		NonStreamHandler: hh.HandleToolOutputs, // add tool outputs (or system messages) to caller's message stack
 	}
 
-	e.GenerateFooStage2(e.Context, genID, c, ext2)
+	GenerateFooStage2(e.Context, genID, c, e.ChatMessages, ext2)
 }
 
-func (e2 XE) GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.ResponseWrap, convo chatmessages.A, ext2 chat.Ext) {
+func GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.ResponseWrap, convo chatmessages.A, ext2 chat.Ext) {
 	var tools otool.Tools
 	err := tools.FromMarshalers(ext2.Tools)
 	if err != nil {
-		slog.Error("failed", "err", err)
-		return
+		slog.Error("tool unmarshal failed", "err", err)
 	}
 	err = cmdpkg.ChatWith(ctx, convo, tools, ext2)
 	if err != nil {
-		slog.Error("failed", "err", err)
+		slog.Error("ChatWith failed", "err", err)
+		c <- hgr2.ResponseWrap{V: err}
 		return
 	}
 }
