@@ -139,7 +139,7 @@ func (c *ConsoleLogger) PrintMessage(w, tw io.Writer, m llm.Message) error {
 			return stackerr.Errorf("%w", err)
 		}
 	}
-	if c.HideToolCalls && len(m.ToolCalls) != 0 { // ollama api returns a full, parsed tool call(s). TODO: future: reimplement chat template for streaming the building of the tool call
+	if !c.HideToolCalls && len(m.ToolCalls) != 0 { // ollama api returns a full, parsed tool call(s). TODO: future: reimplement chat template for streaming the building of the tool call
 		type namewrap struct {
 			Function struct {
 				Name      string          `json:"name"`
