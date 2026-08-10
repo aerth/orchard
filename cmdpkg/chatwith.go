@@ -37,9 +37,8 @@ func NewEphemeralSystem(s string, v ...any) chatmessages.ChatMessage {
 	return *cm
 }
 
-// ChatWith is the main fully-featured chat loop, it gathers generated responses, runs tools, and runs Ext hooks.
-//
-// caller MUST call global.Cancel() after to prevent Context memory leaks
+// ChatWith is the main single-threaded fully-featured chat loop,
+// it gathers generated responses, runs tools, and runs Ext hooks.
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
 	slog := slog.With("ntools", len(tools))
 	slog.Info("starting ChatWith")
