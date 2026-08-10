@@ -4,15 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"strings"
-
 	"m/cmdpkg"
 	"m/pkg/chat"
+	"m/pkg/hgr/hgr2"
 	"m/pkg/llm"
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
-
-	"m/pkg/hgr/hgr2"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -83,6 +81,9 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	hh := NewChatHandler(genID, c)
 	hh.HandleToolOutputs2 = e.NonStreamHandler
 	handlers := append(e.Handlers, hh.Handle) // single handler at this point
+}
+
+func (e XE) GenerateFooStage2(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	if e.PostFunc == nil {
 		e.PostFunc = Postfunc(genID, c)
 	}
