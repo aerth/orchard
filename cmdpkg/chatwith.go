@@ -199,6 +199,7 @@ Chat:
 		if e.PreTools != nil {
 			err := e.PreTools(ctx, newcaller, newcaller.ToolCalls.GetNames())
 			if err != nil {
+				slog.Error("pre-tool confirmation failed", "err", err)
 				stack = append(stack, NewEphemeralSystem("PreTools error: %+v", err))
 				continue
 			}
