@@ -4,7 +4,7 @@ General, extensible, multi-purpose AI Agent orchestration harness system.
 
 This repo contains the Orchard library, and the basic `orchard-io` command (stdin/stdout).
 
-There is also an `orchard-chat` repo usually located at ../orchard-chat/ for the Chat TUI application.
+There is also a separate `orchard-chat` repo for TUI,  usually located at ../orchard-chat/
 
 ## Basics
 
