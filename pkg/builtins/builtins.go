@@ -55,7 +55,7 @@ func LoadBuiltinTools(execs map[string]otool.ExecFunc) (otool.Tools, error) {
 					tool = tool.WithExec(fn)
 					tools = append(tools, tool)
 					slog.Info("builtin tool", "name", tool.Name)
-				} else {
+				} else if false {
 					slog.Warn("no implementation found for builtin tool, skipping", "name", tool.Name)
 				}
 			}
