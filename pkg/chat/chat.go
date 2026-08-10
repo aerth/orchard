@@ -206,12 +206,12 @@ func ChatPlain(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMe
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
 	}
-	return ChatReq(ctx, creq, e)
+	return ChatReqPlain(ctx, creq, e)
 }
 
 // ChatReq WITHOUT RUNNING TOOLS uses 'e' returns a single new message without running tools, running PreFunc, PostFunc, and all layered stream Handlers in order.
 // uses [llm.Client.Chat] using the default global client, creating one from env if first call.
-func ChatReq(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
+func ChatReqPlain(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 	if e.PreFunc != nil {
 		if err := e.PreFunc(creq, e.From); err != nil {
 			return err
