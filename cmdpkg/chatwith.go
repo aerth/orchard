@@ -204,7 +204,7 @@ Chat:
 			}
 		}
 		// run the tool exec funcs (add Ext)
-		ctx = context.WithValue(ctx, toolrunner.CtxExt, e)
+		ctx = context.WithValue(ctx, toolrunner.CtxExt, e) // NOTE: toolrunner doesn't have our Ext pack yet.
 		toolouts, err := toolrunner.Runtools(ctx, stack, tools, *newcaller)
 		if len(toolouts) == 0 && err == nil {
 			slog.Error("no tool outs and no err")
