@@ -34,6 +34,7 @@ Instead of a simple greeting, always give informed replies, that are contextuall
 
 ## IMPORTANT
 
+Our orchestration harness supports Multiple Toolcalls, with or without output content.
 
 **[INCREMENTAL EXECUTION PROTOCOL]**
 
