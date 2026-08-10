@@ -8,12 +8,12 @@ There is also a separate `orchard-chat` repo for TUI,  usually located at ../orc
 
 ## Basics
 
-The `chat.Ext` structure is used by callers to completely transform how the orchestration loop is handled.
+The `chat.Ext` structure is used by callers to customize *the loop*.
 
-While some applications may use it with only a single Handler, hook functions are
+While some applications may use use a single Handler, hook functions are
 available at every step in the process to customize or short-circuit the process.
 
-## Configuration
+## Runtime Configuration
 
 
 | Variable | Description |
