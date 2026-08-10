@@ -122,10 +122,15 @@ func OutputParser(content string) ([]Action, error) {
 
 		// these accept ranges which should be numbers
 		if op == OpLockIn || op == OpDeleteLines {
+			fields := strings.Fields(remainder)
+			if len(fields) > 1 {
+				return nil, stackerr.Errorf("%s arguments contain invalid characters, trailing text, or punctuation (expected: line number or range)", op)
+			}
+			remainder = fields[0]
 			for i := 0; i < len(remainder); i++ {
 				c := remainder[i]
 				if (c < '0' || c > '9') && c != '-' {
-					return nil, errors.New("LOCK arguments contain invalid characters, trailing text, or punctuation")
+					return nil, stackerr.Errorf("%s arguments contain invalid characters, trailing text, or punctuation (expected: line number or range)", op)
 				}
 			}
 		}
