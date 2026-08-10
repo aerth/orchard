@@ -102,7 +102,7 @@ func OutputParser(content string) ([]Action, error) {
 		}
 		// Remove the operator prefix cleanly
 		if len(content) != len(op) {
-			remainder = content[len(op)+1:]
+			remainder = content[len(op)+1:] // remainder shuold have no space prefix
 		}
 	}
 
