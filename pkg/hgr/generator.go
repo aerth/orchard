@@ -121,6 +121,10 @@ func GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.Respo
 
 type E *stackerr.Error
 
+func (e E) String() string {
+	return e.Error()
+}
+
 func Postfunc(genID uuid.UUID, c chan<- hgr2.ResponseWrap) func(err error) error {
 	if true {
 		return nil // ok
