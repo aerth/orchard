@@ -9,15 +9,16 @@ import (
 	"iter"
 	"log"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
-	"m/pkg/types/otool"
-	"m/pkg/yoke"
 	"maps"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/otool"
+	"m/pkg/yoke"
 
 	rege "m/pkg/regexx"
 )
@@ -397,8 +398,9 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			toolName := strings.TrimSuffix(scriptFilename, ".py")
 			toolName = strings.TrimSuffix(toolName, ".bash")
 			pyFilePath := filepath.Join(subDirPath, scriptFilename)
-			slog.Info("creating toolbox tool", "box", subDirName, "name", toolName, "file", pyFilePath, "name", scriptFilename)
-
+			if debugToolGen {
+				slog.Info("creating toolbox tool", "box", subDirName, "name", toolName, "file", pyFilePath, "name", scriptFilename)
+			}
 			contentBytes, err := readFile(pyFilePath)
 			if err != nil {
 				slog.Warn("could not read file", "path", pyFilePath, "err", err)
