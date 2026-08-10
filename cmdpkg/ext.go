@@ -16,6 +16,8 @@ import (
 var NumConfirm = 1
 
 // Cheatcode plain confirmation (uses gum for now)
+//
+// in TUI code, this should be wrapped
 func Cheatcode(ctx context.Context, s string) error {
 	sctx := global.NewCancel(ctx)
 	for i := 1; i <= max(1, NumConfirm); i++ {
