@@ -85,7 +85,7 @@ func main() {
 		slog.Error("fatal", "err", err)
 		global.Close()
 		cmdpkg.Writer = os.Stderr
-		cmdpkg.InitLog()
+		cmdpkg.InitLog(true, " ")
 		if errors.Is(err, context.Canceled) {
 			println("(cancelled)")
 		} else {
