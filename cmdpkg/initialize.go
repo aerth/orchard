@@ -140,7 +140,7 @@ func loadInitFlagsEnv(clearfirst *bool) (*global.Conf, error) {
 	return global.NewConfigFlags(clearfirst), nil
 }
 
-func Initialize(clearfirst *bool) (*global.Conf, error) {
+func Initialize(withSource bool, timeFormat string, clearfirst *bool) (*global.Conf, error) {
 	//store := dbstore.NewFromEnv()
 	conf, err := loadInitFlagsEnv(clearfirst)
 	if err != nil {
