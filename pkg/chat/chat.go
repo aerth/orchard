@@ -6,10 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"slices"
+
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/types/chatmessages"
-	"slices"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -198,7 +199,7 @@ func PrintMessages(creq *llm.ChatRequest) error {
 
 // Chat WITHOUT RUNNING TOOLS uses 'e' for building a temporary {"messages": []} array, using [ChatReq]
 // returns a single new message without running tools, only running PreFunc, PostFunc, and all layered stream Handlers in order.
-func Chat(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages, e Ext) error {
+func ChatPlain(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages, e Ext) error {
 	creq := llm.NewChatRequest()
 	creq.Tools = e.Tools
 	creq.Messages = append(e.Prepend, msgs.Raw()...)
