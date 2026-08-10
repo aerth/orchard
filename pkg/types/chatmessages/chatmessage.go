@@ -204,7 +204,7 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		cm.ToolCalls = nil
 	}
 	if cr.Done {
-		slog.Info("Is Done", "reason", cr.DoneReason, "metrics", cr.Metrics, "cr", cr)
+		//slog.Info("Done", "reason", cr.DoneReason, "metrics", cr.Metrics, "cr", cr)
 		var buf bytes.Buffer
 		cr.Summary(&buf)
 		cm.Summary = buf.String()
