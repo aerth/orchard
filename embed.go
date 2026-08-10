@@ -20,8 +20,12 @@ func initFS() fs.FS {
 		x = os.ExpandEnv("$HOME/src/orchard")
 	}
 	if _, err := os.Stat(filepath.Join(x, "SYSTEM.md")); err == nil {
-		slog.Info("using file-system instead of embedded Orchard prompts", "orchard_dir", x)
+		if debug2 {
+			slog.Info("using file-system instead of embedded Orchard prompts", "orchard_dir", x)
+		}
 		return os.DirFS(x)
 	}
 	return embedded
 }
+
+var debug2 = false
