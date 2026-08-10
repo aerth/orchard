@@ -349,8 +349,10 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 		return nil, fmt.Errorf("basepath readdir: %w", err)
 	}
 
-	for i := range entries {
-		slog.Info("found entry filesystem toolbox", "e", entries[i])
+	if debugToolGen {
+		for i := range entries {
+			slog.Info("found entry filesystem toolbox", "e", entries[i])
+		}
 	}
 	return NewToolboxEntries(os.ReadDir, os.ReadFile, basepath, entries)
 }
