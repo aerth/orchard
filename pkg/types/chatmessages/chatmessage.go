@@ -162,7 +162,7 @@ type MessageOptions struct {
 
 	Model        string
 	Summary      any
-	Metrics      llm.Metrics
+	Metrics      llm.Metrics `gorm:"jsonb"`
 	Style        int
 	RenderHidden bool
 }
