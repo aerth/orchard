@@ -110,6 +110,10 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		basename := filepath.Base(wd)
 		hashed := sha256.Sum256([]byte(basename)) // 32
 		copy(cfg.ThreadID[:], hashed[:])          // 16
-		slog.Info("using thread", "thread_flag", basename, "thread", cfg.ThreadID)
+		if debug2 {
+			slog.Info("using thread", "thread_flag", basename, "thread", cfg.ThreadID)
+		}
 	}
 }
+
+var debug2 = false
