@@ -240,6 +240,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 	cl := debugging.NewConsoleLogger(os.Stdout, os.Stderr)
 	cl.HideThinking = !conf.Get().ShowThinking
+
 	// GENERATE ROUNDS
 	e := chat.Ext{
 		PreTools: func(ctx context.Context, newcaller *chatmessages.ChatMessage, names []string) error {
