@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
+
 	"m/cmdpkg"
 	"m/pkg/chat"
 	"m/pkg/hgr/hgr2"
 	"m/pkg/llm"
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
-	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -120,6 +121,11 @@ func GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.Respo
 }
 
 type E struct{ *stackerr.StackError }
+
+var (
+	_ error        = E{}
+	_ fmt.Stringer = E{}
+)
 
 func (e E) String() string {
 	return e.Error()
