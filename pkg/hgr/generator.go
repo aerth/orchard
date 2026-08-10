@@ -78,6 +78,7 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 		e.PostGenerate()
 		e.CancelFunc()
 	}()
+	e.GenerateFooStage2(genID, c)
 }
 
 func (e XE) GenerateFooStage2(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
