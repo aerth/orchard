@@ -11,17 +11,16 @@ import (
 var embedded embed.FS
 
 // Embedded markdown files (SYSTEM.md template is used as sticky system instruction)
-var Embedded fs.FS = embedded
+var Embedded fs.FS = initFS() // embedded
 
-func init() {
-	if true {
-		x := os.Getenv("ORCHARD_DIR")
-		if x == "" {
-			x = os.ExpandEnv("$HOME/src/orchard")
-		}
-		if _, err := os.Stat(x); err == nil {
-			slog.Info("using file-system instead of embedded prompts", "orchard_dir", x)
-			Embedded = os.DirFS(x)
-		}
+func initFS() fs.FS {
+	x := os.Getenv("ORCHARD_DIR")
+	if x == "" {
+		x = os.ExpandEnv("$HOME/src/orchard")
 	}
+	if _, err := os.Stat(x); err == nil {
+		slog.Info("using file-system instead of embedded prompts", "orchard_dir", x)
+		return os.DirFS(x)
+	}
+	return embedded
 }
