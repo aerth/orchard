@@ -197,7 +197,7 @@ func PrintMessages(creq *llm.ChatRequest) error {
 	return nil
 }
 
-// Chat WITHOUT RUNNING TOOLS uses 'e' for building a temporary {"messages": []} array, using [ChatReq]
+// ChatPlain uses [ChatReq] WITHOUT RUNNING TOOLS uses 'e' for building a temporary {"messages": []} array, using [ChatReq]
 // returns a single new message without running tools, only running PreFunc, PostFunc, and all layered stream Handlers in order.
 func ChatPlain(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages, e Ext) error {
 	creq := llm.NewChatRequest()
