@@ -104,6 +104,7 @@ func main1(ctx context.Context) error {
 		c := global.FreshDefaultConfigInput()
 		c.HideToolCalls = true
 		c.ShowToolOuts = false
+		c.ShowThinking = false
 		return c
 	}
 	conf, err := cmdpkg.Initialize(true, " ", &clearfirst)
