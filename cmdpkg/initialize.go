@@ -8,14 +8,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
-	"strings"
-
 	"m/pkg/global"
 	"m/pkg/llm"
-
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
+	"os"
+	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/joho/godotenv"
@@ -156,7 +154,7 @@ func Initialize(withSource bool, timeFormat string, clearfirst *bool) (*global.C
 		Writer = f
 		global.LogWriter = f
 	}
-	InitLog(true, "").Set(slog.LevelDebug)
+	InitLog(withSource, timeFormat).Set(slog.LevelDebug)
 	//	for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {}
 	return conf, nil
 }
