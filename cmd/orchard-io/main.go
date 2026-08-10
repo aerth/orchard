@@ -100,6 +100,12 @@ func main() {
 
 func main1(ctx context.Context) error {
 	var clearfirst bool
+	global.DefaultConfigInput = func() global.ConfigInput {
+		c := global.FreshDefaultConfigInput()
+		c.HideToolCalls = true
+		c.ShowToolOuts = false
+		return c
+	}
 	conf, err := cmdpkg.Initialize(true, " ", &clearfirst)
 	if err != nil {
 		return stackerr.Errorf("initialize: %w", err)
