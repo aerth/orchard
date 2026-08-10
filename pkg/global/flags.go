@@ -44,8 +44,8 @@ func NewConf(in ConfigInput) *Conf {
 }
 
 func NewConfigFlags(clearfirst *bool) *Conf {
-	cfg := DefaultConfigInput()
-	cfg.Flags(clearfirst) // will quit in case of -h or error
+	cfg := DefaultConfigInput() // can be customized in main package
+	cfg.Flags(clearfirst)       // will quit in case of -h or error
 	return NewConf(cfg)
 }
 
