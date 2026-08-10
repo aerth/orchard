@@ -114,7 +114,7 @@ Chat:
 				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
 			}
 			e.ShowRequests = conf.Get().ShowRequests
-			err = chat.Chat(ctx, conf.GetThreadID(), stack.TopN(20), e)
+			err = chat.ChatPlain(ctx, conf.GetThreadID(), stack.TopN(20), e)
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
 			}
