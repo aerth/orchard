@@ -8,12 +8,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/types/vector256"
 	"slices"
 	"strings"
 	"time"
-
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -524,8 +523,9 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 			content = fmt.Sprintf("<span style=\"color:red\">⚠️ Error: %s</span>\n", v.Error())
 		case string: // e.g., Notes
 			content = ("\n\n" + italicMarkdown("Note: "+v) + "\n")
+		case fmt.Stringer:
+			content = v.String()
 		case json.Marshaler:
-
 			content = ("\n\n" + italicMarkdown("Aux %T") + fencedJSON(toJSONIndent(v)) + "\n")
 		default:
 			content = fmt.Sprintf("Aux %T: %v", v, v)
