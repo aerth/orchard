@@ -411,11 +411,11 @@ func (cm ChatMessages) Raw() llm.Messages {
 			continue
 		}
 		if cm[i].Aux != nil {
-			slog.Warn("skipping raw(aux)", "i", i)
+			//slog.Warn("skipping raw(aux)", "i", i)
 			continue
 		}
 		if cm[i].IsEmpty() {
-			slog.Warn("skipping raw(empty)", "i", i)
+			//slog.Warn("skipping raw(empty)", "i", i)
 			continue
 		}
 		distance = l - (i + 1)  // 4
