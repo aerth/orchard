@@ -12,6 +12,7 @@ import (
 	"m/pkg/types/otool"
 	"strings"
 
+	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )
 
@@ -113,7 +114,7 @@ func GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.Respo
 	err = cmdpkg.ChatWith(ctx, convo, tools, ext2)
 	if err != nil {
 		slog.Error("ChatWith failed", "err", err)
-		c <- hgr2.ResponseWrap{V: err}
+		c <- hgr2.ResponseWrap{V: stackerr.Errorf("%w", err)}
 		return
 	}
 }
