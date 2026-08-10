@@ -18,7 +18,8 @@ While some applications may use it with only a single Handler, hook functions ar
 
 | Variable | Description |
 | :--- | :--- |
-| `ORCHARD_TREE` | Path to the orchestration tree directory. |
-| `ORCHARD_TOOLS` | Path to the tools library. |
-| `OLLAMA_MODEL` | Model name for LLM requests. |
+| `ORCHARD_TREE` | Path to the orchestration tree directory (may be empty to use embedded fs). |
+| `ORCHARD_TOOLS` | Path to the tools library. (may be empty to use embedded fs)|
+| `OLLAMA_MODEL` | Default model name for LLM requests. |
+| `OLLAMA_THINK` | Default reasoning level for LLM requests. |
 | `POSTGRES_DSN` | Connection string for PostgreSQL database. |
