@@ -121,7 +121,7 @@ func GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.Respo
 
 type E struct{ *stackerr.StackError }
 
-func (e *E) String() string {
+func (e E) String() string {
 	return e.Error()
 }
 
