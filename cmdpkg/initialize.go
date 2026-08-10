@@ -156,7 +156,7 @@ func Initialize(clearfirst *bool) (*global.Conf, error) {
 		Writer = f
 		global.LogWriter = f
 	}
-	InitLog().Set(slog.LevelDebug)
+	InitLog(false, "").Set(slog.LevelDebug)
 	//	for v := range dbstore.GormIter[chatmessages.ChatMessage](store.DB(), nil) {}
 	return conf, nil
 }
@@ -168,7 +168,7 @@ var Writer io.Writer = os.Stderr
 // InitLog color slog
 //
 // InitLog().Set(slog.LevelInfo) or use ptr for flag etc
-func InitLog(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
+func InitLog(withSource bool, timeFormat string, loglevel1 ...*slog.LevelVar) *slog.LevelVar {
 	if len(loglevel1) == 1 {
 		loglevel = loglevel1[0]
 	} else if loglevel == nil {
@@ -180,7 +180,8 @@ func InitLog(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
 	}
 	slog.SetLogLoggerLevel(slog.LevelWarn) // for now to use less
 	slog.SetDefault(slog.New(tint.NewTextHandler(Writer, &tint.Options{
-		AddSource: true, Level: loglevel,
+		AddSource: withSource, Level: loglevel,
+		TimeFormat: timeFormat,
 		//
 		//	TimeFormat: "",
 		NoColor: global.Get().Get().NoColor,
