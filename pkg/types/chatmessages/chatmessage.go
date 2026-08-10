@@ -434,7 +434,7 @@ func (cm ChatMessages) Raw() llm.Messages {
 		if mx != 0 && mx < distance {
 			slog.Warn("skipping raw(maxdistance)", "i", i, "msg", cm[i].String())
 			x := cm[i].Message
-			x.Content = "(this message has disappeared for brevity)" // worth noting that typical write-operations are small/empty content while read-operations are large content (eg. cat or touch)
+			x.Content = "(this message has disappeared for brevity, but can be recalled by ID " + cm[i].MessageID.String() + ")" // worth noting that typical write-operations are small/empty content while read-operations are large content (eg. cat or touch)
 			a = append(a, x)
 			continue
 		}
