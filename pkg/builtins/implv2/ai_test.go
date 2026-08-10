@@ -20,7 +20,7 @@ import (
 )
 
 func TestMain(t *testing.M) {
-	cmdpkg.InitLog()
+	cmdpkg.InitLog(true, " ")
 	env := ".env"
 	if _, err := os.Stat(env); err != nil {
 		env = "../../../.env"
