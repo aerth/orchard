@@ -244,6 +244,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	e := chat.Ext{
 		PreTools: func(ctx context.Context, newcaller *chatmessages.ChatMessage, names []string) error {
 			if len(names) > 1 || !isOkTool(names[0]) {
+				println("")
 				for i := range newcaller.ToolCalls {
 					if err := implv2.ConfirmAction(ctx, fmt.Sprintf("Requested tool call: %q\n\n```json\n%s```", names[i], string(newcaller.ToolCalls[i]))); err != nil {
 						return err
@@ -283,6 +284,10 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	}
 
 	return nil
+}
+
+func isOkTool(s string) bool {
+	return s == "read_file_v2" || s == "list_directory" || s == "list_tree"
 }
 
 var titlecaser = cases.Title(language.AmericanEnglish)
