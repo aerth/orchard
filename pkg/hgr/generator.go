@@ -81,7 +81,7 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	e.GenerateFooStage2(genID, c)
 }
 
-func (e XE) GenerateFooStage2(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
+func (e2 XE) GenerateFooStage2(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	if e.PostFunc == nil {
 		e.PostFunc = Postfunc(genID, c)
 	}
