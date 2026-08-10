@@ -1,4 +1,4 @@
-// Command orchard-io
+// Command orchard-io simple stdin/stdout entrypoint
 //
 // For example,
 //
