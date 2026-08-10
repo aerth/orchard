@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"os"
+	"path/filepath"
 )
 
 //go:embed *.md prompts/*.md doc/*.md
@@ -18,8 +19,8 @@ func initFS() fs.FS {
 	if x == "" {
 		x = os.ExpandEnv("$HOME/src/orchard")
 	}
-	if _, err := os.Stat(x); err == nil {
-		slog.Info("using file-system instead of embedded prompts", "orchard_dir", x)
+	if _, err := os.Stat(filepath.Join(x, "SYSTEM.md")); err == nil {
+		slog.Info("using file-system instead of embedded Orchard prompts", "orchard_dir", x)
 		return os.DirFS(x)
 	}
 	return embedded
