@@ -23,3 +23,7 @@ available at every step in the process to customize or short-circuit the process
 | `OLLAMA_MODEL` | Default model name for LLM requests. |
 | `OLLAMA_THINK` | Default reasoning level for LLM requests. |
 | `POSTGRES_DSN` | Connection string for PostgreSQL database, used to store conversations. |
+
+## Command-line flags
+
+See [./pkg/global/flags.go]
