@@ -109,7 +109,7 @@ func (e2 XE) GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hg
 	var tools otool.Tools
 	err := tools.FromMarshalers(ext2.Tools)
 	if err != nil {
-		fail(ctx, genID, stackerr.Errorf("unmarshalers: %w", err))
+		slog.Error("failed")
 		return
 	}
 	err = cmdpkg.ChatWith(e.Context, e.ChatMessages, tools, ext2)
