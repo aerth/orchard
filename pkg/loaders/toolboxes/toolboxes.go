@@ -341,7 +341,9 @@ func NewToolboxFSX(basepath string) (Toolboxes, error) {
 // NewToolboxFS scans the filesystem under the base path and dynamically constructs Toolboxes.
 // It ignores non-python files, empty directories, and python files directly in the base directory.
 func NewToolboxFS(basepath string) (*ToolboxManager, error) {
-	slog.Info("NewToolboxFS Reading filesystem", "basepath", basepath)
+	if debugToolGen {
+		slog.Info("NewToolboxFS Reading filesystem", "basepath", basepath)
+	}
 	entries, err := os.ReadDir(basepath)
 	if err != nil {
 		return nil, fmt.Errorf("basepath readdir: %w", err)
