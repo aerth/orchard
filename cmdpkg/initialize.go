@@ -171,7 +171,7 @@ var Writer io.Writer = os.Stderr
 func InitLog(loglevel1 ...*slog.LevelVar) *slog.LevelVar {
 	if len(loglevel1) == 1 {
 		loglevel = loglevel1[0]
-	} else {
+	} else if loglevel == nil {
 		loglevel = new(slog.LevelVar)
 		loglevel.Set(slog.LevelDebug)
 	}
