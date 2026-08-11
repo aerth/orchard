@@ -131,7 +131,8 @@ Chat:
 			if staticMessage != "" {
 				e.Prepend = []llm.Message{{Role: "system", Content: staticMessage}}
 			} else {
-				e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
+				x,y := global.GetSystemBase(templatedata.NewData(stack)
+				e.Prepend = []llm.Message{{Role: "system", Content: 					x						}}
 			}
 			e.Tools = tools.ToMarshaler()
 			for i := range e.Tools {
