@@ -311,6 +311,10 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 }
 
 func isOkTool(s string) bool {
+	restrict := global.Get().Get().ToolsLimited
+	if slices.Contains(restrict, s) {
+		return true
+	}
 	return !NeedsConfirm(s)
 }
 
