@@ -155,7 +155,18 @@ func (r *reloadWriter) Write(p []byte) (n int, err error) {
 }
 
 func (r *reloadWriter) Reload() {
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0o600)
+	if r.file != nil {
+		err := r.file.Close()
+		if err != nil {
+			slog.Error("closing old logfile", "err", err)
+		}
+	}
+	f, err := os.OpenFile(r.filename, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0o600)
+	if err != nil {
+		slog.Error("could not open file", "err", err)
+		f = os.Stderr
+	}
+	r.file = f
 }
 
 var _ io.Writer = (*reloadWriter)(nil)
