@@ -311,7 +311,33 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 }
 
 func isOkTool(s string) bool {
-	return s == "read_file_v2" || s == "list_directory" || s == "list_tree" || s == "grep_our_movies"
+	return !NeedsConfirm(s)
+}
+
+func NeedsConfirm(s string) bool {
+	return !slices.Contains([]string{
+		"run_bash", // has its own robust confirmation step
+		// simple tools
+		"previous_movies",
+		"play_movie_on_tv",
+		"grep_our_movies",
+		"post_imageboard",
+		"view_imageboard",
+		"read_newspapers",
+		"reload_movies",
+		//
+		"notify_send",
+		"tooltest",
+		//
+		"grep",
+		"read_file",
+		"read_file_v2",
+		"edit_file",
+		"append_text",
+		"locate_file",
+		"list_directory",
+		"list_tree",
+	}, s)
 }
 
 var titlecaser = cases.Title(language.AmericanEnglish)
