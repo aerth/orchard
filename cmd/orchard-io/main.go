@@ -202,7 +202,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		}
 	}
 
-	if true { // run tooltest
+	if false { // run tooltest
 		i := slices.Index(builtinTools.Names(), "tooltest")
 		if i < 0 {
 			return fmt.Errorf("could not find tooltest")
