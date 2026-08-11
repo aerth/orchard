@@ -26,9 +26,6 @@ type Handler struct {
 func (h *Handler) Send(r hgr2.ResponseWrap) error {
 	slog := slog.With("gen_id", h.GenID, "call_num", h.callnum)
 	t1 := time.Now()
-	if r.GenID == uuid.Nil {
-		r.GenID = h.GenID
-	}
 	for {
 		select {
 		case <-time.After(time.Second * 3):
@@ -49,7 +46,7 @@ func (h *Handler) Send(r hgr2.ResponseWrap) error {
 func (h *Handler) HandleToolOutputs(cm chatmessages.ChatMessage) {
 	slog := slog.With("fn", "HandleToolOutputs", "msgid", cm.MessageID)
 	slog.Info("HANDLE OTHER", "cm", cm.String(), "thr", cm.ThreadID)
-	if err := h.Send(hgr2.ResponseWrap{V: cm, GenID: h.GenID}); err != nil {
+	if err := h.Send(hgr2.ResponseWrap{V: cm}); err != nil {
 		slog.Error("could not send to chan", "err", err)
 	}
 	if h.HandleToolOutputs2 != nil {
