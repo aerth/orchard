@@ -70,6 +70,10 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		got := slices.DeleteFunc(slices.Clone(tools), func(t otool.Tool) bool {
 			return !slices.Contains(restrict, t.Name)
 		})
+		if len(got) != len(tools) {
+			slog.Error("removed tools", "was", len(tools), "now", len(got))
+			tools = got
+		}
 	}
 	e.Tools = append(e.Tools, json.RawMessage(finishLoopToolSpec))
 Chat:
