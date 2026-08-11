@@ -155,7 +155,7 @@ func (r *reloadWriter) Write(p []byte) (n int, err error) {
 }
 
 func (r *reloadWriter) Reload() {
-	panic("unimplemented")
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0o600)
 }
 
 var _ io.Writer = (*reloadWriter)(nil)
