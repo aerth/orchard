@@ -20,13 +20,13 @@ type PlainChannelWrap[T any] struct {
 	GenID    uuid.UUID
 	C        <-chan T
 }
-type (
-	ChannelWrapper = PlainChannelWrap[ResponseWrap] // channel with UUID
-	ResponseWrap   struct {
-		GenID uuid.UUID    // this generator, where multiple generators may operating simultaneously.
-		V     fmt.Stringer // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
-	}
-)
+type ChannelWrapper = PlainChannelWrap[ResponseWrap] // channel with UUID
+
+// ResponseWrap
+type ResponseWrap struct {
+	GenID uuid.UUID    // this generator, where multiple generators may operating simultaneously.
+	V     fmt.Stringer // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
+}
 
 func (_ PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) {
 	return GatherQuickly(ctx, ch)
