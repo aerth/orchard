@@ -48,8 +48,7 @@ func (h *Handler) Send(r hgr2.ResponseWrap) error {
 // HandleToolOutputs for tool (or system) role outputs
 func (h *Handler) HandleToolOutputs(cm chatmessages.ChatMessage) {
 	slog := slog.With("fn", "HandleToolOutputs", "msgid", cm.MessageID)
-	slog.Info("HANDLE OTHER")
-
+	slog.Info("HANDLE OTHER", "cm", cm.String(), "thr", cm.ThreadID)
 	if err := h.Send(hgr2.ResponseWrap{V: cm, GenID: h.GenID}); err != nil {
 		slog.Error("could not send to chan", "err", err)
 	}
