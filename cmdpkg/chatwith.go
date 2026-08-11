@@ -109,9 +109,11 @@ Chat:
 			}
 			e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 			e.Tools = tools.ToMarshaler()
-			e.Tools = slices.DeleteFunc(e.Tools, func(t otool.Tool) bool {
-				return !slices.Contains(restrict, t.Name)
-			})
+			if restrict != nil {
+				e.Tools = slices.DeleteFunc(e.Tools, func(t otool.Tool) bool {
+					return !slices.Contains(restrict, t.Name)
+				})
+			}
 			e.Tools = append(e.Tools, json.RawMessage(finishLoopToolSpec))
 			for i := range e.Tools {
 				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
