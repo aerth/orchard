@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-
 	"m/pkg/chat"
 	"m/pkg/hgr/hgr2"
 	"m/pkg/types/chatmessages"
@@ -14,7 +13,10 @@ import (
 )
 
 // Starter to add a channel for tracking
-type Starter hgr2.ChannelWrapper
+type Starter struct {
+	hgr2.ChannelWrapper
+	GenID uuid.UUID
+}
 
 // Refresher may be sent on the channel
 type Refresher struct {
