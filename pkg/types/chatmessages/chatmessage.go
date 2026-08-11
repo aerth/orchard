@@ -413,9 +413,6 @@ func (cm ChatMessages) Raw() llm.Messages {
 	// [1 2 3 4 5]
 	var distance int
 	for i := range cm {
-		if strings.HasPrefix(cm[i].Content, CancelMessage) { // skip purely cancelled messages
-			continue
-		}
 		if cm[i].Aux != nil {
 			//slog.Warn("skipping raw(aux)", "i", i)
 			continue
@@ -424,6 +421,11 @@ func (cm ChatMessages) Raw() llm.Messages {
 			//slog.Warn("skipping raw(empty)", "i", i)
 			continue
 		}
+		if strings.HasPrefix(cm[i].Content, CancelMessage) { // skip purely cancelled messages
+			continue
+		}
+
+		// handle max distance from tip
 		distance = l - (i + 1) // 4
 		suffix, mx := MaxDistanceSuffix(cm[i], distance)
 		if mx != 0 && mx < distance {
