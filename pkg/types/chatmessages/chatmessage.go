@@ -447,6 +447,8 @@ func (cm ChatMessages) Raw() llm.Messages {
 }
 
 func getTimeMessage(cm, prev ChatMessage) string {
+	t1 := prev.UpdatedAt
+	t2 := cm.UpdatedAt
 }
 
 func ReplacementMaxDistanceText(id uuid.UUID) string {
