@@ -69,7 +69,7 @@ func (e XE) Send(r hgr2.ResponseWrap) error {
 	case e.ch <- r:
 		return nil
 	default:
-		return fmt.Errorf("could not send update uuid=%s val=%T %v", r.GenID, r.V, r.V)
+		return fmt.Errorf("could not send update uuid=%s val=%T %v", e.GenID, r.V, r.V)
 	}
 }
 
