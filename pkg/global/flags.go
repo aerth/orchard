@@ -35,6 +35,7 @@ type ConfigInput struct {
 	ShowThinking       bool
 	SidebarRefreshRate time.Duration
 	StreamRefreshRate  time.Duration
+	ToolsLimited       []string
 }
 type cfginput = ConfigInput
 
