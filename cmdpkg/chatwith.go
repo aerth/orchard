@@ -44,6 +44,8 @@ func SetStaticMessage(s string) {
 	staticMessage = s
 }
 
+var nonudge = true
+
 // ChatWith is the main single-threaded fully-featured chat loop,
 // it gathers generated responses, runs tools, and runs Ext hooks.
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
@@ -206,7 +208,7 @@ Chat:
 			break
 		}
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
-			if isAuto {
+			if isAuto || nonudge {
 				return nil // max 2 consecutive
 			}
 			stack = append(stack, NewEphemeralSystem("Quickly use %q tool to complete this round if there are no additional tool calls needed, or continue working on the task.", finishLoopTool))
