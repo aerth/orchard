@@ -64,6 +64,13 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	noStore := e.ThreadID == uuid.Nil
 	isAuto := false
 	numRounds := 0
+
+	if restrict != nil {
+		tools = slices.DeleteFunc(slices.Clone(tools), func(t otool.Tool) bool {
+			return !slices.Contains(restrict, t.Name)
+		})
+	}
+	e.Tools = append(e.Tools, json.RawMessage(finishLoopToolSpec))
 Chat:
 	for ctx.Err() == nil {
 		numRounds++
@@ -109,12 +116,6 @@ Chat:
 			}
 			e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
 			e.Tools = tools.ToMarshaler()
-			if restrict != nil {
-				e.Tools = slices.DeleteFunc(e.Tools, func(t otool.Tool) bool {
-					return !slices.Contains(restrict, t.Name)
-				})
-			}
-			e.Tools = append(e.Tools, json.RawMessage(finishLoopToolSpec))
 			for i := range e.Tools {
 				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
 			}
