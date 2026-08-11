@@ -109,6 +109,9 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		flag.BoolVar(clearfirst, "clear", *clearfirst, "clear thread from DB first")
 	}
 	flag.Parse()
+	if cfg.SystemPrompt != "" {
+		println("SYSPROMPT", cfg.SystemPrompt)
+	}
 	wd, _ := os.Getwd()
 	if cfg.Dir != "." && cfg.Dir != "" && cfg.Dir != wd {
 		if err := os.Chdir(cfg.Dir); err != nil {
