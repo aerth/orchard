@@ -434,6 +434,9 @@ func (cm ChatMessages) Raw() llm.Messages {
 			a = append(a, x)
 			continue
 		}
+		if suffix == "" && i > 0 {
+			suffix = getTimeMessage(cm[i], cm[i-1])
+		}
 		a = append(a, cm[i].Message)
 		if suffix != "" {
 			msg := llm.Message{Role: "system", Content: "The previous message " + suffix}
@@ -441,6 +444,9 @@ func (cm ChatMessages) Raw() llm.Messages {
 		}
 	}
 	return a
+}
+
+func getTimeMessage(cm, prev ChatMessage) string {
 }
 
 func ReplacementMaxDistanceText(id uuid.UUID) string {
