@@ -215,7 +215,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			handler.HandleToolOutputs(newstate)
 			handler.HandleToolOutputs(newusermsg)
 		}
-		creq.Messages = stack.Raw()
+		creq.Messages = stack.Raw() // TODO: use ChatPlain !!!!!!!!!!!!!
 
 		card = ""
 		newmsg := chatmessages.NewFromRole(ext.From, "assistant", "")
