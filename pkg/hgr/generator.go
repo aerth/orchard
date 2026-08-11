@@ -27,8 +27,7 @@ func Prefunc(genID uuid.UUID, threadID uuid.UUID, c chan<- hgr2.ResponseWrap) fu
 		almost.ThreadID = threadID
 		slog.Info("Prefunc PREFUNC", "top", top, "callnum", callnum, "message_id", almost.MessageID, "thread", threadID)
 		wrapped := hgr2.ResponseWrap{
-			V:     almost,
-			GenID: genID,
+			V: almost,
 		}
 		select {
 		case c <- wrapped:
@@ -48,8 +47,7 @@ func (h *Handler) PreFunc(creq *llm.ChatRequest, from string) error {
 	almost.ThreadID = h.ThreadID
 	slog.Info("Prefunc PREFUNC", "top", top, "callnum", h.callnum, "message_id", almost.MessageID, "thread", almost.ThreadID)
 	wrapped := hgr2.ResponseWrap{
-		V:     almost,
-		GenID: h.GenID,
+		V: almost,
 	}
 	select {
 	case h.C <- wrapped:
