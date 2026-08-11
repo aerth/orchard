@@ -434,21 +434,39 @@ func (cm ChatMessages) Raw() llm.Messages {
 			a = append(a, x)
 			continue
 		}
-		if suffix == "" && i > 0 {
-			suffix = getTimeMessage(cm[i], cm[i-1])
-		}
 		a = append(a, cm[i].Message)
 		if suffix != "" {
 			msg := llm.Message{Role: "system", Content: "The previous message " + suffix}
 			a = append(a, msg)
 		}
+		if suffix == "" && i < l-1 {
+			if tm := getTimeMessage(cm[i], cm[i-1]); tm != "" {
+				msg := llm.Message{Role: "system", Content: tm}
+				a = append(a, msg)
+
+			}
+		}
 	}
 	return a
 }
 
-func getTimeMessage(cm, prev ChatMessage) string {
-	t1 := prev.UpdatedAt
-	t2 := cm.UpdatedAt
+func getTimeMessage(cur, next ChatMessage) string {
+	t1 := cur.UpdatedAt
+	t2 := next.UpdatedAt
+	if t1.IsZero() {
+		t1 = cur.CreatedAt
+	}
+	if t2.IsZero() {
+		t2 = next.CreatedAt
+	}
+	if t1.IsZero() || t2.IsZero() {
+		return ""
+	}
+	d := t2.Sub(t1)
+	if d < time.Second*10 {
+		return ""
+	}
+	return fmt.Sprintf("Time has passed: %s", d.Round(time.Second))
 }
 
 func ReplacementMaxDistanceText(id uuid.UUID) string {
