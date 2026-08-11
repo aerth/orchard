@@ -68,6 +68,9 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
 	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
+	flag.Func("tools", "list of tools available in this session (or 'none' for no tools)", func(s string) error {
+		ss := strings.Fields(s)
+	})
 	flag.DurationVar(&cfg.StreamRefreshRate, "stream-rate", cfg.StreamRefreshRate, "rate of stream refresh (UI)")
 	flag.BoolFunc("help-full", "Show extended help including environment variables", func(s string) error {
 		fmt.Println("\nEnvironment Variables:")
