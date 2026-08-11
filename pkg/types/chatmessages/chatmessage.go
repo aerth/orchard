@@ -424,7 +424,8 @@ func (cm ChatMessages) Raw() llm.Messages {
 			//slog.Warn("skipping raw(empty)", "i", i)
 			continue
 		}
-		distance = l - (i + 1)  // 4
+		distance = l - (i + 1) // 4
+		suffix, mx := MaxDistanceSuffix(cm[i], distance)
 		mx := cm[i].MaxDistance // eg: 4 or sentinal -3
 		if mx < 1 {             // default max distance
 			mx = GetMaxDistance(cm[i])
@@ -451,6 +452,10 @@ func (cm ChatMessages) Raw() llm.Messages {
 		}
 	}
 	return a
+}
+
+func MaxDistanceSuffix(chatMessage ChatMessage, distance int) (string, int) {
+	panic("unimplemented")
 }
 
 func (cm ChatMessages) ContainsID(id uuid.UUID) bool {
