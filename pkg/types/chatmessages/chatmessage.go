@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -400,10 +401,10 @@ var GetMaxDistance = func(cm ChatMessage) int {
 }
 
 func (cm ChatMessages) Raw() llm.Messages {
+	l := len(cm)                          // 5
 	a := make(llm.Messages, 0, len(cm)*2) // worst case scenario allocate double
 
 	// [1 2 3 4 5]
-	l := len(cm) // 5
 	var distance int
 	for i := range cm {
 		if strings.HasPrefix(cm[i].Content, CancelMessage) { // skip purely cancelled messages
