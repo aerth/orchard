@@ -38,6 +38,8 @@ func NewEphemeralSystem(s string, v ...any) chatmessages.ChatMessage {
 	return *cm
 }
 
+var staticMessage string
+
 func SetStaticMessage(s string) {
 	staticMessage = s
 }
