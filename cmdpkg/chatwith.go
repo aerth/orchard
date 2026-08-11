@@ -120,7 +120,7 @@ Chat:
 				cl.Reset() // nice thinking colors
 			}
 
-			if staticMessage == "" {
+			if staticMessage != "" {
 				e.Prepend = []llm.Message{{Role: "system", Content: staticMessage}}
 			} else {
 				e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
