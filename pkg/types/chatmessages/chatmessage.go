@@ -421,7 +421,8 @@ func (cm ChatMessages) Raw() llm.Messages {
 			//slog.Warn("skipping raw(empty) that should not even be here", "i", i)
 			continue
 		}
-		if strings.HasPrefix(cm[i].Content, CancelMessage) { // skip purely cancelled messages
+		if strings.HasPrefix(cm[i].Content, CancelMessage) {
+			// skip purely cancelled messages
 			continue
 		}
 
