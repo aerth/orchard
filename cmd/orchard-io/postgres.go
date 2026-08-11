@@ -29,7 +29,11 @@ func UnscopedDB[T any](db *gorm.DB) gorm.ChainInterface[T] {
 
 // NewPostgres creates a Store backed by PostgreSQL.
 func NewPostgres(additionalMigrateTypes ...any) (*PostgresDBStore, error) {
-	diale := postgres.Open(os.Getenv("POSTGRES_DSN"))
+	dsn := os.Getenv("POSTGRES_DSN")
+	if dsn == "0" || dsn == "" {
+		return nil, nil
+	}
+	diale := postgres.Open(dsn)
 	gdb, err := gorm.Open(diale)
 	if err != nil {
 		return nil, stackerr.Errorf("db open: %w", err)
