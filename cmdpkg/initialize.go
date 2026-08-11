@@ -146,7 +146,7 @@ type reloadWriter struct {
 
 // Write implements [io.Writer].
 func (r *reloadWriter) Write(p []byte) (n int, err error) {
-	n, err := r.file.Write(p)
+	n, err = r.file.Write(p)
 	if err != nil {
 		slog.Error("writing to log file", "err", err)
 		r.Reload()
