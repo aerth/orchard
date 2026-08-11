@@ -422,7 +422,7 @@ func (cm ChatMessages) Raw() llm.Messages {
 			continue
 		}
 		if strings.HasPrefix(cm[i].Content, CancelMessage) {
-			// skip purely cancelled messages
+			// skip purely cancelled messages maybe consisting of only Thinking or otherwise empty
 			continue
 		}
 
