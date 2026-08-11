@@ -250,8 +250,10 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		if newmsg == nil || newmsg.Content == "" {
 			return nil
 		}
-		if err = store.Add(ctx, threadID, newmsg); err != nil {
-			slog.Warn("err", "err", err)
+		if store != nil {
+			if err = store.Add(ctx, threadID, newmsg); err != nil {
+				slog.Warn("err", "err", err)
+			}
 		}
 	}
 
