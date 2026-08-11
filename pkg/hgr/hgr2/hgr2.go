@@ -23,8 +23,8 @@ type ResponseWrap struct {
 	V fmt.Stringer // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
 }
 
-func (_ PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) {
-	return GatherQuickly(ctx, ch)
+func (c PlainChannelWrap[T]) GatherQuickly(ctx context.Context) (news []T, isDone bool) {
+	return GatherQuickly(ctx, c.C)
 }
 
 // GatherQuickly is for Update function, and should quickly gather whatever is in the channels buffer.
