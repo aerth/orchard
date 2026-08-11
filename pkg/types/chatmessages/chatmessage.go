@@ -414,11 +414,11 @@ func (cm ChatMessages) Raw() llm.Messages {
 	var distance int
 	for i := range cm {
 		if cm[i].Aux != nil {
-			//slog.Warn("skipping raw(aux)", "i", i)
+			//slog.Warn("skipping raw(aux) that is not useful to LLM", "i", i)
 			continue
 		}
 		if cm[i].IsEmpty() {
-			//slog.Warn("skipping raw(empty)", "i", i)
+			//slog.Warn("skipping raw(empty) that should not even be here", "i", i)
 			continue
 		}
 		if strings.HasPrefix(cm[i].Content, CancelMessage) { // skip purely cancelled messages
