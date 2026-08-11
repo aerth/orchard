@@ -73,6 +73,9 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		if len(ss) == 1 {
 			ss = strings.Split(ss[0], ",")
 		}
+		if len(ss) == 1 && ss[0] == "none" {
+			ss = []string{}
+		}
 		cfg.ToolsLimited = ss
 		return nil
 	})
