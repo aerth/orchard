@@ -73,6 +73,8 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		if len(ss) == 1 {
 			ss = strings.Split(ss[0], ",")
 		}
+		cfg.ToolsLimited = ss
+		return nil
 	})
 	flag.DurationVar(&cfg.StreamRefreshRate, "stream-rate", cfg.StreamRefreshRate, "rate of stream refresh (UI)")
 	flag.BoolFunc("help-full", "Show extended help including environment variables", func(s string) error {
