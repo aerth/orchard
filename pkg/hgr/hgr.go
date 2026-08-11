@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+
 	"m/pkg/chat"
 	"m/pkg/hgr/hgr2"
 	"m/pkg/types/chatmessages"
@@ -59,8 +60,7 @@ func (e XE) Encoder(msgptr *chatmessages.ChatMessage) error {
 		return nil
 	}
 	return e.Send(hgr2.ResponseWrap{
-		GenID: e.GenID,
-		V:     msg,
+		V: msg,
 	})
 }
 
