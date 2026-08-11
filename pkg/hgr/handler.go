@@ -49,7 +49,8 @@ func (h *Handler) Send(r hgr2.ResponseWrap) error {
 func (h *Handler) HandleToolOutputs(cm chatmessages.ChatMessage) {
 	slog := slog.With("fn", "HandleToolOutputs", "msgid", cm.MessageID)
 	slog.Info("HANDLE OTHER")
-	if err := h.Send(hgr2.ResponseWrap{V: cm}); err != nil {
+
+	if err := h.Send(hgr2.ResponseWrap{V: cm, GenID: h.GenID}); err != nil {
 		slog.Error("could not send to chan", "err", err)
 	}
 	if h.HandleToolOutputs2 != nil {
