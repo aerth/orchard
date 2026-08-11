@@ -22,7 +22,7 @@ type PlainChannelWrap[T any] struct {
 }
 type ChannelWrapper = PlainChannelWrap[ResponseWrap] // channel with UUID
 
-// ResponseWrap
+// ResponseWrap allows the receiver to switch based on V.(type) for handling each packet sent in the channel
 type ResponseWrap struct {
 	GenID uuid.UUID    // this generator, where multiple generators may operating simultaneously.
 	V     fmt.Stringer // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
