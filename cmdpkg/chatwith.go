@@ -38,6 +38,10 @@ func NewEphemeralSystem(s string, v ...any) chatmessages.ChatMessage {
 	return *cm
 }
 
+func SetStaticMessage(s string) {
+	staticMessage = s
+}
+
 // ChatWith is the main single-threaded fully-featured chat loop,
 // it gathers generated responses, runs tools, and runs Ext hooks.
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
