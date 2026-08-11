@@ -144,6 +144,8 @@ type reloadWriter struct {
 	file     *os.File
 }
 
+var _ io.Writer = reloadWriter{}
+
 func Initialize(withSource bool, timeFormat string, clearfirst *bool) (*global.Conf, error) {
 	//store := dbstore.NewFromEnv()
 	conf, err := loadInitFlagsEnv(clearfirst)
