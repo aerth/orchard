@@ -4,6 +4,8 @@ package notetaking
 import (
 	"context"
 	"log/slog"
+	"slices"
+	"strings"
 	"time"
 
 	"m/cmdpkg"
@@ -65,6 +67,9 @@ func ExecFunc(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 		if err != nil {
 			slog.Error("ouch", "err", err)
 			return convo, err
+		}
+		if slices.Contains(strings.Fields(newmsg.Content), OpEnd) {
+			break
 		}
 
 		// done gen
