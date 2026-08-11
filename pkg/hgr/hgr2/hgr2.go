@@ -27,11 +27,10 @@ type (
 		//	T     string    // the type string, for logs etc
 	}
 )
-func (_ PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) { 
-	return GatherQuickly(ctx, ch)
 
+func (_ PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) {
+	return GatherQuickly(ctx, ch)
 }
-func GatherQuickly[T fmt.Stringer](ctx context.Context, ch <-chan T) (news []T, isDone bool) {
 
 // GatherQuickly is for Update function, and should quickly gather whatever is in the channels buffer.
 // Returns isDone true if the channel is closed (meaning the caller should remove and no longer check this genID's chan)
