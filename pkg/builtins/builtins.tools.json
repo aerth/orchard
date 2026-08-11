@@ -26,8 +26,22 @@
     }
   },
   {
+    "name": "take_notes",
+    "description": "Begin a note-taking session, entering a new interactive mode for efficient exploration and distillation of potentially large data.",
+    "required": ["path"],
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "string",
+          "description": "detailed, clear plan for this note-taking session to be parsed by the Explorer Agent that will persist during the exploration."
+        }
+      }
+    }
+  },
+  {
     "name": "edit_file",
-    "description": "Begin a file-editing session, entering a new interactive mode for accurate file viewing and editing. Shows a moveable glimpse/squint view of a file. **The Preferred file-editing and file-viewing tool.**",
+    "description": "Begin a file-editing session, entering a new interactive mode for accurate file viewing and editing. Shows a moveable glimpse/squint view of a file.",
     "required": ["path"],
     "parameters": {
       "type": "object",
