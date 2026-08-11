@@ -1,3 +1,4 @@
+// Package hgr2 for GatherQuickly implementation (hunter-gatherer)
 package hgr2
 
 import (
@@ -24,7 +25,6 @@ type (
 	ResponseWrap   struct {
 		GenID uuid.UUID    // this generator, where multiple generators may operating simultaneously.
 		V     fmt.Stringer // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
-		//	T     string    // the type string, for logs etc
 	}
 )
 
