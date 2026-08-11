@@ -119,7 +119,11 @@ Chat:
 			if cl != nil {
 				cl.Reset() // nice thinking colors
 			}
-			e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
+
+			if staticMessage == "" {
+			} else {
+				e.Prepend = []llm.Message{{Role: "system", Content: global.GetSystemBase(templatedata.NewData(stack))}}
+			}
 			e.Tools = tools.ToMarshaler()
 			for i := range e.Tools {
 				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
