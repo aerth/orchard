@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"os"
 	"strings"
+	"sync/atomic"
 
 	"m/pkg/global"
 	"m/pkg/llm"
@@ -142,12 +143,13 @@ func loadInitFlagsEnv(clearfirst *bool) (*global.Conf, error) {
 type reloadWriter struct {
 	filename string
 	file     *os.File
+	loading  atomic.Bool
 }
 
 // Write implements [io.Writer].
 func (r *reloadWriter) Write(p []byte) (n int, err error) {
 	n, err = r.file.Write(p)
-	if err != nil {
+	if err != nil && !r.loading.Load() {
 		slog.Error("writing to log file", "err", err)
 		r.Reload()
 	}
