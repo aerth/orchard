@@ -72,6 +72,8 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		cfg.ShowRequests = false
 		cfg.ShowThinking = false
 		cfg.ShowToolOuts = false
+		cfg.NoSpin = true
+		cfg.NoColor = true
 		return nil
 	})
 	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
