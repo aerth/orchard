@@ -22,7 +22,7 @@ func GetSystemBase(data any) string {
 	tpl := template.New("").Funcs(mdloaders.FuncMap())
 	var err error
 	name := "SYSTEM.md"
-	if len(endingMessage) == 1 && endingMessage != "" {
+	if strings.Count(endingMessage, " ") == 0 && endingMessage != "" {
 		name = filepath.Base(endingMessage)
 		slog.Info("loading system", "f", endingMessage)
 		tpl, err = tpl.ParseFiles(endingMessage)
