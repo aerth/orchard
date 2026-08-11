@@ -401,7 +401,10 @@ var GetMaxDistance = func(cm ChatMessage) int {
 }
 
 func (cm ChatMessages) Raw() llm.Messages {
-	l := len(cm)                          // 5
+	l := len(cm) // 5
+	if l == 0 {
+		return nil
+	}
 	a := make(llm.Messages, 0, len(cm)*2) // worst case scenario allocate double
 
 	// [1 2 3 4 5]
