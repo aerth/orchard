@@ -67,6 +67,11 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.ShowRequests, "v", cfg.ShowRequests, "show requests in log")
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
+	flag.BoolFunc("n", "no system prompt template", func(_ string) error {
+		_ = GetSystemBase
+		noTemplate = true
+		return nil
+	})
 	flag.BoolFunc("s", "mostly silent", func(_ string) error {
 		cfg.HideToolCalls = true
 		cfg.ShowRequests = false
