@@ -426,18 +426,6 @@ func (cm ChatMessages) Raw() llm.Messages {
 		}
 		distance = l - (i + 1) // 4
 		suffix, mx := MaxDistanceSuffix(cm[i], distance)
-		mx := cm[i].MaxDistance // eg: 4 or sentinal -3
-		if mx < 1 {             // default max distance
-			mx = GetMaxDistance(cm[i])
-		}
-		var suffix string
-		switch {
-		case mx == 0:
-		case mx < distance:
-			suffix = fmt.Sprintf("was forgotten after %d (currently %d)", mx, distance)
-		case mx != 0 && (mx-distance) < 4:
-			suffix = fmt.Sprintf("will be forgotten after %d more messages.", mx-distance)
-		}
 		if mx != 0 && mx < distance {
 			//		slog.Warn("skipping raw(maxdistance)", "i", i, "msg", cm[i].String())
 			x := cm[i].Message
@@ -454,8 +442,23 @@ func (cm ChatMessages) Raw() llm.Messages {
 	return a
 }
 
-func MaxDistanceSuffix(chatMessage ChatMessage, distance int) (string, int) {
-	panic("unimplemented")
+func MaxDistanceSuffix(cm ChatMessage, distance int) (string, int) {
+	mx := cm.MaxDistance // eg: 4 or sentinal -3
+	if mx < 1 {          // default max distance
+		mx = GetMaxDistance(cm)
+	}
+	if mx == 0 {
+		return "", 0
+	}
+	var suffix string
+	switch {
+	case mx == 0:
+	case mx < distance:
+		suffix = fmt.Sprintf("was forgotten after %d (currently %d)", mx, distance)
+	case mx != 0 && (mx-distance) < 4:
+		suffix = fmt.Sprintf("will be forgotten after %d more messages.", mx-distance)
+	}
+	return suffix, mx
 }
 
 func (cm ChatMessages) ContainsID(id uuid.UUID) bool {
