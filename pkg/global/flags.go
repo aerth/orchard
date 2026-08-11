@@ -68,6 +68,10 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
 	flag.BoolFunc("s", "mostly silent", func(_ string) error {
+		cfg.HideToolCalls = true
+		cfg.ShowRequests = false
+		cfg.ShowThinking = false
+		cfg.ShowToolOuts = false
 		return nil
 	})
 	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
