@@ -259,7 +259,7 @@ func (cm ChatMessages) RemoveNonThread(d uuid.UUID) A {
 		return slices.Clone(cm)
 	}
 	a := slices.DeleteFunc(slices.Clone(cm), func(v ChatMessage) bool {
-		return v.ThreadID != d
+		return v.ThreadID != uuid.Nil && v.ThreadID != d
 	})
 	return a
 }
