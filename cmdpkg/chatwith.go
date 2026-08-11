@@ -18,6 +18,7 @@ import (
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
 	"m/pkg/types/spinner"
+	"m/pkg/types/templatedata"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -130,8 +131,11 @@ Chat:
 			if staticMessage != "" {
 				e.Prepend = []llm.Message{{Role: "system", Content: staticMessage}}
 			} else {
-				var err error
-				e.Prepend, err = []llm.Message{{Role: "system", Content: x}}
+				x, err := global.GetSystemBase(templatedata.NewData(stack))
+				if err != nil {
+					return stackerr.Errorf("%w", err)
+				}
+				e.Prepend = []llm.Message{{Role: "system", Content: x}}
 			}
 			e.Tools = tools.ToMarshaler()
 			for i := range e.Tools {
