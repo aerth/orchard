@@ -68,7 +68,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		e.ThreadID = global.Get().Get().ThreadID
 	}
 	noStore := e.ThreadID == uuid.Nil
-	isAuto := true // no auto mode (already auto)
+	isAuto := false
 	numRounds := 0
 
 	restrict := global.Get().Get().ToolsLimited
