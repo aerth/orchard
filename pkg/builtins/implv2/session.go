@@ -421,7 +421,7 @@ func (s *Session) ApplyAction(action Action) Result {
 			for idx, line := range s.Lines[:s.CurrentLine] {
 				if strings.Contains(line, action.Content) {
 					targetLine = idx + 1 // Convert to 1-based indexing
-					ext = " around " + action.Content
+					ext = " around " + action.Content + " (WRAPPED DOCUMENT)"
 					break
 				}
 			}
