@@ -139,6 +139,11 @@ func loadInitFlagsEnv(clearfirst *bool) (*global.Conf, error) {
 	return global.NewConfigFlags(clearfirst), nil
 }
 
+type reloadWriter struct {
+	filename string
+	file     *os.File
+}
+
 func Initialize(withSource bool, timeFormat string, clearfirst *bool) (*global.Conf, error) {
 	//store := dbstore.NewFromEnv()
 	conf, err := loadInitFlagsEnv(clearfirst)
