@@ -311,7 +311,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 }
 
 func isOkTool(s string) bool {
-	return s == "read_file_v2" || s == "list_directory" || s == "list_tree"
+	return s == "read_file_v2" || s == "list_directory" || s == "list_tree" || s == "grep_our_movies"
 }
 
 var titlecaser = cases.Title(language.AmericanEnglish)
