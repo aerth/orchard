@@ -34,7 +34,6 @@ func GetSystemBase(data any) string {
 	} else if endingMessage != "" {
 		name = ""
 		tpl, err = tpl.Parse(endingMessage)
-
 	} else {
 		// embedded SYSTEM.md
 		tpl, err = tpl.ParseFS(orchard.Embedded, "SYSTEM.md")
