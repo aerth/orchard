@@ -83,7 +83,7 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 	if err != nil {
 		return fmt.Errorf("create rows: %w", err)
 	}
-	slog.Debug("Added message to thread DB", "threadID", threadID, "n", len(msgs), "first", msgs[0].String())
+	slog.Debug("Added message to thread DB", "threadID", threadID, "n", len(msgs), "first", msgs[0].String(), "first_id", msgs[0].DBID)
 
 	return nil
 }
