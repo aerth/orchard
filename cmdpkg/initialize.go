@@ -144,7 +144,16 @@ type reloadWriter struct {
 	file     *os.File
 }
 
-var _ io.Writer = reloadWriter{}
+// Write implements [io.Writer].
+func (r *reloadWriter) Write(p []byte) (n int, err error) {
+	n, err := r.file.Write(p)
+	if err != nil {
+		r.Reload()
+	}
+	return n, err
+}
+
+var _ io.Writer = (*reloadWriter)(nil)
 
 func Initialize(withSource bool, timeFormat string, clearfirst *bool) (*global.Conf, error) {
 	//store := dbstore.NewFromEnv()
