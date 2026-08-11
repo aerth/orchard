@@ -65,6 +65,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	isAuto := false
 	numRounds := 0
 
+	restrict := global.Get().Get().ToolsLimited
 	if restrict != nil {
 		tools = slices.DeleteFunc(slices.Clone(tools), func(t otool.Tool) bool {
 			return !slices.Contains(restrict, t.Name)
