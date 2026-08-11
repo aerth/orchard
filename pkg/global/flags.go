@@ -67,6 +67,9 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
+	flag.BoolFunc("s", "mostly silent", func(_ string) error {
+		return nil
+	})
 	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
 	flag.Func("tools", "list of tools available in this session (or 'none' for no tools)", func(s string) error {
 		ss := strings.Fields(s)
