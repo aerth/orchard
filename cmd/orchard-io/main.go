@@ -165,7 +165,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			"read_file":      implv1.ReadFile,
 			"list_directory": implv1.ListDirectory,
 			//"edit_file":      implv2.EditTool,
-			//"edit_file": singleeditor.EditTool,
+			"edit_file": singleeditor.EditTool,
 			//"write_file": implv1.WriteFile,
 			//	"run_go_command":   noop,
 			"run_bash": basher1.Basher,
@@ -268,6 +268,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	e := chat.Ext{
 		PreTools: func(ctx context.Context, newcaller *chatmessages.ChatMessage, names []string) error {
 			if len(names) > 1 || !isOkTool(names[0]) {
+				println(debugging.ColorReset)
 				for i := range newcaller.ToolCalls {
 					if err := implv2.ConfirmAction(ctx, fmt.Sprintf("Requested tool call: %q\n\n```json\n%s```", names[i], string(newcaller.ToolCalls[i]))); err != nil {
 						return err
@@ -310,7 +311,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 }
 
 func isOkTool(s string) bool {
-	return s == "read_file_v2" || s == "list_directory" || s == "list_tree" || s == "grep_our_movies"
+	return s == "read_file_v2" || s == "list_directory" || s == "list_tree"
 }
 
 var titlecaser = cases.Title(language.AmericanEnglish)
