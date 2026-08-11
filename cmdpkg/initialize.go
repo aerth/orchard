@@ -164,7 +164,7 @@ func (r *reloadWriter) Reload() {
 	f, err := os.OpenFile(r.filename, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0o600)
 	if err != nil {
 		slog.Error("could not open file", "err", err)
-		f = os.Stderr
+		r.file = os.Stderr
 	}
 	r.file = f
 }
