@@ -440,7 +440,7 @@ func (cm ChatMessages) Raw() llm.Messages {
 			a = append(a, msg)
 		}
 		if suffix == "" && i < l-1 {
-			if tm := getTimeMessage(cm[i], cm[i-1]); tm != "" {
+			if tm := getTimeMessage(cm[i], cm[i+1]); tm != "" {
 				msg := llm.Message{Role: "system", Content: tm}
 				a = append(a, msg)
 
