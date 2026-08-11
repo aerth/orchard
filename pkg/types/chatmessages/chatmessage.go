@@ -427,9 +427,8 @@ func (cm ChatMessages) Raw() llm.Messages {
 		distance = l - (i + 1) // 4
 		suffix, mx := MaxDistanceSuffix(cm[i], distance)
 		if mx != 0 && mx < distance {
-			//		slog.Warn("skipping raw(maxdistance)", "i", i, "msg", cm[i].String())
-			x := cm[i].Message
-			x.Content = "(this message has disappeared for brevity, but can be recalled by ID " + cm[i].MessageID.String() + ")" // worth noting that typical write-operations are small/empty content while read-operations are large content (eg. cat or touch)
+			x := cm[i].Message // copy llm.Message
+			x.Content = ReplacementMaxDistanceText(cm[i].MessageID)
 			a = append(a, x)
 			continue
 		}
