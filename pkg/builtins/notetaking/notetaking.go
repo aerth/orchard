@@ -25,6 +25,8 @@ const OpEnd = "END"
 
 var prompt = "You are now in a notetaking session. To stop taking notes, output only END on a single line. You can use tools, and output notes directly as content. All output will be saved for reviewing after done with notetaking."
 
+var NoteToolName = "take_notes"
+
 type args struct {
 	Intent string `json:"intent"` // The intention for starting the notetaking session
 }
