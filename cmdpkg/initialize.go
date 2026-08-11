@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+	"strings"
+
 	"m/pkg/global"
 	"m/pkg/llm"
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
-	"os"
-	"strings"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/joho/godotenv"
@@ -147,7 +148,7 @@ func Initialize(withSource bool, timeFormat string, clearfirst *bool) (*global.C
 	// set up logging
 	// log.Printf("Got config: %#v", conf)
 	if filename := conf.GetLogFilename(); filename != "" {
-		f, err := os.Create(filename)
+		f, err := os.OpenFile(filename, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0o600)
 		if err != nil {
 			return nil, stackerr.Errorf("%w", err)
 		}
