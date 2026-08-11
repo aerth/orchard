@@ -36,7 +36,7 @@ func GatherQuickly[T fmt.Stringer](ctx context.Context, ch <-chan T) (news []T, 
 // GatherQuickly is for Update function, and should quickly gather whatever is in the channels buffer.
 // Returns isDone true if the channel is closed (meaning the caller should remove and no longer check this genID's chan)
 // NOTE: this isDone (agent is complete) is DIFFERENT than an individual pending message's [llm.ChatResponse] Done (meaning that a single message is complete)
-func GatherQuickly[T fmt.Stringer](ctx context.Context, ch <-chan T) (news []T, isDone bool) {
+func GatherQuickly[T any](ctx context.Context, ch <-chan T) (news []T, isDone bool) {
 	var a []T
 	for ctx.Err() == nil { // limit for this Update call in the ~2fps loop
 		select {
