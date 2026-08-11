@@ -116,12 +116,14 @@ func main1(ctx context.Context) error {
 	if err != nil {
 		return stackerr.Errorf("db: %w", err)
 	}
-	store := dbstore.New(sql)
-	if clearfirst {
-		store.DeleteThread(ctx, conf.GetThreadID())
+	if sql != nil {
+		store := dbstore.New(sql)
+		if clearfirst {
+			store.DeleteThread(ctx, conf.GetThreadID())
+		}
+		slog.Info("STORE ENABLED")
+		global.SetStore(store)
 	}
-	slog.Info("STORE ENABLED")
-	global.SetStore(store)
 	global.SetConf(*conf)
 
 	global.AddCloser(func() error {
