@@ -442,6 +442,11 @@ func (cm ChatMessages) Raw() llm.Messages {
 	return a
 }
 
+func ReplacementMaxDistanceText(id uuid.UUID) string {
+	// worth noting that typical write-operations are small/empty content while read-operations are large content (eg. cat or touch)
+	return "(this message has disappeared for brevity, but can be recalled by ID " + id.String() + ")"
+}
+
 func MaxDistanceSuffix(cm ChatMessage, distance int) (string, int) {
 	mx := cm.MaxDistance // eg: 4 or sentinal -3
 	if mx < 1 {          // default max distance
