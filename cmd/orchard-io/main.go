@@ -191,6 +191,17 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		}
 	}
 
+	restrict := global.Get().Get().ToolsLimited
+	if restrict != nil {
+		got := slices.DeleteFunc(slices.Clone(builtinTools), func(t otool.Tool) bool {
+			return !slices.Contains(restrict, t.Name)
+		})
+		if len(got) != len(builtinTools) {
+			slog.Error("removed tools", "was", len(builtinTools), "now", len(got))
+			builtinTools = got
+		}
+	}
+
 	if true { // run tooltest
 		i := slices.Index(builtinTools.Names(), "tooltest")
 		if i < 0 {
