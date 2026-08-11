@@ -24,8 +24,7 @@ type ChannelWrapper = PlainChannelWrap[ResponseWrap] // channel with UUID
 
 // ResponseWrap allows the receiver to switch based on V.(type) for handling each packet sent in the channel
 type ResponseWrap struct {
-	GenID uuid.UUID    // this generator, where multiple generators may operating simultaneously.
-	V     fmt.Stringer // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
+	V fmt.Stringer // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
 }
 
 func (_ PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) {
