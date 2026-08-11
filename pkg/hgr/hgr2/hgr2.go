@@ -5,8 +5,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-
-	"github.com/google/uuid"
 )
 
 var (
@@ -16,9 +14,7 @@ var (
 )
 
 type PlainChannelWrap[T any] struct {
-	ThreadID uuid.UUID
-	GenID    uuid.UUID
-	C        <-chan T
+	C <-chan T
 }
 type ChannelWrapper = PlainChannelWrap[ResponseWrap] // channel with UUID
 
