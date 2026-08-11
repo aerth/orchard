@@ -31,7 +31,7 @@ type (
 // GatherQuickly is for Update function, and should quickly gather whatever is in the channels buffer.
 // Returns isDone true if the channel is closed (meaning the caller should remove and no longer check this genID's chan)
 // NOTE: this isDone (agent is complete) is DIFFERENT than an individual pending message's [llm.ChatResponse] Done (meaning that a single message is complete)
-func (c PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) {
+func (_ PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (news []T, isDone bool) {
 	var a []T
 	for ctx.Err() == nil { // limit for this Update call in the ~2fps loop
 		select {
@@ -53,14 +53,14 @@ func (c PlainChannelWrap[T]) GatherQuickly(ctx context.Context, ch <-chan T) (ne
 			if len(a) == 0 {
 				a = nil
 			}
-			slog.Debug("GatherQuickly: gathering is DONE, caller should stop checking", "todo", len(ch), "cap", cap(ch), "genID", c.GenID)
+			slog.Debug("GatherQuickly: gathering is DONE, caller should stop checking", "todo", len(ch), "cap", cap(ch))
 			return a, true // channel is closed, caller should stop checking
 		default: // prevent blocking
 			if len(a) == 0 {
 				return nil, false // none since last call
 			}
 			if len(a) > ((SmallArraySize * 10) / 12) {
-				slog.Warn("GatherQuickly: gathered lots in one frame, check faster!", "got", len(a), "genID", c.GenID)
+				slog.Warn("GatherQuickly: gathered lots in one frame, check faster!", "got", len(a))
 			}
 			return a, false // some since last call
 		}
