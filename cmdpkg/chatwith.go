@@ -46,7 +46,7 @@ func SetStaticMessage(s string) {
 
 var nonudge = true
 
-func righthere() (string, error) {
+func righthere(stack chatmessages.ChatMessage) (string, error) {
 	if staticMessage != "" {
 		return staticMessage, nil
 	} else {
