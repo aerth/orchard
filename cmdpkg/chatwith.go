@@ -46,15 +46,15 @@ func SetStaticMessage(s string) {
 
 var nonudge = true
 
-func righthere() string {
+func righthere() (string, error) {
 	if staticMessage != "" {
-		return staticMessage
+		return staticMessage, nil
 	} else {
 		x, err := global.GetSystemBase(templatedata.NewData(stack))
 		if err != nil {
-			return stackerr.Errorf("%w", err)
+			return "", stackerr.Errorf("%w", err)
 		}
-		return x
+		return x, nil
 	}
 }
 
