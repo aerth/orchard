@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
