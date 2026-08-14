@@ -342,7 +342,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			}
 			if err == nil {
 				slog.Info("WRITING FILE")
-				err = os.WriteFile(session.ActiveFile, session.Current(), 0o600)
+				err = atomicWriteFile(session.ActiveFile, session.Current(), 0o600)
 				if err != nil {
 					return nil, stackerr.Errorf("WriteFile after editing failed: %w", err)
 				}
