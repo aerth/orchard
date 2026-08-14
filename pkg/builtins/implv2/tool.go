@@ -420,19 +420,19 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 	var err error
 
 	if len(parts) == 0 || len(parts) > 2 {
-		return 0, 0, errors.New("invalid coordinate format (need either <number> or <number>-<number>")
+		return 0, 0, stackerr.Errorf("invalid coordinate format (need either <number> or <number>-<number>")
 	}
 	l := len(parts)
 	switch {
 	case l == 0:
-		return 0, 0, errors.New("invalid coordinate format: need '%d' or '%d-%d' format (not enough args)")
+		return 0, 0, stackerr.Errorf("invalid coordinate format: need '%d' or '%d-%d' format (not enough args)")
 	case l > 2:
-		return 0, 0, errors.New("invalid coordinate format: need '%d' or '%d-%d' format (too many args)")
+		return 0, 0, stackerr.Errorf("invalid coordinate format: need '%d' or '%d-%d' format (too many args)")
 	}
 
 	start, err = strconv.Atoi(parts[0])
 	if err != nil {
-		return 0, 0, errors.New("invalid start coordinate format: " + err.Error())
+		return 0, 0, stackerr.Errorf("invalid start coordinate format: %w", err)
 	}
 	if l == 1 {
 		end = start
@@ -440,11 +440,11 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 	if l == 2 {
 		end, err = strconv.Atoi(parts[1])
 		if err != nil {
-			return 0, 0, errors.New("invalid end coordinate format: " + err.Error())
+			return 0, 0, stackerr.Errorf("invalid end coordinate format: " + err.Error())
 		}
 	}
 	if start < 1 || end < start {
-		return 0, 0, errors.New("coordinates out of file range boundaries (start)")
+		return 0, 0, stackerr.Errorf("coordinates out of file range boundaries (start)")
 	}
 	if end > len(s.Lines) {
 		return 0, 0, stackerr.Errorf("coordinates out of file range boundaries (end line number %d is greater than number of lines %d)", end, len(s.Lines))
