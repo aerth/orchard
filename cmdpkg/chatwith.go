@@ -140,7 +140,11 @@ Chat:
 				cl.Reset() // nice thinking colors
 			}
 
-			righthere
+			spr, err := GetSystemMessage(stack)
+			if err != nil {
+				return stackerr.Errorf("%w", err)
+			}
+			e.Prepend = []llm.Message{{Role: "system", Content: spr}}
 			e.Tools = tools.ToMarshaler()
 			for i := range e.Tools {
 				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
