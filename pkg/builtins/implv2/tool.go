@@ -81,7 +81,7 @@ func NewResultMessage(threadID uuid.UUID, resp Result) chatmessages.ChatMessage 
 }
 
 var ConfirmAction = func(ctx context.Context, s string) error {
-	return fmt.Errorf("there is no ConfirmAction function provided by the main package")
+	return stackerr.Errorf("there is no ConfirmAction function provided by the main package")
 }
 
 // EditTool main entrypoint for the EditorTool. Called by an LLM as a tool function with two parameters ("path" and "intent")
@@ -89,7 +89,7 @@ var ConfirmAction = func(ctx context.Context, s string) error {
 func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	ctx = global.NewCancel(ctx)
 	if ConfirmAction == nil {
-		return nil, fmt.Errorf("no ConfirmAction available for EditTool")
+		return nil, stackerr.Errorf("no ConfirmAction available for EditTool")
 	}
 	// begin loop
 
@@ -447,11 +447,11 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 		return 0, 0, errors.New("coordinates out of file range boundaries (start)")
 	}
 	if end > len(s.Lines) {
-		return 0, 0, fmt.Errorf("coordinates out of file range boundaries (end line number %d is greater than number of lines %d)", end, len(s.Lines))
+		return 0, 0, stackerr.Errorf("coordinates out of file range boundaries (end line number %d is greater than number of lines %d)", end, len(s.Lines))
 	}
 	numLines := end - start + 1
 	if numLines > MaxLinesLocked {
-		return 0, 0, fmt.Errorf("coordinates are too big (we want small edits only) and the edit should be broken into smaller pieces (%d > max %d)", numLines, MaxLinesLocked)
+		return 0, 0, stackerr.Errorf("coordinates are too big (we want small edits only) and the edit should be broken into smaller pieces (%d > max %d)", numLines, MaxLinesLocked)
 	}
 	return start, end, nil
 }
