@@ -440,7 +440,7 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 	if l == 2 {
 		end, err = strconv.Atoi(parts[1])
 		if err != nil {
-			return 0, 0, stackerr.Errorf("invalid end coordinate format: " + err.Error())
+			return 0, 0, stackerr.Errorf("invalid end coordinate format: %w", err)
 		}
 	}
 	if start < 1 || end < start {
