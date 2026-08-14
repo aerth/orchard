@@ -18,6 +18,7 @@ import (
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
 	"m/pkg/types/spinner"
+	"m/pkg/types/templatedata"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -44,6 +45,18 @@ func SetStaticMessage(s string) {
 }
 
 var nonudge = true
+
+func righthere() {
+	if staticMessage != "" {
+		e.Prepend = []llm.Message{{Role: "system", Content: staticMessage}}
+	} else {
+		x, err := global.GetSystemBase(templatedata.NewData(stack))
+		if err != nil {
+			return stackerr.Errorf("%w", err)
+		}
+		e.Prepend = []llm.Message{{Role: "system", Content: x}}
+	}
+}
 
 // ChatWith is the main single-threaded fully-featured chat loop,
 // it gathers generated responses, runs tools, and runs Ext hooks.
