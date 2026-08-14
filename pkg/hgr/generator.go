@@ -41,6 +41,9 @@ func Prefunc(genID uuid.UUID, threadID uuid.UUID, c chan<- hgr2.ResponseWrap) fu
 
 // PreFunc newer version
 func (h *Handler) PreFunc(creq *llm.ChatRequest, from string) error {
+	if h.ThreadID == uuid.Nil {
+		return fmt.Errorf("no threadID in PreFunc")
+	}
 	h.callnum++
 	top := creq.Messages[len(creq.Messages)-1]
 	almost := *chatmessages.NewFromRole(from, "assistant", "")
@@ -80,7 +83,7 @@ func (e XE) GeneratorFoo(genID uuid.UUID, c chan<- hgr2.ResponseWrap) {
 	if e.PostFunc == nil {
 		e.PostFunc = Postfunc(genID, c)
 	}
-	hh := NewChatHandler(genID, c)
+	hh := NewChatHandler(genID, c, e.ThreadID)
 	hh.HandleToolOutputs2 = e.NonStreamHandler
 	handlers := append(e.Handlers, hh.Handle) // single handler at this point
 	ext2 := chat.Ext{
