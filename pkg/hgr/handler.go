@@ -65,7 +65,7 @@ func (h *Handler) Handle(cr llm.ChatResponse) error {
 }
 
 // NewChatHandler only sends updates to the channel. Caller may then assign h.HandleToolOutputs2
-func NewChatHandler(genid uuid.UUID, ch chan<- hgr2.ResponseWrap) *Handler {
-	h := &Handler{C: ch, GenID: genid}
+func NewChatHandler(genid uuid.UUID, ch chan<- hgr2.ResponseWrap, threadID uuid.UUID) *Handler {
+	h := &Handler{C: ch, GenID: genid, ThreadID: threadID}
 	return h
 }
