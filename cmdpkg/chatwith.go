@@ -18,7 +18,6 @@ import (
 	"m/pkg/types/chatmessages"
 	"m/pkg/types/otool"
 	"m/pkg/types/spinner"
-	"m/pkg/types/templatedata"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -128,15 +127,7 @@ Chat:
 				cl.Reset() // nice thinking colors
 			}
 
-			if staticMessage != "" {
-				e.Prepend = []llm.Message{{Role: "system", Content: staticMessage}}
-			} else {
-				x, err := global.GetSystemBase(templatedata.NewData(stack))
-				if err != nil {
-					return stackerr.Errorf("%w", err)
-				}
-				e.Prepend = []llm.Message{{Role: "system", Content: x}}
-			}
+			righthere
 			e.Tools = tools.ToMarshaler()
 			for i := range e.Tools {
 				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
