@@ -104,6 +104,10 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 	if threadID == uuid.Nil {
 		threadID = global.Get().Get().ThreadID
 	}
+	if threadID == uuid.Nil {
+		slog.Error("no thread id found anywhere") // todo ctx lol
+		return nil, stackerr.Errorf("no thread id in EditTool")
+	}
 	got, err := e.editToolInner(ctx, caller, toolCallIndex, call, threadID)
 	for i := range got {
 		got[i].ThreadID = threadID
