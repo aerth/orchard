@@ -457,13 +457,16 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 }
 
 // atomicWriteFile writes data to a temporary file and then renames it to the target path.
-func atomicWriteFile(path string, data []byte, perm int) error {
+func atomicWriteFile(path string, data []byte, perm os.FileMode) error {
 	dir := filepath.Dir(path)
 	tempFile, err := os.CreateTemp(dir, "atomic-")
 	if err != nil {
 		return err
 	}
 	if perm != 0o600 {
+		if err := tempFile.Chmod(perm); err != nil {
+			return err
+		}
 	}
 	defer os.Remove(tempFile.Name())
 
