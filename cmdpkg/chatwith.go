@@ -46,15 +46,15 @@ func SetStaticMessage(s string) {
 
 var nonudge = true
 
-func righthere() {
+func righthere() string {
 	if staticMessage != "" {
-		e.Prepend = []llm.Message{{Role: "system", Content: staticMessage}}
+		return staticMessage
 	} else {
 		x, err := global.GetSystemBase(templatedata.NewData(stack))
 		if err != nil {
 			return stackerr.Errorf("%w", err)
 		}
-		e.Prepend = []llm.Message{{Role: "system", Content: x}}
+		return x
 	}
 }
 
