@@ -115,6 +115,9 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 			got[i].MessageID = uuid.New()
 		}
 	}
+	if err != nil {
+		return got, stackerr.Errorf("%w", err)
+	}
 	return got, err
 }
 
@@ -152,7 +155,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 	}
 	startstacklen := len(stack)
 	if startstacklen == 0 {
-		return nil, fmt.Errorf("no conversation memory")
+		return nil, stackerr.Errorf("no conversation memory")
 	}
 	{
 		//	stack = append(stack, chatmessages.A{
