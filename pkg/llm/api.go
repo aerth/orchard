@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"m/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
@@ -18,8 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"m/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -453,6 +452,7 @@ func (cm Messages) FormatRoles() []string {
 //		_, _ = fmt.Fprintf(log.Writer(), "StreamPreFunc %s\n", string(bts))
 //		return nil
 //	}
+var debug2 = false
 
 func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatStreamHandlerFunc) error {
 	if len(callbacks) == 0 {
@@ -461,7 +461,9 @@ func (c Client) Chat(ctx context.Context, creq *ChatRequest, callbacks ...ChatSt
 	//	if len(creq.Tools) == 0 { // messages may be empty for preloading an llm model on the server
 	//		return fmt.Errorf("no tools?")
 	//	}
-	slog.Info("chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "roles", creq.Messages.FormatRoles())
+	if debug2 {
+		slog.Info("chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "roles", creq.Messages.FormatRoles())
+	}
 	return c.stream(ctx, http.MethodPost, "/api/chat", creq, func(bts []byte) error {
 		if len(bts) == 0 || !isFirstCharJSON(bts[0]) {
 			return stackerr.Errorf("server replied not with json object: %s", string(bts))
