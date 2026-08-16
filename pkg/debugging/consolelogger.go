@@ -185,8 +185,9 @@ func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) error {
 			return stackerr.Errorf("%w", err)
 		}
 	} else if cr.Message.Content != "" {
-		_, _ = w.Write([]byte("\n"))
 		slog.Warn("notprinting", "text", cr.Message.Content, "is_done", cr.Done)
+	} else {
+		_, _ = w.Write([]byte("\n"))
 	}
 	//}
 	var err error
