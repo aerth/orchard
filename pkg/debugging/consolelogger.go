@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"os"
-
 	"m/pkg/global"
 	"m/pkg/llm"
+	"os"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -185,8 +184,8 @@ func (c *ConsoleLogger) PrintChat(w, tw io.Writer, cr llm.ChatResponse) error {
 			}
 			return stackerr.Errorf("%w", err)
 		}
-	} else {
-		slog.Info("notprinting", "text", cr.Message.Content, "is_done", cr.Done)
+	} else if cr.Message.Content != "" {
+		slog.Warn("notprinting", "text", cr.Message.Content, "is_done", cr.Done)
 	}
 	//}
 	var err error
