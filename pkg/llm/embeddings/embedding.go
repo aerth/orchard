@@ -2,16 +2,16 @@ package embeddings
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/vector256"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
-
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
-	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -23,7 +23,7 @@ var model = "nomic-embed-text:v1.5"
 
 var defaultEclient *llm.Client
 
-const MinLength = 4
+const MinLength = 3
 
 func BestEffort(ctx context.Context, s string, isQueryOrQuestion bool) *vector256.Vector256 {
 	v, err := Embed(ctx, nil, s, isQueryOrQuestion)
@@ -43,12 +43,14 @@ func GetEmbeddingEndpoint() string {
 	return "http://127.0.0.1:11434"
 }
 
+var ErrBadQuery = errors.New("bad search query")
+
 func Embed(ctx context.Context, client *llm.Client, s string, isQueryOrQuestion bool) (vector256.Vector256, error) {
 	if len(s) < MinLength {
-		return nil, nil
+		return nil, stackerr.Errorf("too short: %w", ErrBadQuery)
 	}
 	if strings.Count(s, " ") > 1024 {
-		return nil, fmt.Errorf("chunk too big")
+		return nil, fmt.Errorf("chunk too big: %w", ErrBadQuery)
 	}
 	if client == nil && defaultEclient == nil {
 		u, err := url.Parse(GetEmbeddingEndpoint())
@@ -64,10 +66,10 @@ func Embed(ctx context.Context, client *llm.Client, s string, isQueryOrQuestion 
 	ereq := NomicEmbed(s, isQueryOrQuestion)
 	got, err := client.Embed(ctx, &ereq)
 	if err != nil {
-		return nil, err
+		return nil, stackerr.Errorf("%w", err)
 	}
 	if len(got.Embeddings) != 1 {
-		return nil, fmt.Errorf("got %d not 1", len(got.Embeddings))
+		return nil, stackerr.Errorf("got %d not 1", len(got.Embeddings))
 	}
 	//slog.Debug("got embedding")
 	return vector256.Vector256(got.Embeddings[0]), nil
