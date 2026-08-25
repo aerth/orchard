@@ -5,13 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
-	"m/pkg/types/vector256"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"m/pkg/llm"
+	"m/pkg/types/chatmessages"
+	"m/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
@@ -42,6 +43,8 @@ func GetEmbeddingEndpoint() string {
 	}
 	return "http://127.0.0.1:11434"
 }
+
+type VEC = vector256.Vector256
 
 var ErrBadQuery = errors.New("bad search query")
 
