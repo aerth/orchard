@@ -8,14 +8,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"m/pkg/llm"
+	"m/pkg/types/vector256"
 	"slices"
 	"strings"
 	"time"
 
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
-
-	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -176,10 +174,10 @@ func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
 		panic("GatherChatResponse for nil")
 	}
 	if !cm.Ephemeral {
-		if cr.Message.Content != "" && strings.HasSuffix(cm.Content, cr.Message.Content) {
-			slog.Info("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo(1), "caller3", stackerr.GetFuncCallerInfo(2))
-			cr.Message.Content = strings.ToUpper(cr.Message.Content)
-		}
+		//	if cr.Message.Content != "" && strings.HasSuffix(cm.Content, cr.Message.Content) {
+		//		slog.Info("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo(1), "caller3", stackerr.GetFuncCallerInfo(2))
+		//		cr.Message.Content = strings.ToUpper(cr.Message.Content)
+		//	}
 	} else {
 		slog.Error("Ephemeral Gather?")
 	}
