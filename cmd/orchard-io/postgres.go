@@ -1,3 +1,5 @@
+//go:build postgres
+
 package main
 
 import (
@@ -38,6 +40,7 @@ func NewPostgres(additionalMigrateTypes ...any) (*PostgresDBStore, error) {
 	if err != nil {
 		return nil, stackerr.Errorf("db open: %w", err)
 	}
+	gdb.TranslateErrors = true
 	db, err := gdb.DB() //sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, stackerr.Errorf("open db: %w", err)
