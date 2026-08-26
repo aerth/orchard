@@ -413,7 +413,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 	slog.Info("done editing", "out", toolout.Content)
 	outmsg1 := *chatmessages.New(toolout)
 	outmsg1.ThreadID = parentThreadID
-	handler.HandleToolOutputs(outmsg1)
+	//handler.HandleToolOutputs(outmsg1)
 	outmsgs := chatmessages.A{outmsg1}
 	outmsgs = outmsgs.RemoveThoughts()
 	slog.Info("editor returning messages", "n", len(outmsgs))
