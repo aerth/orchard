@@ -288,6 +288,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 				if err != nil {
 					errmsg := *chatmessages.NewThread(sessionThreadID, llm.Message{Role: "system"})
 					errmsg.Content = fmt.Sprintf("Delete Lines failed: %+v", err)
+					errmsg.ThreadID = sessionThreadID
 					stack = append(stack, errmsg)
 					handler.HandleToolOutputs(errmsg)
 					continue
