@@ -44,6 +44,9 @@ func (h *Handler) Send(r hgr2.ResponseWrap) error {
 
 // HandleToolOutputs for tool (or system) role outputs
 func (h *Handler) HandleToolOutputs(cm chatmessages.ChatMessage) {
+	if cm.ThreadID == uuid.Nil {
+		cm.ThreadID = h.ThreadID
+	}
 	slog := slog.With("fn", "HandleToolOutputs", "msgid", cm.MessageID)
 	slog.Info("HANDLE OTHER", "cm", cm.String(), "thr", cm.ThreadID)
 	if err := h.Send(hgr2.ResponseWrap{V: cm}); err != nil {
@@ -56,7 +59,11 @@ func (h *Handler) HandleToolOutputs(cm chatmessages.ChatMessage) {
 
 // BeginStream starts a new stream within this channel
 func (h *Handler) BeginStream() error {
-	return h.Send(hgr2.ResponseWrap{V: *chatmessages.NewFromRole("", "assistant", "")})
+	cm := chatmessages.NewFromRole("", "assistant", "")
+	cm.ThreadID = h.ThreadID
+	return h.Send(hgr2.ResponseWrap{
+		V: *cm,
+	})
 }
 
 // Handle implements [chat.Handler]
