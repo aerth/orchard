@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+
 	"m/pkg/global"
 	"m/pkg/llm"
-	"os"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -40,7 +41,7 @@ const (
 func NewConsoleLogger(ww ...io.Writer) *ConsoleLogger {
 	hidetoolcall := global.Get().Get().HideToolCalls
 	nocolor := global.Get().Get().NoColor || os.Getenv("NO_COLOR") != ""
-	w := io.Writer(os.Stderr)
+	w := io.Writer(io.Discard)
 	tw := w
 	if len(ww) == 1 {
 		w = ww[0]
