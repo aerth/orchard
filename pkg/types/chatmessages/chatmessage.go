@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
 	"slices"
 	"strings"
 	"time"
+
+	"m/pkg/llm"
+	"m/pkg/types/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -406,44 +407,45 @@ var GetMaxDistance = func(cm ChatMessage) int {
 }
 
 func (cm ChatMessages) Raw() llm.Messages {
-	l := len(cm) // 5
+	cloned := slices.Clone(cm)
+	l := len(cloned) // 5
 	if l == 0 {
 		return nil
 	}
-	a := make(llm.Messages, 0, len(cm)*2) // worst case scenario allocate double
+	a := make(llm.Messages, 0, len(cloned)*2) // worst case scenario allocate double
 
 	// [1 2 3 4 5]
 	var distance int
-	for i := range cm {
-		if cm[i].Aux != nil {
+	for i := range cloned {
+		if cloned[i].Aux != nil {
 			//slog.Warn("skipping raw(aux) that is not useful to LLM", "i", i)
 			continue
 		}
-		if cm[i].IsEmpty() {
+		if cloned[i].IsEmpty() {
 			//slog.Warn("skipping raw(empty) that should not even be here", "i", i)
 			continue
 		}
-		if strings.HasPrefix(cm[i].Content, CancelMessage) {
+		if strings.HasPrefix(cloned[i].Content, CancelMessage) {
 			// skip purely cancelled messages maybe consisting of only Thinking or otherwise empty
 			continue
 		}
 
 		// handle max distance from tip
 		distance = l - (i + 1) // 4
-		suffix, mx := MaxDistanceSuffix(cm[i], distance)
+		suffix, mx := MaxDistanceSuffix(cloned[i], distance)
 		if mx != 0 && mx < distance {
-			x := cm[i].Message // copy llm.Message
-			x.Content = ReplacementMaxDistanceText(cm[i].MessageID)
+			x := *new(cloned[i].Message) // copy llm.Message
+			x.Content = ReplacementMaxDistanceText(cloned[i].MessageID)
 			a = append(a, x)
 			continue
 		}
-		a = append(a, cm[i].Message)
+		a = append(a, *new(cloned[i].Message))
 		if suffix != "" {
 			msg := llm.Message{Role: "system", Content: "The previous message " + suffix}
 			a = append(a, msg)
 		}
 		if suffix == "" && i < l-1 {
-			if tm := getTimeMessage(cm[i], cm[i+1]); tm != "" {
+			if tm := getTimeMessage(cloned[i], cloned[i+1]); tm != "" {
 				msg := llm.Message{Role: "system", Content: tm}
 				a = append(a, msg)
 
