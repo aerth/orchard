@@ -145,9 +145,9 @@ Chat:
 			}
 			e.Prepend = []llm.Message{{Role: "system", Content: spr}}
 			e.Tools = tools.ToMarshaler()
-			for i := range e.Tools {
-				_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
-			}
+			//		for i := range e.Tools {
+			//			_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
+			//		}
 			e.ShowRequests = conf.Get().ShowRequests
 			err = chat.ChatPlain(ctx, conf.GetThreadID(), stack.TopN(20), e)
 			if spin != nil {
