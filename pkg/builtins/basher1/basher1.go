@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"maps"
 	"math/rand"
@@ -68,7 +69,7 @@ func doShellReview(ctx context.Context, ch chan error, code string) {
 		{Role: "system", Content: randReviewerText()},
 		{Role: "user", Content: code},
 	}
-	cl := debugging.NewConsoleLogger(global.LogWriter)
+	cl := debugging.NewConsoleLogger(io.Discard)
 	err := llm.New().Chat(ctx, creq, gr.GatherChatResponse, cl.HandleChatResponse)
 	if err != nil {
 		ch <- stackerr.Errorf("shell review generation failed: %w", err)
