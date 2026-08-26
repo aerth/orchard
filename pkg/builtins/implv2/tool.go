@@ -312,6 +312,13 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			err = session.ApplySurgicalEdit(strings.Split(newmsg.Content, "\n"))
 			if err != nil {
 				slog.Error("surgical edit failed", "err", err)
+				if errors.Is(err, ErrKeywordCancelled) {
+					// no longer in edit mode
+					session.LockStart = 0
+					session.LockEnd = 0
+					continue
+
+				}
 				errmsg := *chatmessages.NewThread(sessionThreadID, llm.Message{Role: "system"})
 				errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
 				stack = append(stack, errmsg)
