@@ -205,7 +205,8 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			newstate := *chatmessages.NewSystemEphemeral("")
 			newstate.Content = strings.Join([]string{card, session.SystemMessage()}, "\n")
 			newstate.ThreadID = sessionThreadID
-			newusermsg := *chatmessages.NewFromRole("auto", "user", "What is the next action? Use a single edit_file protocol command.")
+			newusermsg := *chatmessages.NewFromRole("auto", "user",
+				fmt.Sprintf("You are currently in the `edit_file` session. What is the next action? Use a single edit_file protocol command. Available commands: %q", AllOperations))
 			newusermsg.ThreadID = sessionThreadID
 			if numLocked := session.NumLinesLocked(); numLocked != 0 {
 				if numLocked == 1 {
@@ -317,7 +318,6 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 					session.LockStart = 0
 					session.LockEnd = 0
 					continue
-
 				}
 				errmsg := *chatmessages.NewThread(sessionThreadID, llm.Message{Role: "system"})
 				errmsg.Content = fmt.Sprintf("ApplySurgicalEdit failed: %+v", err)
@@ -373,7 +373,8 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 		}
 		if err != nil {
 			slog.Error("parsing edit TODO", "err", err)
-			msg := *chatmessages.NewSystemEphemeral("Error: " + err.Error() + "\n\nTry again or use CANCEL to return to conversation")
+			msg := *chatmessages.NewSystemEphemeral("Could not parse operator keyword: " + err.Error() + "\n\nTry again or use CANCEL to return to conversation")
+			msg.MaxDistance = 2
 			msg.ThreadID = sessionThreadID
 			stack = append(stack, msg)
 			handler.HandleToolOutputs(msg)
