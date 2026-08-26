@@ -216,7 +216,12 @@ Chat:
 			return nil
 		}
 		if numRounds == 1 && len(newcaller.ToolCalls) == 0 {
-			break
+			slog.Info("nudging continue")
+			newcaller.Ephemeral = true
+			tmp := NewEphemeralSystem("This environment allows for tool calls. Use " + finishLoopTool + " to break this loop, or use tools to continue.")
+			tmp.MaxDistance = 1
+			stack = append(stack, tmp)
+			continue
 		}
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
 			if isAuto || nonudge {
