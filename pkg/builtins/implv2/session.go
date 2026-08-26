@@ -361,6 +361,7 @@ func (s *Session) ApplyAction(action Action) Result {
 		return Result{E: fmt.Errorf("no active file selected, cant %s yet. use %s first", action.Op, OpFilename), Code: CodeError}
 	}
 
+	slog.Info("Applying Action", "action", action.Op, "arg", shorten(action.Content, 100))
 	switch action.Op {
 	default:
 		return Result{E: stackerr.Errorf("unhandled protocol command %q", action.Op), Code: CodeError}
@@ -452,6 +453,13 @@ func (s *Session) ApplyAction(action Action) Result {
 	}
 }
 
+func shorten(s string, n int) string {
+	if len(s) < n {
+		return s
+	}
+	return s[:n]
+}
+
 func (s *Session) CurrentLineString() string {
 	if s.CurrentLine == 0 {
 		return "" // should not happen
@@ -459,4 +467,4 @@ func (s *Session) CurrentLineString() string {
 	return s.Lines[s.CurrentLine]
 }
 
-var MaxLinesLocked = 6
+var MaxLinesLocked = 40
