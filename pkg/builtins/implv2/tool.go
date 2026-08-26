@@ -255,6 +255,8 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			} else {
 				slog.Error("not a BeginStream interface", "T", fmt.Sprintf("%T", handler))
 			}
+		} else {
+			slog.Error("handler is nil!!")
 		}
 		creq.Think = false
 		if session.NumLinesLocked() > 20 {
