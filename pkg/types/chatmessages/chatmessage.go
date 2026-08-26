@@ -493,7 +493,7 @@ func MaxDistanceSuffix(cm ChatMessage, distance int) (string, int) {
 	case mx == 0:
 	case mx < distance:
 		suffix = fmt.Sprintf("was forgotten after %d (currently %d)", mx, distance)
-	case mx != 0 && (mx-distance) < 4:
+	case mx > 4 && (mx-distance) < 4:
 		suffix = fmt.Sprintf("will be forgotten after %d more messages.", mx-distance)
 	}
 	return suffix, mx
