@@ -45,7 +45,7 @@ func SetStaticMessage(s string) {
 	staticMessage = s
 }
 
-var nonudge = true
+var nonudge = false
 
 func GetSystemMessage(stack chatmessages.ChatMessages) (string, error) {
 	if staticMessage != "" {
@@ -215,7 +215,7 @@ Chat:
 		if len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool {
 			return nil
 		}
-		if numRounds == 1 && len(newcaller.ToolCalls) == 0 {
+		if len(newcaller.ToolCalls) == 0 && !nonudge {
 			slog.Info("nudging continue")
 			newcaller.Ephemeral = true
 			tmp := NewEphemeralSystem("This environment allows for tool calls. Use " + finishLoopTool + " to break this loop, or use tools to continue.")
