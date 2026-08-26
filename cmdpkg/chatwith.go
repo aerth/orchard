@@ -94,7 +94,6 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 			tools = got
 		}
 	}
-	e.Tools = append(e.Tools, json.RawMessage(finishLoopToolSpec))
 Chat:
 	for ctx.Err() == nil {
 		numRounds++
@@ -145,6 +144,8 @@ Chat:
 			}
 			e.Prepend = []llm.Message{{Role: "system", Content: spr}}
 			e.Tools = tools.ToMarshaler()
+			e.Tools = append(e.Tools, json.RawMessage(finishLoopToolSpec))
+
 			//		for i := range e.Tools {
 			//			_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
 			//		}
@@ -219,7 +220,7 @@ Chat:
 			slog.Info("nudging continue")
 			newcaller.Ephemeral = true
 			tmp := NewEphemeralSystem("This environment allows for tool calls. Use **" + finishLoopTool + "** tool call to break this loop, or use other tools to continue.")
-			tmp.MaxDistance = 1
+			tmp.MaxDistance = 2
 			stack = append(stack, tmp)
 			continue
 		}
