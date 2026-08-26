@@ -252,6 +252,8 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 				if err := x.BeginStream(); err != nil {
 					return nil, err
 				}
+			} else {
+				slog.Error("not a BeginStream interface", "T", fmt.Sprintf("%T", handler))
 			}
 		}
 		creq.Think = false
