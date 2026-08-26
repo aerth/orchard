@@ -6,7 +6,7 @@ OCHATDIR=../orchard-chat/
 build: ${bin}/orchard-io
 ${bin}/orchard-io:	*.go */*.go */*/*.go */*/*/*.go
 	@echo Building orchard-io
-	go -C ./cmd/orchard-io build -v -ldflags '-X main.version=${VERSION} -X main.buildtime=${NOW} -X main.ollamahost=${OLLAMA_HOST} -X main.ollamamodel=${OLLAMA_MODEL} -X main.ollamathink=${OLLAMA_THINK}' -o $@
+	go -C ./cmd/orchard-io build -v -tags postgres -ldflags '-X main.version=${VERSION} -X main.buildtime=${NOW} -X main.ollamahost=${OLLAMA_HOST} -X main.ollamamodel=${OLLAMA_MODEL} -X main.ollamathink=${OLLAMA_THINK}' -o $@
 	@test ! -d $(OCHATDIR) || echo "Building Orchard TUI ($(OCHATDIR))"
 	@test ! -d $(OCHATDIR) || ${MAKE} -C $(OCHATDIR) 1>/dev/null
 run: build
