@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -66,7 +67,7 @@ func NewEditTool(session *Session) *EditorTool {
 	return edit
 }
 
-var MaxRounds = 7
+var MaxRounds = 0 // unlimited 0
 
 func (s *Session) EditTool() otool.ExecFunc {
 	return s.editor.EditTool
@@ -165,7 +166,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 	var operators []string
 	creq := llm.NewChatRequest()
 	var card string
-	cl := debugging.NewConsoleLogger(global.LogWriter, global.LogWriter)
+	cl := debugging.NewConsoleLogger(io.Discard)
 	rounds := 0
 	numberFilesEdited := 0
 	ext := e.Ext
@@ -194,7 +195,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 	var filesModifiedList []string
 	for ctx.Err() == nil {
 		rounds++
-		if rounds > MaxRounds {
+		if MaxRounds != 0 && rounds > MaxRounds {
 			slog.Warn("hit max rounds")
 			break
 		}
