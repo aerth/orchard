@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"slices"
 	"strings"
@@ -72,9 +73,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	}
 	var cl *debugging.ConsoleLogger
 	{
-		tw := global.LogWriter // thought writer
-		out := global.LogWriter
-		cl = debugging.NewConsoleLogger(out, tw)
+		cl = debugging.NewConsoleLogger(io.Discard)
 	}
 	var err error
 	handlers := e.Handlers // unmodified before loop
