@@ -182,9 +182,9 @@ Chat:
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
 		// handle tools
 		for _, op := range badwordsimplv2 {
-			if strings.HasPrefix(newcaller.Content, string(op)) { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
+			if strings.HasPrefix(newcaller.Content, string(op)) || strings.Contains(newcaller.Content, "\n"+string(op)+" ") { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
 				newcaller.Ephemeral = true
-				stack = append(stack, NewEphemeralSystem("Attention! You must use edit_file tool for using file-editing operator keywords"))
+				stack = append(stack, NewEphemeralSystem("Attention! You must use edit_file tool to begin the file-editing session where you may use operator keywords."))
 				continue
 			}
 		}
