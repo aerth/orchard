@@ -187,8 +187,10 @@ Chat:
 		newcaller = &stack[len(stack)-1]  // fix ptr for below
 		switch {
 		case len(newcaller.ToolCalls) == 1 && newcaller.Content == "" && newcaller.ToolCalls.GetNames()[0] == finishLoopTool:
+			nonudge = true
 			newcaller.Ephemeral = true
 		case strings.HasSuffix(newcaller.Content, finishLoopTool):
+			nonudge = true
 			newcaller.Ephemeral = true
 		case hasBreakAt >= 0:
 			if hasBreakAt != 0 {
