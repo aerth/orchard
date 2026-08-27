@@ -219,7 +219,7 @@ Chat:
 				return err
 			}
 		}
-		if len(newcaller.ToolCalls) == 0 && !nonudge {
+		if len(newcaller.ToolCalls) == 0 && !nonudge && hasBreakAt < 0 {
 			slog.Info("nudging continue")
 			newcaller.Ephemeral = true
 			tmp := NewEphemeralSystem("You sent a message, but it had no tool calls. This environment allows for tool calls. You *must* use **" + finishLoopTool + "** tool call to break this loop, or use other tools to continue. If there is no work to be done, break the loop.")
