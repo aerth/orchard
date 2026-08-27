@@ -199,6 +199,8 @@ Chat:
 		case len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool:
 			shouldBreak = true
 			newcaller.Ephemeral = true
+		case hasBreakAt >= 0:
+			newcaller.ToolCalls = newcaller.ToolCalls
 		default:
 		}
 		if e.AfterGen != nil {
