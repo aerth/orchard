@@ -144,13 +144,13 @@ Chat:
 				return stackerr.Errorf("%w", err)
 			}
 			e.Prepend = []llm.Message{{Role: "system", Content: spr}}
-			e.Tools = tools.ToMarshaler()
-			e.Tools = append(e.Tools, json.RawMessage(finishLoopToolSpec))
 
 			//		for i := range e.Tools {
 			//			_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
 			//		}
 			e.ShowRequests = conf.Get().ShowRequests
+			e.Tools = tools.ToMarshaler()
+			e.Tools = append(e.Tools, finishLoopToolSpec)
 			err = chat.ChatPlain(ctx, conf.GetThreadID(), stack.TopN(20), e)
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
