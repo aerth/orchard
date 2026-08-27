@@ -188,8 +188,6 @@ Chat:
 		switch {
 		case len(newcaller.ToolCalls) == 1 && newcaller.Content == "" && newcaller.ToolCalls.GetNames()[0] == finishLoopTool:
 			newcaller.Ephemeral = true
-		case len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool:
-			newcaller.Ephemeral = true
 		case strings.HasSuffix(newcaller.Content, finishLoopTool):
 			newcaller.Ephemeral = true
 		case hasBreakAt >= 0:
@@ -203,13 +201,6 @@ Chat:
 			if err := e.AfterGen(newcaller); err != nil {
 				return err
 			}
-		}
-
-			return nil
-		}
-
-		if len(newcaller.ToolCalls) == 0 && strings.TrimSpace(newcaller.Content) == finishLoopTool {
-			return nil
 		}
 		if len(newcaller.ToolCalls) == 0 && !nonudge {
 			slog.Info("nudging continue")
