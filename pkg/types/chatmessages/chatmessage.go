@@ -439,11 +439,11 @@ func (cm ChatMessages) Raw() llm.Messages {
 			continue
 		}
 		a = append(a, *new(cloned[i].Message))
+		// add system message
 		if suffix != "" {
 			msg := llm.Message{Role: "system", Content: "The previous message " + suffix}
 			a = append(a, msg)
-		}
-		if suffix == "" && i < l-1 {
+		} else if suffix == "" && i >= 0 && i < l-1 {
 			if tm := getTimeMessage(cloned[i], cloned[i+1]); tm != "" {
 				msg := llm.Message{Role: "system", Content: tm}
 				a = append(a, msg)
