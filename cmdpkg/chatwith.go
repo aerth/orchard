@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"m/pkg/builtins/implv2"
 	"m/pkg/chat"
 	"m/pkg/debugging"
 	"m/pkg/global"
@@ -59,6 +58,12 @@ func GetSystemMessage(stack chatmessages.ChatMessages) (string, error) {
 		}
 		return x, nil
 	}
+}
+
+var badwordsimplv2 = []string{}
+
+func SetBadWordsImplv2(a []string) {
+	badwordsimplv2 = a
 }
 
 // ChatWith is the main single-threaded fully-featured chat loop,
@@ -176,7 +181,7 @@ Chat:
 		}
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
 		// handle tools
-		for _, op := range implv2.AllOperations {
+		for _, op := range badwordsimplv2 {
 			if strings.HasPrefix(newcaller.Content, string(op)) { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
 				newcaller.Ephemeral = true
 				stack = append(stack, NewEphemeralSystem("Error: you must use edit_file tool for using file-editing operator keywords"))
