@@ -184,7 +184,7 @@ Chat:
 		for _, op := range badwordsimplv2 {
 			if strings.HasPrefix(newcaller.Content, string(op)) { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
 				newcaller.Ephemeral = true
-				stack = append(stack, NewEphemeralSystem("Error: you must use edit_file tool for using file-editing operator keywords"))
+				stack = append(stack, NewEphemeralSystem("Attention! You must use edit_file tool for using file-editing operator keywords"))
 				continue
 			}
 		}
