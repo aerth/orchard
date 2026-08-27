@@ -159,12 +159,7 @@ Chat:
 				slog.Warn("no summary found")
 			}
 		}
-		shouldBreak := err != nil
-
 		hasBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
-		if hasBreakAt >= 0 {
-			shouldBreak = true
-		}
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
@@ -205,9 +200,6 @@ Chat:
 			if err := e.AfterGen(newcaller); err != nil {
 				return err
 			}
-		}
-		if shouldBreak {
-			return nil
 		}
 
 		if strings.HasSuffix(newcaller.Content, finishLoopTool) {
