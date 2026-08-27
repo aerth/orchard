@@ -200,7 +200,7 @@ Chat:
 			shouldBreak = true
 			newcaller.Ephemeral = true
 		case hasBreakAt >= 0:
-			newcaller.ToolCalls = newcaller.ToolCalls
+			newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt)
 		default:
 		}
 		if e.AfterGen != nil {
@@ -228,7 +228,7 @@ Chat:
 			continue
 		}
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
-			if isAuto || nonudge {
+			if hasBreakAt >= 0 || isAuto || nonudge {
 				return nil // max 2 consecutive
 			}
 			stack = append(stack, NewEphemeralSystem("Quickly use %q tool to complete this round if there are no additional tool calls needed, or continue working on the task.", finishLoopTool))
