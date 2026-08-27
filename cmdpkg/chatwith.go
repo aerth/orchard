@@ -82,7 +82,6 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		e.ThreadID = global.Get().Get().ThreadID
 	}
 	noStore := e.ThreadID == uuid.Nil
-	isAuto := false
 	numRounds := 0
 
 	restrict := global.Get().Get().ToolsLimited
@@ -214,18 +213,8 @@ Chat:
 			continue
 		}
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
-			if hasBreakAt >= 0 || isAuto || nonudge {
-				return nil // max 2 consecutive
-			}
-			stack = append(stack, NewEphemeralSystem("Quickly use %q tool to complete this round if there are no additional tool calls needed, or continue working on the task.", finishLoopTool))
-			isAuto = true
-			continue
-		}
-		isAuto = false
-		if newcaller.ToolCalls.GetNames()[0] == finishLoopTool {
 			return nil
 		}
-		//
 		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls), "ok", ctx.Err() == nil)
 		if e.PreTools != nil {
 			err := e.PreTools(ctx, newcaller, newcaller.ToolCalls.GetNames())
