@@ -159,6 +159,9 @@ Chat:
 			}
 		}
 		hasBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
+		if hasBreakAt >= 0 {
+			newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt)
+		}
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
@@ -196,7 +199,6 @@ Chat:
 			if hasBreakAt != 0 {
 				newcaller.Ephemeral = true
 			}
-			newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt)
 		default:
 		}
 		if e.AfterGen != nil {
