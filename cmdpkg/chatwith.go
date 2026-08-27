@@ -200,6 +200,11 @@ Chat:
 		}
 		stack = append(stack, *newcaller) // for this thread only
 		newcaller = &stack[len(stack)-1]  // fix ptr for below
+		if e.AfterGen != nil {
+			if err := e.AfterGen(newcaller); err != nil {
+				return err
+			}
+		}
 		switch {
 		case len(newcaller.ToolCalls) == 1 && newcaller.Content == "" && newcaller.ToolCalls.GetNames()[0] == finishLoopTool:
 			nonudge = true
@@ -212,12 +217,9 @@ Chat:
 			if hasBreakAt != 0 {
 				newcaller.Ephemeral = true
 			}
+		case hasBreakAt == 0: // first and only tool call
+			return nil
 		default:
-		}
-		if e.AfterGen != nil {
-			if err := e.AfterGen(newcaller); err != nil {
-				return err
-			}
 		}
 		if len(newcaller.ToolCalls) == 0 && !nonudge && hasBreakAt < 0 {
 			slog.Info("nudging continue")
