@@ -192,6 +192,7 @@ Chat:
 		hasBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
 		if hasBreakAt >= 0 {
 			slog.Info("GOT BREAK")
+			time.Sleep(time.Second * 2)
 			newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt)
 		}
 		if hasBreakAt == 0 && newcaller.Content == "" {
