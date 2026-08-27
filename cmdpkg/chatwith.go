@@ -207,7 +207,7 @@ Chat:
 		if len(newcaller.ToolCalls) == 0 && !nonudge {
 			slog.Info("nudging continue")
 			newcaller.Ephemeral = true
-			tmp := NewEphemeralSystem("This environment allows for tool calls. Use **" + finishLoopTool + "** tool call to break this loop, or use other tools to continue.")
+			tmp := NewEphemeralSystem("You sent a message, but it had no tool calls. This environment allows for tool calls. Use **" + finishLoopTool + "** tool call to break this loop, or use other tools to continue.")
 			tmp.MaxDistance = 2
 			stack = append(stack, tmp)
 			continue
