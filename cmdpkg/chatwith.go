@@ -163,7 +163,10 @@ Chat:
 		}
 		shouldBreak := err != nil
 
-		hasBreak := slices.Contains(newcaller.ToolCalls.GetNames(), finishLoopTool)
+		hasBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
+		if hasBreakAt >= 0 {
+			shouldBreak = true
+		}
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
