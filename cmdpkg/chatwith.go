@@ -182,9 +182,9 @@ Chat:
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
 		// handle tools
 		for _, op := range implv2.AllOperations {
-			if strings.HasPrefix(newcaller.Content, string(op)+" ") { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
+			if strings.HasPrefix(newcaller.Content, string(op)) { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
 				newcaller.Ephemeral = true
-				stack = append(stack, NewEphemeralSystem("Error: you must use edit_file tool to use SELECT_FILE and other operators"))
+				stack = append(stack, NewEphemeralSystem("Error: you must use edit_file tool for using file-editing operator keywords"))
 				continue
 			}
 		}
