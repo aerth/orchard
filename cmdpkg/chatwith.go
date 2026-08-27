@@ -145,9 +145,6 @@ Chat:
 			}
 			e.Prepend = []llm.Message{{Role: "system", Content: spr}}
 
-			//		for i := range e.Tools {
-			//			_ = json.NewEncoder(global.LogWriter).Encode(e.Tools[i])
-			//		}
 			e.ShowRequests = conf.Get().ShowRequests
 			e.Tools = tools.ToMarshaler()
 			e.Tools = append(e.Tools, finishLoopToolSpec)
