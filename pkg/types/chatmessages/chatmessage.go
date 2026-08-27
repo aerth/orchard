@@ -542,6 +542,9 @@ func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname 
 		return "", nil
 	}
 	if cm.Aux == nil {
+		if cm.Equals(llm.Message{}) && cm.From != "" && cm.Summary != nil {
+			return "", nil // TODO: better yield_control finishLoopTool
+		}
 		if cm.Equals(llm.Message{}) && cm.From != "" {
 			return fmt.Sprintf("(empty from %s)", cm.From), nil
 		}
