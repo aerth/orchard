@@ -159,11 +159,6 @@ Chat:
 				slog.Warn("no summary found")
 			}
 		}
-		hasBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
-		if hasBreakAt >= 0 {
-			slog.Info("GOT BREAK")
-			newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt)
-		}
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return stackerr.Errorf("gen: %w", err)
 		}
@@ -189,6 +184,11 @@ Chat:
 			}
 		}
 
+		hasBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
+		if hasBreakAt >= 0 {
+			slog.Info("GOT BREAK")
+			newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt)
+		}
 		stack = append(stack, *newcaller) // for this thread only
 		newcaller = &stack[len(stack)-1]  // fix ptr for below
 		switch {
