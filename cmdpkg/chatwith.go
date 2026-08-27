@@ -139,7 +139,8 @@ Chat:
 				cl.Reset() // nice thinking colors
 			}
 
-			spr, err := GetSystemMessage(stack)
+			var spr string
+			spr, err = GetSystemMessage(stack)
 			if err != nil {
 				return stackerr.Errorf("%w", err)
 			}
