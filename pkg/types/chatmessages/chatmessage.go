@@ -435,7 +435,9 @@ func (cm ChatMessages) Raw() llm.Messages {
 		suffix, mx := MaxDistanceSuffix(cloned[i], distance)
 		if mx != 0 && mx < distance {
 			x := ReplacementMaxDistanceText(cloned[i]).Message
-			a = append(a, x)
+			if x.Content != "" {
+				a = append(a, x)
+			}
 			continue
 		}
 		a = append(a, *new(cloned[i].Message))
@@ -474,6 +476,10 @@ func getTimeMessage(cur, next ChatMessage) string {
 }
 
 func ReplacementMaxDistanceText(cm ChatMessage) ChatMessage {
+	if cm.MaxDistance < 4 {
+		cm.Content = ""
+		return cm
+	}
 	// worth noting that typical write-operations are small/empty content while read-operations are large content (eg. cat or touch)
 	cm.Role = "system" // prevent llm copycat loop
 	cm.Content = "(this message has disappeared for brevity)"
