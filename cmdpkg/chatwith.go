@@ -201,10 +201,6 @@ Chat:
 				return err
 			}
 		}
-		// case len(cm.ToolCalls) == 1 && cm.Content == "" && cm.ToolCalls.GetNames()[0] == finishTool:
-		// skip
-		//	return nil
-		// case len(cm.ToolCalls) == 0 && strings.TrimSpace(cm.Content) == finishTool:
 		if shouldBreak {
 			return nil
 		}
