@@ -193,6 +193,7 @@ Chat:
 			nonudge = true
 			newcaller.Ephemeral = true
 		case hasBreakAt >= 0:
+			nonudge = true
 			if hasBreakAt != 0 {
 				newcaller.Ephemeral = true
 			}
