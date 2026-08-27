@@ -189,6 +189,9 @@ Chat:
 			slog.Info("GOT BREAK")
 			newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt)
 		}
+		if hasBreakAt == 0 && newcaller.Content == "" {
+			return nil
+		}
 		stack = append(stack, *newcaller) // for this thread only
 		newcaller = &stack[len(stack)-1]  // fix ptr for below
 		switch {
