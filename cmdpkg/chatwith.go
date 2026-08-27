@@ -148,7 +148,7 @@ Chat:
 			e.ShowRequests = conf.Get().ShowRequests
 			e.Tools = tools.ToMarshaler()
 			e.Tools = append(e.Tools, finishLoopToolSpec)
-			err = chat.ChatPlain(ctx, conf.GetThreadID(), stack.TopN(20), e)
+			err = chat.ChatPlain(ctx, conf.GetThreadID(), stack.TopN(100), e)
 			if spin != nil {
 				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
 			}
