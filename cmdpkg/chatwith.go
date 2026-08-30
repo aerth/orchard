@@ -191,9 +191,16 @@ Chat:
 
 		hasBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
 		if hasBreakAt >= 0 {
-			slog.Info("GOT BREAK")
-			time.Sleep(time.Second * 2)
-			newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt)
+			if len(newcaller.ToolCalls) == 1 && hasBreakAt == 0 {
+				newcaller.ToolCalls = nil
+			} else {
+				slog.Info("GOT BREAK", "at", hasBreakAt)
+				time.Sleep(time.Second * 2)
+				newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt+1)
+				if len(newcaller.ToolCalls) == 0 {
+					newcaller.ToolCalls = nil
+				}
+			}
 		}
 		if hasBreakAt == 0 && newcaller.Content == "" {
 			return nil
@@ -217,14 +224,16 @@ Chat:
 			if hasBreakAt != 0 {
 				newcaller.Ephemeral = true
 			}
-		case hasBreakAt == 0: // first and only tool call
+		case hasBreakAt == 0: // first and only tool call. had content.
 			return nil
 		default:
 		}
 		if len(newcaller.ToolCalls) == 0 && !nonudge && hasBreakAt < 0 {
 			slog.Info("nudging continue")
 			newcaller.Ephemeral = true
-			tmp := NewEphemeralSystem("Attention! You sent a text message, but it had no tool calls. This environment allows for tool calls. The message was sent successfully, and should not be re-submitted. You *must* use **" + finishLoopTool + "** tool call to break this loop, or use other tools to continue. If there is no work to be done, break the loop by calling the " + finishLoopTool + " tool.")
+			tmp := NewEphemeralSystem(
+				"Attention! You sent a text message, but it had no tool calls. " +
+					"This environment allows for tool calls. The message was sent successfully, and should not be re-submitted. You *must* use **" + finishLoopTool + "** tool call to break this loop, or use other tools to continue. If there is no work to be done, break the loop by calling the " + finishLoopTool + " tool.")
 			tmp.MaxDistance = 1
 			stack = append(stack, tmp)
 			continue
