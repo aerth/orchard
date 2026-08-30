@@ -218,6 +218,23 @@ type (
 	ToolCalls []json.RawMessage
 )
 
+func (cm Messages) ThoughtContent() []string {
+	if len(cm) == 0 {
+		return nil
+	}
+	a := make([]string, len(cm)*2)
+	for i := range cm {
+		j := i * 2
+		k := j + 1
+		if cm[i].Thinking != "" {
+			a[j] = "*" + cm[i].Thinking + "*\n"
+		}
+		a[k] = cm[i].Content + " from " + cm[i].Role
+
+	}
+	return a
+}
+
 func (cm Messages) TrimThoughts(i int) {
 	l := len(cm)
 	if l <= i {
