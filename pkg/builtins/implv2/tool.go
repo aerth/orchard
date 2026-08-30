@@ -208,7 +208,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			newusermsg := *chatmessages.NewFromRole("auto", "system",
 				fmt.Sprintf(
 					"You are currently in the `edit_file` session, with no lines locked for editing."+
-						"Use a single edit_file protocol command to proceed. Available commands: %q", AllOperations))
+						"Use a single edit_file protocol command to proceed. Available commands: %q\nAvoid locking lines that we are not changing.", AllOperations))
 			newusermsg.ThreadID = sessionThreadID
 			if numLocked := session.NumLinesLocked(); numLocked != 0 {
 				if numLocked == 1 {
