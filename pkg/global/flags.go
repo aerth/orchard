@@ -66,7 +66,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.ShowRequests, "v", cfg.ShowRequests, "show requests in log")
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
-	flag.BoolVar(&cfg.NoSpin, "nospin", debugging.NoSpin, "disable spin")
+	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
 	flag.BoolFunc("n", "no system prompt template", func(_ string) error {
 		_ = GetSystemBase
 		noTemplate = true
