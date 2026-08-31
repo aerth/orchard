@@ -29,7 +29,7 @@ func (s *Spinner) Reset() {
 
 var (
 	Out    = os.Stderr
-	NoSpin = false
+	NoSpin = true
 )
 
 // Start kicks off the spinner in a background goroutine, writing to Out
