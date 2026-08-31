@@ -31,7 +31,7 @@ const (
 	finishLoopTool = otool.FinishLoopToolName //"finish_turn"
 )
 
-var finishLoopToolSpec json.RawMessage = json.RawMessage(`{"function": {"name": "` + finishLoopTool + `", "description": "immediately finish this round, waiting for the user to respond"}, "parameters": {"required": [], "properties": {}}, "type": "function"}`)
+var finishLoopToolSpec json.RawMessage = json.RawMessage(`{"function": {"name": "` + finishLoopTool + `", "description": "calling this tool immediately finishes this turn, giving the (human) user an opportunity to send a message."}, "parameters": {"required": [], "properties": {}}, "type": "function"}`)
 
 func NewEphemeralSystem(s string, v ...any) chatmessages.ChatMessage {
 	cm := chatmessages.NewFromRole("", "system", fmt.Sprintf(s, v...))
@@ -69,6 +69,7 @@ func SetBadWordsImplv2(a []string) {
 // ChatWith is the main single-threaded fully-featured chat loop,
 // it gathers generated responses, runs tools, and runs Ext hooks.
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
+	t1 := time.Now()
 	slog := slog.With("ntools", len(tools))
 	slog.Info("starting ChatWith")
 	stack := make(chatmessages.ChatMessages, len(stackInput), 10000)
@@ -100,10 +101,15 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 			tools = got
 		}
 	}
+	var t2 time.Time
 Chat:
 	for ctx.Err() == nil {
 		numRounds++
 		slog = slog.With("round", numRounds)
+		if !t2.IsZero() {
+			slog.Info("starting new round", "stack", len(stack))
+		}
+		t2 = time.Now()
 		for i := range stack {
 			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil || (!noStore && stack[i].ThreadID == uuid.Nil) {
 				// keep this to identify regressions
@@ -189,20 +195,25 @@ Chat:
 			}
 		}
 
-		hasBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
-		if hasBreakAt >= 0 {
-			if len(newcaller.ToolCalls) == 1 && hasBreakAt == 0 {
+		toolCallBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
+		if toolCallBreakAt >= 0 {
+			if len(newcaller.ToolCalls) == 1 && toolCallBreakAt == 0 {
 				newcaller.ToolCalls = nil
 			} else {
-				slog.Info("GOT BREAK", "at", hasBreakAt)
+				slog.Info("GOT BREAK", "at", toolCallBreakAt)
 				time.Sleep(time.Second * 2)
-				newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, hasBreakAt, hasBreakAt+1)
+				newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, toolCallBreakAt, toolCallBreakAt+1)
 				if len(newcaller.ToolCalls) == 0 {
 					newcaller.ToolCalls = nil
 				}
 			}
 		}
-		if hasBreakAt == 0 && newcaller.Content == "" {
+		contentFinishLoopAt := strings.Index(newcaller.Content, finishLoopTool)
+		if contentFinishLoopAt >= 0 {
+			newcaller.Content = strings.TrimSpace(newcaller.Content[:contentFinishLoopAt])
+		}
+		if newcaller.Content == "" && len(newcaller.ToolCalls) == 0 {
+			slog.Debug("got empty")
 			return nil
 		}
 		stack = append(stack, *newcaller) // for this thread only
@@ -212,28 +223,34 @@ Chat:
 				return err
 			}
 		}
+		if contentFinishLoopAt >= 0 || toolCallBreakAt == 0 {
+			slog.Info("Done with round", "d", time.Since(t1), "d2", time.Since(t2))
+			return nil
+		}
 		switch {
+		case contentFinishLoopAt >= 0:
+			nonudge = true
 		case len(newcaller.ToolCalls) == 1 && newcaller.Content == "" && newcaller.ToolCalls.GetNames()[0] == finishLoopTool:
 			nonudge = true
 			newcaller.Ephemeral = true
 		case strings.HasSuffix(newcaller.Content, finishLoopTool):
 			nonudge = true
 			newcaller.Ephemeral = true
-		case hasBreakAt >= 0:
+		case toolCallBreakAt >= 0:
 			nonudge = true
-			if hasBreakAt != 0 {
+			if toolCallBreakAt != 0 {
 				newcaller.Ephemeral = true
 			}
-		case hasBreakAt == 0: // first and only tool call. had content.
+		case toolCallBreakAt == 0: // first and only tool call. had content.
 			return nil
 		default:
 		}
-		if len(newcaller.ToolCalls) == 0 && !nonudge && hasBreakAt < 0 {
+		if len(newcaller.ToolCalls) == 0 && !nonudge && toolCallBreakAt < 0 {
 			slog.Info("nudging continue")
 			newcaller.Ephemeral = true
 			tmp := NewEphemeralSystem(
-				"Attention! You sent a text message, but it had no tool calls. " +
-					"This environment allows for tool calls. The message was sent successfully, and should not be re-submitted. You *must* use **" + finishLoopTool + "** tool call to break this loop, or use other tools to continue. If there is no work to be done, break the loop by calling the " + finishLoopTool + " tool.")
+				"Attention! The assistant sent a text message, but it had no tool calls. " +
+					"This environment allows for tool calls. The previous message was sent by the assistant successfully, and should not be re-submitted. The assistant *must* use **" + finishLoopTool + "** tool function call to *break this loop*, or use other tools to continue work. If there is no work to be done **in this turn**, the assistant must break the loop now by calling the " + finishLoopTool + " tool.")
 			tmp.MaxDistance = 1
 			stack = append(stack, tmp)
 			continue
@@ -241,7 +258,7 @@ Chat:
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
 			return nil
 		}
-		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls), "ok", ctx.Err() == nil)
+		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls), "ok", ctx.Err() == nil, "names", newcaller.ToolCalls.GetNames())
 		if e.PreTools != nil {
 			err := e.PreTools(ctx, newcaller, newcaller.ToolCalls.GetNames())
 			if err != nil {
