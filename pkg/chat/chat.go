@@ -8,9 +8,9 @@ import (
 	"log/slog"
 	"slices"
 
-	"m/pkg/global"
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
+	"m/orchard/pkg/global"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"

@@ -3,9 +3,9 @@ package gitlog
 import (
 	"context"
 
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
-	"m/pkg/types/otool"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
+	"m/orchard/pkg/types/otool"
 )
 
 var cmdline = "git --no-pager log -p -n 100 --reverse | tail -n 200"

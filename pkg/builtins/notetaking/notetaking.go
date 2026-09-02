@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"m/cmdpkg"
-	"m/pkg/chat"
-	"m/pkg/llm"
-	"m/pkg/toolrunner"
-	"m/pkg/types/chatmessages"
-	"m/pkg/types/otool"
+	"m/orchard/cmdpkg"
+	"m/orchard/pkg/chat"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/toolrunner"
+	"m/orchard/pkg/types/chatmessages"
+	"m/orchard/pkg/types/otool"
 
 	"github.com/aerth/mostly/stackerr"
 )

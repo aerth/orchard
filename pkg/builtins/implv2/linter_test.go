@@ -3,7 +3,7 @@ package implv2
 import (
 	"testing"
 
-	"m/pkg/loaders/treesitters"
+	"m/orchard/pkg/loaders/treesitters"
 )
 
 func TestLint(t *testing.T) {

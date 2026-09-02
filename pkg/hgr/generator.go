@@ -6,12 +6,12 @@ import (
 	"log/slog"
 	"strings"
 
-	"m/cmdpkg"
-	"m/pkg/chat"
-	"m/pkg/hgr/hgr2"
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
-	"m/pkg/types/otool"
+	"m/orchard/cmdpkg"
+	"m/orchard/pkg/chat"
+	"m/orchard/pkg/hgr/hgr2"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
+	"m/orchard/pkg/types/otool"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"

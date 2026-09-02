@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"os"
 
-	"m/pkg/global"
-	"m/pkg/llm"
+	"m/orchard/pkg/global"
+	"m/orchard/pkg/llm"
 
 	"github.com/aerth/mostly/stackerr"
 )

@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"m/cmdpkg"
-	"m/pkg/loaders/toolboxes"
+	"m/orchard/cmdpkg"
+	"m/orchard/pkg/loaders/toolboxes"
 )
 
 func TestToolboxes(t *testing.T) {

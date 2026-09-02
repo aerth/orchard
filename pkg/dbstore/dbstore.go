@@ -9,7 +9,7 @@ import (
 	"log/slog"
 	"slices"
 
-	"m/pkg/types/chatmessages"
+	"m/orchard/pkg/types/chatmessages"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

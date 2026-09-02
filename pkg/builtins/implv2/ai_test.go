@@ -10,11 +10,11 @@ import (
 	"strings"
 	"testing"
 
-	"m/cmdpkg"
-	"m/pkg/builtins/implv2"
-	"m/pkg/llm"
-	"m/pkg/loaders/treesitters"
-	"m/pkg/types/chatmessages"
+	"m/orchard/cmdpkg"
+	"m/orchard/pkg/builtins/implv2"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/loaders/treesitters"
+	"m/orchard/pkg/types/chatmessages"
 
 	"github.com/joho/godotenv"
 )

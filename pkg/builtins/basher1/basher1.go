@@ -11,13 +11,13 @@ import (
 	"slices"
 	"strings"
 
-	"m/pkg/builtins/implv1/bashtooler"
-	"m/pkg/builtins/implv2"
-	"m/pkg/chat"
-	"m/pkg/debugging"
-	"m/pkg/global"
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
+	"m/orchard/pkg/builtins/implv1/bashtooler"
+	"m/orchard/pkg/builtins/implv2"
+	"m/orchard/pkg/chat"
+	"m/orchard/pkg/debugging"
+	"m/orchard/pkg/global"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
 
 	"github.com/aerth/mostly/stackerr"
 )

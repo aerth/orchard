@@ -1,4 +1,4 @@
-module m
+module m/orchard
 
 go 1.26.3
 

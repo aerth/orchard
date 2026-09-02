@@ -10,9 +10,9 @@ import (
 	"testing"
 	"text/template"
 
-	"m/pkg/loaders/mdloaders"
+	"m/orchard/pkg/loaders/mdloaders"
 
-	orchard "m"
+	orchard "m/orchard"
 )
 
 var noTemplate bool

@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"m/pkg/llm"
-	"m/pkg/types/vector256"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/vector256"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

@@ -3,8 +3,8 @@
 package main
 
 import (
-	"m/pkg/dbstore"
-	"m/pkg/types/chatmessages"
+	"m/orchard/pkg/dbstore"
+	"m/orchard/pkg/types/chatmessages"
 )
 
 func NewPostgres(chatMessage *chatmessages.ChatMessage) (*dbstore.Store, error) {

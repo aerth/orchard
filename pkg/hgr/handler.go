@@ -5,10 +5,10 @@ import (
 	"log/slog"
 	"time"
 
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
 
-	"m/pkg/hgr/hgr2"
+	"m/orchard/pkg/hgr/hgr2"
 
 	"github.com/google/uuid"
 )

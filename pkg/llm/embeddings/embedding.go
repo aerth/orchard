@@ -10,9 +10,9 @@ import (
 	"os"
 	"strings"
 
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
-	"m/pkg/types/vector256"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
+	"m/orchard/pkg/types/vector256"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"

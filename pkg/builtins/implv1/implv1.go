@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"m/pkg/chat"
-	"m/pkg/global"
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
+	"m/orchard/pkg/chat"
+	"m/orchard/pkg/global"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
 )
 
 type fileArgs struct {

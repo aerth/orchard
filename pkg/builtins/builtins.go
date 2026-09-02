@@ -10,9 +10,9 @@ import (
 	"log/slog"
 	"path/filepath"
 
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
-	"m/pkg/types/otool"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
+	"m/orchard/pkg/types/otool"
 )
 
 //go:embed *.json

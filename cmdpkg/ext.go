@@ -7,8 +7,8 @@ import (
 	"os"
 	"os/exec"
 
-	"m/pkg/debugging"
-	"m/pkg/global"
+	"m/orchard/pkg/debugging"
+	"m/orchard/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 )

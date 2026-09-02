@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"math/rand/v2"
 
-	"m/pkg/orderedmap"
-	//	"m/pkg/ollama/api/orderedmap"
+	"m/orchard/pkg/orderedmap"
+	//	"m/orchard/pkg/ollama/api/orderedmap"
 )
 
 type PropertyType []string

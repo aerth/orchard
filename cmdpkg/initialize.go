@@ -12,10 +12,10 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"m/pkg/global"
-	"m/pkg/llm"
-	"m/pkg/types/chatmessages"
-	"m/pkg/types/otool"
+	"m/orchard/pkg/global"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
+	"m/orchard/pkg/types/otool"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/joho/godotenv"

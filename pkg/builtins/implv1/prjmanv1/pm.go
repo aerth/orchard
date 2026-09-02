@@ -5,7 +5,7 @@ import (
 	"context"
 	"strings"
 
-	"m/pkg/types/chatmessages"
+	"m/orchard/pkg/types/chatmessages"
 )
 
 // SplitStack splits a stack of chat messages into chunks.

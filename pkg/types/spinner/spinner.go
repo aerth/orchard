@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"m/pkg/global"
-	"m/pkg/llm"
+	"m/orchard/pkg/global"
+	"m/orchard/pkg/llm"
 )
 
 type Spinner struct {
