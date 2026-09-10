@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"m/orchard/pkg/global"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
+
+	"m/orchard/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -164,13 +166,18 @@ var (
 	EchoPython     = false
 	DisableScripts = os.Getenv("NO_SCRIPTS") != ""
 )
+var otoolsdir string
 
 // RunPyStdin runs a script (stdin reader) using a specific venv python path and returns stdout as a string
 func RunPyStdin(ctx context.Context, stdin io.Reader, params RunParams) (string, error) {
 	args := params.Args
 	args = append([]string{"-"}, args...)
+	// otools/.venv/bin/python
 	const python3Executable = ".venv/bin/python3"
-	abs, err := os.Readlink(python3Executable)
+	if otoolsdir == "" {
+		otoolsdir = os.Getenv("ORCHARD_TOOLS")
+	}
+	abs, err := os.Readlink(filepath.Join(otoolsdir, python3Executable))
 	if err != nil {
 		slog.Warn("uhoh ", "err", err)
 		return "", fmt.Errorf("finding python failed: %w", err)
