@@ -5,20 +5,25 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
+	"m/orchard/pkg/types/vector256"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
-
-	"m/orchard/pkg/llm"
-	"m/orchard/pkg/types/chatmessages"
-	"m/orchard/pkg/types/vector256"
+	"time"
 
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
+
+func init() {
+	time.Sleep(time.Second * 10)
+	slog.Warn("this package is deprecated, please switch import to m/orchard/pkg/llm/genembed/")
+}
 
 var model = "nomic-embed-text:v1.5"
 
