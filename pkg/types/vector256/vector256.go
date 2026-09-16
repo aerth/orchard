@@ -11,6 +11,13 @@ import (
 // Vector256 represents a 256-dimensional float32 vector for pgvector and may be zero-length or a slice of 256 float32
 type Vector256 []float32
 
+// SearchEmbeddings helper type for 256 specific
+type SearchEmbeddings struct {
+	Embeddings Vector256 `gorm:"type:vector(256);null" json:"-"`
+}
+
+var VarLen = 256
+
 // Value converts the Go float32 slice into the '[0.1,0.2,...]' string format Postgres expects
 func (v Vector256) Value() (driver.Value, error) {
 	if v == nil {
@@ -19,8 +26,8 @@ func (v Vector256) Value() (driver.Value, error) {
 	if len(v) == 0 {
 		return nil, nil
 	}
-	if len(v) != 256 {
-		return nil, fmt.Errorf("invalid vector length: got %d, expected 256", len(v))
+	if len(v) != VarLen {
+		return nil, fmt.Errorf("invalid vector length: got %d, expected %d", len(v), VarLen)
 	}
 
 	strVals := make([]string, len(v))
@@ -51,8 +58,8 @@ func (v *Vector256) Scan(value any) error {
 		return nil
 	}
 	tokens := strings.Split(str, ",")
-	if len(tokens) != 256 {
-		return fmt.Errorf("invalid database vector dimension: got %d, expected 256", len(tokens))
+	if len(tokens) != VarLen {
+		return fmt.Errorf("invalid database vector dimension: got %d, expected %d", len(tokens), VarLen)
 	}
 
 	res := make([]float32, len(tokens))
