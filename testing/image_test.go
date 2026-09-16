@@ -2,12 +2,11 @@ package testing
 
 import (
 	"fmt"
+	rege "m/orchard/pkg/regexx"
+	"m/orchard/pkg/types/chatmessages"
 	"os"
 	"path/filepath"
 	"testing"
-
-	rege "m/pkg/regexx"
-	"m/pkg/types/chatmessages"
 )
 
 func TestImageAttachmentLogic(t *testing.T) {
