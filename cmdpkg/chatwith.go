@@ -245,7 +245,7 @@ Chat:
 			return nil
 		default:
 		}
-		if len(newcaller.ToolCalls) == 0 && !nonudge && toolCallBreakAt < 0 {
+		if len(tools) != 0 && len(newcaller.ToolCalls) == 0 && !nonudge && toolCallBreakAt < 0 {
 			slog.Info("nudging continue")
 			newcaller.Ephemeral = true
 			tmp := NewEphemeralSystem(
