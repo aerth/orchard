@@ -36,6 +36,7 @@ type ConfigInput struct {
 	SidebarRefreshRate time.Duration
 	StreamRefreshRate  time.Duration
 	ToolsLimited       []string
+	UseDB              bool
 }
 type cfginput = ConfigInput
 
@@ -65,6 +66,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 	flag.BoolVar(&cfg.HideToolCalls, "q", cfg.HideToolCalls, "hide tool call json chunks")
 	flag.BoolVar(&cfg.ShowRequests, "v", cfg.ShowRequests, "show requests in log")
 	flag.BoolVar(&cfg.ShowThinking, "show-thinking", cfg.ShowThinking, "show thinking")
+	flag.BoolVar(&cfg.UseDB, "db", cfg.UseDB, "use db postgres etc")
 	flag.BoolVar(&cfg.NoColor, "nocolor", cfg.NoColor, "disable colorized output")
 	flag.BoolVar(&cfg.NoSpin, "nospin", cfg.NoSpin, "disable spin")
 	flag.BoolFunc("n", "no system prompt template", func(_ string) error {
