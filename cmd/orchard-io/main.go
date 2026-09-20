@@ -112,20 +112,22 @@ func main1(ctx context.Context) error {
 	if err != nil {
 		return stackerr.Errorf("initialize: %w", err)
 	}
-	sql, err := NewPostgres(&chatmessages.ChatMessage{})
-	if err != nil {
-		return stackerr.Errorf("db: %w", err)
-	}
-	if sql != nil {
-		store := dbstore.New(sql)
-		if clearfirst {
-			store.DeleteThread(ctx, conf.GetThreadID())
-		}
-		slog.Info("STORE ENABLED")
-		global.SetStore(store)
-	}
-	global.SetConf(*conf)
 
+	if conf.Get().UseDB {
+		sql, err := NewPostgres(&chatmessages.ChatMessage{})
+		if err != nil {
+			return stackerr.Errorf("db: %w", err)
+		}
+		if sql != nil {
+			store := dbstore.New(sql)
+			if clearfirst {
+				store.DeleteThread(ctx, conf.GetThreadID())
+			}
+			slog.Info("STORE ENABLED")
+			global.SetStore(store)
+		}
+		global.SetConf(*conf)
+	}
 	global.AddCloser(func() error {
 		os.Exit(1)
 		return nil
