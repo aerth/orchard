@@ -270,7 +270,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	e := chat.Ext{
 		PreTools: func(ctx context.Context, newcaller *chatmessages.ChatMessage, names []string) error {
 			if len(names) > 1 || !isOkTool(names[0]) {
-				if !debugging.NoColor {
+				if !confg.Get().NoColor {
 					println(debugging.ColorReset)
 				}
 				for i := range newcaller.ToolCalls {
