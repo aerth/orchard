@@ -1,6 +1,6 @@
 module m/orchard
 
-go 1.26.3
+go 1.27.0
 
 require (
 	github.com/aerth/mostly v0.0.7
@@ -33,3 +33,5 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/aerth/mostly => ../mostly
