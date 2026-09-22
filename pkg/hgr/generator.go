@@ -116,7 +116,7 @@ func GenerateFooStage2(ctx context.Context, genID uuid.UUID, c chan<- hgr2.Respo
 	err = cmdpkg.ChatWith(ctx, convo, tools, ext2)
 	if err != nil {
 		slog.Error("ChatWith failed", "err", err)
-		c <- hgr2.ResponseWrap{V: E{stackerr.Errorf("%w", err)}}
+		c <- hgr2.ResponseWrap{V: E{stackerr.Errorf("%w", err).(*stackerr.StackError)}}
 		return
 	}
 }
