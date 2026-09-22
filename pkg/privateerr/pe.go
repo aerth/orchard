@@ -8,7 +8,7 @@ import (
 )
 
 func Errorf(public string, f string, i ...any) error {
-	e := stackerr.Errorf(f, i...)
+	e := stackerr.Errorf(f, i...).(*stackerr.StackError)
 	e.St = stackerr.GetFuncCallerInfo()
 	return &E{underlying: e, public: public}
 }
