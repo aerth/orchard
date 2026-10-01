@@ -37,6 +37,8 @@ type ConfigInput struct {
 	StreamRefreshRate  time.Duration
 	ToolsLimited       []string
 	UseDB              bool
+	Thinking           string
+	Model              string
 }
 type cfginput = ConfigInput
 
@@ -83,7 +85,6 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		cfg.NoColor = true
 		return nil
 	})
-	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder")
 	flag.Func("tools", "list of tools available in this session (or 'none' for no tools)", func(s string) error {
 		ss := strings.Fields(s)
 		if len(ss) == 1 {
@@ -95,7 +96,11 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		cfg.ToolsLimited = ss
 		return nil
 	})
+	flag.StringVar(&cfg.Thinking, "think", cfg.Thinking, "thinking/reasoning value (low,medium,high or true,false)")
+
+	flag.StringVar(&cfg.InitialUserPrompt, "placeholder", cfg.InitialUserPrompt, "the empty text area placeholder (UI)")
 	flag.DurationVar(&cfg.StreamRefreshRate, "stream-rate", cfg.StreamRefreshRate, "rate of stream refresh (UI)")
+
 	flag.BoolFunc("help-full", "Show extended help including environment variables", func(s string) error {
 		fmt.Println("\nEnvironment Variables:")
 		fmt.Println("  ORCHARD_TREE     Path to the orchestration tree directory.")
