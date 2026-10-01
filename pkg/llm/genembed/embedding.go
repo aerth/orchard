@@ -5,14 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"net/http"
-	"net/url"
 	"os"
 	"strings"
 
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/chatmessages"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/mostly/vector256"
 	"github.com/google/uuid"
@@ -22,7 +21,7 @@ import (
 
 var model = "nomic-embed-text:v1.5"
 
-var defaultEclient *llm.Client
+var defaultEclient *mllm.E
 
 const MinLength = 3
 
@@ -38,6 +37,12 @@ func BestEffort(ctx context.Context, s string, isQueryOrQuestion bool) *vector25
 }
 
 func GetEmbeddingEndpoint() string {
+	if x := os.Getenv("LLM_EMBED_HOST"); x != "" {
+		return x
+	}
+	if x := os.Getenv("MLLM_EMBED_HOST"); x != "" {
+		return x
+	}
 	if x := os.Getenv("OLLAMA_EMBED_HOST"); x != "" {
 		return x
 	}
@@ -48,7 +53,7 @@ type VEC = vector256.Vector256
 
 var ErrBadQuery = errors.New("bad search query")
 
-func Embed(ctx context.Context, client *llm.Client, s string, isQueryOrQuestion bool) (vector256.Vector256, error) {
+func Embed(ctx context.Context, client *mllm.E, s string, isQueryOrQuestion bool) (vector256.Vector256, error) {
 	if len(s) < MinLength {
 		return nil, stackerr.Errorf("too short: %w", ErrBadQuery)
 	}
@@ -56,18 +61,19 @@ func Embed(ctx context.Context, client *llm.Client, s string, isQueryOrQuestion 
 		return nil, fmt.Errorf("chunk too big: %w", ErrBadQuery)
 	}
 	if client == nil && defaultEclient == nil {
-		u, err := url.Parse(GetEmbeddingEndpoint())
-		if err != nil {
-			return nil, stackerr.Errorf("%w", err)
-		}
-		defaultEclient = llm.NewClient(u, http.DefaultClient)
-		//	defaultEclient = llm.NewClient(&url.URL{Host: "127.0.0.1:11434", Scheme: "http"}, http.DefaultClient)
+		e := mllm.Default()
+		defaultEclient = &e
 	}
 	if client == nil {
 		client = defaultEclient
 	}
-	ereq := NomicEmbed(s, isQueryOrQuestion)
-	got, err := client.Embed(ctx, &ereq)
+	var ereq mllm.EmbedRequest
+	if isQueryOrQuestion {
+		ereq = mllm.NewNomicQuery(s)
+	} else {
+		ereq = mllm.NewNomicDocument(s)
+	}
+	got, err := client.Embed(ctx, ereq)
 	if err != nil {
 		return nil, stackerr.Errorf("%w", err)
 	}
@@ -113,42 +119,6 @@ func QueryDB(ctx context.Context, db *gorm.DB, threadID uuid.UUID, query *vector
 	return messages, nil
 }
 
-/*
-type OllamaEmbedRequest struct {
-	Model   string   `json:"model"`
-	Input   []string `json:"input"`
-	Options Options  `json:"options"`
-}
-
-type Options struct {
-	EmbeddingDim int `json:"embedding_dim"` // Truncates vector to 256 for ultra-fast CPU math
-}
-*/
-/*
-from config_sentence_transforms.json:
-
-	{
-	  "__version__": {
-	    "sentence_transformers": "3.3.0",
-	    "transformers": "4.44.2",
-	    "pytorch": "2.4.1+cu121"
-	  },
-	  "prompts": {
-	    "query": "search_query: ",
-	    "passage": "search_document: ",
-	    "Classification": "classification: ",
-	    "MultilabelClassification": "classification: ",
-	    "Clustering": "clustering: ",
-	    "PairClassification": "classification: ",
-	    "STS": "classification: ",
-	    "Summarization": "classification: ",
-	    "Speed": "search_document: "
-	  },
-	  "default_prompt_name": null,
-	  "similarity_fn_name": "cosine"
-	}
-*/
-
 // NomicEmbed ...
 // From docs: "Important! The text prompt must include a task instruction prefix, instructing the model which task is being performed."
 // "Please use search_query: before your queries/questions, and search_document: before your documents."
@@ -160,10 +130,6 @@ func NomicEmbed(text string, isQueryOrQuestion bool) llm.EmbedRequest {
 }
 
 var DefaultEmbedOptions map[string]any
-
-//	Options: map[string]any{
-//			"embedding_dim": 256,
-//		},
 
 func GetNomicEmbeddingRequestQuery(s string) llm.EmbedRequest {
 	reqBody := llm.EmbedRequest{
