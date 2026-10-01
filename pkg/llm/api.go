@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"log/slog"
-	"m/orchard/pkg/global"
 	"net/http"
 	"net/url"
 	"os"
@@ -19,6 +18,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"m/orchard/pkg/global"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -158,7 +159,7 @@ type EmbedRequest struct {
 	Dimensions int   `json:"dimensions,omitempty"`
 	Truncate   *bool `json:"truncate,omitempty"`
 	// Options lists model-specific options.
-	Options map[string]any `json:"options"`
+	Options map[string]any `json:"options,omitempty"`
 }
 
 // EmbedResponse is the response from [Client.Embed].
