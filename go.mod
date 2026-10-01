@@ -27,7 +27,6 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mailru/easyjson v0.9.2 // indirect
-	github.com/mattn/go-sqlite3 v1.14.24 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
