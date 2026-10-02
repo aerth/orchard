@@ -3,11 +3,11 @@ module m/orchard
 go 1.27.0
 
 require (
-	github.com/aerth/mostly v0.1.0
+	github.com/aerth/mostly v0.2.2
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.12.3
-	github.com/lmittmann/tint v1.2.0
+	github.com/lmittmann/tint v1.2.1
 	github.com/mattn/go-isatty v0.0.24
 	github.com/smacker/go-tree-sitter v0.0.0-20240827094217-dd81d9e9be82
 	github.com/wk8/go-ordered-map/v2 v2.1.8
