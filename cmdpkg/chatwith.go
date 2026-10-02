@@ -5,14 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"slices"
 	"strings"
 	"time"
 
 	"m/orchard/pkg/chat"
-	"m/orchard/pkg/debugging"
 	"m/orchard/pkg/global"
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/toolrunner"
@@ -21,6 +19,7 @@ import (
 	"m/orchard/pkg/types/spinner"
 	"m/orchard/pkg/types/templatedata"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )
@@ -79,12 +78,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		slog.Warn("conversation is empty, (noop)")
 		return nil
 	}
-	var cl *debugging.ConsoleLogger
-	{
-		cl = debugging.NewConsoleLogger(io.Discard)
-	}
 	var err error
-	handlers := e.Handlers // unmodified before loop
 	if e.ThreadID == uuid.Nil {
 		e.ThreadID = global.Get().Get().ThreadID
 	}
@@ -92,16 +86,20 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	numRounds := 0
 
 	restrict := global.Get().Get().ToolsLimited
-	if restrict != nil {
+	if len(restrict) != 0 {
+		slog.Warn("")
 		got := slices.DeleteFunc(slices.Clone(tools), func(t otool.Tool) bool {
 			return !slices.Contains(restrict, t.Name)
 		})
 		if len(got) != len(tools) {
 			slog.Error("removed tools", "was", len(tools), "now", len(got))
 			tools = got
+		} else {
+			slog.Warn("removed no tools")
 		}
 	}
 	var t2 time.Time
+	handlers := e.Handlers // unmodified before loop
 Chat:
 	for ctx.Err() == nil {
 		numRounds++
@@ -113,7 +111,12 @@ Chat:
 		for i := range stack {
 			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil || (!noStore && stack[i].ThreadID == uuid.Nil) {
 				// keep this to identify regressions
-				return fmt.Errorf("detected a non-system (%s) message with no IDs: %d: %s -- this means that a caller is forgetting to add a threadID but we cant assume in ChatWith", stack[i].Role, i, stack[i].String())
+				if stack[i].Ephemeral {
+					continue
+				}
+				return fmt.Errorf("detected a non-system (%s) message with no IDs: %d: %s --"+
+					" this means that a caller is forgetting to add a threadID but we cant assume in ChatWith",
+					stack[i].Role, i, stack[i].String())
 			}
 		}
 		top := stack.Top()
@@ -121,34 +124,28 @@ Chat:
 			slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
 			return nil
 		}
-		slog.Info("Chatting", "after", top)
 
 		// this goroutine needs its own chat ptr for GatherChatResponse and then tool calls
 		newcaller := chatmessages.NewFromRole(e.From, "assistant", "")
 		newcaller.ThreadID = e.ThreadID
 		//	newcaller.Ephemeral = true  // to prevent storing
 		if true {
-			var hh []llm.ChatStreamHandlerFunc
-			if cl != nil {
-				hh = append(hh, cl.HandleChatResponse)
-			}
+			var hh []mllm.StreamHandler
 			if newcaller != nil {
 				hh = append(hh, newcaller.GatherChatResponse)
 			}
 			spin := spinner.Start(ctx)
 			if spin != nil {
-				hh = append([]llm.ChatStreamHandlerFunc{spin.HandleChatResponse}, hh...)
+				hh = append([]mllm.StreamHandler{spin.HandleChatResponse}, hh...)
 			}
 			e.Handlers = append(hh, handlers...)
+			slog.Info("Chatting", "after", top, "handlers", len(e.Handlers), "orig", len(handlers))
 			//	handl := []llm.ChatStreamHandlerFunc{ cl.HandleChatResponse, newcaller.GatherChatResponse}
 
 			/*
 			* CHAT LLM GENERATE
 			*
 			 */
-			if cl != nil {
-				cl.Reset() // nice thinking colors
-			}
 
 			var spr string
 			spr, err = GetSystemMessage(stack)
@@ -162,7 +159,7 @@ Chat:
 			e.Tools = append(e.Tools, finishLoopToolSpec)
 			err = chat.ChatPlain(ctx, conf.GetThreadID(), stack.TopN(100), e)
 			if spin != nil {
-				_ = spin.HandleChatResponse(llm.ChatResponse{}) // ensure spinner is stopped first regardless of output
+				_ = spin.HandleChatResponse(mllm.ChatResponse{}) // ensure spinner is stopped first regardless of output
 			}
 			if summary, ok := newcaller.Summary.(string); ok {
 				_, _ = global.LogWriter.Write([]byte("\n" + summary + "\n"))
@@ -177,7 +174,7 @@ Chat:
 			if ctx.Err() != nil {
 				err = context.Cause(ctx) // get our underlying error like 'ctrl+c pressed'
 			}
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 		if errors.Is(err, context.Canceled) {
 			if ctx.Err() != nil {
@@ -195,7 +192,7 @@ Chat:
 			}
 		}
 
-		toolCallBreakAt := slices.Index(newcaller.ToolCalls.GetNames(), finishLoopTool)
+		toolCallBreakAt := slices.Index(otool.GetNames(newcaller.ToolCalls), finishLoopTool)
 		if toolCallBreakAt >= 0 {
 			if len(newcaller.ToolCalls) == 1 && toolCallBreakAt == 0 {
 				newcaller.ToolCalls = nil
@@ -213,14 +210,14 @@ Chat:
 			newcaller.Content = strings.TrimSpace(newcaller.Content[:contentFinishLoopAt])
 		}
 		if newcaller.Content == "" && len(newcaller.ToolCalls) == 0 {
-			slog.Debug("got empty")
+			slog.Debug("got empty", "message_out", toJson(newcaller))
 			return nil
 		}
 		stack = append(stack, *newcaller) // for this thread only
 		newcaller = &stack[len(stack)-1]  // fix ptr for below
 		if e.AfterGen != nil {
 			if err := e.AfterGen(newcaller); err != nil {
-				return err
+				return stackerr.Errorf("%w", err)
 			}
 		}
 		if contentFinishLoopAt >= 0 || toolCallBreakAt == 0 {
@@ -230,7 +227,7 @@ Chat:
 		switch {
 		case contentFinishLoopAt >= 0:
 			nonudge = true
-		case len(newcaller.ToolCalls) == 1 && newcaller.Content == "" && newcaller.ToolCalls.GetNames()[0] == finishLoopTool:
+		case len(newcaller.ToolCalls) == 1 && newcaller.Content == "" && otool.GetNames(newcaller.ToolCalls)[0] == finishLoopTool:
 			nonudge = true
 			newcaller.Ephemeral = true
 		case strings.HasSuffix(newcaller.Content, finishLoopTool):
@@ -258,9 +255,9 @@ Chat:
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
 			return nil
 		}
-		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls), "ok", ctx.Err() == nil, "names", newcaller.ToolCalls.GetNames())
+		slog.Info("detected tool calls", "ncalls", len(newcaller.ToolCalls), "ok", ctx.Err() == nil, "names", otool.GetNames(newcaller.ToolCalls))
 		if e.PreTools != nil {
-			err := e.PreTools(ctx, newcaller, newcaller.ToolCalls.GetNames())
+			err := e.PreTools(ctx, newcaller, otool.GetNames(newcaller.ToolCalls))
 			if err != nil {
 				slog.Error("pre-tool confirmation failed", "err", err)
 				stack = append(stack, NewEphemeralSystem("PreTools error: %+v", err))
@@ -289,13 +286,13 @@ Chat:
 			return stackerr.Errorf("%w", err)
 		}
 		if len(toolouts) == 0 {
-			toolouts = append(toolouts, WrapToolError(fmt.Errorf("function %q gave no outputs, signalling an error in our orchestration loop", newcaller.ToolCalls.GetNames()))...)
+			toolouts = append(toolouts, WrapToolError(fmt.Errorf("function %q gave no outputs, signalling an error in our orchestration loop", otool.GetNames(newcaller.ToolCalls)))...)
 		}
 		for i := range toolouts {
 			toolouts[i].ThreadID = e.ThreadID
 			toolouts[i].From = e.From
 			if toolouts[i].ToolName == "" {
-				names := newcaller.ToolCalls.GetNames()
+				names := otool.GetNames(newcaller.ToolCalls)
 				slog.Warn("missing toolname, guessing", "i", i, "ncalls", len(names), "name", names[i%len(names)])
 				toolouts[i].ToolName = names[i%len(names)]
 			}
@@ -309,4 +306,12 @@ Chat:
 		continue Chat
 	}
 	return context.Cause(ctx)
+}
+
+func toJson(v any) json.RawMessage {
+	b, err := json.Marshal(v)
+	if err != nil {
+		panic(err.Error())
+	}
+	return b
 }
