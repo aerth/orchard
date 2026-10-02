@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"log/slog"
@@ -109,7 +110,7 @@ func LOADENV() error {
 	homedir, err := os.UserHomeDir()
 	if err != nil {
 		slog.Info("loading env", "file", ENVFILE)
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 	ENVFILE = strings.Replace(ENVFILE, "~", homedir, 1)
 	if os.Getenv("HOME") == "" {
@@ -118,7 +119,7 @@ func LOADENV() error {
 	}
 	if err := godotenv.Load(ENVFILE); err != nil && !errors.Is(err, os.ErrNotExist) {
 		slog.Info("loading env", "file", ENVFILE)
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 
 	// support tilde in paths in case shell did not expand
@@ -173,6 +174,9 @@ func (r *reloadWriter) Reload() {
 var _ io.Writer = (*reloadWriter)(nil)
 
 func Initialize(withSource bool, timeFormat string, clearfirst *bool) (*global.Conf, error) {
+	if flag.Parsed() {
+		panic("flags were already parsed")
+	}
 	//store := dbstore.NewFromEnv()
 	conf, err := loadInitFlagsEnv(clearfirst)
 	if err != nil {
