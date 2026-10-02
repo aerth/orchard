@@ -15,6 +15,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -35,11 +36,13 @@ import (
 	"m/orchard/pkg/dbstore"
 	"m/orchard/pkg/debugging"
 	"m/orchard/pkg/global"
-	"m/orchard/pkg/llm"
 	"m/orchard/pkg/loaders/toolboxes"
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 	"m/orchard/pkg/types/spinner"
+
+	"github.com/aerth/mostly/mllm"
+	llm "github.com/aerth/mostly/mllm"
 
 	"github.com/aerth/mostly/stackerr"
 	"golang.org/x/text/cases"
@@ -81,11 +84,9 @@ func main() {
 	} else {
 		buildtime = "dev"
 	}
-
 	ctx := context.Background()
 	go Sig()
 	if err := main1(ctx); err != nil {
-		fmt.Fprintf(os.Stderr, "Fatal: %+v\n", err)
 		slog.Error("fatal", "err", err)
 		global.Close()
 		cmdpkg.Writer = os.Stderr
@@ -93,9 +94,10 @@ func main() {
 		if errors.Is(err, context.Canceled) {
 			println("(cancelled)")
 		} else {
-			log.Fatalf("Fatal: %+v", err)
+			slog.Error(fmt.Sprintf("Fatal: %+v", err))
 		}
 	}
+	slog.Info("all one")
 }
 
 func main1(ctx context.Context) error {
@@ -112,8 +114,12 @@ func main1(ctx context.Context) error {
 	if err != nil {
 		return stackerr.Errorf("initialize: %w", err)
 	}
+	if flag.NArg() != 0 {
+		return stackerr.Errorf("use stdin not args")
+	}
 
 	if conf.Get().UseDB {
+		slog.Warn("using db")
 		sql, err := NewPostgres(&chatmessages.ChatMessage{})
 		if err != nil {
 			return stackerr.Errorf("db: %w", err)
@@ -127,6 +133,8 @@ func main1(ctx context.Context) error {
 			global.SetStore(store)
 		}
 		global.SetConf(*conf)
+	} else {
+		slog.Info("no db")
 	}
 	global.AddCloser(func() error {
 		os.Exit(1)
@@ -135,6 +143,7 @@ func main1(ctx context.Context) error {
 
 	spinner.NoSpin = conf.Get().NoSpin
 	err = runmain(ctx, conf)
+	slog.Info("going main")
 	if err != nil {
 		return stackerr.Errorf("runmain: %w", err)
 	}
@@ -185,7 +194,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		builtinTools = nil
 		box, err := toolboxes.New("") // use env with toolboxes subdir
 		if err != nil {
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 		tools := box.AllTools()
 		for _, v := range tools {
@@ -224,18 +233,19 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 	var stack chatmessages.A
 	store := global.GetStore[*dbstore.Store]()
 	if store == nil {
-		slog.Warn("no store")
+		slog.Warn("no db store")
 	}
 	if store != nil {
 		stack, err = store.LoadThread(ctx, conf.GetThreadID(), 4)
 		if err != nil {
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 	}
 
 	if _, err := os.Stdin.Read(nil); err != nil {
 		return stackerr.Errorf("reading stdin: %w", err)
 	}
+	slog.Info("going1")
 	{ // USER MESSAGE
 		newmsg := chatmessages.NewFromRole(conf.GetUsername(), "user", "")
 		newmsg.ThreadID = threadID
@@ -257,15 +267,19 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 				slog.Warn("err", "err", err)
 			}
 		}
+		slog.Info("going1", "input", newmsg.Content)
 	}
 
 	var enc *json.Encoder
 	if conf.Get().JsonOutput {
 		enc = json.NewEncoder(os.Stdout)
 	}
-	cl := debugging.NewConsoleLogger(os.Stdout, os.Stderr)
-	cl.HideThinking = !conf.Get().ShowThinking
+	//cl := debugging.NewConsoleLogger(os.Stdout, os.Stderr)
 
+	cl := mllm.NewHandlerOut(os.Stderr, mllm.DefaultThinkPre, mllm.DefaultThinkPost)
+	mllm.HideThink = !conf.Get().ShowThinking
+
+	slog.Info("goings")
 	// GENERATE ROUNDS
 	e := chat.Ext{
 		PreTools: func(ctx context.Context, newcaller *chatmessages.ChatMessage, names []string) error {
@@ -275,7 +289,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 				}
 				for i := range newcaller.ToolCalls {
 					if err := implv2.ConfirmAction(ctx, fmt.Sprintf("Requested tool call: %q\n\n```json\n%s```", names[i], string(newcaller.ToolCalls[i]))); err != nil {
-						return err
+						return stackerr.Errorf("%w", err)
 					}
 				}
 			}
@@ -291,12 +305,15 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			if enc != nil {
 				_ = enc.Encode(cm)
 			} else if conf.Get().ShowToolOuts {
-				cl.PrintMessage(os.Stdout, os.Stderr, cm.Message)
+				err := mllm.NewHandlerOut(os.Stderr, llm.DefaultThinkPre, llm.DefaultThinkPost).HandleChat(mllm.ChatResponse{Message: cm.Message})
+				if err != nil {
+					slog.Error("could not handle chat", "err", err)
+				}
 			}
 		}, AfterGen: func(cm *chatmessages.ChatMessage) error {
 			if store != nil {
 				if err = store.Add(ctx, threadID, cm); err != nil {
-					return err
+					return stackerr.Errorf("%w", err)
 				}
 			}
 			if enc != nil {
@@ -304,7 +321,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			}
 			return nil
 		},
-		Handlers: chat.Handlers{cl.HandleChatResponse},
+		Handlers: chat.Handlers{cl.HandleChat},
 	}
 	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
@@ -364,7 +381,7 @@ func ReadMessage(r io.Reader, from, role string, newmsg **chatmessages.ChatMessa
 		err = nil
 	}
 	if err != nil {
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 
 	//
