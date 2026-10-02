@@ -9,10 +9,10 @@ import (
 	"m/orchard/pkg/builtins"
 	"m/orchard/pkg/builtins/implv1"
 	"m/orchard/pkg/chat"
-	"m/orchard/pkg/debugging"
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 )
@@ -59,12 +59,11 @@ func TestPrimitive(t *testing.T) {
 	}
 	threadID := uuid.UUID{}
 	// [chat.Chat] calls underlying [llm.Client.Chat]
-	cl := debugging.NewConsoleLogger(os.Stderr)
 	err := chat.ChatPlain(t.Context(), threadID, stack, chat.Ext{
 		//	Prepend:  []llm.Message{{Role: "system", Content: "Keep all replies short."}},
 		Tools:    testtools.ToMarshaler(),
 		ThreadID: threadID,
-		Handlers: chat.Handlers{cl.HandleChatResponse},
+		Handlers: chat.Handlers{mllm.NewHandlerOut(os.Stderr, mllm.DefaultThinkPre, mllm.DefaultThinkPost)},
 	})
 	if err != nil {
 		t.Fatal(err)
