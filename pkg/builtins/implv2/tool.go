@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -14,7 +13,6 @@ import (
 	"strings"
 
 	"m/orchard/pkg/chat"
-	"m/orchard/pkg/debugging"
 	"m/orchard/pkg/global"
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/loaders/treesitters"
@@ -22,6 +20,7 @@ import (
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )
@@ -35,7 +34,7 @@ type EditorConfig struct {
 	AskBeforeWriting bool
 	GetHandler       func() chat.ChatHandlerPlus
 	GetSender        func(Result)
-	PreFunc          func(*llm.ChatRequest, string) error
+	PreFunc          func(*mllm.ChatRequest, string) error
 	ThreadID         uuid.UUID
 }
 
@@ -43,7 +42,7 @@ var DefaultEditorConfig = &EditorConfig{
 	AskBeforeWriting: false,
 	GetHandler:       func() chat.ChatHandlerPlus { return nil },
 	GetSender:        func(Result) {},
-	PreFunc:          func(creq *llm.ChatRequest, from string) error { return nil },
+	PreFunc:          func(creq *mllm.ChatRequest, from string) error { return nil },
 }
 
 const EditorName = "editor_agent"
@@ -164,9 +163,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 		//	}...)
 	}
 	var operators []string
-	creq := llm.NewChatRequest()
 	var card string
-	cl := debugging.NewConsoleLogger(io.Discard)
 	rounds := 0
 	numberFilesEdited := 0
 	ext := e.Ext
@@ -226,14 +223,16 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 			handler.HandleToolOutputs(newstate)
 			handler.HandleToolOutputs(newusermsg)
 		}
-		creq.Messages = stack.Raw() // TODO: use ChatPlain !!!!!!!!!!!!!
-
 		card = ""
 		newmsg := chatmessages.NewFromRole(ext.From, "assistant", "")
 		newmsg.ThreadID = sessionThreadID
-		handlers := []chat.Handler{cl.HandleChatResponse, newmsg.GatherChatResponse}
+		pending := mllm.ChatResponse{}
+		handlers := []chat.Handler{pending.Handler}
 		if handler != nil {
 			handlers = append(handlers, handler.Handle) // stream to channel
+		}
+		creq := &mllm.ChatRequest{
+			Messages: stack.Raw(), // TODO: use ChatPlain !!!!!!!!!!!!!
 		}
 		if e.Ext.PreFunc != nil {
 			if err := e.Ext.PreFunc(creq, ext.From); err != nil {
@@ -262,12 +261,13 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 		} else {
 			slog.Error("handler is nil!!")
 		}
-		creq.Think = false
-		if session.NumLinesLocked() > 20 {
-			creq.Think = "low"
+		creq.Think = &mllm.Think{
+			Value: false,
 		}
-		err := llm.New().Chat(ctx, creq, handlers...)
-		cl.Reset()
+		if session.NumLinesLocked() > 20 {
+			creq.Think.Value = "low"
+		}
+		err := mllm.Default().WithTools(ext.Tools...).Stream(ctx, creq.Messages, false, handlers...)
 		if err != nil {
 			operators = append(operators, err.Error())
 			break
@@ -477,23 +477,29 @@ func atomicWriteFile(path string, data []byte, perm os.FileMode) error {
 	dir := filepath.Dir(path)
 	tempFile, err := os.CreateTemp(dir, "atomic-")
 	if err != nil {
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 	if perm != 0o600 {
 		if err := tempFile.Chmod(perm); err != nil {
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 	}
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		_ = os.Remove(tempFile.Name()) // TODO: log err
+	}()
 
 	if _, err := tempFile.Write(data); err != nil {
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 	if err := tempFile.Close(); err != nil {
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 
-	return os.Rename(tempFile.Name(), path)
+	err = os.Rename(tempFile.Name(), path)
+	if err != nil {
+		return stackerr.Errorf("%w", err)
+	}
+	return nil
 }
 
 func FirstLineSystemOnly(a chatmessages.ChatMessages) {

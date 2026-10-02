@@ -12,15 +12,16 @@ import (
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/chatmessages"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )
 
 // ChatHandler would be called ChatStreamHandler but that is too long
 type (
-	ChatHandler     = func(llm.ChatResponse) error
+	ChatHandler     = func(mllm.ChatResponse) error
 	ChatHandlerPlus interface {
-		Handle(llm.ChatResponse) error
+		Handle(mllm.ChatResponse) error
 		HandleToolOutputs(cm chatmessages.ChatMessage)
 	}
 )
@@ -32,10 +33,10 @@ type Ext struct {
 
 	// PreFunc current streaming output for DISPLAY
 	// Called right before llm.Chat call, may be used to cancel
-	PreFunc func(creq *llm.ChatRequest, from string) error `json:"-"`
+	PreFunc func(creq *mllm.ChatRequest, from string) error `json:"-"`
 	// PostFunc should return nil
 	PostFunc func(err error) error                 `json:"-"`
-	Handlers []ChatHandler                         `json:"-"` // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
+	Handlers []mllm.StreamHandler                  `json:"-"` // Handlers for streaming, func (cr ChatResponse) error - see [chatmessages.ChatMessage.GatherChatResponse]
 	AfterGen func(*chatmessages.ChatMessage) error `json:"-"` // after generation is complete (assistant, toolcalls) for applying modifications or exit early or store to DB
 	// NonStreamHandler for any toolouts or temporary system messages for DISPLAY
 	// for tool/system (not generated assistant stream)
@@ -93,8 +94,8 @@ func (e Ext) FromA(exts ...Ext) Ext {
 }
 
 type (
-	Handlers = []ChatHandler
-	Handler  = ChatHandler
+	Handlers = []mllm.StreamHandler
+	Handler  = mllm.StreamHandler
 )
 
 type StoreI interface {
@@ -161,9 +162,9 @@ type (
 		return msgs, nil
 	}
 */
-var client *llm.Client
+var client mllm.E
 
-func SetClient(x *llm.Client) {
+func SetClient(x mllm.E) {
 	client = x
 }
 
@@ -177,7 +178,7 @@ func FormatRoles(in []llm.Message) []string {
 
 var DebugTrimImages = true
 
-func PrintMessages(creq *llm.ChatRequest) error {
+func PrintMessages(creq *mllm.ChatRequest) error {
 	w := global.LogWriter
 	slog.Info("showing messages", "n", len(creq.Messages), "roles", FormatRoles(creq.Messages))
 	_, _ = fmt.Fprintf(w, "MESSAGES: %d (%q)\n", len(creq.Messages), FormatRoles(creq.Messages))
@@ -200,9 +201,8 @@ func PrintMessages(creq *llm.ChatRequest) error {
 // ChatPlain uses [ChatReq] WITHOUT RUNNING TOOLS uses 'e' for building a temporary {"messages": []} array, using [ChatReq]
 // returns a single new message without running tools, only running PreFunc, PostFunc, and all layered stream Handlers in order.
 func ChatPlain(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages, e Ext) error {
-	creq := llm.NewChatRequest()
+	creq := mllm.Default().NewRequest(append(e.Prepend, msgs.Raw()...), false)
 	creq.Tools = e.Tools
-	creq.Messages = append(e.Prepend, msgs.Raw()...)
 	if e.Append != nil {
 		creq.Messages = append(creq.Messages, e.Append...)
 	}
@@ -211,25 +211,31 @@ func ChatPlain(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMe
 
 // ChatReqPlain WITHOUT RUNNING TOOLS uses 'e' returns a single new message without running tools, running PreFunc, PostFunc, and all layered stream Handlers in order.
 // uses [llm.Client.Chat] using the default global client, creating one from env if first call.
-func ChatReqPlain(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
+func ChatReqPlain(ctx context.Context, creq *mllm.ChatRequest, e Ext) error {
 	if e.PreFunc != nil {
 		if err := e.PreFunc(creq, e.From); err != nil {
-			return err
+			return stackerr.Errorf("%w", err)
 		}
-	}
-	if client == nil {
-		client = llm.New()
 	}
 	if len(e.Handlers) == 0 {
 		return fmt.Errorf("no handlers")
 	}
+	if client.Host.Host == "" {
+		client = mllm.Default()
+	}
 	slog.Info("Chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "handlers", len(e.Handlers))
+
 	if e.ShowRequests {
 		_ = PrintMessages(creq)
 	}
-
-	creq.Messages.TrimThoughts(2)
-	err := client.Chat(ctx, creq, e.Handlers...)
+	//creq.Messages.TrimThoughts(2)
+	client.Handlers = e.Handlers
+	//creq.Tools = e.Tools
+	//slog.Info("SENDING", "js", len(toJsonIndent(creq)))
+	//	global.LogWriter.Write(toJsonIndent(creq))
+	creq.Stream = true
+	creq.Think.Value = false
+	err := client.Do(ctx, *creq, client.Handlers)
 	if err != nil {
 		slog.Error("Chatting error", "err", err, "cause", context.Cause(ctx))
 	}
@@ -242,4 +248,20 @@ func ChatReqPlain(ctx context.Context, creq *llm.ChatRequest, e Ext) error {
 		return stackerr.Errorf("%w", err)
 	}
 	return nil
+}
+
+func toJsonIndent(v any) json.RawMessage {
+	b, err := json.MarshalIndent(v, "", " ")
+	if err != nil {
+		panic(err.Error())
+	}
+	return b
+}
+
+func toJson(v any) json.RawMessage {
+	b, err := json.Marshal(v)
+	if err != nil {
+		panic(err.Error())
+	}
+	return b
 }

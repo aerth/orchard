@@ -14,8 +14,8 @@ import (
 	"m/orchard/pkg/builtins/implv2"
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/loaders/treesitters"
-	"m/orchard/pkg/types/chatmessages"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/joho/godotenv"
 )
 
@@ -81,9 +81,7 @@ func TestAi(t *testing.T) {
 		if tc.Filename == "" || tc.Prompt == "" || tc.FileInp == "" {
 			t.Fatal("bad tc")
 		}
-		creq := llm.NewChatRequest()
-
-		creq.Messages = []llm.Message{
+		convo := []llm.Message{
 			{Role: "system", Content: implv2.SystemInstruction()},
 			{Role: "user", Content: tc.Prompt},
 		}
@@ -97,36 +95,36 @@ func TestAi(t *testing.T) {
 		}
 		testpass := false
 		for {
-			if creq.Messages[len(creq.Messages)-1].Role == "assistant" {
+			if convo[len(convo)-1].Role == "assistant" {
 				println("[test] test is done (latest message is assistant)")
 				break
 			}
-			generated := chatmessages.NewFromRole("", "assistant", "")
-			//		for i := range creq.Messages[1 : len(creq.Messages)-1] {
-			//			if creq.Messages[i].Role == "system" && strings.Count(creq.Messages[i].Content, "\n") > 1 {
-			//				creq.Messages[i].Content = strings.Split(creq.Messages[i].Content, "\n")[0]
+			//		for i := range convo[1 : len(convo)-1] {
+			//			if convo[i].Role == "system" && strings.Count(convo[i].Content, "\n") > 1 {
+			//				convo[i].Content = strings.Split(convo[i].Content, "\n")[0]
 			//			}
 			//		}
-			msgs := creq.Messages
-			creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: session.SystemMessage()})
+			msgs := convo
+			convo = append(convo, mllm.Message{Role: "system", Content: session.SystemMessage()})
 			// CHAT
-			err = llm.New().Chat(t.Context(), creq, generated.GatherChatResponse)
-			creq.Messages = msgs
+			generated := mllm.ChatResponse{}
+			err = mllm.Default().Stream(t.Context(), convo, generated.Handler)
+			convo = msgs
 			if err != nil {
 				t.Fatal(err)
 			}
-			println("OUT: " + generated.Content)
-			creq.Messages = append(creq.Messages, generated.Message)
-			actions, err := session.Parse(generated.Content)
+			println("OUT: " + generated.Message.Content)
+			convo = append(convo, generated.Message)
+			actions, err := session.Parse(generated.Message.Content)
 			if errors.Is(err, implv2.ErrNot) && session.LockEnd == 0 {
 				// finished. latest was a "I have corrected the typos in `foo.txt` while maintaining the exact number of lines." message
 				break
 			}
 			if errors.Is(err, implv2.ErrNot) && session.LockEnd != 0 {
 				// target acquired
-				err = session.ApplySurgicalEdit(strings.Split(generated.Content, "\n"))
+				err = session.ApplySurgicalEdit(strings.Split(generated.Message.Content, "\n"))
 				if err != nil {
-					creq.Messages = append(creq.Messages, llm.Message{Role: "system", Content: fmt.Sprintf("The file edit failed: %+v", err)})
+					convo = append(convo, mllm.Message{Role: "system", Content: fmt.Sprintf("The file edit failed: %+v", err)})
 					continue
 				}
 				if err == nil && !strings.HasSuffix(session.ActiveFile, ".txt") {
@@ -144,7 +142,7 @@ func TestAi(t *testing.T) {
 				}
 				session.LockStart = 0
 				session.LockEnd = 0
-				creq.Messages = append(creq.Messages, llm.Message{
+				convo = append(convo, mllm.Message{
 					Role:    "system",
 					Content: "The file edits were applied to the filesystem",
 				})
@@ -167,11 +165,11 @@ func TestAi(t *testing.T) {
 				if res.Message == "" {
 					res.Message = SuccessMessage
 				}
-				creq.Messages = append(creq.Messages, llm.Message{
+				convo = append(convo, mllm.Message{
 					Role:    "system",
 					Content: res.Message + "\n" + session.SystemMessage(),
 				})
-				println(creq.Messages[len(creq.Messages)-1].Content)
+				println(convo[len(convo)-1].Content)
 			}
 		}
 		if !testpass {

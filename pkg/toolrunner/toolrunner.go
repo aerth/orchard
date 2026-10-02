@@ -98,12 +98,12 @@ func RealRunner(ctx context.Context, tools otool.Tools, caller chatmessages.Chat
 	if tool.Name != call.Function.Name {
 		return nil, stackerr.Errorf("tool named %q is also %q in %d tools", tool.Name, call.Function.Name, len(tools))
 	}
-	slog.Info("Running tools...", "caller", caller.String(), "i", toolCallIndex, "call", call)
+	slog.Info("Running tools...", "caller", caller.ToolCalls, "i", toolCallIndex, "call", call)
 	x, err := tool.Exec(ctx, caller.Message, toolCallIndex)
 	if len(x) == 0 && err != nil {
 		return nil, stackerr.Errorf("%w", err)
 	}
-	slog.Info("Running tools got", "toolouts", len(x), "err", err, "caller", caller.String(), "i", toolCallIndex, "call", call)
+	slog.Info("Running tools got", "toolouts", len(x), "err", err, "caller", caller, "i", toolCallIndex, "call", call)
 	if len(x) == 0 && err == nil {
 		x = append(x, *chatmessages.NewFromRole("", "tool", "(empty)"))
 	}

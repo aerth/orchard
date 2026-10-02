@@ -14,6 +14,8 @@ import (
 	"m/orchard/pkg/global"
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/chatmessages"
+
+	"github.com/aerth/mostly/mllm"
 )
 
 type fileArgs struct {
@@ -24,7 +26,7 @@ type ToolArg struct{}
 func (ToolArg) IsToolArgument()    {}
 func (f fileArgs) IsToolArgument() {}
 
-func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+func ReadFile(ctx context.Context, caller mllm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	// 1. Extract args from the specific tool call in the message history
 	// This assumes your Message struct allows access to the raw ToolCalls string slice
 	// var args fileArgs
@@ -58,7 +60,7 @@ func ReadFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatm
 	return x, nil
 }
 
-func ListDirectory(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+func ListDirectory(ctx context.Context, caller mllm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	call, err := chat.ReadToolCall[fileArgs](ctx, caller, toolCallIndex)
 	if err != nil {
 		return NewResponse(call, fmt.Sprintf("Error parsing args: %+v", err)), nil
@@ -107,7 +109,7 @@ type writefileArgs struct {
 
 func (w writefileArgs) IsToolArgument() {}
 
-func WriteFile(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+func WriteFile(ctx context.Context, caller mllm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	// 1. Extract args from the specific tool call in the message history
 	call, err := chat.ReadToolCall[writefileArgs](ctx, caller, toolCallIndex)
 	if err != nil {

@@ -14,6 +14,7 @@ import (
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )
@@ -54,13 +55,14 @@ func DoReview(ctx context.Context, info PreReview, reviewTools otool.Tools, e ch
 		*chatmessages.NewThread(reviewID, llm.Message{Role: "user", Content: reviewPromptInstruction}),
 		*chatmessages.NewThread(reviewID, llm.Message{Role: "user", Content: "Diff:\n" + diff}),
 	}
-	got := *chatmessages.NewThread(parentThreadID, llm.Message{Role: "assistant"})
-	e = chat.Ext{Handlers: []chat.ChatHandler{got.GatherChatResponse}}.FromA(e)
+	var pending mllm.ChatResponse
+	e = chat.Ext{Handlers: []mllm.StreamHandler{pending.Handler}}.FromA(e)
 	err = cmdpkg.ChatWith(ctx, newmsgs, reviewTools, e)
 	if err != nil {
 		return "", stackerr.Errorf("DoReview ChatWith: %w", err)
 	}
-	return got.Content, nil
+
+	return pending.Message.Content, nil
 }
 
 // Differ error may occur because of filesystem or running diff

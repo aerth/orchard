@@ -3,7 +3,6 @@
 package chatmessages
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,12 +11,37 @@ import (
 	"strings"
 	"time"
 
-	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/vector256"
 
+	"github.com/aerth/mostly/mllm"
+	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
+
+func GetNames(tc []json.RawMessage) []string {
+	if len(tc) == 0 {
+		return nil
+	}
+	a := make([]string, len(tc))
+	for i := range tc {
+		call := struct {
+			Function struct {
+				Name string `json:"name"`
+			} `json:"function"`
+		}{}
+		if err := json.Unmarshal(tc[i], &call); err != nil {
+			a[i] = "ERROR"
+			continue
+		}
+		if call.Function.Name == "" {
+			a[i] = "MISSING"
+			continue
+		}
+		a[i] = call.Function.Name
+	}
+	return a
+}
 
 var CancelMessage = "**This text-generation run was cancelled by user**"
 
@@ -47,10 +71,20 @@ type ChatMessage struct {
 	ThreadID       uuid.UUID `gorm:"type:uuid;not null;index:idx_thread_time,priority:1" json:"thread_id,omitempty"` // ThreadID for storing in DB
 	MessageID      uuid.UUID `gorm:"type:uuid;primaryKey;notnull;" json:"message_id,omitempty"`                      // MessageID is unique identifier for each message
 	From           string    `json:"from,omitempty"`                                                                 // name of assistant
-	llm.Message    `gorm:"embedded" json:"message"`
-	Embedding      *vector256.Vector256 `gorm:"type:vector(256);null" json:"-"`
-	Metrics        llm.Metrics          `gorm:"serializer:json"`
+	mllm.Message   `gorm:"embedded" json:"message"`
+	Embedding      vector256.Vector256 `gorm:"type:vector(256);default:null" json:"-"`
+	Metrics        mllm.Stats          `gorm:"serializer:json"`
 	MessageOptions `gorm:"-" json:"-"`
+}
+
+func (cm *ChatMessage) GatherChatResponse(cr mllm.ChatResponse) error {
+	msg := &cm.Message
+	*msg = msg.Add(cr.Message)
+	cm.Metrics = cr.Stats
+	if cr.Done {
+		cm.Summary = cr.Stats.SummaryString()
+	}
+	return nil
 }
 
 // FormatText in dialogue text format with no newline ending
@@ -97,52 +131,52 @@ func (cm *ChatMessage) ContentOrToolCall() string {
 	return "(empty)"
 }
 
-func New(m llm.Message) *ChatMessage {
+func New(m mllm.Message) *ChatMessage {
 	return NewFrom("", m)
 }
 
-func NewThread(threadID uuid.UUID, m llm.Message) *ChatMessage {
+func NewThread(threadID uuid.UUID, m mllm.Message) *ChatMessage {
 	cm := New(m)
 	cm.ThreadID = threadID
 	return cm
 }
 
 func NewChatMessage(role string, content string) *ChatMessage {
-	return NewFrom("", llm.Message{Role: role, Content: content})
+	return NewFrom("", mllm.Message{Role: role, Content: content})
 }
 
 func NewFromRole(from, role, content string) *ChatMessage {
-	return NewFrom(from, llm.Message{Role: role, Content: content})
+	return NewFrom(from, mllm.Message{Role: role, Content: content})
 }
 
-func NewFrom(from string, m llm.Message) *ChatMessage {
+func NewFrom(from string, m mllm.Message) *ChatMessage {
 	t := time.Now().UTC()
 	return &ChatMessage{From: from, Message: m, DBMODEL: DBMODEL{CreatedAt: t, UpdatedAt: t}, MessageID: uuid.New(), MessageOptions: MessageOptions{}}
 }
 
-func NewFromEphemeral(from string, m llm.Message) *ChatMessage {
+func NewFromEphemeral(from string, m mllm.Message) *ChatMessage {
 	t := time.Now().UTC()
 	return &ChatMessage{From: from, Message: m, DBMODEL: DBMODEL{CreatedAt: t, UpdatedAt: t}, MessageID: uuid.New(), MessageOptions: MessageOptions{Ephemeral: true}}
 }
 
 func NewSystemEphemeral(content string) *ChatMessage {
-	return NewFromEphemeral("", llm.Message{Role: "system", Content: content})
+	return NewFromEphemeral("", mllm.Message{Role: "system", Content: content})
 }
 
 // NewToolReply with matching Call ID and ToolName for the given i index.
-func NewToolReplyPlain(caller llm.Message, i int, content string) *ChatMessage {
+func NewToolReplyPlain(caller mllm.Message, i int, content string) *ChatMessage {
 	return NewToolReply("", caller, i, content)
 }
 
 // NewToolReply with matching Call ID and ToolName for the given i index.
-func NewToolReply(from string, caller llm.Message, i int, content string) *ChatMessage {
+func NewToolReply(from string, caller mllm.Message, i int, content string) *ChatMessage {
 	var call Call[json.RawMessage]
 	err := json.Unmarshal(caller.ToolCalls[i], &call)
 	if err != nil {
 		slog.Error("unmarshal tool call", "err", err)
 		return nil
 	}
-	toolmsg := llm.Message{
+	toolmsg := mllm.Message{
 		Role:       "tool",
 		ToolCallID: call.ID,
 		ToolName:   call.Function.Name,
@@ -170,61 +204,13 @@ func (cm ChatMessage) TableName() string {
 	return "chat_messages_test"
 }
 
-func (cm *ChatMessage) GatherChatResponse(cr llm.ChatResponse) error {
-	if cm == nil {
-		panic("GatherChatResponse for nil")
-	}
-	if !cm.Ephemeral {
-		//	if cr.Message.Content != "" && strings.HasSuffix(cm.Content, cr.Message.Content) {
-		//		slog.Info("GatherChatResponse", "cr", cr, "caller2", stackerr.GetFuncCallerInfo(1), "caller3", stackerr.GetFuncCallerInfo(2))
-		//		cr.Message.Content = strings.ToUpper(cr.Message.Content)
-		//	}
-	} else {
-		slog.Error("Ephemeral Gather?")
-	}
-	if cr.Message.Role != "" {
-		cm.Role = cr.Message.Role
-	}
-	cm.Thinking += cr.Message.Thinking
-	cm.Content += cr.Message.Content
-	if len(cr.Message.ToolCalls) == 0 && !cr.Done {
-		return nil
-	}
-	if cm.ToolCallID == "" {
-		cm.ToolCallID = cr.Message.ToolCallID
-	}
-	if len(cr.Message.ToolCalls) != 0 {
-		cm.ToolCalls = append(cm.ToolCalls, cr.Message.ToolCalls...)
-		if l := len(cm.ToolCalls); l != len(cr.Message.ToolCalls) { // gather additional tool calls TODO: make more often
-			slog.Info("more tool calls found", "ncalls", l)
-		}
-	}
-	if len(cm.ToolCalls) == 0 {
-		cm.ToolCalls = nil
-	}
-	if cr.Done {
-		//slog.Info("Done", "reason", cr.DoneReason, "metrics", cr.Metrics, "cr", cr)
-		var buf bytes.Buffer
-		cr.Summary(&buf)
-		cm.Summary = buf.String()
-		cm.Metrics = cr.Metrics
-		if !cr.CreatedAt.IsZero() {
-			cm.CreatedAt = cr.CreatedAt // NOTE: this uses server's timestamp which may be off.
-			cm.UpdatedAt = cr.CreatedAt
-		}
-		cm.Model = cr.Model
-
-	}
-	return nil
-}
-
 // IsEmpty permits non-empty Role, ToolCallID, and ToolName
 func (cm ChatMessage) IsEmpty() bool {
-	return cm.Thinking == "" && cm.Content == "" && len(cm.ToolCalls) == 0
+	return cm.Reasoning == "" && cm.Content == "" && len(cm.ToolCalls) == 0
 }
 
 func (cm ChatMessage) String() string {
-	return cm.Tag() + "_" + cm.Message.String()
+	return cm.Tag() + "_" + cm.Message.Role + "_" + cm.Message.Content
 }
 
 func (cm ChatMessage) Tag() string {
@@ -282,7 +268,7 @@ func (cm ChatMessages) FormatRolesFrom() []string {
 			a[i] = cm[i].Role
 		}
 		if len(cm[i].ToolCalls) != 0 {
-			a[i] += "\n " + strings.Join(cm[i].ToolCalls.GetNames(), ",")
+			a[i] += "\n " + strings.Join(GetNames(cm[i].ToolCalls), ",")
 		}
 	}
 	return a
@@ -363,7 +349,7 @@ func (cm ChatMessages) Top() ChatMessage {
 func (cm ChatMessages) RemoveThoughts() ChatMessages {
 	a := cm.Clone()
 	for i := range a {
-		a[i].Thinking = ""
+		a[i].Reasoning = ""
 	}
 	return a
 }
@@ -379,7 +365,7 @@ func (cm ChatMessages) RemoveSystemEphemeralThoughts() ChatMessages {
 		return v.Ephemeral || v.Role == "system"
 	})
 	for i := range a {
-		a[i].Thinking = ""
+		a[i].Reasoning = ""
 	}
 	return a
 }
@@ -406,13 +392,13 @@ var GetMaxDistance = func(cm ChatMessage) int {
 	return 0
 }
 
-func (cm ChatMessages) Raw() llm.Messages {
+func (cm ChatMessages) Raw() mllm.Messages {
 	cloned := slices.Clone(cm)
 	l := len(cloned) // 5
 	if l == 0 {
 		return nil
 	}
-	a := make(llm.Messages, 0, len(cloned)*2) // worst case scenario allocate double
+	a := make(mllm.Messages, 0, len(cloned)*2) // worst case scenario allocate double
 
 	// [1 2 3 4 5]
 	var distance int
@@ -426,7 +412,7 @@ func (cm ChatMessages) Raw() llm.Messages {
 			continue
 		}
 		if strings.HasPrefix(cloned[i].Content, CancelMessage) {
-			// skip purely cancelled messages maybe consisting of only Thinking or otherwise empty
+			// skip purely cancelled messages maybe consisting of only Reasoning or otherwise empty
 			continue
 		}
 
@@ -443,11 +429,11 @@ func (cm ChatMessages) Raw() llm.Messages {
 		a = append(a, *new(cloned[i].Message))
 		// add system message
 		if suffix != "" {
-			msg := llm.Message{Role: "system", Content: "The previous message " + suffix}
+			msg := mllm.Message{Role: "system", Content: "The previous message " + suffix}
 			a = append(a, msg)
 			/*	} else if suffix == "" && i >= 0 && i < l-1 {
 				if tm := getTimeMessage(cloned[i], cloned[i+1]); tm != "" {
-					msg := llm.Message{Role: "system", Content: tm}
+					msg := mllm.Message{Role: "system", Content: tm}
 					a = append(a, msg)
 
 				}*/
@@ -520,7 +506,7 @@ var (
 )
 
 func NewAux(aux any) *ChatMessage {
-	x := New(llm.Message{})
+	x := New(mllm.Message{})
 	x.Aux = aux
 	return x
 }
@@ -542,13 +528,13 @@ func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname 
 		return "", nil
 	}
 	if cm.Aux == nil {
-		if cm.Equals(llm.Message{}) && cm.From != "" && cm.Summary != nil {
+		if cm.IsEmpty() && cm.From != "" && cm.Summary != nil {
 			return "", nil // TODO: better yield_control finishLoopTool
 		}
-		if cm.Equals(llm.Message{}) && cm.From != "" {
+		if cm.IsEmpty() && cm.From != "" {
 			return fmt.Sprintf("(empty from %s)", cm.From), nil
 		}
-		if cm.Equals(llm.Message{}) {
+		if cm.IsEmpty() {
 			return "(empty)", nil
 		}
 	}
@@ -607,9 +593,9 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		content = cm.Content
 	case len(cm.ToolCalls) != 0 && cm.Content == "":
 		content = ""
-	case ShowThoughts && cm.Content == "" && cm.Thinking != "":
+	case ShowThoughts && cm.Content == "" && cm.Reasoning != "":
 		content = ""
-	case !ShowThoughts && cm.Content == "" && cm.Thinking != "":
+	case !ShowThoughts && cm.Content == "" && cm.Reasoning != "":
 		content = ""
 	case cm.Content != "":
 		content = cm.Content
@@ -621,13 +607,13 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	if content == "" {
 		switch {
 		case len(cm.ToolCalls) == 1:
-			content = fmt.Sprintf("Tool Call: %q", cm.ToolCalls.GetNames()[0])
+			content = fmt.Sprintf("Tool Call: %q", GetNames(cm.ToolCalls)[0])
 		case len(cm.ToolCalls) != 0:
-			content = fmt.Sprintf("Tool Calls: %d (%q)", len(cm.ToolCalls), cm.ToolCalls.GetNames())
+			content = fmt.Sprintf("Tool Calls: %d (%q)", len(cm.ToolCalls), GetNames(cm.ToolCalls))
 		}
 	}
-	if ShowThoughts && cm.Thinking != "" {
-		content = strings.Join([]string{italicMarkdown(cm.Thinking), content}, "\n\n")
+	if ShowThoughts && cm.Reasoning != "" {
+		content = strings.Join([]string{italicMarkdown(cm.Reasoning), content}, "\n\n")
 	}
 	if len(cm.ToolCalls) != 0 && ShowCallJSON {
 		content += fmt.Sprintf("\n```json\n%s\n```\n", toJSONIndent(cm.ToolCalls))
@@ -642,7 +628,7 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 		}()
 		content, err = renderfuncMaybe(content, cm.GetMessageStyle())
 		if err != nil {
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 	}
 	if !strings.HasSuffix(content, "\n") {
@@ -651,11 +637,11 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	name := cm.GetName(username, botname)
 	if name == "" {
 		_, err := w.Write([]byte(content + MarkdownSuffix))
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 	_, err = fmt.Fprintf(w, "%s: %s%s", name, strings.TrimSpace(content), MarkdownSuffix)
 	if err != nil {
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 	return nil
 }

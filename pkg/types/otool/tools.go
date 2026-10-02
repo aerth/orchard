@@ -11,14 +11,39 @@ import (
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/chatmessages"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 )
 
 const FinishLoopToolName = "yield_control"
 
+func GetNames(tc []json.RawMessage) []string {
+	if len(tc) == 0 {
+		return nil
+	}
+	a := make([]string, len(tc))
+	for i := range tc {
+		call := struct {
+			Function struct {
+				Name string `json:"name"`
+			} `json:"function"`
+		}{}
+		if err := json.Unmarshal(tc[i], &call); err != nil {
+			a[i] = "ERROR"
+			continue
+		}
+		if call.Function.Name == "" {
+			a[i] = "MISSING"
+			continue
+		}
+		a[i] = call.Function.Name
+	}
+	return a
+}
+
 func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 	isFinishToolONLY := false
-	funcnames := cm.ToolCalls.GetNames()
+	funcnames := GetNames(cm.ToolCalls)
 	switch {
 	// // TODO: sync with otool package that imports this package
 	case len(cm.ToolCalls) == 1 && cm.Content == "" && funcnames[0] == FinishLoopToolName:
@@ -42,10 +67,10 @@ func WithoutFinishCall(cm *chatmessages.ChatMessage) {
 		cm.From = ""
 		cm.Aux = "--"
 		cm.ToolCalls = nil
-		cm.Thinking = ""
+		cm.Reasoning = ""
 		return
 	}
-	i := slices.Index(cm.ToolCalls.GetNames(), FinishLoopToolName)
+	i := slices.Index(GetNames(cm.ToolCalls), FinishLoopToolName)
 	if i < 0 {
 		return
 	}
@@ -112,7 +137,7 @@ func (t *Tools) FromMarshalers(a []json.Marshaler) error {
 type Tool struct {
 	Name string          `json:"name"`     // spec also contains name
 	Spec json.RawMessage `json:"function"` // spec also contains name
-	exec ExecFunc
+	exec any
 }
 
 func (t Tool) GetName() string {
@@ -127,7 +152,7 @@ func (t Tools) Names() []string {
 	return a
 }
 
-func (t Tool) WithExec(execFn ExecFunc) Tool {
+func (t Tool) WithExec(execFn any) Tool {
 	t.exec = execFn
 	return t
 }
@@ -141,15 +166,42 @@ func (t Tool) GetDescription() string {
 }
 
 // Exec is likely a [toolboxes.StaticExecFuncFS]
-func (t Tool) Exec(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
+func (t Tool) Exec(ctx context.Context, caller mllm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
 	if t.exec != nil {
-		slog.Debug("exec", "tool", t.Name, "caller_funcs", caller.ToolCalls.GetNames())
-		return t.exec(ctx, caller, toolCallIndex)
+		switch fn := t.exec.(type) {
+		case ExecFunc:
+			if slog.Default().Enabled(ctx, slog.LevelDebug) {
+				slog.Debug("exec", "tool", t.Name, "caller_funcs", GetNames(caller.ToolCalls))
+			}
+			return fn(ctx, caller, toolCallIndex)
+			/*	case ExecFunc2:
+				var lm llm.Message
+				err := ncodeJ2J(caller, &lm)
+				if err != nil {
+					return nil, err
+				}
+				if slog.Default().Enabled(ctx, slog.LevelDebug) {
+					slog.Debug("exec", "tool", t.Name, "caller_funcs", GetNames(caller.ToolCalls))
+				}
+				return fn(ctx, lm, toolCallIndex)
+			*/
+		}
 	}
 	return nil, fmt.Errorf("exec func was called but is not implemented for this tool %q", t.Name)
 }
 
-type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
+func ncodeJ2J[F any, P any](from F, toptr *P) error {
+	js, err := json.Marshal(from)
+	if err != nil {
+		panic(err.Error())
+	}
+	return json.Unmarshal(js, toptr)
+}
+
+type (
+	ExecFunc = func(ctx context.Context, caller mllm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
+	//ExecFunc2 = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
+)
 
 func (t Tool) MarshalJSON() ([]byte, error) {
 	b, err := json.Marshal(map[string]any{"type": "function", "function": t.Spec})

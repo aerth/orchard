@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"log/slog"
 	"maps"
 	"math/rand"
@@ -14,11 +13,11 @@ import (
 	"m/orchard/pkg/builtins/implv1/bashtooler"
 	"m/orchard/pkg/builtins/implv2"
 	"m/orchard/pkg/chat"
-	"m/orchard/pkg/debugging"
 	"m/orchard/pkg/global"
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/chatmessages"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 )
 
@@ -59,18 +58,14 @@ var previouslyWhitelisted []string // to store one-liners
 // doShellReview ALWAYS sends n replies then closes the channel
 func doShellReview(ctx context.Context, ch chan error, code string) {
 	gr := chatmessages.NewFromRole("bash_reviewer", "assistant", "")
-	creq := llm.NewChatRequest()
-	creq.Think = "low"
-	if creq.Options == nil {
-		creq.Options = make(map[string]any)
-	}
-	creq.Options["seed"] = rand.Intn(13089823748)
-	creq.Messages = llm.Messages{
+	convo := mllm.Messages{
 		{Role: "system", Content: randReviewerText()},
 		{Role: "user", Content: code},
 	}
-	cl := debugging.NewConsoleLogger(io.Discard)
-	err := llm.New().Chat(ctx, creq, gr.GatherChatResponse, cl.HandleChatResponse)
+	client := mllm.Default()
+	client.Options = new(mllm.Options)
+	client.Options.Seed = rand.Int63n(13089823748)
+	err := client.Stream(ctx, convo, false)
 	if err != nil {
 		ch <- stackerr.Errorf("shell review generation failed: %w", err)
 		return

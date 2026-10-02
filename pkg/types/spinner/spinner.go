@@ -10,7 +10,8 @@ import (
 	"time"
 
 	"m/orchard/pkg/global"
-	"m/orchard/pkg/llm"
+
+	"github.com/aerth/mostly/mllm"
 )
 
 type Spinner struct {
@@ -72,7 +73,7 @@ func Start(ctx context.Context) *Spinner {
 }
 
 // HandleChatResponse implements [llm.ChatStreamHandlerFunc] (for cascading chat handlers) so our spinner stops when the first token is generated.
-func (s *Spinner) HandleChatResponse(_ llm.ChatResponse) error {
+func (s *Spinner) HandleChatResponse(_ mllm.ChatResponse) error {
 	s.quit()
 	return nil
 }

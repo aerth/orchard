@@ -5,11 +5,11 @@ import (
 	"log/slog"
 	"time"
 
-	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/chatmessages"
 
 	"m/orchard/pkg/hgr/hgr2"
 
+	"github.com/aerth/mostly/mllm"
 	"github.com/google/uuid"
 )
 
@@ -36,7 +36,7 @@ func (h *Handler) Send(r hgr2.ResponseWrap) error {
 			}
 			return nil
 		default: // could not send
-			slog.Error("COULD NOT SEND TO CHANNEL", "str", r.V.String())
+			slog.Error("COULD NOT SEND TO CHANNEL", "str", fmt.Sprint(r.V))
 			return fmt.Errorf("could not send it")
 		}
 	}
@@ -67,7 +67,7 @@ func (h *Handler) BeginStream() error {
 }
 
 // Handle implements [chat.Handler]
-func (h *Handler) Handle(cr llm.ChatResponse) error {
+func (h *Handler) Handle(cr mllm.ChatResponse) error {
 	return h.Send(hgr2.ResponseWrap{V: cr})
 }
 

@@ -155,7 +155,7 @@ func ValidateCommand(command string) error {
 		}
 		for _, pattern := range dangerPatterns {
 			if pattern.regex.MatchString(trimmed) {
-				return ErrDangerous
+				return stackerr.Errorf("%w", ErrDangerous)
 			}
 		}
 	}

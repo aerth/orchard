@@ -9,10 +9,10 @@ import (
 	"m/orchard/cmdpkg"
 	"m/orchard/pkg/chat"
 	"m/orchard/pkg/hgr/hgr2"
-	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 
+	llm "github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 )

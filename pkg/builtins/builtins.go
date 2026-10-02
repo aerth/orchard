@@ -10,9 +10,12 @@ import (
 	"log/slog"
 	"path/filepath"
 
+	"m/orchard/pkg/global"
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
+
+	"github.com/aerth/mostly/stackerr"
 )
 
 //go:embed *.json
@@ -25,11 +28,18 @@ func Noop(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessa
 // LoadBuiltinTools reads all .json files from the embedded FS and initializes Tool objects.
 // You pass in a map of actual Go functions to bind them.
 func LoadBuiltinTools(execs map[string]otool.ExecFunc) (otool.Tools, error) {
+	limited := global.Get().Get().ToolsLimited
+	if limited != nil && len(limited) == 0 {
+		return nil, nil
+	}
+	if len(limited) == 1 && limited[0] == "none" {
+		return nil, nil
+	}
 	var tools otool.Tools
 
 	err := fs.WalkDir(Embedded, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return stackerr.Errorf("%w", err)
 		}
 		// Only process .json files
 		if !d.IsDir() && filepath.Ext(path) == ".json" {

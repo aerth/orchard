@@ -40,14 +40,15 @@ type ConfigInput struct {
 	Thinking           string
 	Model              string
 }
-type cfginput = ConfigInput
 
 func NewConf(in ConfigInput) *Conf {
-	input := cfginput(in)
-	return &Conf{i: input}
+	return &Conf{i: in}
 }
 
 func NewConfigFlags(clearfirst *bool) *Conf {
+	if flag.Parsed() {
+		panic("flags were already parsed")
+	}
 	cfg := DefaultConfigInput() // can be customized in main package
 	cfg.Flags(clearfirst)       // will quit in case of -h or error
 	return NewConf(cfg)
@@ -89,9 +90,6 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		ss := strings.Fields(s)
 		if len(ss) == 1 {
 			ss = strings.Split(ss[0], ",")
-		}
-		if len(ss) == 1 && ss[0] == "none" {
-			ss = []string{}
 		}
 		cfg.ToolsLimited = ss
 		return nil

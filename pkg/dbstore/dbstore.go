@@ -11,6 +11,7 @@ import (
 
 	"m/orchard/pkg/types/chatmessages"
 
+	"github.com/aerth/mostly/stackerr"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -152,7 +153,7 @@ func (s *Store) DeleteThread(ctx context.Context, threadID uuid.UUID) error {
 
 	n, err := gorm.G[chatmessages.ChatMessage](s.db.DB()).Where("thread_id = ?", threadID).Delete(ctx)
 	if err != nil {
-		return err
+		return stackerr.Errorf("%w", err)
 	}
 	slog.Info("deleted thread", "n", n, "thread", threadID)
 	//_, err = db.ExecContext(ctx, `DELETE FROM chat_messages WHERE thread_id=$1`, threadID)

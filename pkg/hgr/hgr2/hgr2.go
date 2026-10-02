@@ -3,7 +3,6 @@ package hgr2
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 )
 
@@ -20,7 +19,7 @@ type ChannelWrapper = PlainChannelWrap[ResponseWrap] // channel with UUID
 
 // ResponseWrap allows the receiver to switch based on V.(type) for handling each packet sent in the channel
 type ResponseWrap struct {
-	V fmt.Stringer // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
+	V any // One of: [[]api.ChatResponse] or [messages.ChatMessage] or error
 }
 
 func (c PlainChannelWrap[T]) GatherQuickly(ctx context.Context) (news []T, isDone bool) {

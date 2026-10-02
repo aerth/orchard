@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"m/orchard/pkg/llm"
 	"m/orchard/pkg/types/chatmessages"
 
 	"github.com/aerth/mostly/mllm"
@@ -122,33 +121,11 @@ func QueryDB(ctx context.Context, db *gorm.DB, threadID uuid.UUID, query *vector
 // NomicEmbed ...
 // From docs: "Important! The text prompt must include a task instruction prefix, instructing the model which task is being performed."
 // "Please use search_query: before your queries/questions, and search_document: before your documents."
-func NomicEmbed(text string, isQueryOrQuestion bool) llm.EmbedRequest {
+func NomicEmbed(text string, isQueryOrQuestion bool) mllm.EmbedRequest {
 	if isQueryOrQuestion {
-		return GetNomicEmbeddingRequestQuery(text)
+		return mllm.NewNomicQuery(text)
 	}
-	return GetNomicEmbeddingRequestSearchDocument(text)
+	return mllm.NewNomicDocument(text)
 }
 
 var DefaultEmbedOptions map[string]any
-
-func GetNomicEmbeddingRequestQuery(s string) llm.EmbedRequest {
-	reqBody := llm.EmbedRequest{
-		Model:      model,
-		Input:      []string{fmt.Sprintf("search_query: %s", s)},
-		Options:    DefaultEmbedOptions,
-		Truncate:   new(true),
-		Dimensions: 256,
-	}
-	return reqBody
-}
-
-func GetNomicEmbeddingRequestSearchDocument(s string) llm.EmbedRequest {
-	reqBody := llm.EmbedRequest{
-		Model:      model,
-		Input:      []string{fmt.Sprintf("search_document: %s", s)},
-		Truncate:   new(true),
-		Dimensions: 256,
-		Options:    DefaultEmbedOptions,
-	}
-	return reqBody
-}
