@@ -74,7 +74,7 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 	stack := make(chatmessages.ChatMessages, len(stackInput), 10000)
 	copy(stack, stackInput)
 	conf := global.Get()
-	topRequest := stack[len(stack)-1]
+	topRequest := stack.TopRole("user")
 	if len(stack) == 0 {
 		slog.Warn("conversation is empty, (noop)")
 		return nil
@@ -244,7 +244,7 @@ Chat:
 		default:
 		}
 		if len(tools) != 0 && len(newcaller.ToolCalls) == 0 && !nonudge && toolCallBreakAt < 0 {
-			runQuickPreNudgeCheck()
+			runQuickPreNudgeCheck(ctx, topRequest, newcaller)
 			slog.Info("nudging continue")
 			newcaller.Ephemeral = true
 			tmp := NewEphemeralSystem(
