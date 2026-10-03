@@ -542,7 +542,7 @@ func (cm ChatMessage) FormatMarkdown(renderfunc RendererFunc, username, botname 
 	var str strings.Builder
 	err := cm.FormatMarkdownTo(&str, renderfunc, username, botname)
 	if err != nil {
-		return str.String(), err
+		return str.String(), stackerr.Errorf("%w", err)
 	}
 	return str.String(), nil
 }
@@ -637,7 +637,10 @@ func (cm ChatMessage) FormatMarkdownTo(w io.Writer, renderfuncMaybe RendererFunc
 	name := cm.GetName(username, botname)
 	if name == "" {
 		_, err := w.Write([]byte(content + MarkdownSuffix))
-		return stackerr.Errorf("%w", err)
+		if err != nil {
+			return stackerr.Errorf("%w", err)
+		}
+		return stackerr.Errorf("no name: role=%q", cm.Role)
 	}
 	_, err = fmt.Fprintf(w, "%s: %s%s", name, strings.TrimSpace(content), MarkdownSuffix)
 	if err != nil {
