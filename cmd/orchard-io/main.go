@@ -69,7 +69,7 @@ func Sig() { // handle **signals* (may include ctrl+c if not TUI)
 var builtinTools otool.Tools
 
 func init() {
-	implv2.ConfirmAction = cmdpkg.Cheatcode
+	implv2.ConfirmAction = tuilite.Cheatcode
 }
 
 // orchard CLI infinite loop, simple stdin stdout, minimal stderr.
