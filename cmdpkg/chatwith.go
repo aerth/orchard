@@ -316,7 +316,8 @@ Chat:
 }
 
 func runQuickPreNudgeCheck(ctx context.Context, topRequest, chatMessage chatmessages.ChatMessage) error {
-	panic("unimplemented")
+	cr := mllm.ChatResponse{}
+	err := <-mllm.Default().StreamBG(ctx, mllm.Messages{}, false, cr.Handler)
 }
 
 func toJson(v any) json.RawMessage {
