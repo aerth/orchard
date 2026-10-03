@@ -40,6 +40,7 @@ import (
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 	"m/orchard/pkg/types/spinner"
+	"m/orchardtui/tuilite"
 
 	"github.com/aerth/mostly/mllm"
 	llm "github.com/aerth/mostly/mllm"
