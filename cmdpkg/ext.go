@@ -18,7 +18,7 @@ var NumConfirm = 1
 // Cheatcode plain confirmation (uses gum for now)
 //
 // in TUI code, this should be wrapped for proper display (ie: p.ReleaseTerminal/p.RestoreTerminal)
-func Cheatcode(ctx context.Context, s string, prefixPrompt) error {
+func Cheatcode(ctx context.Context, s string) error {
 	sctx := global.NewCancel(ctx)
 	for i := 1; i <= max(1, NumConfirm); i++ {
 		slog.Warn("asking", "q", s)
@@ -30,7 +30,6 @@ func Cheatcode(ctx context.Context, s string, prefixPrompt) error {
 		if err != nil {
 			return stackerr.Errorf("%w", err)
 		}
-		println(prefixPrompt)
 		cmd := exec.CommandContext(sctx, "/usr/bin/gum", "confirm", "--default=no", "--padding=\"10 10\"", "--prompt.background=#FF0000", "--prompt.foreground=#FFFFFF", s)
 		cmd.Stdin = os.Stdin
 		cmd.Stderr = os.Stderr
