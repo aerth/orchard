@@ -40,7 +40,6 @@ import (
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 	"m/orchard/pkg/types/spinner"
-	"m/orchardtui/tuilite"
 
 	"github.com/aerth/mostly/mllm"
 	llm "github.com/aerth/mostly/mllm"
@@ -70,7 +69,7 @@ func Sig() { // handle **signals* (may include ctrl+c if not TUI)
 var builtinTools otool.Tools
 
 func init() {
-	implv2.ConfirmAction = tuilite.Cheatcode
+	implv2.ConfirmAction = cmdpkg.Cheatcode
 }
 
 // orchard CLI infinite loop, simple stdin stdout, minimal stderr.
