@@ -318,6 +318,10 @@ Chat:
 func runQuickPreNudgeCheck(ctx context.Context, topRequest, chatMessage chatmessages.ChatMessage) error {
 	cr := mllm.ChatResponse{}
 	err := <-mllm.Default().StreamBG(ctx, mllm.Messages{}, false, cr.Handler)
+	if err != nil {
+		return stackerr.Errorf("%w", err)
+	}
+	return nil
 }
 
 func toJson(v any) json.RawMessage {
