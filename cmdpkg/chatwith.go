@@ -319,7 +319,7 @@ func runQuickPreNudgeCheck(ctx context.Context, topRequest, chatMessage chatmess
 	convo := chatmessages.ChatMessages{topRequest, chatMessage}
 	cr := mllm.ChatResponse{}
 	err := <-mllm.Default().StreamBG(ctx, mllm.Messages{
-		{Role: "system", Content: "Below is a user request, and an assistant response. Determine if the chat loop should break. If the reply is sufficient, output only BREAK, otherwise output KEEP GOING"},
+		{Role: "system", Content: "Below is a user request, and an assistant response. Determine if the chat loop should break. If the ASSISTANT reply is sufficient, output only BREAK, otherwise output KEEP GOING to nudge the assistant to keep working."},
 		{Role: "user", Content: convo.FormatText("USER", "ASSISTANT")},
 	}, false, cr.Handler)
 	if err != nil {
