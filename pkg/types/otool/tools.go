@@ -58,7 +58,7 @@ func IsFinishOnly(cm chatmessages.ChatMessage) bool {
 	return isFinishToolONLY
 }
 
-func WithoutFinishCall(cm *chatmessages.ChatMessage) {
+func withoutFinishCall(cm *chatmessages.ChatMessage) {
 	if IsFinishOnly(*cm) {
 		cm.MessageOptions = chatmessages.MessageOptions{}
 		cm.Message = llm.Message{}
