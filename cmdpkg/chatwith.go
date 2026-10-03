@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -214,9 +215,12 @@ Chat:
 			slog.Debug("got empty", "message_out", toJson(newcaller))
 			return nil
 		}
-		stack = append(stack, *newcaller) // for this thread only
-		newcaller = &stack[len(stack)-1]  // fix ptr for below
+
+		// gen complete, add to convo for this thread only
+		stack = append(stack, *newcaller)
+		newcaller = &stack[len(stack)-1] // fix ptr for below
 		if e.AfterGen != nil {
+			_ = strconv.ParseBool
 			if err := e.AfterGen(newcaller); err != nil {
 				return stackerr.Errorf("%w", err)
 			}
@@ -251,12 +255,6 @@ Chat:
 				return stackerr.Errorf("%w", err)
 			}
 			slog.Info("nudging continue")
-			newcaller.Ephemeral = true
-			tmp := NewEphemeralSystem(
-				"Attention! The assistant sent a text message, but it had no tool calls. " +
-					"This environment allows for tool calls. The previous message was sent by the assistant successfully, and should not be re-submitted. The assistant *must* use **" + finishLoopTool + "** tool function call to *break this loop*, or use other tools to continue work. If there is no work to be done **in this turn**, the assistant must break the loop now by calling the " + finishLoopTool + " tool.")
-			tmp.MaxDistance = 1
-			stack = append(stack, tmp)
 			continue
 		}
 		if len(newcaller.ToolCalls) == 0 { // cant reply to self, so this is a stop
