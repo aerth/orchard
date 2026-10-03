@@ -65,7 +65,7 @@ func doShellReview(ctx context.Context, ch chan error, code string) {
 	client := mllm.Default()
 	client.Options = new(mllm.Options)
 	client.Options.Seed = rand.Int63n(13089823748)
-	err := client.Stream(ctx, convo, false)
+	err := client.Stream(ctx, convo, false, gr.GatherChatResponse)
 	if err != nil {
 		ch <- stackerr.Errorf("shell review generation failed: %w", err)
 		return
