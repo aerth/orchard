@@ -146,7 +146,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 			}
 		}
 		if !isOkBashCode(code) {
-			if err := implv2.ConfirmAction(ctx, "Run this bash code? "+code, "[todo here]"); err != nil {
+			if err := implv2.ConfirmAction(ctx, "Run this bash code? "+code, ""); err != nil {
 				cause := err.Error()
 				if ctx.Err() != nil {
 					cause = context.Cause(ctx).Error()
