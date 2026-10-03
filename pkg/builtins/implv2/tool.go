@@ -441,9 +441,9 @@ func ParseRange(s *Session, actionContent string) (int, int, error) {
 	l := len(parts)
 	switch {
 	case l == 0:
-		return 0, 0, stackerr.Errorf("invalid coordinate format: need '%d' or '%d-%d' format (not enough args)")
+		return 0, 0, stackerr.Errorf("invalid coordinate format: need '%%d' or '%%d-%%d' format (not enough args)")
 	case l > 2:
-		return 0, 0, stackerr.Errorf("invalid coordinate format: need '%d' or '%d-%d' format (too many args)")
+		return 0, 0, stackerr.Errorf("invalid coordinate format: need '%%d' or '%%d-%%d' format (too many args)")
 	}
 
 	start, err = strconv.Atoi(parts[0])
