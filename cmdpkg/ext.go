@@ -9,6 +9,8 @@ import (
 
 	"m/orchard/pkg/debugging"
 	"m/orchard/pkg/global"
+	"m/orchardtui/mainmodel"
+	"m/orchardtui/tuilite"
 
 	"github.com/aerth/mostly/stackerr"
 )
@@ -30,6 +32,8 @@ func Cheatcode(ctx context.Context, s string) error {
 		if err != nil {
 			return stackerr.Errorf("%w", err)
 		}
+		mo := tuilite.GetMainModel[mainmodel.Model]()
+		println(mo.GetMM().V.GetContent())
 		cmd := exec.CommandContext(sctx, "/usr/bin/gum", "confirm", "--default=no", "--padding=\"10 10\"", "--prompt.background=#FF0000", "--prompt.foreground=#FFFFFF", s)
 		cmd.Stdin = os.Stdin
 		cmd.Stderr = os.Stderr
