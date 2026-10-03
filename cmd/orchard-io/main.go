@@ -288,7 +288,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 					println(debugging.ColorReset)
 				}
 				for i := range newcaller.ToolCalls {
-					if err := implv2.ConfirmAction(ctx, fmt.Sprintf("Requested tool call: %q\n\n```json\n%s```", names[i], string(newcaller.ToolCalls[i]))); err != nil {
+					if err := implv2.ConfirmAction(ctx, fmt.Sprintf("Requested tool call: %q\n\n```json\n%s```", names[i], string(newcaller.ToolCalls[i])), "[todo here]"); err != nil {
 						return stackerr.Errorf("%w", err)
 					}
 				}
