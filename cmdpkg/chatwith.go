@@ -244,7 +244,12 @@ Chat:
 		default:
 		}
 		if len(tools) != 0 && len(newcaller.ToolCalls) == 0 && !nonudge && toolCallBreakAt < 0 {
-			runQuickPreNudgeCheck(ctx, topRequest, newcaller)
+			if err := runQuickPreNudgeCheck(ctx, topRequest, *newcaller); err != nil {
+				if errors.Is(err, ErrOK) {
+					return nil
+				}
+				return stackerr.Errorf("%w", err)
+			}
 			slog.Info("nudging continue")
 			newcaller.Ephemeral = true
 			tmp := NewEphemeralSystem(
@@ -308,6 +313,10 @@ Chat:
 		continue Chat
 	}
 	return context.Cause(ctx)
+}
+
+func runQuickPreNudgeCheck(ctx context.Context, topRequest, chatMessage chatmessages.ChatMessage) error {
+	panic("unimplemented")
 }
 
 func toJson(v any) json.RawMessage {
