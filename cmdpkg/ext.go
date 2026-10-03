@@ -22,17 +22,20 @@ func Cheatcode(ctx context.Context, s string) error {
 	sctx := global.NewCancel(ctx)
 	for i := 1; i <= max(1, NumConfirm); i++ {
 		slog.Warn("asking", "q", s)
-		fmt.Fprintf(os.Stdout, "\r%s", debugging.ColorReset)
-		fmt.Fprintf(os.Stderr, "\r%s", debugging.ColorReset)
-		cmd := exec.CommandContext(sctx, "/usr/bin/gum", "confirm", "--default=no", "--padding=\"10 10\"", "--prompt.background=#FF0000", s)
+		_, err := fmt.Fprintf(os.Stdout, "\r%s", debugging.ColorReset)
+		if err != nil {
+			return stackerr.Errorf("%w", err)
+		}
+		_, err = fmt.Fprintf(os.Stderr, "\r%s", debugging.ColorReset)
+		if err != nil {
+			return stackerr.Errorf("%w", err)
+		}
+		cmd := exec.CommandContext(sctx, "/usr/bin/gum", "confirm", "--default=no", "--padding=\"10 10\"", "--prompt.background=#FF0000", "--prompt.foreground=#FFFFFF", s)
 		cmd.Stdin = os.Stdin
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = os.Stdout
-		err := cmd.Run()
-		println()
-		println()
-		if err != nil { // this catches
-			//		slog.Error("error asking", "err", err)
+		err = cmd.Run()
+		if err != nil {
 			return stackerr.Errorf("%w", err)
 		}
 		if !cmd.ProcessState.Success() {
