@@ -15,8 +15,8 @@ import (
 	"m/orchard/pkg/llm"
 	"m/orchard/pkg/loaders/treesitters"
 
+	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/mllm"
-	"github.com/joho/godotenv"
 )
 
 func TestMain(t *testing.M) {

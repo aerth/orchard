@@ -18,8 +18,8 @@ import (
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 
+	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/stackerr"
-	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 )
 
