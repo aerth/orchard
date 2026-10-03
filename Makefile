@@ -31,9 +31,9 @@ cleaninstall:
 	@test ! -d $(OCHATDIR) || echo installing $(OCHATDIR) TUI
 	@test ! -d $(OCHATDIR) || ${MAKE} -C $(OCHATDIR) install 
 push:
-	git push
-	git -C ../orchard-chat push
-	git -C ../otools push
+	git diff && git push
+	git -C ../orchard-chat diff && git -C ../orchard-chat push
+	git -C ../orchard-chat diff && git -C ../otools push
 .PHONY += clean cleaninstall push
 
 complexity:
