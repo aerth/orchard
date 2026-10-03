@@ -39,6 +39,7 @@ type ConfigInput struct {
 	UseDB              bool
 	Thinking           string
 	Model              string
+	EnableTTS          bool
 }
 
 func NewConf(in ConfigInput) *Conf {
