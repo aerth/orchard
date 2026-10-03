@@ -80,7 +80,7 @@ func NewResultMessage(threadID uuid.UUID, resp Result) chatmessages.ChatMessage 
 	return msg
 }
 
-var ConfirmAction = func(ctx context.Context, s string) error {
+var ConfirmAction = func(ctx context.Context, s string, pre string) error {
 	return stackerr.Errorf("there is no ConfirmAction function provided by the main package")
 }
 
@@ -349,7 +349,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 
 			}
 			if e.Cfg.AskBeforeWriting {
-				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```%s\n%s\n```", langname, session.CurrentView()))
+				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```%s\n%s\n```", langname, session.CurrentView()), "[todo here]")
 				if err != nil {
 					messagesGathered = append(messagesGathered, fmt.Sprintf("The reviewer has denied this particular code and you should send a new better version now.\nError: %+v", err))
 					slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
