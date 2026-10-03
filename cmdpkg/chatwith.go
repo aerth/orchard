@@ -321,8 +321,13 @@ func runQuickPreNudgeCheck(ctx context.Context, topRequest, chatMessage chatmess
 	if err != nil {
 		return stackerr.Errorf("%w", err)
 	}
+	if strings.Contains(strings.ToUpper(cr.Message.Content), "BREAK") {
+		return ErrOK
+	}
 	return nil
 }
+
+var ErrOK = errors.New("OK")
 
 func toJson(v any) json.RawMessage {
 	b, err := json.Marshal(v)
