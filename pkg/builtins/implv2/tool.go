@@ -349,7 +349,7 @@ func (e *EditorTool) editToolInner(ctx context.Context, caller llm.Message, tool
 
 			}
 			if e.Cfg.AskBeforeWriting {
-				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```%s\n%s\n```", langname, session.CurrentView()), "[todo here]")
+				err = ConfirmAction(ctx, fmt.Sprintf("EDITOR EDITING Lines:\n```%s\n%s\n```", langname, session.CurrentView()), "")
 				if err != nil {
 					messagesGathered = append(messagesGathered, fmt.Sprintf("The reviewer has denied this particular code and you should send a new better version now.\nError: %+v", err))
 					slog.Info("Editing File", "latest", messagesGathered[len(messagesGathered)-1])
