@@ -34,9 +34,9 @@ func (m *Map[K, V]) Get(key K) (V, bool) {
 // it is appended to the end.
 func (m *Map[K, V]) Set(key K, value V) {
 	if m == nil {
-		return
+		panic("map is nil")
 	}
-	if m.om == nil {
+	if m.om == nil { // initialize
 		m.om = orderedmap.New[K, V]()
 	}
 	m.om.Set(key, value)
@@ -67,7 +67,7 @@ func (m *Map[K, V]) All() iter.Seq2[K, V] {
 // ToMap converts to a regular Go map.
 // Note: The resulting map does not preserve order.
 func (m *Map[K, V]) ToMap() map[K]V {
-	if m == nil || m.om == nil {
+	if m == nil || m.om == nil || m.om.Len() == 0 {
 		return nil
 	}
 	result := make(map[K]V, m.om.Len())
