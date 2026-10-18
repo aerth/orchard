@@ -72,6 +72,7 @@ import (
 		}
 	}
 */
+
 func ActivateTools(tools otool.Tools) error {
 	for i := range tools {
 		if tools[i].Name == "foo" {
