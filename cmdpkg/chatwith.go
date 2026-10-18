@@ -187,6 +187,9 @@ Chat:
 		newcaller.GenDuration = time.Since(newcaller.CreatedAt)
 		// handle tools
 		for _, op := range badwordsimplv2 {
+			if op == "" {
+				continue
+			}
 			if strings.HasPrefix(newcaller.Content, string(op)) || strings.Contains(newcaller.Content, "\n"+string(op)+" ") { // TODO: add more operators like LOCK or GOTO use slices.Contains add [implv2.Operators] []string
 				newcaller.Ephemeral = true
 				stack = append(stack, NewEphemeralSystem("Attention! You must use edit_file tool to begin the file-editing session where you may use operator keywords."))
@@ -196,26 +199,22 @@ Chat:
 
 		toolCallBreakAt := slices.Index(otool.GetNames(newcaller.ToolCalls), finishLoopTool)
 		if toolCallBreakAt >= 0 {
-			if len(newcaller.ToolCalls) == 1 && toolCallBreakAt == 0 {
-				newcaller.ToolCalls = nil
-			} else {
-				slog.Info("GOT BREAK", "at", toolCallBreakAt)
-				time.Sleep(time.Second * 2)
-				newcaller.ToolCalls = slices.Delete(newcaller.ToolCalls, toolCallBreakAt, toolCallBreakAt+1)
-				if len(newcaller.ToolCalls) == 0 {
-					newcaller.ToolCalls = nil
-				}
-			}
+			newcaller.ToolCalls = slices.DeleteFunc(newcaller.ToolCalls, func(v json.RawMessage) bool {
+				name := otool.GetName(v)
+				return name == finishLoopTool
+			})
+		}
+		if len(newcaller.ToolCalls) == 0 {
+			newcaller.ToolCalls = nil
 		}
 		contentFinishLoopAt := strings.Index(newcaller.Content, finishLoopTool)
 		if contentFinishLoopAt >= 0 {
-			newcaller.Content = strings.TrimSpace(newcaller.Content[:contentFinishLoopAt])
+			newcaller.Content = strings.TrimSpace(newcaller.Content[:contentFinishLoopAt]) // TODO: careful
 		}
 		if newcaller.Content == "" && len(newcaller.ToolCalls) == 0 {
 			slog.Debug("got empty", "message_out", toJson(newcaller))
 			return nil
 		}
-
 		// gen complete, add to convo for this thread only
 		stack = append(stack, *newcaller)
 		newcaller = &stack[len(stack)-1] // fix ptr for below
@@ -232,17 +231,11 @@ Chat:
 		switch {
 		case contentFinishLoopAt >= 0:
 			nonudge = true
-		case len(newcaller.ToolCalls) == 1 && newcaller.Content == "" && otool.GetNames(newcaller.ToolCalls)[0] == finishLoopTool:
-			nonudge = true
-			newcaller.Ephemeral = true
-		case strings.HasSuffix(newcaller.Content, finishLoopTool):
+		case newcaller.Content == "" && len(newcaller.ToolCalls) == 0 && toolCallBreakAt >= 0: // 0 because it was removed
 			nonudge = true
 			newcaller.Ephemeral = true
 		case toolCallBreakAt >= 0:
 			nonudge = true
-			if toolCallBreakAt != 0 {
-				newcaller.Ephemeral = true
-			}
 		case toolCallBreakAt == 0: // first and only tool call. had content.
 			return nil
 		default:
