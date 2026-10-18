@@ -23,22 +23,24 @@ func GetNames(tc []json.RawMessage) []string {
 	}
 	a := make([]string, len(tc))
 	for i := range tc {
-		call := struct {
-			Function struct {
-				Name string `json:"name"`
-			} `json:"function"`
-		}{}
-		if err := json.Unmarshal(tc[i], &call); err != nil {
-			a[i] = "ERROR"
-			continue
-		}
-		if call.Function.Name == "" {
-			a[i] = "MISSING"
-			continue
-		}
-		a[i] = call.Function.Name
+		a[i] = GetName(tc[i])
 	}
 	return a
+}
+
+func GetName(v json.RawMessage) string {
+	call := struct {
+		Function struct {
+			Name string `json:"name"`
+		} `json:"function"`
+	}{}
+	if err := json.Unmarshal(v, &call); err != nil {
+		return "ERROR"
+	}
+	if call.Function.Name == "" {
+		return "MISSINGNAME"
+	}
+	return call.Function.Name
 }
 
 func IsFinishOnly(cm chatmessages.ChatMessage) bool {
