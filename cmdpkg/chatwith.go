@@ -66,6 +66,8 @@ func SetBadWordsImplv2(a []string) {
 	badwordsimplv2 = a
 }
 
+var NoAssistantBackToBack = true
+
 // ChatWith is the main single-threaded fully-featured chat loop,
 // it gathers generated responses, runs tools, and runs Ext hooks.
 func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools otool.Tools, e chat.Ext) error {
@@ -122,7 +124,7 @@ Chat:
 			}
 		}
 		top := stack.Top()
-		if top.Role == "assistant" {
+		if top.Role == "assistant" && NoAssistantBackToBack {
 			slog.Error("already is assistant, cant generate", "top", top.String(), "roles", stack.FormatRoles())
 			return nil
 		}
