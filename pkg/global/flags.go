@@ -10,8 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/google/uuid"
+	"uuid"
 )
 
 type ConfigInput struct {
@@ -138,7 +137,7 @@ func (cfg *ConfigInput) Flags(clearfirst *bool) {
 		time.Sleep(time.Second)
 	}
 
-	if !threadIDSet && cfg.ThreadID == uuid.Nil {
+	if !threadIDSet && cfg.ThreadID == uuid.Nil() {
 		basename := filepath.Base(wd)
 		hashed := sha256.Sum256([]byte(basename)) // 32
 		copy(cfg.ThreadID[:], hashed[:])          // 16

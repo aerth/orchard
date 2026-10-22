@@ -8,11 +8,11 @@ import (
 	"iter"
 	"log/slog"
 	"slices"
+	"uuid"
 
 	"m/orchard/pkg/types/chatmessages"
 
 	"github.com/aerth/mostly/stackerr"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -63,7 +63,7 @@ func (s *Store) Add(ctx context.Context, threadID uuid.UUID, msgsInput ...*chatm
 		if v.Ephemeral {
 			return true
 		}
-		if v.ThreadID == uuid.Nil {
+		if v.ThreadID == uuid.Nil() {
 			slog.Warn("Add skipping no threadID", "dbid", v.DBID, "is_ephemeral", v.Ephemeral, "'s", v.String(), "content", v.Content)
 			return true
 		}
@@ -97,7 +97,7 @@ func (s *Store) GetMessage(ctx context.Context, threadID uuid.UUID, messageID uu
 //.Omit("embedding")
 
 func (s *Store) SaveThread(ctx context.Context, threadID uuid.UUID, msgs chatmessages.ChatMessages) error {
-	if threadID == uuid.Nil {
+	if threadID == uuid.Nil() {
 		slog.Debug("not saving thread to db...", "threadID", threadID, "msgs", len(msgs), "msg1", msgs[len(msgs)-1])
 		return nil
 	}

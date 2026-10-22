@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"slices"
+	"uuid"
 
 	"m/orchard/pkg/global"
 	"m/orchard/pkg/llm"
@@ -14,7 +15,6 @@ import (
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
-	"github.com/google/uuid"
 )
 
 // ChatHandler would be called ChatStreamHandler but that is too long
@@ -67,7 +67,7 @@ func (e Ext) FromA(exts ...Ext) Ext {
 		if exts[i].From != "" {
 			temp.From = exts[i].From
 		}
-		if temp.ThreadID == uuid.Nil {
+		if temp.ThreadID == uuid.Nil() {
 			temp.ThreadID = exts[i].ThreadID
 		}
 		if exts[i].PreTools != nil {

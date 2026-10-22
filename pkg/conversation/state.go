@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
+	"uuid"
 )
 
 // State is used for template

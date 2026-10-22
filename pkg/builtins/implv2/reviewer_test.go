@@ -10,7 +10,7 @@ import (
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 
-	"github.com/google/uuid"
+	"uuid"
 )
 
 func TestDiff(t *testing.T) {

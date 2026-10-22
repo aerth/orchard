@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"uuid"
 
 	"m/orchard/pkg/chat"
 	"m/orchard/pkg/global"
@@ -22,7 +23,6 @@ import (
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
-	"github.com/google/uuid"
 )
 
 type haspath struct {
@@ -98,20 +98,20 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		return nil, stackerr.Errorf("%w", err)
 	}
 	threadID := e.Ext.ThreadID
-	if threadID == uuid.Nil {
+	if threadID == uuid.Nil() {
 		threadID = e.Cfg.ThreadID
 	}
-	if threadID == uuid.Nil {
+	if threadID == uuid.Nil() {
 		threadID = global.Get().Get().ThreadID
 	}
-	if threadID == uuid.Nil {
+	if threadID == uuid.Nil() {
 		slog.Error("no thread id found anywhere") // todo ctx lol
 		return nil, stackerr.Errorf("no thread id in EditTool")
 	}
 	got, err := e.editToolInner(ctx, caller, toolCallIndex, call, threadID)
 	for i := range got {
 		got[i].ThreadID = threadID
-		if got[i].MessageID == uuid.Nil {
+		if got[i].MessageID == uuid.Nil() {
 			got[i].MessageID = uuid.New()
 		}
 	}

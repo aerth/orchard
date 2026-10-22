@@ -5,11 +5,11 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"uuid"
+
 	"m/orchard/pkg/chat"
 	"m/orchard/pkg/hgr/hgr2"
 	"m/orchard/pkg/types/chatmessages"
-
-	"github.com/google/uuid"
 )
 
 // Starter to add a channel for tracking
@@ -54,7 +54,7 @@ type XE struct { // immutable. sends api.Response to channel
 
 func (e XE) Encoder(msgptr *chatmessages.ChatMessage) error {
 	msg := *msgptr
-	if msg.ThreadID == uuid.Nil {
+	if msg.ThreadID == uuid.Nil() {
 		msg.ThreadID = e.ThreadID
 	}
 	if false && msg.Role == "assistant" {

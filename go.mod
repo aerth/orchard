@@ -4,7 +4,6 @@ go 1.27.0
 
 require (
 	github.com/aerth/mostly v0.2.4
-	github.com/google/uuid v1.6.0
 	github.com/lmittmann/tint v1.2.1
 	github.com/mattn/go-isatty v0.0.24
 	//github.com/modelcontextprotocol/go-sdk v1.8.0

@@ -8,12 +8,12 @@ import (
 	"log/slog"
 	"strings"
 	"time"
+	"uuid"
 
 	"m/orchard/pkg/types/chatmessages"
 	"m/orchard/pkg/types/otool"
 
 	"github.com/aerth/mostly/stackerr"
-	"github.com/google/uuid"
 )
 
 func init() {
@@ -113,10 +113,10 @@ func RealRunner(ctx context.Context, tools otool.Tools, caller chatmessages.Chat
 		if x[i].CreatedAt.IsZero() {
 			x[i].CreatedAt = time.Now().UTC()
 		}
-		if x[i].ThreadID == uuid.Nil {
+		if x[i].ThreadID == uuid.Nil() {
 			x[i].ThreadID = caller.ThreadID
 		}
-		if x[i].MessageID == uuid.Nil {
+		if x[i].MessageID == uuid.Nil() {
 			x[i].MessageID = uuid.New()
 		}
 		if x[i].Role == "" {

@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"uuid"
 
 	"m/orchard/pkg/chat"
 	"m/orchard/pkg/global"
@@ -22,7 +23,6 @@ import (
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
-	"github.com/google/uuid"
 )
 
 type EncoderFunc = func(v *chatmessages.ChatMessage) error
@@ -83,10 +83,10 @@ func ChatWith(ctx context.Context, stackInput chatmessages.ChatMessages, tools o
 		return nil
 	}
 	var err error
-	if e.ThreadID == uuid.Nil {
+	if e.ThreadID == uuid.Nil() {
 		e.ThreadID = global.Get().Get().ThreadID
 	}
-	noStore := e.ThreadID == uuid.Nil
+	noStore := e.ThreadID == uuid.Nil()
 	numRounds := 0
 
 	restrict := global.Get().Get().ToolsLimited
@@ -113,7 +113,7 @@ Chat:
 		}
 		t2 = time.Now()
 		for i := range stack {
-			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil || (!noStore && stack[i].ThreadID == uuid.Nil) {
+			if stack[i].Role != "system" && stack[i].MessageID == uuid.Nil() || (!noStore && stack[i].ThreadID == uuid.Nil()) {
 				// keep this to identify regressions
 				if stack[i].Ephemeral {
 					continue

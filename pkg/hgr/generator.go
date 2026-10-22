@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"uuid"
 
 	"m/orchard/cmdpkg"
 	"m/orchard/pkg/chat"
@@ -14,7 +15,6 @@ import (
 
 	llm "github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
-	"github.com/google/uuid"
 )
 
 // Prefunc simply sends signal that a new message will be streaming to this channel (receiver should append a new blank)
@@ -41,7 +41,7 @@ func Prefunc(genID uuid.UUID, threadID uuid.UUID, c chan<- hgr2.ResponseWrap) fu
 
 // PreFunc newer version
 func (h *Handler) PreFunc(creq *llm.ChatRequest, from string) error {
-	if h.ThreadID == uuid.Nil {
+	if h.ThreadID == uuid.Nil() {
 		return fmt.Errorf("no threadID in PreFunc")
 	}
 	h.callnum++

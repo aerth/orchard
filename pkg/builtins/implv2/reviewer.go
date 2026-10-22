@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"uuid"
 
 	"m/orchard/cmdpkg"
 	"m/orchard/pkg/chat"
@@ -16,7 +17,6 @@ import (
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
-	"github.com/google/uuid"
 )
 
 type PreReview struct {
@@ -40,7 +40,7 @@ This code is great.
 
 func DoReview(ctx context.Context, info PreReview, reviewTools otool.Tools, e chat.Ext) (string, error) {
 	parentThreadID := e.ThreadID
-	if parentThreadID == uuid.Nil {
+	if parentThreadID == uuid.Nil() {
 		return "", stackerr.Errorf("parentThreadID missing from Ext")
 	}
 	reviewID := uuid.New()

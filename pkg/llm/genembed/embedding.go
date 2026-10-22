@@ -13,7 +13,7 @@ import (
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/mostly/vector256"
-	"github.com/google/uuid"
+	"uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

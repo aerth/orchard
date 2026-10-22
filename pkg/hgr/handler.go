@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log/slog"
 	"time"
+	"uuid"
 
 	"m/orchard/pkg/types/chatmessages"
 
 	"m/orchard/pkg/hgr/hgr2"
 
 	"github.com/aerth/mostly/mllm"
-	"github.com/google/uuid"
 )
 
 // Handler that sends stream ChatResponse and Tool Output messages to a channel
@@ -44,7 +44,7 @@ func (h *Handler) Send(r hgr2.ResponseWrap) error {
 
 // HandleToolOutputs for tool (or system) role outputs
 func (h *Handler) HandleToolOutputs(cm chatmessages.ChatMessage) {
-	if cm.ThreadID == uuid.Nil {
+	if cm.ThreadID == uuid.Nil() {
 		cm.ThreadID = h.ThreadID
 	}
 	slog := slog.With("fn", "HandleToolOutputs", "msgid", cm.MessageID)

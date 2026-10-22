@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+	"uuid"
 
-	"github.com/google/uuid"
 	"github.com/mattn/go-isatty"
 )
 
@@ -154,7 +154,7 @@ func FreshDefaultConfigInput() ConfigInput {
 	if err != nil {
 		panic(err.Error())
 	}
-	threadID := uuid.Nil // nostore
+	threadID := uuid.Nil() // nostore
 	//threadID := SingleThreadID // dummy testing
 	if x := os.Getenv("ORCHARD_THREAD"); x != "" {
 		if err := threadID.UnmarshalText([]byte(x)); err != nil {

@@ -35,6 +35,7 @@ import (
 	"m/orchard/pkg/chat"
 	"m/orchard/pkg/dbstore"
 	"m/orchard/pkg/debugging"
+	"m/orchard/pkg/editv3"
 	"m/orchard/pkg/global"
 	"m/orchard/pkg/loaders/toolboxes"
 	"m/orchard/pkg/types/chatmessages"
@@ -167,7 +168,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 
 	threadID := conf.GetThreadID()
 
-	singleeditor := implv2.NewEditTool(nil) // single file editor
+	//singleeditor := implv2.NewEditTool(nil) // single file editor
 
 	var err error
 	if true { // builtin go tools
@@ -175,8 +176,9 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file":      implv1.ReadFile,
 			"list_directory": implv1.ListDirectory,
+			"edit_file":      editv3.Tool,
 			//"edit_file":      implv2.EditTool,
-			"edit_file": singleeditor.EditTool,
+			//		"edit_file": singleeditor.EditTool,
 			//"write_file": implv1.WriteFile,
 			//	"run_go_command":   noop,
 			"run_bash": basher1.Basher,

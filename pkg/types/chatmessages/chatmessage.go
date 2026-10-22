@@ -10,12 +10,12 @@ import (
 	"slices"
 	"strings"
 	"time"
+	"uuid"
 
 	"m/orchard/pkg/types/vector256"
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -66,15 +66,18 @@ type DBMODEL struct {
 	UpdatedAt time.Time       `json:"-"`
 	DeletedAt *gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 }
+
+// compare with [mllm.ChatMessage]
 type ChatMessage struct {
 	DBMODEL
-	ThreadID       uuid.UUID `gorm:"type:uuid;not null;index:idx_thread_time,priority:1" json:"thread_id,omitempty"` // ThreadID for storing in DB
 	MessageID      uuid.UUID `gorm:"type:uuid;primaryKey;notnull;" json:"message_id,omitempty"`                      // MessageID is unique identifier for each message
+	ThreadID       uuid.UUID `gorm:"type:uuid;not null;index:idx_thread_time,priority:1" json:"thread_id,omitempty"` // ThreadID for storing in DB
 	From           string    `json:"from,omitempty"`                                                                 // name of assistant
 	mllm.Message   `gorm:"embedded" json:"message"`
 	Embedding      vector256.Vector256 `gorm:"type:vector(256);default:null" json:"-"`
-	Metrics        mllm.Stats          `gorm:"serializer:json"`
+	Metrics        mllm.Stats          `gorm:"serializer:json;default:null"`
 	MessageOptions `gorm:"-" json:"-"`
+	// MessageID        uuid.UUID           `gorm:"type:uuid;primaryKey;notnull;" json:"message_id,omitempty"` // MessageID is unique identifier for each message
 }
 
 func (cm *ChatMessage) GatherChatResponse(cr mllm.ChatResponse) error {
@@ -151,12 +154,15 @@ func NewFromRole(from, role, content string) *ChatMessage {
 
 func NewFrom(from string, m mllm.Message) *ChatMessage {
 	t := time.Now().UTC()
-	return &ChatMessage{From: from, Message: m, DBMODEL: DBMODEL{CreatedAt: t, UpdatedAt: t}, MessageID: uuid.New(), MessageOptions: MessageOptions{}}
+	return &ChatMessage{
+		From: from, Message: m,
+		CreatedAt: t, UpdatedAt: t, MessageID: uuid.New(), MessageOptions: MessageOptions{},
+	}
 }
 
 func NewFromEphemeral(from string, m mllm.Message) *ChatMessage {
 	t := time.Now().UTC()
-	return &ChatMessage{From: from, Message: m, DBMODEL: DBMODEL{CreatedAt: t, UpdatedAt: t}, MessageID: uuid.New(), MessageOptions: MessageOptions{Ephemeral: true}}
+	return &ChatMessage{From: from, Message: m, CreatedAt: t, UpdatedAt: t, MessageID: uuid.New(), MessageOptions: MessageOptions{Ephemeral: true}}
 }
 
 func NewSystemEphemeral(content string) *ChatMessage {
@@ -227,6 +233,14 @@ func (cm ChatMessages) Contents() string {
 
 type ChatMessages []ChatMessage
 
+func FromMCM(in mllm.ChatMessages, threadID uuid.UUID) ChatMessages {
+	a := make(ChatMessages, len(in))
+	for i := range in {
+		a[i] = ChatMessage{Message: in[i].Message, CreatedAt: in[i].CreatedAt, MessageID: in[i].MessageID, From: in[i].From, ThreadID: threadID} // TODO: improve
+	}
+	return a
+}
+
 func WithThreadID(threadID uuid.UUID, cm ChatMessages) ChatMessages {
 	for i := range cm {
 		cm[i].ThreadID = threadID
@@ -240,12 +254,12 @@ func (cm ChatMessages) WithThreadID(threadID uuid.UUID) ChatMessages {
 }
 
 func (cm ChatMessages) RemoveNonThread(d uuid.UUID) A {
-	if d == uuid.Nil {
+	if d == uuid.Nil() {
 		slog.Warn("ignoring bad filter")
 		return slices.Clone(cm)
 	}
 	a := slices.DeleteFunc(slices.Clone(cm), func(v ChatMessage) bool {
-		return v.ThreadID != uuid.Nil && v.ThreadID != d
+		return v.ThreadID != uuid.Nil() && v.ThreadID != d
 	})
 	return a
 }

@@ -14,7 +14,7 @@ import (
 
 	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/mllm"
-	"github.com/google/uuid"
+	"uuid"
 )
 
 var testtools otool.Tools
