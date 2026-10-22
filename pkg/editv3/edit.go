@@ -10,7 +10,10 @@ import (
 	"strconv"
 	"strings"
 
+	"m/orchard/pkg/chat"
+	"m/orchard/pkg/toolrunner"
 	"m/orchard/pkg/types/chatmessages"
+	"m/orchard/pkg/types/otool"
 
 	"github.com/aerth/mostly/mllm"
 )
@@ -36,6 +39,8 @@ func (m Mode) String() string {
 }
 
 type EditorSession struct {
+	chat.ChatHandlerPlus
+	chat.Ext
 	mllm.E
 	FilePath      string
 	Original      []string
@@ -59,11 +64,15 @@ type ToolArg struct {
 }
 
 type ToolWith struct {
-	E mllm.E
+	E          mllm.E
+	Ext        chat.Ext
+	GetHandler func() chat.ChatHandlerPlus
 }
 
-// Tool is [otool.ExecFunc]
-func Tool(ctx context.Context, caller mllm.Message, i int) (chatmessages.ChatMessages, error) {
+var _ otool.ExecFunc = ToolWith{}.Tool
+
+// Tool editv3 is [otool.ExecFunc]
+func (tw ToolWith) Tool(ctx context.Context, caller mllm.Message, i int) (chatmessages.ChatMessages, error) {
 	var call chatmessages.Call[ToolArg]
 	err := json.Unmarshal(caller.ToolCalls[i], &call)
 	if err != nil {
@@ -74,8 +83,19 @@ func Tool(ctx context.Context, caller mllm.Message, i int) (chatmessages.ChatMes
 	if err != nil {
 		return nil, err
 	}
+
+	ext := tw.Ext
+	if e, ok := ctx.Value(toolrunner.CtxExt).(chat.Ext); ok {
+		ext = e.FromA(ext)
+	}
+	ext.From = "editor"
+
+	if len(ext.Handlers) == 0 {
+		return nil, fmt.Errorf("editor has no stream handlers yet")
+	}
 	lines := strings.Split(string(b), "\n")
-	x := NewSession(mllm.Default(), args.Path, lines)
+	j := tw.GetHandler()
+	x := NewSession(j, tw.E, ext, args.Path, lines)
 	convoStartLen := len(x.Convo)
 	err = x.Run(ctx)
 	a := x.Convo[convoStartLen:]
@@ -85,24 +105,30 @@ func Tool(ctx context.Context, caller mllm.Message, i int) (chatmessages.ChatMes
 	return a, nil
 }
 
-func NewSession(e mllm.E, path string, content []string) *EditorSession {
+func NewSession(j chat.ChatHandlerPlus, e mllm.E, ext chat.Ext, path string, content []string) *EditorSession {
+	if e.Model == "" {
+		e = mllm.Default()
+	}
 	orig := make([]string, len(content))
 	draft := make([]string, len(content))
 	copy(orig, content)
 	copy(draft, content)
 
 	s := &EditorSession{
-		E:        e,
-		FilePath: path,
-		Original: orig,
-		Draft:    draft,
-		Mode:     ModeView,
+		ChatHandlerPlus: j,
+		Ext:             ext,
+		E:               e,
+		FilePath:        path,
+		Original:        orig,
+		Draft:           draft,
+		Mode:            ModeView,
 	}
 	//s.appendSys(sysMsg)
 	return s
 }
 
 func (s *EditorSession) Run(ctx context.Context) error {
+	handlers := s.E.Handlers
 	for s.Mode != ModeFinished {
 
 		sysMsg := "You are in a FILE session for: " + s.FilePath + "\n" +
@@ -112,7 +138,8 @@ func (s *EditorSession) Run(ctx context.Context) error {
 			"- In Edit Mode, output replacement text line-by-line, ending with SAVE on its own line (or CANCEL to abort).\n\n" +
 			"Current file view:\n" + s.renderWindow(1)
 
-		resp, err := s.Get(ctx, append(s.Convo.Raw(), mllm.Message{Role: "system", Content: sysMsg}), false)
+		s.E.Handlers = append(handlers, s.ChatHandlerPlus.Handle)
+		resp, err := s.E.Get(ctx, append(s.Convo.Raw(), mllm.Message{Role: "system", Content: sysMsg}), false)
 		if err != nil {
 			return err
 		}
