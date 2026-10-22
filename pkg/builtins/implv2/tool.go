@@ -108,6 +108,13 @@ func (e *EditorTool) EditTool(ctx context.Context, caller llm.Message, toolCallI
 		slog.Error("no thread id found anywhere") // todo ctx lol
 		return nil, stackerr.Errorf("no thread id in EditTool")
 	}
+
+	ext := e.Ext
+	if e, ok := ctx.Value(toolrunner.CtxExt).(chat.Ext); ok {
+		ext = e.FromA(ext)
+	}
+	ext.From = EditorName
+	e.Ext = ext
 	got, err := e.editToolInner(ctx, caller, toolCallIndex, call, threadID)
 	for i := range got {
 		got[i].ThreadID = threadID
