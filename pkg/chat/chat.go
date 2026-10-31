@@ -246,13 +246,7 @@ func ChatReqPlain(ctx context.Context, creq *mllm.ChatRequest, e Ext) error {
 	//slog.Info("SENDING", "js", len(toJsonIndent(creq)))
 	//	global.LogWriter.Write(toJsonIndent(creq))
 	creq.Stream = true
-	creq.Think.Value = false
-	if true {
-		if client.Options == nil {
-			client.Options = &mllm.Options{}
-		}
-		client.Options.Debug = true
-	}
+	//creq.Think.Value = false
 	err := client.Do(ctx, *creq, client.Handlers)
 	if err != nil {
 		slog.Error("Chatting error", "err", err, "cause", context.Cause(ctx))
