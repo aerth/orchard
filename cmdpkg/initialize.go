@@ -218,14 +218,21 @@ func InitLog(withSource bool, timeFormat string, loglevel1 ...*slog.LevelVar) *s
 	if Writer == nil {
 		Writer = os.Stderr
 	}
+	if true {
+		slog.SetDefault(slog.New(slog.NewJSONHandler(Writer, &slog.HandlerOptions{
+			AddSource: withSource, Level: loglevel,
+			//		TimeFormat:  timeFormat,
+			ReplaceAttr: ReplaceAttr, // nil
+			//		NoColor:     global.Get().Get().NoColor,
+		})))
+	} else {
+		slog.SetDefault(slog.New(tint.NewTextHandler(Writer, &tint.Options{
+			AddSource: withSource, Level: loglevel,
+			TimeFormat:  timeFormat,
+			ReplaceAttr: ReplaceAttr, // nil
+			NoColor:     global.Get().Get().NoColor,
+		})))
+	}
 	slog.SetLogLoggerLevel(slog.LevelWarn) // for now to use less
-	slog.SetDefault(slog.New(tint.NewTextHandler(Writer, &tint.Options{
-		AddSource: withSource, Level: loglevel,
-		TimeFormat:  timeFormat,
-		ReplaceAttr: ReplaceAttr, // nil
-		//
-		//	TimeFormat: "",
-		NoColor: global.Get().Get().NoColor,
-	})))
 	return loglevel
 }
