@@ -73,7 +73,7 @@ var _ otool.ExecFunc = ToolWith{}.Tool
 
 // Tool editv3 is [otool.ExecFunc]
 func (tw ToolWith) Tool(ctx context.Context, caller mllm.Message, i int) (chatmessages.ChatMessages, error) {
-	var call chatmessages.Call[ToolArg]
+	var call mllm.Call[ToolArg]
 	err := json.Unmarshal(caller.ToolCalls[i], &call)
 	if err != nil {
 		return nil, err
