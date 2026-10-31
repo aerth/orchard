@@ -67,8 +67,6 @@ func Sig() { // handle **signals* (may include ctrl+c if not TUI)
 	}
 }
 
-var builtinTools otool.Tools
-
 func init() {
 	implv2.ConfirmAction = cmdpkg.Cheatcode
 }
@@ -160,20 +158,12 @@ type codeargs struct {
 
 func (c codeargs) IsToolArgument() {}
 
-// rumain already initialized
-func runmain(ctx context.Context, conf *global.Conf) error {
-	if showChar {
-		fmt.Fprintf(os.Stderr, "Press ctrl+d to send your message, press ctrl+c to cancel generation. slash commands are supported, see '/help'.\n")
-	}
-
-	threadID := conf.GetThreadID()
-
-	//singleeditor := implv2.NewEditTool(nil) // single file editor
-
+func getAllTools() (otool.Tools, error) {
+	var tools otool.Tools
 	var err error
 	if true { // builtin go tools
 		slog.Debug("loading native tools")
-		builtinTools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
+		tools, err = builtins.LoadBuiltinTools(map[string]otool.ExecFunc{
 			"read_file":      implv1.ReadFile,
 			"list_directory": implv1.ListDirectory,
 			"edit_file":      editv3.ToolWith{}.Tool,
@@ -187,26 +177,45 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		if err != nil {
 			log.Fatalf("could not load builtin tools: %+v", err)
 		}
-		if len(builtinTools) == 0 {
+		if len(tools) == 0 {
 			panic("no builtin tools")
 		}
 	}
 	if true { // runtime bash/python tools
 		slog.Debug("loading toolbox tools")
-		builtinTools = nil
+		tools = nil
 		box, err := toolboxes.New("") // use env with toolboxes subdir
 		if err != nil {
-			return stackerr.Errorf("%w", err)
+			return tools, stackerr.Errorf("%w", err)
 		}
-		tools := box.AllTools()
-		for _, v := range tools {
-			if !slices.Contains(builtinTools.Names(), v.GetName()) {
-				builtinTools = append(builtinTools, v)
+		for _, v := range box.AllTools() {
+			if !slices.Contains(tools.Names(), v.GetName()) {
+				tools = append(tools, v)
 			}
 		}
 	}
+	return tools, nil
+}
 
+// rumain already initialized
+func runmain(ctx context.Context, conf *global.Conf) error {
+	if showChar {
+		fmt.Fprintf(os.Stderr, "Press ctrl+d to send your message, press ctrl+c to cancel generation. slash commands are supported, see '/help'.\n")
+	}
+
+	threadID := conf.GetThreadID()
+	var builtinTools otool.Tools
 	restrict := global.Get().Get().ToolsLimited
+	if restrict == nil || len(restrict) != 0 {
+		if tools, err := getAllTools(); err != nil {
+			return err
+		} else if len(tools) != 0 {
+			builtinTools = tools
+		}
+	}
+
+	//singleeditor := implv2.NewEditTool(nil) // single file editor
+
 	if restrict != nil {
 		got := slices.DeleteFunc(slices.Clone(builtinTools), func(t otool.Tool) bool {
 			return !slices.Contains(restrict, t.Name)
@@ -238,6 +247,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		slog.Warn("no db store")
 	}
 	if store != nil {
+		var err error
 		stack, err = store.LoadThread(ctx, conf.GetThreadID(), 4)
 		if err != nil {
 			return stackerr.Errorf("%w", err)
@@ -257,7 +267,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		if showChar {
 			_, _ = fmt.Fprintf(os.Stderr, "%s: ", titlecaser.String(conf.GetUsername())) // eg: Chief:
 		}
-		err = ReadMessage(os.Stdin, conf.GetUsername(), "user", &newmsg) // ptr of ptr
+		err := ReadMessage(os.Stdin, conf.GetUsername(), "user", &newmsg) // ptr of ptr
 		if err != nil {
 			return stackerr.Errorf("ReadMessage: %w", err)
 		}
@@ -300,7 +310,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		ThreadID: threadID,
 		NonStreamHandler: func(cm chatmessages.ChatMessage) {
 			if store != nil {
-				if err = store.Add(ctx, threadID, &cm); err != nil {
+				if err := store.Add(ctx, threadID, &cm); err != nil {
 					slog.Warn("err", "err", err)
 				}
 			}
@@ -314,7 +324,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 			}
 		}, AfterGen: func(cm *chatmessages.ChatMessage) error {
 			if store != nil {
-				if err = store.Add(ctx, threadID, cm); err != nil {
+				if err := store.Add(ctx, threadID, cm); err != nil {
 					return stackerr.Errorf("%w", err)
 				}
 			}
@@ -325,7 +335,7 @@ func runmain(ctx context.Context, conf *global.Conf) error {
 		},
 		Handlers: chat.Handlers{cl.HandleChat},
 	}
-	err = cmdpkg.ChatWith(ctx, stack, builtinTools, e)
+	err := cmdpkg.ChatWith(ctx, stack, builtinTools, e)
 	if err != nil {
 		return stackerr.Errorf("%w", err)
 	}
