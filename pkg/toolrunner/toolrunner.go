@@ -82,7 +82,7 @@ func RealRunner(ctx context.Context, tools otool.Tools, caller chatmessages.Chat
 		} `json:"function"`
 	}
 	if err := json.Unmarshal(caller.ToolCalls[toolCallIndex], &call); err != nil {
-		return nil, stackerr.Errorf("json unmarshal call: %w", err)
+		return nil, stackerr.Errorf("json unmarshal name-only call: %w", err)
 	}
 	if call.ID == "" {
 		return nil, stackerr.Errorf("call is missing ID")
