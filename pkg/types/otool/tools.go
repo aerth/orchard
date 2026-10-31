@@ -169,27 +169,29 @@ func (t Tool) GetDescription() string {
 
 // Exec is likely a [toolboxes.StaticExecFuncFS]
 func (t Tool) Exec(ctx context.Context, caller mllm.Message, toolCallIndex int) (chatmessages.ChatMessages, error) {
-	if t.exec != nil {
-		switch fn := t.exec.(type) {
-		case ExecFunc:
+	if t.exec == nil {
+		return nil, fmt.Errorf("exec func was called but is not implemented for this tool %q", t.Name)
+	}
+	switch fn := t.exec.(type) {
+	case ExecFunc:
+		if slog.Default().Enabled(ctx, slog.LevelDebug) {
+			slog.Debug("exec", "tool", t.Name, "caller_funcs", GetNames(caller.ToolCalls))
+		}
+		return fn(ctx, caller, toolCallIndex)
+		/*	case ExecFunc2:
+			var lm llm.Message
+			err := ncodeJ2J(caller, &lm)
+			if err != nil {
+				return nil, err
+			}
 			if slog.Default().Enabled(ctx, slog.LevelDebug) {
 				slog.Debug("exec", "tool", t.Name, "caller_funcs", GetNames(caller.ToolCalls))
 			}
-			return fn(ctx, caller, toolCallIndex)
-			/*	case ExecFunc2:
-				var lm llm.Message
-				err := ncodeJ2J(caller, &lm)
-				if err != nil {
-					return nil, err
-				}
-				if slog.Default().Enabled(ctx, slog.LevelDebug) {
-					slog.Debug("exec", "tool", t.Name, "caller_funcs", GetNames(caller.ToolCalls))
-				}
-				return fn(ctx, lm, toolCallIndex)
-			*/
-		}
+			return fn(ctx, lm, toolCallIndex)
+		*/
+	default:
+		return nil, fmt.Errorf("bad tool exec func")
 	}
-	return nil, fmt.Errorf("exec func was called but is not implemented for this tool %q", t.Name)
 }
 
 func ncodeJ2J[F any, P any](from F, toptr *P) error {
