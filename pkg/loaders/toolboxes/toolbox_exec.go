@@ -5,13 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"m/orchard/pkg/builtins/implv1/bashtooler"
-	"m/orchard/pkg/llm"
-	"m/orchard/pkg/types/chatmessages"
 	"os"
 	"slices"
 	"strings"
 	"time"
+
+	"m/orchard/pkg/builtins/implv1/bashtooler"
+	"m/orchard/pkg/llm"
+	"m/orchard/pkg/types/chatmessages"
+
+	"github.com/aerth/mostly/mllm"
 )
 
 type ExecFunc = func(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.ChatMessages, error)
@@ -48,13 +51,14 @@ func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 llm.Message, callInd
 		slog.Warn("context is finished before tool could run", "err", ctx.Err(), "cause", context.Cause(ctx))
 		return nil, ctx.Err()
 	}
-	var caller chatmessages.Call[map[string]json.RawMessage]
+	var caller mllm.Call[map[string]json.RawMessage]
 	if len(s.required) == 0 && len(caller1.ToolCalls) == 0 {
 		// to make testing easy, we can call a no-arg tooltest without any real tool calls
 	} else {
 		err := json.Unmarshal(caller1.ToolCalls[callIndex], &caller)
 		if err != nil {
-			return nil, err
+			slog.Error("check", "raw", caller1.ToolCalls[callIndex])
+			return nil, fmt.Errorf("parse tool call: %w", err)
 		}
 	}
 
