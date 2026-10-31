@@ -90,7 +90,7 @@ func ListDirectory(ctx context.Context, caller mllm.Message, toolCallIndex int) 
 	return x, nil
 }
 
-func NewResponse[T any](call chatmessages.Call[T], resp string) chatmessages.ChatMessages {
+func NewResponse[T any](call mllm.Call[T], resp string) chatmessages.ChatMessages {
 	x := chatmessages.ChatMessages{
 		*chatmessages.New(llm.Message{
 			Role:       "tool",
