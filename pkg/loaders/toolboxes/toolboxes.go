@@ -95,12 +95,12 @@ type (
 type ToolFunction struct {
 	Name        string            `json:"name,omitempty"`
 	Description string            `json:"description,omitempty"`
-	Parameters  OrchParamsWrapper `json:"parameters,omitempty"`
+	Parameters  OrchParamsWrapper `json:"parameters"`
 }
 type OrchParamsWrapper struct {
 	Type       string               `json:"type,omitempty"`
 	Required   []string             `json:"required,omitempty"`
-	Properties map[string]OrchParam `json:"properties,omitempty"`
+	Properties map[string]OrchParam `json:"properties"`
 }
 
 func (t *Toolbox) ToolSpecs() Tools {
