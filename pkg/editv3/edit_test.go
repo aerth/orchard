@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"m/orchard/pkg/chat"
+
 	"github.com/aerth/mostly/mllm"
 )
 
@@ -26,7 +28,8 @@ func TestEditorSession_EditFlow(t *testing.T) {
 
 	_ = mock
 	initial := []string{"line 1", "line 2", "line 3"}
-	session := NewSession(mllm.E{}, "test.txt", initial)
+	//session := NewSession(mllm.E{}, "test.txt", initial)
+	session := NewSession(nil, mllm.E{}, chat.Ext{}, "test.txt", initial)
 	if err := session.Run(context.Background()); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -49,7 +52,8 @@ func TestEditorSession_PrependFlow(t *testing.T) {
 
 	_ = mock
 	initial := []string{"line 1", "line 2"}
-	session := NewSession(mllm.E{}, "test.txt", initial)
+	//session := NewSession(mllm.E{}, "test.txt", initial)
+	session := NewSession(nil, mllm.E{}, chat.Ext{}, "test.txt", initial)
 
 	if err := session.Run(context.Background()); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -72,7 +76,8 @@ func TestEditorSession_InvalidLock(t *testing.T) {
 
 	_ = mock
 	initial := []string{"line 1"}
-	session := NewSession(mllm.Default(), "test.txt", initial)
+	//session := NewSession(mllm.Default(), "test.txt", initial)
+	session := NewSession(nil, mllm.E{}, chat.Ext{}, "test.txt", initial)
 
 	if err := session.Run(context.Background()); err != nil {
 		t.Fatalf("unexpected error: %v", err)
