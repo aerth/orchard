@@ -105,6 +105,7 @@ func Basher(ctx context.Context, caller llm.Message, toolCallIndex int) (chatmes
 	if implv2.ConfirmAction == nil {
 		return nil, stackerr.Errorf("bash tool needs a ConfirmAction set in implv2 package (from main package)")
 	}
+	slog.Info("reading tool call")
 	call, err := chat.ReadToolCall[codeargs](ctx, caller, toolCallIndex)
 	if err != nil {
 		return nil, err
