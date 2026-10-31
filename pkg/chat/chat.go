@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"os"
 	"slices"
 	"uuid"
 
@@ -127,8 +128,9 @@ func Vals[T any, A ~[]*T](o A) []T {
 type IsToolArgument interface{ IsToolArgument() }
 
 // ReadToolCall may return an error message
-func ReadToolCall[T IsToolArgument](ctx context.Context, caller llm.Message, toolCallIndex int) (chatmessages.Call[T], error) {
-	var call chatmessages.Call[T]
+func ReadToolCall[T IsToolArgument](ctx context.Context, caller llm.Message, toolCallIndex int) (mllm.Call[T], error) {
+	var call mllm.Call[T]
+	slog.Info("Reading tool", "T", fmt.Sprintf("%T", call.Function.Arguments), "fromjs", caller.ToolCalls[toolCallIndex])
 	if err := json.Unmarshal([]byte(caller.ToolCalls[toolCallIndex]), &call); err != nil {
 		return call, stackerr.Errorf("unmarshal json arguments into call[%T]: %w", call.Function.Arguments, err)
 	}
@@ -166,6 +168,13 @@ var client mllm.E
 
 func SetClient(x mllm.E) {
 	client = x
+	client = mllm.Default()
+	if x := os.Getenv("OLLAMA_API_KEY"); x != "" {
+		if client.Headers == nil {
+			client.Headers = make(map[string]string)
+		}
+		client.Headers["Authorization"] = "Bearer " + x
+	}
 }
 
 func FormatRoles(in []llm.Message) []string {
@@ -221,9 +230,12 @@ func ChatReqPlain(ctx context.Context, creq *mllm.ChatRequest, e Ext) error {
 		return fmt.Errorf("no handlers")
 	}
 	if client.Host.Host == "" {
-		client = mllm.Default()
+		SetClient(mllm.Default())
 	}
-	slog.Info("Chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "handlers", len(e.Handlers))
+	if client.Host.Host == "" {
+		return fmt.Errorf("need OLLAMA_HOST")
+	}
+	slog.Info("Chatting", "convo", len(creq.Messages), "tools", len(creq.Tools), "handlers", len(e.Handlers), "with_auth", client.Headers != nil && client.Headers["Authorization"] != "")
 
 	if e.ShowRequests {
 		_ = PrintMessages(creq)
@@ -235,6 +247,12 @@ func ChatReqPlain(ctx context.Context, creq *mllm.ChatRequest, e Ext) error {
 	//	global.LogWriter.Write(toJsonIndent(creq))
 	creq.Stream = true
 	creq.Think.Value = false
+	if true {
+		if client.Options == nil {
+			client.Options = &mllm.Options{}
+		}
+		client.Options.Debug = true
+	}
 	err := client.Do(ctx, *creq, client.Handlers)
 	if err != nil {
 		slog.Error("Chatting error", "err", err, "cause", context.Cause(ctx))
