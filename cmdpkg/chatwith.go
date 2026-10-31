@@ -31,7 +31,24 @@ const (
 	finishLoopTool = otool.FinishLoopToolName //"finish_turn"
 )
 
-var finishLoopToolSpec json.RawMessage = json.RawMessage(`{"function": {"name": "` + finishLoopTool + `", "description": "calling this tool immediately finishes this turn, giving the (human) user an opportunity to send a message."}, "parameters": {"required": [], "properties": {}}, "type": "function"}`)
+var spec12 = json.RawMessage(`{
+      "type": "function",
+      "function": {
+        "name": "yield_control",
+        "description": "calling this tool immediately finishes this turn, giving the (human) user an opportunity to send a message.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "__is_empty": {
+              "type": "boolean",
+              "description": "Internal dummy property"
+            }
+          }
+        }
+      }
+    }`)
+
+var finishLoopToolSpec json.RawMessage = spec12
 
 func NewEphemeralSystem(s string, v ...any) chatmessages.ChatMessage {
 	cm := chatmessages.NewFromRole("", "system", fmt.Sprintf(s, v...))
