@@ -49,17 +49,6 @@ func (cm ChatMessage) GetID() uint {
 	return cm.DBID
 }
 
-type (
-	RawCall     = Call[json.RawMessage]
-	Call[T any] struct {
-		ID       string `json:"id"`
-		Function struct {
-			Name      string `json:"name"`
-			Arguments T      `json:"arguments,omitempty"`
-		} `json:"function"`
-	}
-)
-
 type DBMODEL struct {
 	DBID      uint            `gorm:"primarykey;column:id" json:"dbid,omitempty"` // The MESSAGE DATABASE ID INTERNAL UNUSED ORDERED
 	CreatedAt time.Time       `json:"time"`
@@ -67,7 +56,7 @@ type DBMODEL struct {
 	DeletedAt *gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 }
 
-// compare with [mllm.ChatMessage]
+// ChatMessage wraps [mllm.Message] compare with [mllm.ChatMessage]
 type ChatMessage struct {
 	DBMODEL
 	MessageID      uuid.UUID `gorm:"type:uuid;primaryKey;notnull;" json:"message_id,omitempty"`                      // MessageID is unique identifier for each message
@@ -176,7 +165,7 @@ func NewToolReplyPlain(caller mllm.Message, i int, content string) *ChatMessage 
 
 // NewToolReply with matching Call ID and ToolName for the given i index.
 func NewToolReply(from string, caller mllm.Message, i int, content string) *ChatMessage {
-	var call Call[json.RawMessage]
+	var call mllm.Call[json.RawMessage]
 	err := json.Unmarshal(caller.ToolCalls[i], &call)
 	if err != nil {
 		slog.Error("unmarshal tool call", "err", err)
