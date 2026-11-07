@@ -79,7 +79,7 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	slog.Info("RUN TOOL", "function", caller.Function.Name, "args", caller.Function.Arguments)
 	var execArgs []string
 	var inputFileContents string
-	if len(s.params) == 0 && len(args) != 0 {
+	if len(s.params) == 0 && len(args) > 4 {
 		slog.Warn("no params for this func but args given", "nargs", len(args))
 		return nil, fmt.Errorf("args given (%q) but none are allowed for this function", args)
 	}
