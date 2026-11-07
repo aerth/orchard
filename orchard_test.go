@@ -3,12 +3,23 @@ package orchard_test
 import (
 	"context"
 	_ "embed"
+	"flag"
+	"os"
 	"testing"
 	"uuid"
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/orchard"
 )
+
+func TestMain(m *testing.M) {
+	mllm.Flags()
+	orchard.Flags()
+	if !flag.Parsed() {
+		flag.Parse()
+	}
+	os.Exit(m.Run())
+}
 
 func TestO1(t *testing.T) {
 	threadReader := func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error) {
@@ -22,6 +33,7 @@ func TestO1(t *testing.T) {
 	ctx := t.Context()
 	think := "none"
 	mllm.DefaultOptions.Debug = 2
+	mllm.DefaultWriter = os.Stderr
 	add, err := orchard.Create(ctx, threadID, orchard.Config{
 		ThreadReader: threadReader, Toolbox: tools,
 		Think: think, SystemPrompt: orchard.DefaultSystemPrompt,
