@@ -1,12 +1,16 @@
 # orchard ai
 
-tiny agent library (tool orchestration, agentic harness)
+**tiny agent library** (tool orchestration, agentic harness)
 
-## Current Status
+Made for local LLM.
 
-Currently, the only exposed tool is bash. This gives the agent extraordinary abilities.
+Uses [mllm](https://github.com/aerth/mostly/blob/master/mllm/) as LLM client,
+and sqlite (GORM) for optional persistence.
 
-Optional persistence via sqlite database file.
+## Tools
+
+Your program should define it's own tools.
+The examples use a simple [bash tool](https://github.com/aerth/orchard/blob/master/orchard_tools.go#L55) that is convenient for testing, but is both dangerous and limiting.
 
 ## **Warnings**
 
@@ -17,11 +21,11 @@ Watch output and logs carefully!!
 - Is dangerous.
 - Executes code provided by LLM.
 
-
 ## Examples
 
 - [orchard-tui](https://github.com/aerth/orchard-tui) TUI using bubbletea UI library
 - [orchard_test.go](./orchard_test.go) for example usage.
+- [orchard-io](./cmd/orchard-io/) read stdin, print to stdout
 
 ## Work In Progress
 
@@ -29,10 +33,10 @@ Many components have not made it into this source tree yet. These include:
 
 - Dynamic toolboxes (bash/python scripts for tool.Exec)
 - Confirmation (yes/no/cancel)
-- tree in sticky system message
+- Source tree in sticky system message
 - conversation compression/truncate
 
 This package will remain lightweight and versatile, and the API is mostly stable.
 
 For Documentation, refer to source code or [pkg.go.dev](https://pkg.go.dev/github.com/aerth/orchard)
-
+[Latest source](https://github.com/aerth/orchard)
