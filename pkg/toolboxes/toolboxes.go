@@ -21,13 +21,14 @@ import (
 	"github.com/aerth/mostly/mllm"
 )
 
+// AllTools does not include t.ToolSpec()
 func (t *ToolboxManager) AllTools() Tools {
 	var a Tools
 	for i := range t.Toolboxes {
 		a = append(a, t.Toolboxes[i].ToolSpecs()...)
 	}
 	a = append(a, t.AdditionalTools...)
-	a = append(a, t.ToolSpec())
+	//a = append(a, t.ToolSpec())
 	return a
 }
 
