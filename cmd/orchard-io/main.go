@@ -16,8 +16,10 @@ import (
 var client orchard.Config
 
 func main() {
+	prefix := ""
 	mllm.Flags()
 	orchard.Flags()
+	flag.StringVar(&prefix, "system", prefix, "for example, orchard-io -system 'explain this file' < README.md")
 	flag.Parse()
 	orchard.Slog = mllm.Slog
 	_ = godotenv.Load()
@@ -33,9 +35,12 @@ func main() {
 		if err != nil {
 			return nil, err
 		}
+		if prefix != "" {
+			prefix += " "
+		}
 		return mllm.ChatMessages{{
 			Role:    "user",
-			Content: string(input),
+			Content: prefix + string(input),
 		}}, nil
 	}
 	_, err := orchard.Create(ctx, threadID, client)
