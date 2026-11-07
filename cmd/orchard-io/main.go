@@ -11,6 +11,7 @@ import (
 	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/orchard"
+	"github.com/aerth/orchard/pkg/toolboxes"
 )
 
 var client orchard.Config
@@ -25,6 +26,16 @@ func main() {
 	_ = godotenv.Load()
 	client.E = mllm.Default()
 	client.Toolbox = orchard.AllTools
+	if dir := os.Getenv("ORCHARD_TOOLS"); dir != "" {
+		box, err := toolboxes.NewToolboxFS(dir)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		client.Toolbox = box.AllTools()
+		//	for _, v := range client.Toolbox {
+		//		println("TOOL AVAILABLE:", v.GetName())
+		//	}
+	}
 	ctx := context.Background()
 	threadID := uuid.MustParse("7e0330fc-bb4a-48d7-aae5-bd666db0734a")
 	client.Writer = os.Stdout

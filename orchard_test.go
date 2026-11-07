@@ -10,6 +10,7 @@ import (
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/orchard"
+	"github.com/aerth/orchard/pkg/toolboxes"
 )
 
 func TestMain(m *testing.M) {
@@ -29,6 +30,36 @@ func TestO1(t *testing.T) {
 		}}, nil
 	}
 	tools := orchard.AllTools
+	threadID := uuid.Nil()
+	ctx := t.Context()
+	think := "none"
+	mllm.DefaultOptions.Debug = 2
+	mllm.DefaultWriter = os.Stderr
+	add, err := orchard.Create(ctx, threadID, orchard.Config{
+		ThreadReader: threadReader, Toolbox: tools,
+		Think: think, SystemPrompt: orchard.DefaultSystemPrompt,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(add) < 2 {
+		t.Fatal("did not")
+	}
+}
+
+func TestO2(t *testing.T) {
+	threadReader := func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error) {
+		return mllm.ChatMessages{{
+			Role:    "user",
+			Content: "explain the current dir repo, what does it do? examine the main files",
+		}}, nil
+	}
+	tooldir := "../otools/"
+	toolbox, err := toolboxes.NewToolboxFS(tooldir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tools := toolbox.AllTools()
 	threadID := uuid.Nil()
 	ctx := t.Context()
 	think := "none"
