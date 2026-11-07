@@ -208,7 +208,7 @@ Loop:
 		Slog().Info("running tools", "calls", len(calls), "convo_size", len(convo), "top", convo.Top())
 	}
 	runner := cfg.Toolbox
-	for _, v := range calls {
+	for index, v := range calls {
 		caller.ToolCalls = []json.RawMessage{v}
 		var call mllm.Call[json.RawMessage]
 		err = json.Unmarshal(v, &call)
@@ -216,9 +216,17 @@ Loop:
 			return convo[startLen:], fmt.Errorf("json decode call: %w", err)
 		}
 		var out any
-		out, err = runner.Run(ctx, call.Function.Name, call.Function.ArgsToMap())
+		ctx2 := ctx
+		ctx2 = mllm.WithCaller(ctx2, caller.Message)
+		ctx2 = mllm.WithCall(ctx2, call)
+		ctx2 = mllm.WithCallIndex(ctx2, index)
+		mp := call.Function.ArgsToMap()
+		if len(mp) == 0 {
+			mp = nil
+		}
+		out, err = runner.Run(ctx2, call.Function.Name, mp)
 		if err != nil {
-			return convo[startLen:], fmt.Errorf("json decode call: %w", err)
+			return convo[startLen:], fmt.Errorf("json decode call map: %w", err)
 		}
 		toolout := call.ReplyTool(out).ToThreadMessage("", threadID)
 		convo = append(convo, *toolout)
