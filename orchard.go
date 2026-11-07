@@ -19,17 +19,37 @@ import (
 )
 
 type Config struct {
-	mllm.E
-	DB           gorm.CreateInterface[mllm.ChatMessage]
-	Toolbox      mllm.Tools
+	mllm.E // llm client
+
+	DB gorm.CreateInterface[mllm.ChatMessage] // get with gorm.G[mllm.ChatMessage](db)
+
+	Toolbox mllm.Tools // Tools available (must not be empty)
+
 	Think        any
 	LimitHistory int
 	LimitRounds  int
-	ThreadReader func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error) // ThreadReader loads the history at beginning of the run. see [NewStaticThreadReader]
-	SystemPrompt func() (string, error)
-	NonTextHook  func(mllm.Message) error
-	PreTextHook  func() error
-	FinishHook   func()
+
+	// ThreadReader loads the history ONCE at beginning of the [Create] run. see [NewStaticThreadReader]
+	ThreadReader func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error)
+	SystemPrompt func() (string, error) // sticky system prompt
+
+	NonTextHook func(mllm.Message) error // Hook: tool outputs after running tool
+	PreTextHook func() error             // Hook: before starting generate stream
+	FinishHook  func()                   // Hook: after [Create] is finished with all rounds
+}
+
+func Flags() {
+	// currently no flags
+}
+
+func NewStringThreadReader(userSingleMessage string) ThreadReader {
+	a := mllm.ChatMessages{{Role: "user", Content: userSingleMessage}}
+	return func(ctx context.Context, _ uuid.UUID) (mllm.ChatMessages, error) {
+		if ctx.Err() != nil {
+			return nil, context.Cause(ctx)
+		}
+		return a, nil
+	}
 }
 
 func NewStaticThreadReader(a mllm.ChatMessages) ThreadReader {
@@ -41,9 +61,10 @@ func NewStaticThreadReader(a mllm.ChatMessages) ThreadReader {
 	}
 }
 
-// ThreadReader function is the way to load the history
+// ThreadReader function is the way to load the history, at beginning of each [Create]
 type ThreadReader = func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error)
 
+// DefaultSystemPrompt function for [Create] if not provided in [Config]
 var DefaultSystemPrompt = sysprompt
 
 //go:embed systemprompt.md
@@ -73,6 +94,9 @@ func executeTemplateString(s string, d templateData) (string, error) {
 
 var Slog = slog.Default
 
+// GormThreadReader uses a sql database to read the conversation thread by threadID
+//
+// see [mllm.ChatMessage]
 func (cfg Config) GormThreadReader(ctx context.Context, threadID uuid.UUID) (convo mllm.ChatMessages, err error) {
 	if cfg.DB == nil {
 		return nil, fmt.Errorf("no db")
@@ -94,6 +118,7 @@ func (cfg Config) GormThreadReader(ctx context.Context, threadID uuid.UUID) (con
 	return convo, nil
 }
 
+// Create is the main loop. Although it returns the new messages, these should be gathered using the 3 hooks in [Config]
 func Create(ctx context.Context, threadID uuid.UUID, cfg Config) (mllm.ChatMessages, error) {
 	if cfg.ThreadID == uuid.Nil() {
 		cfg.ThreadID = threadID
@@ -138,11 +163,17 @@ func Create(ctx context.Context, threadID uuid.UUID, cfg Config) (mllm.ChatMessa
 	startLen := len(convo) // for system prompt
 	var caller mllm.ChatMessage
 Loop:
-	sprompt, err := cfg.SystemPrompt()
+	sfn := cfg.SystemPrompt
+	if sfn == nil {
+		sfn = DefaultSystemPrompt
+	}
+	sprompt, err := sfn()
 	if err != nil {
 		return nil, fmt.Errorf("SystemPrompt: %w", err)
 	}
-	Slog().Info("convo", "size", len(convo), "top", convo.Top())
+	if mllm.DebugLLM {
+		Slog().Info("convo", "size", len(convo), "top", convo.Top())
+	}
 	convox := append(mllm.ChatMessages{mllm.ChatMessage{
 		Role:    "system",
 		Content: sprompt,
@@ -173,7 +204,9 @@ Loop:
 		return convo[startLen:], nil
 	}
 	calls := caller.ToolCalls
-	Slog().Info("running tools", "calls", len(calls), "convo_size", len(convo), "top", convo.Top())
+	if mllm.DebugLLM {
+		Slog().Info("running tools", "calls", len(calls), "convo_size", len(convo), "top", convo.Top())
+	}
 	runner := cfg.Toolbox
 	for _, v := range calls {
 		caller.ToolCalls = []json.RawMessage{v}
