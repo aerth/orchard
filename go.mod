@@ -2,10 +2,8 @@ module github.com/aerth/orchard
 
 go 1.27.3
 
-replace github.com/aerth/mostly => ../mostly/
-
 require (
-	github.com/aerth/mostly v0.0.0-00010101000000-000000000000
+	github.com/aerth/mostly v0.4.1
 	gorm.io/gorm v1.31.2
 )
 
