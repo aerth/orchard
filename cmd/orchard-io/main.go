@@ -2,16 +2,44 @@ package main
 
 import (
 	"context"
+	"flag"
+	"io"
+	"log"
+	"os"
+	"uuid"
 
 	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/mllm"
+	"github.com/aerth/orchard"
 )
 
-var client mllm.E
+var client orchard.Config
 
 func main() {
+	mllm.Flags()
+	orchard.Flags()
+	flag.Parse()
+	orchard.Slog = mllm.Slog
 	_ = godotenv.Load()
-	client = mllm.Default()
+	client.E = mllm.Default()
+	client.Toolbox = orchard.AllTools
 	ctx := context.Background()
-	_, _ = client.Generate(ctx, "Style: plain text, no markdown.", "say hello world in esperanto", false)
+	threadID := uuid.MustParse("7e0330fc-bb4a-48d7-aae5-bd666db0734a")
+	client.Writer = os.Stdout
+
+	// one round
+	client.ThreadReader = func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error) {
+		input, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return nil, err
+		}
+		return mllm.ChatMessages{{
+			Role:    "user",
+			Content: string(input),
+		}}, nil
+	}
+	_, err := orchard.Create(ctx, threadID, client)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
