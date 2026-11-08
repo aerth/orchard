@@ -6,13 +6,21 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/orchard/pkg/bashtooler"
 )
+
+var Options = struct {
+	ToolDirEnv bool
+}{
+	ToolDirEnv: true,
+}
 
 // type ExecFunc = func(ctx context.Context, caller mllm.Message, toolCallIndex int) (mllm.ChatMessages, error)
 type (
@@ -133,13 +141,32 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	var outputMessage string
 	var err error
 	pyFilePath := s.pyFilePath
+	var eenv []string
+	if Options.ToolDirEnv { // otools/toolboxes/web/web_search.bash script should load otools/toolboxes/web/.env or otools/.env (or both o_O)
+		envname := filepath.Join(filepath.Dir(s.pyFilePath), ".env")
+		if _, err := os.Stat(envname); err != nil {
+			// skip box name, skip 'toolboxes'
+			envname = filepath.Join(filepath.Dir(s.pyFilePath), "../../.env")
+		}
+		if _, err := os.Stat(envname); err == nil {
+			envmap, _ := godotenv.Read(envname) // toolboxes/boxname
+			if len(envmap) != 0 {
+				i := 0
+				eenv = make([]string, len(envmap))
+				for k, v := range envmap {
+					eenv[i] = k + "=" + v
+					i++
+				}
+			}
+		}
+	}
 	if strings.HasSuffix(pyFilePath, ".py") {
 		slog.Info("executing python", "file", pyFilePath, "args", execArgs)
 		//		return nil, fmt.Errorf("uhoh, we disabled python")
-		outputMessage, err = bashtooler.RunPy(ctx, ".", s.readFile, pyFilePath, execArgs...)
+		outputMessage, err = bashtooler.RunPy(ctx, ".", eenv, s.readFile, pyFilePath, execArgs...)
 	} else if strings.HasSuffix(pyFilePath, ".bash") {
 		slog.Info("executing bash", "file", pyFilePath, "args", execArgs)
-		outputMessage, err = bashtooler.RunBash(ctx, ".", s.readFile, pyFilePath, execArgs...)
+		outputMessage, err = bashtooler.RunBash(ctx, ".", eenv, s.readFile, pyFilePath, execArgs...)
 	} else {
 		slog.Warn("wtf?", "path", pyFilePath)
 		outputMessage = "wtf tool was that? dunno"

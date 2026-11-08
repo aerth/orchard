@@ -23,22 +23,22 @@ func Init(newcleanenv func() []string) {
 	NewCleanEnviron = newcleanenv
 }
 
-func RunBash(ctx context.Context, wd string, readFile func(string) ([]byte, error), filename string, args ...string) (string, error) {
+func RunBash(ctx context.Context, wd string, environ []string, readFile func(string) ([]byte, error), filename string, args ...string) (string, error) {
 	b, err := readFile(filename)
 	if err != nil {
 		return "", err
 	}
 	stdin := bytes.NewReader(b)
-	return RunBashScript(ctx, stdin, RunParams{WorkingDir: wd, Args: append([]string{"/dev/stdin"}, args...)})
+	return RunBashScript(ctx, stdin, RunParams{WorkingDir: wd, Args: append([]string{"/dev/stdin"}, args...), AddEnviron: environ})
 }
 
-func RunPy(ctx context.Context, wd string, readFile func(string) ([]byte, error), filename string, args ...string) (string, error) {
+func RunPy(ctx context.Context, wd string, environ []string, readFile func(string) ([]byte, error), filename string, args ...string) (string, error) {
 	b, err := readFile(filename)
 	if err != nil {
 		return "", err
 	}
 	stdin := bytes.NewReader(b)
-	return RunPyStdin(ctx, stdin, RunParams{WorkingDir: wd, Args: args})
+	return RunPyStdin(ctx, stdin, RunParams{WorkingDir: wd, Args: args, AddEnviron: environ})
 }
 
 type RunParams struct {
