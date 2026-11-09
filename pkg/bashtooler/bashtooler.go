@@ -29,7 +29,12 @@ func RunBash(ctx context.Context, wd string, environ []string, readFile func(str
 		return "", err
 	}
 	stdin := bytes.NewReader(b)
-	return RunBashScript(ctx, stdin, RunParams{WorkingDir: wd, Args: append([]string{"/dev/stdin"}, args...), AddEnviron: environ})
+	return RunBashScript(ctx, stdin,
+		RunParams{
+			WorkingDir: wd,
+			Args:       append([]string{"/dev/stdin"}, args...),
+			AddEnviron: environ,
+		})
 }
 
 func RunPy(ctx context.Context, wd string, environ []string, readFile func(string) ([]byte, error), filename string, args ...string) (string, error) {
@@ -38,7 +43,12 @@ func RunPy(ctx context.Context, wd string, environ []string, readFile func(strin
 		return "", err
 	}
 	stdin := bytes.NewReader(b)
-	return RunPyStdin(ctx, stdin, RunParams{WorkingDir: wd, Args: args, AddEnviron: environ})
+	return RunPyStdin(ctx, stdin,
+		RunParams{
+			WorkingDir: wd,
+			Args:       args,
+			AddEnviron: environ,
+		})
 }
 
 type RunParams struct {
