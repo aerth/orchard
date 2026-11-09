@@ -2,7 +2,9 @@
 
 **tiny agent library** (tool orchestration, agentic harness)
 
-Made for local LLM.
+Made for local LLM, such as **ollama** or **llama.cpp**.
+
+No telemetry or advertisements.
 
 Uses [mllm](https://github.com/aerth/mostly/blob/master/mllm/) as LLM client,
 and GORM (SQL) for optional persistence.
@@ -16,18 +18,14 @@ Orchard can use dynamic toolboxes. See [orchard-tools](https://github.com/aerth/
 
 ## **Warnings**
 
-Watch output and logs carefully!!
-
-- Is unsafe.
-- Runs shell commands.
-- Is dangerous.
-- Executes code provided by LLM.
+- Runs shell commands, sends system information to the LLM provider you choose.
+- Executes code provided by LLM with no confirmations.
 
 ## Examples
 
-- [orchard-tui](https://github.com/aerth/orchard-tui): TUI using bubbletea UI library
-- [orchard_test.go](./orchard_test.go): for example usage.
-- [orchard-io](./cmd/orchard-io/): read stdin, print to stdout
+- [orchard-tui](https://github.com/aerth/orchard-tui): TUI agent interface using bubbletea UI library
+- [orchard_test.go](./orchard_test.go): for example library usage.
+- [orchard-io](./cmd/orchard-io/): minimal example, read stdin, print to stdout
 - [orchard-tools](https://github.com/aerth/orchard-tools): a tool scripts repository
 
 ## Work In Progress
