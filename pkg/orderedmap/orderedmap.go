@@ -109,6 +109,8 @@ func (m *Map[K, V]) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
+//
+// TODO: unmarshal ordered
 func (m *Map[K, V]) UnmarshalJSON(data []byte) error {
 	// Unmarshal into a temporary map to extract keys/values dynamically
 	var tempMap map[K]V
