@@ -226,7 +226,8 @@ Loop:
 		}
 		out, err = runner.Run(ctx2, call.Function.Name, mp)
 		if err != nil {
-			return convo[startLen:], fmt.Errorf("json decode call map: %w", err)
+			slog.Error("tool run", "err", err, "name", call.Function.Name)
+			out = fmt.Errorf("json decode call map: %w", err)
 		}
 		toolout := call.ReplyTool(out).ToThreadMessage("", threadID)
 		convo = append(convo, *toolout)
