@@ -1,4 +1,4 @@
-# orchard ai
+# [orchard ai](https://github.com/aerth/orchard)
 
 **tiny agent library** (tool orchestration, agentic harness)
 
@@ -6,7 +6,7 @@ Made for local LLM, such as **ollama** or **llama.cpp**.
 
 No telemetry or advertisements.
 
-Uses [mllm](https://github.com/aerth/mostly/blob/master/mllm/) as LLM client,
+Uses the lightweight [mllm](https://github.com/aerth/mostly/blob/master/mllm/) package for LLM client,
 and GORM (SQL) for optional persistence.
 
 ## Tools
@@ -16,10 +16,7 @@ The examples use a simple [bash tool](https://github.com/aerth/orchard/blob/mast
 
 Orchard can use dynamic toolboxes. See [orchard-tools](https://github.com/aerth/orchard-tools) for an example toolbox repo.
 
-## **Warnings**
-
-- Runs shell commands, sends system information to the LLM provider you choose.
-- Executes code provided by LLM with no confirmations.
+Dynamic toolboxes are made with scripts (bash/python).
 
 ## Examples
 
@@ -40,4 +37,5 @@ Many components have not made it into this source tree yet. These include:
 This package, like [mllm](https://github.com/aerth/mostly), will remain lightweight and versatile, and the API is mostly stable.
 
 For Documentation, refer to source code or [pkg.go.dev](https://pkg.go.dev/github.com/aerth/orchard)
+
 [Latest source](https://github.com/aerth/orchard)
