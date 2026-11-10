@@ -12,8 +12,10 @@ import (
 
 type PropertyType []string
 
+var AlwaysListType = false
+
 func (p PropertyType) MarshalJSON() ([]byte, error) {
-	if false && len(p) == 1 {
+	if !AlwaysListType && len(p) == 1 {
 		return json.Marshal(p[0])
 	}
 	return json.Marshal([]string(p[:]))
@@ -62,6 +64,9 @@ func FormatObject(propertyMap PropertiesMap, required []string) json.RawMessage 
 	return b
 }
 
+// YR (Yoked Response? Yoke Rule? Yoke Registry? Yoke Restriction?)
+//
+// See [New] and [NewYoke]
 type YR struct {
 	Type       string        `json:"type"`
 	Properties PropertiesMap `json:"properties"`
@@ -105,6 +110,7 @@ func (y *YR) JSON() json.RawMessage {
 	return js
 }
 
+// ShuffleEnums shuffles y enums in place, returning self y for chained lightning
 func (y *YR) ShuffleEnums() *YR {
 	for _, k := range y.Properties.Keys() {
 		v, _ := y.Properties.Get(k)
@@ -155,12 +161,21 @@ func (y *YR) ShuffleEnums() *YR {
 		return got.Message, nil
 	}
 */
+
+// WithProperty sets a new named required property
 func (y *YR) WithProperty(name string, property Property) *YR {
-	y.Properties.Set(name, property)
+	y.WithPropertyOptional(name, property)
 	y.Required = append(y.Required, name)
 	return y
 }
 
+// WithPropertyOptional sets a new named required property
+func (y *YR) WithPropertyOptional(name string, property Property) *YR {
+	y.Properties.Set(name, property)
+	return y
+}
+
+// WithStringEnum sets property `name` to a new string enum
 func (y *YR) WithStringEnum(name string, v ...string) *YR {
 	y.Properties.Set(name, NewStringEnum(v...))
 	return y
@@ -171,8 +186,14 @@ func (y *YR) WithAnyEnum(name string, v ...any) *YR {
 	return y
 }
 
+// NewYoke creates a new [YR] with enum of type string,int,bool type
+//
+// For example, NewYoke("color", "red", "green", "blue")
+// Will be something like {"color": "red"} or {"color": "green"}
+//
+// For now, only these 3 primitive types not types based on them
 func NewYoke[T any](name string, v ...T) *YR {
-	switch a := any(v).(type) {
+	switch a := any(v).(type) { // check type
 	case []string:
 		return New().WithProperty(name, NewStringEnum(a...))
 	case []int:
@@ -184,6 +205,9 @@ func NewYoke[T any](name string, v ...T) *YR {
 	}
 }
 
+// New empty
+//
+// See [NewYoke]
 func New() *YR {
 	return &YR{Type: "object", Properties: NewPropertiesMap(), Required: nil}
 }
@@ -213,6 +237,8 @@ func New() *YR {
 		return wrap.Value, nil
 	}
 */
+
+// WithMap adds each k/v to the current properties map of y
 func (y *YR) WithMap(x PropertiesMap) *YR {
 	for k, v := range x.All() {
 		y.Properties.Set(k, v)
