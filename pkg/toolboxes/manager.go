@@ -68,7 +68,9 @@ func argsGet(args map[string]json.RawMessage, name string) (any, bool) {
 	if err := json.Unmarshal(args[name], &x); err != nil {
 		return nil, false
 	}
-	slog.Info("got arg: ", "name", name, "val", x)
+	if mllm.DebugLLM {
+		slog.Info("got arg: ", "name", name, "val", x)
+	}
 	return x, true
 }
 

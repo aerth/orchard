@@ -344,10 +344,16 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	if _, err := os.Stat(filepath.Join(basepath, "toolboxes")); err == nil {
 		basepath = filepath.Join(basepath, "toolboxes")
 	}
+	if strings.HasPrefix(basepath, "~/") {
+		basepath = strings.Replace(basepath, "~/", os.ExpandEnv("$HOME")+"/", 1)
+	}
 	entries, err := os.ReadDir(basepath)
 	if err != nil {
-		return nil, fmt.Errorf("basepath readdir: %w", err)
+		return nil, fmt.Errorf("toolbox scan: basepath readdir %w", err)
 	}
+	entries = slices.DeleteFunc(entries, func(v fs.DirEntry) bool {
+		return !v.IsDir() || strings.HasPrefix(v.Name(), ".") || strings.HasPrefix(v.Name(), "disabled") || v.Name() == "tmp"
+	})
 	if debugToolGen {
 		for i := range entries {
 			slog.Info("found entry filesystem toolbox", "e", entries[i])
@@ -362,10 +368,13 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 	if len(entries) > MaxToolboxes {
 		return nil, fmt.Errorf("too many toolboxes (%d) > %d", len(entries), MaxToolboxes)
 	}
-	log.Printf("Toolbox Directories: %q", entries)
+	//log.Printf("Toolbox Directories: %q", entries)
 
 	for _, entry := range entries {
-		if !entry.IsDir() {
+		if entry.Name() == "README.md" {
+			continue
+		}
+		if !entry.IsDir() { // should not be here
 			slog.Warn("skipping toolbox nonbox", "e", entry.Name())
 			continue
 		}
@@ -453,7 +462,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			slog.Warn("no tools in map", "box", subDirName)
 			continue
 		}
-		slog.Info("adding toolbox", "box", subDirName, "tools", len(toolsMap), "available", alphabeticalToolnames)
+		mllm.Slog().Debug("adding toolbox", "box", subDirName, "tools", len(toolsMap), "available", alphabeticalToolnames)
 		slices.Sort(alphabeticalToolnames)
 		tbs = append(tbs, Toolbox{
 			Name:    subDirName,

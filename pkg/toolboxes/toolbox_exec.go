@@ -60,7 +60,9 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	callIndex, _ := mllm.CtxCallIndex(ctx)
 	t1 := time.Now()
 	defer func() {
-		slog.Info("done running tool", "function", s.Name, "duration", time.Since(t1))
+		if d := time.Since(t1); d > time.Second {
+			slog.Info("done running tool", "function", s.Name, "duration", d.String())
+		}
 	}()
 	if ctx.Err() != nil {
 		slog.Warn("context is finished before tool could run", "err", ctx.Err(), "cause", context.Cause(ctx))
@@ -84,7 +86,10 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 		}
 		return nil, fmt.Errorf("Tool %q is currently unavailable", s.Name)
 	}
-	slog.Info("RUN TOOL", "function", caller.Function.Name, "args", caller.Function.Arguments)
+
+	if mllm.DebugLLM {
+		slog.Info("RUN TOOL", "function", caller.Function.Name, "args", caller.Function.Arguments)
+	}
 	var execArgs []string
 	var inputFileContents string
 	if len(s.params) == 0 && len(args) > 4 {
@@ -161,11 +166,11 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 		}
 	}
 	if strings.HasSuffix(pyFilePath, ".py") {
-		slog.Info("executing python", "file", pyFilePath, "args", execArgs)
+		slog.Info("executing python for toolbox tool", "file", filepath.Base(pyFilePath), "args", execArgs)
 		//		return nil, fmt.Errorf("uhoh, we disabled python")
 		outputMessage, err = bashtooler.RunPy(ctx, ".", eenv, s.readFile, pyFilePath, execArgs...)
 	} else if strings.HasSuffix(pyFilePath, ".bash") {
-		slog.Info("executing bash", "file", pyFilePath, "args", execArgs)
+		slog.Info("executing bash for toolbox tool", "file", filepath.Base(pyFilePath), "args", execArgs)
 		outputMessage, err = bashtooler.RunBash(ctx, ".", eenv, s.readFile, pyFilePath, execArgs...)
 	} else {
 		slog.Warn("wtf?", "path", pyFilePath)
