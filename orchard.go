@@ -21,21 +21,30 @@ import (
 type Config struct {
 	mllm.E // llm client
 
-	DB gorm.CreateInterface[mllm.ChatMessage] // get with gorm.G[mllm.ChatMessage](db)
+	DB gorm.CreateInterface[mllm.ChatMessage] // Optional, get with: gorm.G[mllm.ChatMessage](db)
 
-	Toolbox mllm.Tools // Tools available (must not be empty)
+	Toolbox mllm.Tools // Required: Tools available (must not be empty)
 
-	Think        any
-	LimitHistory int
-	LimitRounds  int
+	Think any // probably false or "low" or "none"
 
-	// ThreadReader loads the history ONCE at beginning of the [Create] run. see [NewStaticThreadReader]
+	LimitHistory int // loop option, infinite < 0
+	LimitRounds  int // loop option, infinite < 0
+
+	// ThreadReader loads the history ONCE per [Create] run. see [NewStaticThreadReader]
 	ThreadReader func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error)
-	SystemPrompt func() (string, error) // sticky system prompt
+
+	// SystemPrompt might even return a const string
+	SystemPrompt func(*PromptInput) (string, error) // sticky system prompt
 
 	NonTextHook func(mllm.Message) error // Hook: tool outputs after running tool
 	PreTextHook func() error             // Hook: before starting generate stream
 	FinishHook  func()                   // Hook: after [Create] is finished with all rounds
+}
+
+// PromptInput new subject to change
+type PromptInput struct {
+	ToolNames []string
+	Extra     string // added to internal prompt
 }
 
 func Flags() {
@@ -70,17 +79,28 @@ var DefaultSystemPrompt = sysprompt
 //go:embed systemprompt.md
 var systemprompttemplate string
 
-func sysprompt() (string, error) {
+func sysprompt(input *PromptInput) (string, error) {
+	if input == nil {
+		input = &PromptInput{}
+	}
 	wd, _ := os.Getwd()
 	return executeTemplateString(systemprompttemplate, templateData{
+		Tools:            input.ToolNames,
 		WorkingDirectory: wd,
 		CurrentTime:      time.Now().Truncate(time.Second).UTC().Format(time.DateTime),
+		Extra:            input.Extra,
 	})
 }
 
 type templateData struct {
 	WorkingDirectory string
 	CurrentTime      string
+	Tools            []string
+	Extra            string
+}
+
+func (t templateData) HasTool(name string) bool {
+	return slices.Contains(t.Tools, name)
 }
 
 func executeTemplateString(s string, d templateData) (string, error) {
@@ -162,12 +182,15 @@ func Create(ctx context.Context, threadID uuid.UUID, cfg Config) (mllm.ChatMessa
 	}
 	startLen := len(convo) // for system prompt
 	var caller mllm.ChatMessage
+	promptinput := &PromptInput{
+		ToolNames: Names(cfg.Toolbox),
+	}
 Loop:
 	sfn := cfg.SystemPrompt
 	if sfn == nil {
 		sfn = DefaultSystemPrompt
 	}
-	sprompt, err := sfn()
+	sprompt, err := sfn(promptinput)
 	if err != nil {
 		return nil, fmt.Errorf("SystemPrompt: %w", err)
 	}
@@ -216,10 +239,13 @@ Loop:
 			return convo[startLen:], fmt.Errorf("json decode call: %w", err)
 		}
 		var out any
+
+		/* mllm call stack */
 		ctx2 := ctx
 		ctx2 = mllm.WithCaller(ctx2, caller.Message)
 		ctx2 = mllm.WithCall(ctx2, call)
 		ctx2 = mllm.WithCallIndex(ctx2, index)
+		ctx2 = mllm.WithClient(ctx2, cfg.E)
 		mp := call.Function.ArgsToMap()
 		if len(mp) == 0 {
 			mp = nil
@@ -244,4 +270,12 @@ Loop:
 		}
 	}
 	goto Loop
+}
+
+func Names(tools mllm.Tools) []string {
+	names := make([]string, len(tools))
+	for i := range tools {
+		names[i] = tools[i].GetName()
+	}
+	return names
 }
