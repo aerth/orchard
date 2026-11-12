@@ -3,14 +3,12 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"io"
 	"log"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 	"uuid"
 
 	"github.com/aerth/mostly/godotenv"
@@ -18,24 +16,26 @@ import (
 	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/orchard"
 	"github.com/aerth/orchard/pkg/toolboxes"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var client orchard.Config
 
+var sloglvl slog.LevelVar
+
 func main() {
+	sloglvl.Set(slog.LevelDebug)
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
 		AddSource: false,
-		Level:     slog.LevelDebug,
+		Level:     &sloglvl,
 	})))
 	orchard.Slog = mllm.Slog // get -q -v flags
 	prefix := ""
+	suffix := ""
 	dbflag := false
 	mllm.NoLogFlags = !mllm.NoLogFlags // TODO: fix mllm
 	mllm.Flags()
-	orchard.Flags()
+	orchard.Flags(&sloglvl)
 	flag.StringVar(&prefix, "system", prefix, "for example, orchard-io -system 'explain this file, plaintext paragraph, no markdown' < README.md")
 	flag.BoolVar(&dbflag, "db", dbflag, "this program explicity requires this db flag before using sqlite database if $ORCHARD_DB env is set")
 	flag.BoolFunc("no-bash", "remove bash tool, only use toolboxes", func(s string) error {
@@ -48,17 +48,13 @@ func main() {
 	client.E = mllm.Default()
 	client.Toolbox = orchard.AllTools
 	if prefix != "" {
-		client.SystemPrompt = func(x *orchard.PromptInput) (string, error) {
-			if x == nil {
-				panic("oops")
-			}
-			s, err := orchard.DefaultSystemPrompt(x)
-			s += "\n" + prefix
-			return s, err
-		}
+		orchard.Custom.PromptPrefix = prefix
+	}
+	if suffix != "" {
+		orchard.Custom.PromptSuffix = prefix
 	}
 	if err := main2(client, dbflag); err != nil {
-		log.Fatalln("fatal:", err)
+		log.Fatalf("fatal: %+v", err)
 	}
 }
 
@@ -83,30 +79,18 @@ func main2(client orchard.Config, dbflag bool) error {
 		//	}
 	}
 	wd, _ := os.Getwd()
+	if mllm.DefaultThread == uuid.Nil() {
+		mllm.DefaultThread = mllm.ThreadHasher(wd) // TODO: config for filepath.Base option
+	}
 	if dbfile := os.Getenv("ORCHARD_DB"); dbfile != "" && dbflag {
 		if strings.HasPrefix(dbfile, "~/") {
 			dbfile = strings.Replace(dbfile, "~/", os.ExpandEnv("$HOME")+"/", 1)
 		}
-		mllm.DefaultThread = mllm.ThreadHasher(wd) // TODO: config for filepath.Base option
-		slog.Info("opening db", "thread", mllm.DefaultThread)
-		gormOptions := &gorm.Config{
-			TranslateError: true,
-			Logger: logger.NewSlogLogger(slog.Default(), logger.Config{
-				SlowThreshold:             time.Millisecond * 700,
-				Colorful:                  true,
-				LogLevel:                  logger.Warn,
-				IgnoreRecordNotFoundError: true,
-			}),
-		}
-		db, err := gorm.Open(sqlite.Open(dbfile), gormOptions)
-		if err != nil {
-			return fmt.Errorf("open sqlite %q: %w", dbfile, err)
-		}
-		client.DB = gorm.G[mllm.ChatMessage](db)
-		defer CloseDB(db)
+		client.DB = opendb(dbfile)
+		defer closedb()
 	}
 	ctx := context.Background()
-	threadID := uuid.MustParse("7e0330fc-bb4a-48d7-aae5-bd666db0734a")
+	//threadID := uuid.MustParse("7e0330fc-bb4a-48d7-aae5-bd666db0734a")
 	client.Writer = os.Stdout
 
 	// one round
@@ -119,9 +103,9 @@ func main2(client orchard.Config, dbflag bool) error {
 			Role:    "user",
 			Content: string(input),
 		}
-		var a mllm.ChatMessages
 		if client.DB != nil {
 			// get previous
+			var a mllm.ChatMessages
 			a, err = client.GormThreadReader(ctx, threadID)
 			if err != nil {
 				return nil, err
@@ -133,11 +117,18 @@ func main2(client orchard.Config, dbflag bool) error {
 			if err := client.DB.Create(ctx, &x); err != nil {
 				return nil, err
 			}
+			slog.Info("got thread")
+			return append(a, x), nil
 		}
-		a = append(a, x)
-		return a, nil
+		slog.Debug("single message", "prompt", x.Content)
+		return mllm.ChatMessages{x}, nil
 	}
-	_, err := orchard.Create(ctx, threadID, client)
+
+	// run [orchard.Create] once
+	if client.ThreadID == uuid.Nil() {
+		client.ThreadID = mllm.DefaultThread
+	}
+	_, err := orchard.Create(ctx, client)
 	if err != nil {
 		return err
 	}
@@ -157,9 +148,5 @@ func CloseDB(db *gorm.DB) {
 }
 
 func Roles(cm mllm.ChatMessages) []string {
-	roles := make([]string, len(cm))
-	for i := range cm {
-		roles[i] = cm[i].Role // might be empty if cm[i].Aux, caller can remove
-	}
-	return roles
+	return cm.Roles()
 }
