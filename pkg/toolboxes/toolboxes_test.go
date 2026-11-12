@@ -19,7 +19,7 @@ func TestToolboxes(t *testing.T) {
 	}
 	toolboxdir = filepath.Join(toolboxdir, "toolboxes")
 	log.Printf("toolbox dir: %q", toolboxdir)
-	tb, err := toolboxes.New(toolboxdir)
+	tb, err := toolboxes.NewToolboxFS(toolboxdir)
 	if err != nil {
 		t.Fatal(err)
 		return

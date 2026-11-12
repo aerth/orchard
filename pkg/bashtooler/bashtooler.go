@@ -1,3 +1,7 @@
+// Package bashtooler converts a script into an Orchard Tool.
+//
+// The script must be either .bash or .py suffix and
+// after shebang, first lines must contain Description and optionally, Params.
 package bashtooler
 
 import (

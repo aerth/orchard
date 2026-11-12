@@ -82,7 +82,7 @@ func argsGet(args map[string]json.RawMessage, name string) (any, bool) {
 //	return json.Marshal(Alias(t))
 //}
 
-func New(toolboxdir string) (*ToolboxManager, error) {
+func New(toolboxdir string) (mllm.Tools, error) {
 	if toolboxdir == "" {
 		toolboxdir = os.ExpandEnv(os.Getenv("ORCHARD_TOOLS"))
 		if toolboxdir == "" {
@@ -91,7 +91,7 @@ func New(toolboxdir string) (*ToolboxManager, error) {
 		toolboxdir = filepath.Join(toolboxdir, "toolboxes")
 	}
 	got, err := NewToolboxFS(toolboxdir)
-	return got, err
+	return got.AllTools(), err
 }
 
 const ToolboxManagerName = "toolbox_open"

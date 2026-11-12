@@ -68,7 +68,7 @@ Many components have not made it into this source tree yet. These include:
 - conversation compression
 - reading SKILLS or other runtime prompts
 
-This package, like [mllm](https://github.com/aerth/mostly), will remain lightweight and versatile, and the API (`CreateConvo` and `Create`) is mostly stable.
+This package, like [mllm](https://github.com/aerth/mostly), will remain lightweight and versatile.
 
 For Documentation, refer to source code or [pkg.go.dev](https://pkg.go.dev/github.com/aerth/orchard)
 

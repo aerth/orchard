@@ -21,8 +21,11 @@ import (
 	"github.com/aerth/mostly/mllm"
 )
 
-// AllTools does not include t.ToolSpec()
+// AllTools does not include the manager t.ToolSpec()
 func (t *ToolboxManager) AllTools() Tools {
+	if t == nil {
+		return nil
+	}
 	var a Tools
 	for i := range t.Toolboxes {
 		a = append(a, t.Toolboxes[i].ToolSpecs()...)
@@ -327,14 +330,6 @@ func parsePythonMetadata(filename string, content string) (string, OrchParams, [
 	return description, params, requiredParamNames
 }
 
-func NewToolboxFSX(basepath string) (Toolboxes, error) {
-	x, err := NewToolboxFS(basepath)
-	if x != nil {
-		return x.Toolboxes, err
-	}
-	return nil, err
-}
-
 // NewToolboxFS scans the filesystem under the base path and dynamically constructs Toolboxes.
 // It ignores non-python files, empty directories, and python files directly in the base directory.
 func NewToolboxFS(basepath string) (*ToolboxManager, error) {
@@ -349,7 +344,7 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	}
 	entries, err := os.ReadDir(basepath)
 	if err != nil {
-		return nil, fmt.Errorf("toolbox scan: basepath readdir %w", err)
+		return nil, fmt.Errorf("toolbox scan: readdir %w", err)
 	}
 	entries = slices.DeleteFunc(entries, func(v fs.DirEntry) bool {
 		return !v.IsDir() || strings.HasPrefix(v.Name(), ".") || strings.HasPrefix(v.Name(), "disabled") || v.Name() == "tmp"
