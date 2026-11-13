@@ -15,7 +15,9 @@ docker:
 	test ! -d tmp/otools || git -C tmp/otools pull origin master
 	test -d tmp/otools/.git || git clone https://github.com/aerth/orchard-tools tmp/otools
 	docker build --network=host -t orchard .
-	@docker run --network=host \
+	@echo built container
+	@test -f ~/.config/orchard/env || echo create ~/.config/orchard/env file to run quick docker test
+	@test ! -f ~/.config/orchard/env || docker run --network=host \
 		-v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro \
 		--hostname "orchard-os" \
 		--env-file ~/.config/orchard/env \
