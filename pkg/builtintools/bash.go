@@ -82,6 +82,11 @@ var bashguardprompt = strings.Join([]string{
 	"Say one word: GOOD or BAD",
 }, "\n")
 
+func AddGuardPrompt(lines string) {
+	bashguardprompt += "\n"
+	bashguardprompt += lines
+}
+
 var pathenv = func() []string {
 	var envs []string
 	for _, key := range okkeys {
