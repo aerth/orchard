@@ -11,3 +11,13 @@ run: build
 test:
 	#go test -json -v -short -failfast ./... | jq -c
 	go test -v -short -failfast ./...
+docker:
+	test ! -d tmp/otools || git -C tmp/otools pull origin master
+	test -d tmp/otools/.git || git clone https://github.com/aerth/orchard-tools tmp/otools
+	docker build --network=host -t orchard .
+	@docker run --network=host \
+		-v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro \
+		--hostname "orchard-os" \
+		--env-file ~/.config/orchard/env \
+		-i \
+		orchard <<<"Tell me about this machine, environment. What programs are installed, etc"

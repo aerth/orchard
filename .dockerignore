@@ -1,0 +1,6 @@
+.env
+*.env
+.env*
+tmp
+!tmp/otools
+data
