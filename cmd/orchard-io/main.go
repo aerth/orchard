@@ -16,6 +16,7 @@ import (
 	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/orchard"
 	"github.com/aerth/orchard/pkg/toolboxes"
+	"github.com/aerth/orchard/pkg/visions"
 	"gorm.io/gorm"
 )
 
@@ -34,8 +35,10 @@ func main() {
 	suffix := ""
 	dbflag := false
 	mllm.NoLogFlags = !mllm.NoLogFlags // TODO: fix mllm
+	//
 	mllm.Flags()
 	orchard.Flags(&sloglvl)
+	//
 	flag.StringVar(&prefix, "system", prefix, "for example, orchard-io -system 'explain this file, plaintext paragraph, no markdown' < README.md")
 	flag.BoolVar(&dbflag, "db", dbflag, "this program explicity requires this db flag before using sqlite database if $ORCHARD_DB env is set")
 	flag.BoolFunc("no-bash", "remove bash tool, only use toolboxes", func(s string) error {
@@ -103,6 +106,7 @@ func main2(client orchard.Config, dbflag bool) error {
 			Role:    "user",
 			Content: string(input),
 		}
+
 		if client.DB != nil {
 			// get previous
 			var a mllm.ChatMessages
@@ -121,6 +125,10 @@ func main2(client orchard.Config, dbflag bool) error {
 			return append(a, x), nil
 		}
 		slog.Debug("single message", "prompt", x.Content)
+
+		if err := visions.AttachImages(x.Content, &x.Message); err != nil {
+			slog.Warn("could not attach image", "err", err)
+		}
 		return mllm.ChatMessages{x}, nil
 	}
 
