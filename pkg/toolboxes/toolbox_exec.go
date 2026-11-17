@@ -177,7 +177,13 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 		outputMessage = "wtf tool was that? dunno"
 	}
 	if err != nil {
-		outputMessage += fmt.Sprintf("Error running tool script %q: %s", pyFilePath, err.Error())
+		outputMessage += fmt.Sprintf("Error running tool script %q: %s", shortish(pyFilePath), err.Error())
 	}
 	return outputMessage, nil
+}
+
+func shortish(full string) string {
+	dir := filepath.Base(filepath.Dir(full))
+	base := filepath.Base(full)
+	return filepath.Join(dir, base)
 }
