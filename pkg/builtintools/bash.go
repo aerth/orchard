@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 
 	"github.com/aerth/mostly/mllm"
@@ -74,6 +75,10 @@ var okkeys = []string{
 	"NVCC_CCBIN",
 	"PYTHONPATH",
 	"NODE_ENV",
+}
+
+func OKENV() []string {
+	return slices.Clone(okkeys)
 }
 
 var bashguardprompt = strings.Join([]string{

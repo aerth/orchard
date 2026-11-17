@@ -14,12 +14,52 @@ import (
 	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/orchard/pkg/bashtooler"
+	"github.com/aerth/orchard/pkg/builtintools"
 )
 
 var Options = struct {
 	ToolDirEnv bool
 }{
 	ToolDirEnv: true,
+}
+
+func getEnvironment(pyFilePath string) []string {
+	if _, err := os.Stat(pyFilePath); err != nil {
+		slog.Error("script not found, no env mode")
+		return nil
+	}
+
+	var envmap map[string]string
+	if Options.ToolDirEnv { // default true.
+		// example:
+		// otools/toolboxes/web/web_search.bash script should load FIRST OF otools/toolboxes/web/.env or otools/.env
+		envFilename := filepath.Join(filepath.Dir(pyFilePath), ".env")
+		if _, err := os.Stat(envFilename); err != nil { // otools/toolsboxes/web/.env does not exist
+			// ../../ = skip box name, skip 'toolboxes'
+			envFilename = filepath.Join(filepath.Dir(pyFilePath), "../../.env") // maybe otools/.env exists
+		}
+		if _, err := os.Stat(envFilename); err == nil {
+			envmap, _ = godotenv.Read(envFilename) // toolboxes/boxname
+		}
+	}
+	for _, v := range builtintools.OKENV() {
+		if _, found := envmap[v]; !found { // allow dot env to override per-tool
+			e := os.Getenv(v)
+			if e != "" {
+				envmap[v] = e
+			}
+
+		}
+	}
+
+	// map2env
+	eenv := make([]string, len(envmap))
+	i := 0
+	for k, v := range envmap {
+		eenv[i] = k + "=" + v
+		i++
+	}
+	return eenv
 }
 
 // type ExecFunc = func(ctx context.Context, caller mllm.Message, toolCallIndex int) (mllm.ChatMessages, error)
@@ -35,7 +75,7 @@ type (
 	}
 )
 
-// makeExecFn for [otool.Tool.Exec]
+// makeExecFn for [orchard.Tool.Exec]
 func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile func(string) ([]byte, error), pyFilePath string) ExecFunc {
 	_ = toolName
 	var required []string
@@ -48,13 +88,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 	return s.ExecV1
 }
 
-/*func (s StaticExecFuncFS) Exec(ctx context.Context, caller1 mllm.Message, callIndex int) (mllm.ChatMessages, error) {
-	outputMessage, err := s.ExecV1(ctx, caller1)
-	return mllm.ChatMessages{*mllm.NewChatMessage(
-		caller.ReplyTool(outputMessage), "", uuid.Nil())}, nil
-}*/
-
-// Exec for [otool.Tool.Exec]
+// ExecV1 for [orchard.Tool.Exec]
 func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any, error) {
 	caller1, _ := mllm.CtxCaller(ctx)
 	callIndex, _ := mllm.CtxCallIndex(ctx)
@@ -126,8 +160,10 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 		}
 	}
 	var inputfilename string
+	pyFilePath := s.pyFilePath
+	eenv := getEnvironment(pyFilePath)
 	if inputFileContents != "" { // for when inputs are too big
-		file, err := os.CreateTemp("", "input_*")
+		file, err := os.CreateTemp("", "orchard_input_*")
 		if err != nil {
 			return nil, fmt.Errorf("invalid: %w", err)
 		}
@@ -138,33 +174,10 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 			return nil, fmt.Errorf("invalid: %w", err)
 		}
 		inputfilename = file.Name()
-		_ = os.Setenv("INPUT_FILE", inputfilename)
-		// TODO: defer remove file
-	} else if os.Getenv("INPUT_FILE") != "" {
-		_ = os.Unsetenv("INPUT_FILE")
+		eenv = append(eenv, "INPUT_FILE="+inputfilename)
 	}
 	var outputMessage string
 	var err error
-	pyFilePath := s.pyFilePath
-	var eenv []string
-	if Options.ToolDirEnv { // otools/toolboxes/web/web_search.bash script should load otools/toolboxes/web/.env or otools/.env (or both o_O)
-		envname := filepath.Join(filepath.Dir(s.pyFilePath), ".env")
-		if _, err := os.Stat(envname); err != nil {
-			// skip box name, skip 'toolboxes'
-			envname = filepath.Join(filepath.Dir(s.pyFilePath), "../../.env")
-		}
-		if _, err := os.Stat(envname); err == nil {
-			envmap, _ := godotenv.Read(envname) // toolboxes/boxname
-			if len(envmap) != 0 {
-				i := 0
-				eenv = make([]string, len(envmap))
-				for k, v := range envmap {
-					eenv[i] = k + "=" + v
-					i++
-				}
-			}
-		}
-	}
 	if strings.HasSuffix(pyFilePath, ".py") {
 		slog.Info("executing python for toolbox tool", "file", filepath.Base(pyFilePath), "args", execArgs)
 		//		return nil, fmt.Errorf("uhoh, we disabled python")
