@@ -3,3 +3,7 @@ bin
 *.work.sum
 *.work
 tmp
+*.orig
+*.rej
+*.diff
+*.patch
