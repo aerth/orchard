@@ -122,7 +122,7 @@ type DangerPattern struct {
 	reason string
 }
 
-const bashExec = "/usr/bin/bash"
+const bashExec = "/bin/bash"
 
 var (
 	pipeExecRe      = regexp.MustCompile(`\b(?:curl|wget)\b.*\|\s*(?:bash|sh|zsh|dash)\b`)
