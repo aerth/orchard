@@ -3,6 +3,7 @@ package orchard
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"slices"
 
@@ -14,7 +15,8 @@ import (
 
 type odefaults struct{}
 
-// Generator implements [GeneratorFunc] for the default in [CreateConvo].
+// Generator implements [Custom.GeneratorFunc] for the default in [CreateConvo].
+// Creates a single message, does not run tools. Saves to cfg.DB if exists.
 func (odefaults) Generator(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm.ChatMessage, error) {
 	//	startLen := len(convo) // for system prompt
 	sfn := cfg.SystemPrompt
@@ -26,6 +28,8 @@ func (odefaults) Generator(ctx context.Context, cfg Config, convo mllm.ChatMessa
 	}
 	var sprompt string // new sticky system prompt each turn
 	var err error
+
+	// generate new sticky system prompt for this run
 	sprompt, err = sfn()
 	if cfg.PromptPrefix != "" {
 		sprompt = cfg.PromptPrefix + "\n" + sprompt
@@ -33,46 +37,60 @@ func (odefaults) Generator(ctx context.Context, cfg Config, convo mllm.ChatMessa
 	if cfg.PromptSuffix != "" {
 		sprompt = sprompt + "\n" + cfg.PromptSuffix
 	}
-	var caller mllm.ChatMessage
 	if err != nil {
-		return caller, Errorf("SystemPrompt: %w", err)
+		return mllm.ChatMessage{}, Errorf("SystemPrompt: %w", err)
 	}
+
+	// compaction V1
 	if cfg.PreTextHookEditV1 != nil {
 		if convo, err = cfg.PreTextHookEditV1(ctx, convo); err != nil {
-			return caller, Errorf("nontext hook: %w", err)
-		}
-	}
-	convox := append(mllm.ChatMessages{mllm.ChatMessage{
-		Role:    "system",
-		Content: sprompt,
-	}}, convo...)
-	convox = slices.DeleteFunc(convox, func(v mllm.ChatMessage) bool {
-		return v.IsBlank() || v.Aux != nil
-	})
-	convox = convox.TopN(cfg.LimitHistory) // limit history
-	if cfg.PreTextHookEditV2 != nil {
-		if convox, err = cfg.PreTextHookEditV2(ctx, convox); err != nil {
-			return caller, Errorf("nontext hook: %w", err)
+			return mllm.ChatMessage{}, Errorf("edit hook-1: %w", err)
 		}
 	}
 
-	if cfg.PreTextHook != nil {
-		if err = cfg.PreTextHook(); err != nil {
-			return caller, Errorf("nontext hook: %w", err)
+	// get only the non-aux messages
+	convox := slices.DeleteFunc(slices.Clone(convo), func(v mllm.ChatMessage) bool {
+		return v.IsBlank() || v.Aux != nil
+	})
+
+	// limit history (tail)
+	if cfg.LimitHistory != 0 {
+		convox = convox.TopN(cfg.LimitHistory)
+	}
+
+	// new slice with sticky
+	convox = append(mllm.ChatMessages{{Role: "system", Content: sprompt}}, convox...)
+	// compaction V2 (preferred)
+	if cfg.PreTextHookEditV2 != nil {
+		if convox, err = cfg.PreTextHookEditV2(ctx, convox); err != nil {
+			return mllm.ChatMessage{}, Errorf("edit hook-2: %w", err)
 		}
 	}
-	// gen
+
+	// pre-text hook send signal for UI to add a new "pending" message
+	if cfg.PreTextHook != nil {
+		if err = cfg.PreTextHook(); err != nil {
+			return mllm.ChatMessage{}, Errorf("pre-text hook: %w", err)
+		}
+	}
+	// generate a new single message. MultiChat uses cfg.E.Handlers ([Config.E]) ([mllm.E.Handlers]) to stream to UI/stdout
+	var caller mllm.ChatMessage
 	caller, err = cfg.MultiChat(ctx, convox, cfg.Think)
-	if err != nil {
+	if err != nil && ctx.Err() == nil {
 		return caller, Errorf("llm: %w", err)
 	}
-	// aftergen
-	if cfg.DB != nil { // DB.Create gives db id, do first
-		if err = cfg.DB.Create(ctx, &caller); err != nil {
+	if caller.Content == "" && len(caller.ToolCalls) == 0 {
+		return caller, Errorf("llm: no message created")
+	}
+	if err != nil { // add cancellation message
+		caller.Content += fmt.Sprintf("\n(this was cancelled by the user: %v", context.Cause(ctx))
+	}
+	// aftergen add db row
+	if cfg.DB != nil {
+		if err = cfg.DB.Create(context.WithoutCancel(ctx), &caller); err != nil {
 			return caller, Errorf("db: %w", err)
 		}
 	}
-
 	return caller, nil
 }
 
