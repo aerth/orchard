@@ -39,7 +39,10 @@ type funcConfig struct {
 	// SystemPromptFunc might even return a const string and ignore input, generally should be nil to use default.
 	SystemPromptFunc func() (string, error)
 
-	PreTextHook func() error // Optional UI Hook: before starting generate stream
+	PreTextHook func() error // UI hook (for example, insert new pending message to switch [mllm.StreamHandler] to)
+
+	PreTextHookEditV1 func(ctx context.Context, convo mllm.ChatMessages) (mllm.ChatMessages, error) // Edit Convo Hook EXPERIMENTAL (for example, compaction)
+	PreTextHookEditV2 func(ctx context.Context, convo mllm.ChatMessages) (mllm.ChatMessages, error) // Edit Convo Hook PREFERRED (for example, compaction)
 
 	PreToolHook func(ctx context.Context, name string, args map[string]any) error // Optional: can modify or deny
 

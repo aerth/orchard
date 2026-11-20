@@ -37,7 +37,11 @@ func (odefaults) Generator(ctx context.Context, cfg Config, convo mllm.ChatMessa
 	if err != nil {
 		return caller, Errorf("SystemPrompt: %w", err)
 	}
-
+	if cfg.PreTextHookEditV1 != nil {
+		if convo, err = cfg.PreTextHookEditV1(ctx, convo); err != nil {
+			return caller, Errorf("nontext hook: %w", err)
+		}
+	}
 	convox := append(mllm.ChatMessages{mllm.ChatMessage{
 		Role:    "system",
 		Content: sprompt,
@@ -46,6 +50,11 @@ func (odefaults) Generator(ctx context.Context, cfg Config, convo mllm.ChatMessa
 		return v.IsBlank() || v.Aux != nil
 	})
 	convox = convox.TopN(cfg.LimitHistory) // limit history
+	if cfg.PreTextHookEditV2 != nil {
+		if convox, err = cfg.PreTextHookEditV2(ctx, convox); err != nil {
+			return caller, Errorf("nontext hook: %w", err)
+		}
+	}
 
 	if cfg.PreTextHook != nil {
 		if err = cfg.PreTextHook(); err != nil {
@@ -75,9 +84,7 @@ func (odefaults) Generator(ctx context.Context, cfg Config, convo mllm.ChatMessa
 //
 // NOTE: runs PreToolHook and PostToolHook and finally NonTextHook
 //
-// TODO: simplify further
-//
-// TODO: hook args prevent moving the hooks outside of this func for now
+// TODO: simplify further: move hooks out of this replacable function. hook args prevent moving the hooks outside of this func for now [Create]
 func (odefaults) ToolRunner(ctx context.Context, cfg Config, caller mllm.ChatMessage, index int) (mllm.ChatMessages, error) {
 	runner := cfg.Toolbox
 	var convo mllm.ChatMessages
