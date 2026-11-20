@@ -82,9 +82,13 @@ func OKENV() []string {
 }
 
 var bashguardprompt = strings.Join([]string{
-	"You are a bash guard. Determine if this shell command-line is safe and read-only.",
-	"No exceptions. If it is obfuscated or creates/writes to files, or is overly complex, it is bad.",
-	"Say one word: GOOD or BAD",
+	"You are a bash guard. You determine if the input (bash shell command-line) is safe.",
+	"Safe: Compiling programs, running tests, running build scripts",
+	"Unsafe: Deleting, overwriting files, editing parent directory, or destructive commands not easily-reversed is BAD.",
+	"Only easily-reversed actions are permitted. The script may edit files in the current project ./ and subdirectories. ",
+	"No exceptions: If it is obfuscated or creates/writes to files outside (../) this project (./), or is overly complex, it is bad.",
+	"No .env or secrets are permitted to be accessed.",
+	"Say GOOD, or BAD <reason>",
 }, "\n")
 
 func AddGuardPrompt(lines string) {
@@ -116,11 +120,11 @@ func runbash(ctx context.Context, cmdline string) (string, error) {
 				false)
 			if err != nil {
 				slog.Error("bash guardian", "err", err)
-				return "", fmt.Errorf("could not communicate with bash guard")
+				return "", fmt.Errorf("could not communicate with bash guardian")
 			}
 			if strings.Contains(got.Content, "BAD") || !strings.Contains(got.Content, "GOOD") {
 				slog.Error("bash guardian", "nope", got.Content, "cmdline", cmdline)
-				return "This command was denied by our bash guardian", nil
+				return "Error: This command was denied by our bash guardian: " + got.Content, nil // add the reason so LLM can workaround
 			}
 			guardreplies = append(guardreplies, got.Content)
 		}
