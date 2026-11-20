@@ -32,10 +32,16 @@ var defaults = Config{
 
 // Custom loop funcs to overhaul parts of the main orchard loop. Used by [CreateConvo] (and [Create])
 var Custom = struct {
+	// ToolRunnerFunc runs a [mllm.Tool.Exec] function, returning a message.
+	// Errors end the loop. ToolRunnerFunc should usually re-insert the error into a message to allow self-healing.
 	ToolRunnerFunc func(ctx context.Context, cfg Config, caller mllm.ChatMessage, index int) (mllm.ChatMessages, error)
-	GeneratorFunc  func(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm.ChatMessage, error)
-	PromptPrefix   string
-	PromptSuffix   string
+	// GeneratorFunc generates a [mllm.ChatMessage] from the convo.
+	GeneratorFunc func(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm.ChatMessage, error)
+
+	// PromptPrefix added to sticky system prompt
+	PromptPrefix string
+	// PromptSuffix added to sticky system prompt
+	PromptSuffix string
 }{
 	ToolRunnerFunc: odefaults{}.ToolRunner,
 	GeneratorFunc:  odefaults{}.Generator,
