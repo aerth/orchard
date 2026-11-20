@@ -14,9 +14,9 @@ func must[T any](v T, err error) T {
 }
 
 func TestPrompt(t *testing.T) {
-	b := must(os.ReadFile("testdata/testprompt.md"))
+	b := must(os.ReadFile("prompts/system.v1.md"))
 	tpl := template.Must(template.New("").Parse(string(b)))
-	if err := tpl.Execute(os.Stdout, templateData{}); err != nil {
+	if err := tpl.Execute(os.Stdout, templateData{Tools: []string{"rm", "dd"}}); err != nil {
 		t.Fatal(err)
 	}
 }
