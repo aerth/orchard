@@ -15,16 +15,18 @@ import (
 	"github.com/aerth/orchard/pkg/toolboxes"
 )
 
-type (
-	ToolRunnerFunc = func(ctx context.Context, cfg orchard.Config, caller mllm.ChatMessage, index int) (mllm.ChatMessages, error)
-	GeneratorFunc  = func(ctx context.Context, cfg orchard.Config, convo mllm.ChatMessages) (mllm.ChatMessage, error)
-)
-
-// duplicated for vim etc
-var (
-	_ ToolRunnerFunc = orchard.Custom.ToolRunnerFunc
-	_ GeneratorFunc  = orchard.Custom.GeneratorFunc
-)
+func TestFuncCheck(t *testing.T) {
+	type (
+		ToolRunnerFunc = func(ctx context.Context, cfg orchard.Config, caller mllm.ChatMessage, index int) (mllm.ChatMessages, error)
+		GeneratorFunc  = func(ctx context.Context, cfg orchard.Config, convo mllm.ChatMessages) (mllm.ChatMessage, error)
+	)
+	// duplicated func signatures for vim completion, but test here that they do not change
+	var x ToolRunnerFunc
+	var y GeneratorFunc
+	x = orchard.Custom.ToolRunnerFunc
+	y = orchard.Custom.GeneratorFunc
+	_, _ = x, y
+}
 
 func TestMain(m *testing.M) {
 	_ = orchard.Config{}.SystemPromptFunc // test that we can access the unexported embedded struct from outside the package
