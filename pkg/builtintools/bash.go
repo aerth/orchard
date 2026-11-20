@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/aerth/mostly/mllm"
+	"github.com/aerth/orchard/prompts"
 )
 
 // LLM2 may replace the default model (used by bash guardian)
@@ -81,17 +82,12 @@ func OKENV() []string {
 	return slices.Clone(okkeys)
 }
 
-var bashguardprompt = strings.Join([]string{
-	"You are a bash guard. You determine if the input (bash shell command-line) is safe.",
-	"Safe: Compiling programs, running tests, running build scripts",
-	"Unsafe: Deleting, overwriting files, editing parent directory, or destructive commands not easily-reversed is BAD.",
-	"Only easily-reversed actions are permitted. The script may edit files in the current project ./ and subdirectories. ",
-	"No exceptions: If it is obfuscated or creates/writes to files outside (../) this project (./), or is overly complex, it is bad.",
-	"No .env or secrets are permitted to be accessed.",
-	"Say GOOD, or BAD <reason>",
-}, "\n")
+var bashguardprompt, _ = prompts.Get("bashguard")
 
 func AddGuardPrompt(lines string) {
+	if len(bashguardprompt) == 0 {
+		panic("no bashguard prompt found")
+	}
 	bashguardprompt += "\n"
 	bashguardprompt += lines
 }
@@ -113,6 +109,9 @@ func runbash(ctx context.Context, cmdline string) (string, error) {
 		bashg := LLM2()
 		bashg.Writer = io.Discard
 		bashg.StreamWriter.Writer = nil // skip the GOOD/BAD streaming output in log
+		if len(bashguardprompt) == 0 {
+			return "", fmt.Errorf("no bash guardian prompt found in this version")
+		}
 		for range 3 {
 			got, err := bashg.Generate(ctx,
 				bashguardprompt,
