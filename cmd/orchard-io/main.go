@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 	"uuid"
 
 	"github.com/aerth/mostly/godotenv"
@@ -39,6 +41,8 @@ func main() {
 	mllm.Flags()
 	orchard.Flags(&sloglvl)
 	//
+	sleepDur := time.Second * 2
+	flag.DurationVar(&sleepDur, "slow", sleepDur, "sleep duration after tool response is created. set 0 to make quick. or 1s 2s 3s etc")
 	flag.StringVar(&prefix, "system", prefix, "for example, orchard-io -system 'explain this file, plaintext paragraph, no markdown' < README.md")
 	flag.BoolVar(&dbflag, "db", dbflag, "this program explicity requires this db flag before using sqlite database if $ORCHARD_DB env is set")
 	flag.BoolFunc("no-bash", "remove bash tool, only use toolboxes", func(s string) error {
@@ -56,14 +60,14 @@ func main() {
 	if suffix != "" {
 		orchard.Custom.PromptSuffix = prefix
 	}
-	if err := main2(client, dbflag); err != nil {
+	if err := main2(client, dbflag, sleepDur); err != nil {
 		log.Fatalf("fatal: %+v", err)
 	}
 }
 
 var Errorf = stackerr.Errorf
 
-func main2(client orchard.Config, dbflag bool) error {
+func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	if dir := os.Getenv("ORCHARD_TOOLS"); dir != "" {
 		if strings.HasPrefix(dir, "~/") {
 			dir = strings.Replace(dir, "~/", os.ExpandEnv("$HOME")+"/", 1)
@@ -84,6 +88,13 @@ func main2(client orchard.Config, dbflag bool) error {
 	wd, _ := os.Getwd()
 	if mllm.DefaultThread == uuid.Nil() {
 		mllm.DefaultThread = mllm.ThreadHasher(wd) // TODO: config for filepath.Base option
+	}
+	client.NonTextHook = func(m mllm.Message) error {
+		fmt.Fprintf(os.Stderr, "Tool %q output: %s\n", m.ToolName, m.Content)
+		if sleepDur != 0 {
+			time.Sleep(sleepDur)
+		}
+		return nil
 	}
 	if dbfile := os.Getenv("ORCHARD_DB"); dbfile != "" && dbflag {
 		if strings.HasPrefix(dbfile, "~/") {
