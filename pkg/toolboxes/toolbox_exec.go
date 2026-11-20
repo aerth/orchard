@@ -29,7 +29,7 @@ func getEnvironment(pyFilePath string) []string {
 		return nil
 	}
 
-	var envmap map[string]string
+	envmap := map[string]string{}
 	if Options.ToolDirEnv { // default true.
 		// example:
 		// otools/toolboxes/web/web_search.bash script should load FIRST OF otools/toolboxes/web/.env or otools/.env
