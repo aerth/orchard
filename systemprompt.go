@@ -3,6 +3,7 @@ package orchard
 import (
 	"bytes"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log/slog"
@@ -38,6 +39,14 @@ type templateData struct {
 	CurrentTime      string
 	Tools            []string // for HasTool
 	Extra            string
+}
+
+func (t templateData) ToolsJSON() string {
+	b, err := json.Marshal(t.Tools)
+	if err != nil {
+		panic(err.Error())
+	}
+	return string(b)
 }
 
 func (t templateData) HasTool(name string) bool {
