@@ -58,7 +58,7 @@ func main() {
 		orchard.Custom.PromptPrefix = prefix
 	}
 	if suffix != "" {
-		orchard.Custom.PromptSuffix = prefix
+		orchard.Custom.PromptSuffix = suffix
 	}
 	if err := main2(client, dbflag, sleepDur); err != nil {
 		log.Fatalf("fatal: %+v", err)
