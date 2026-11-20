@@ -153,12 +153,10 @@ var (
 	}
 )
 
-var ErrDangerous = errors.New("dangerous")
-
 // ValidateCommand checks strings against dangerous patterns.
 func ValidateCommand(command string) error {
 	if pipeExecRe.MatchString(command) {
-		return stackerr.Errorf("%w", ErrDangerous)
+		return stackerr.Errorf("Script denied, reason: do not pipe curl to bash. Always prefer to inspect scripts.")
 	}
 	segments := operatorSplitRe.Split(command, -1)
 	for _, segment := range segments {
@@ -168,7 +166,7 @@ func ValidateCommand(command string) error {
 		}
 		for _, pattern := range dangerPatterns {
 			if pattern.regex.MatchString(trimmed) {
-				return stackerr.Errorf("%w", ErrDangerous)
+				return stackerr.Errorf("Script denied, reason: %s", pattern.reason)
 			}
 		}
 	}
