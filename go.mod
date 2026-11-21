@@ -3,7 +3,7 @@ module github.com/aerth/orchard
 go 1.27.3
 
 require (
-	github.com/aerth/mostly v0.4.12
+	github.com/aerth/mostly v0.4.14
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.2
 )
