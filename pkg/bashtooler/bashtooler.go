@@ -60,6 +60,7 @@ type RunParams struct {
 	Args           []string
 	WorkingDir     string
 	AddEnviron     []string
+	RawOnly        bool // do not add "no content" to empty tool output
 }
 
 var EchoBash = false
@@ -107,8 +108,10 @@ func RunBashScript(ctx context.Context, stdinReal io.Reader, params RunParams) (
 		}
 	}
 
-	if strings.TrimSpace(buf.String()) == "" {
-		buf.WriteString("(no output)")
+	if !params.RawOnly {
+		if strings.TrimSpace(buf.String()) == "" {
+			buf.WriteString("(no output)")
+		}
 	}
 	var x string
 	if code := cmd.ProcessState.ExitCode(); code != 0 {
