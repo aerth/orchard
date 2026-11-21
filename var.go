@@ -3,8 +3,10 @@ package orchard
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
@@ -42,9 +44,13 @@ var Custom = struct {
 	PromptPrefix string
 	// PromptSuffix added to sticky system prompt
 	PromptSuffix string
+
+	// PostToolHookCommands are bash commandlines that are run after matching tools are ran. '*' for all
+	PostToolHookCommands map[string]string
 }{
-	ToolRunnerFunc: odefaults{}.ToolRunner,
-	GeneratorFunc:  odefaults{}.Generator,
+	ToolRunnerFunc:       odefaults{}.ToolRunner,
+	GeneratorFunc:        odefaults{}.Generator,
+	PostToolHookCommands: map[string]string{},
 }
 
 // Flags are optional
@@ -65,6 +71,17 @@ func Flags(sloglvl *slog.LevelVar) {
 
 	flag.BoolVar(&mllm.HideThink, "hide-think", mllm.HideThink, "hide thinking when thinking is enabled")
 	flag.BoolVar(&mllm.HideTools, "hide-tools", mllm.HideTools, "hide tools, not recommended. prefer redirecting stderr")
+	flag.Func("toolhook", "add tool hook (can be used multiple times) in format name:command, for example: \"apply_patch_id:make lint\"", func(s string) error {
+		pre, post, ok := strings.Cut(s, ":")
+		if !ok || pre == "" || post == "" {
+			return fmt.Errorf("invalid format toolhook flag. shell quoting issue? try: --toolhook \"apply_patch_id:make lint\"")
+		}
+		if pre == "all" {
+			pre = "*"
+		}
+		Custom.PostToolHookCommands[pre] = post
+		return nil
+	})
 
 	if sloglvl != nil {
 		flag.Func("log-level", "debug,info,warn,error", func(s string) error {
