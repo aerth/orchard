@@ -23,3 +23,7 @@ docker:
 		--env-file ~/.config/orchard/env \
 		-i \
 		orchard <<<"Tell me about this machine, environment. What programs are installed, etc"
+lint:
+	golangci-lint run ./...
+lintfix:
+	golangci-lint run --fix ./...
