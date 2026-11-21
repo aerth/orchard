@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"io"
 	"log"
 	"log/slog"
@@ -17,6 +16,7 @@ import (
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/orchard"
+	"github.com/aerth/orchard/pkg/compactor"
 	"github.com/aerth/orchard/pkg/toolboxes"
 	"github.com/aerth/orchard/pkg/visions"
 	"gorm.io/gorm"
@@ -36,7 +36,6 @@ func main() {
 	prefix := ""
 	suffix := ""
 	dbflag := false
-	mllm.NoLogFlags = !mllm.NoLogFlags // TODO: fix mllm
 	//
 	mllm.Flags()
 	orchard.Flags(&sloglvl)
@@ -89,8 +88,12 @@ func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	if mllm.DefaultThread == uuid.Nil() {
 		mllm.DefaultThread = mllm.ThreadHasher(wd) // TODO: config for filepath.Base option
 	}
+	client.PreTextHookEditV2 = compactor.V1
 	client.NonTextHook = func(m mllm.Message) error {
-		fmt.Fprintf(os.Stderr, "Tool %q output: %s\n", m.ToolName, m.Content)
+		if !mllm.HideTools {
+			// ugly, but , does not break 2> >(jq -c)
+			slog.Info("tool output", "name", m.ToolName, "content", m.Content)
+		}
 		if sleepDur != 0 {
 			time.Sleep(sleepDur)
 		}
