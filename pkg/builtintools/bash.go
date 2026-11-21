@@ -128,6 +128,7 @@ var pathenv = func() []string {
 	return envs
 }()
 
+// runbash is used in [BashTool] [mllm.Tool.Exec] func
 func runbash(ctx context.Context, cmdline string) (string, error) {
 	var guardreplies []string
 	{
@@ -153,12 +154,12 @@ func runbash(ctx context.Context, cmdline string) (string, error) {
 			guardreplies = append(guardreplies, got.Content)
 		}
 	}
-	slog.Warn("running bash", "cmdline", cmdline, "guard_replies", guardreplies)
 	var out bytes.Buffer
 	cmd := exec.CommandContext(ctx, "bash", "-c", cmdline)
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	cmd.Env = pathenv
+	slog.Warn("running bash", "cmdline", cmdline, "guard_replies", guardreplies)
 	err := cmd.Run()
 	if err != nil {
 		return out.String() + "\nError: " + err.Error(), nil
