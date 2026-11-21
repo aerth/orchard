@@ -66,6 +66,8 @@ var EchoBash = false
 
 // RunBashScript runs a script (stdin reader) using and returns stdout as a string
 // caller must prefix args with /dev/stdin if script is stdin
+//
+// Non-zero exit will NOT return error, and instead added to output.
 func RunBashScript(ctx context.Context, stdinReal io.Reader, params RunParams) (string, error) {
 	if stdinReal == nil {
 		return "", fmt.Errorf("missing stdin script")
@@ -97,10 +99,12 @@ func RunBashScript(ctx context.Context, stdinReal io.Reader, params RunParams) (
 	cmd.Stdin = stdin
 	cmd.Env = append(NewCleanEnviron(), params.AddEnviron...)
 	if err := cmd.Run(); err != nil {
-		//		wd, _ := os.Getwd()
-		slog.Error(fmt.Sprintf("got err running cmd from %s: %s", params.WorkingDir, buf.String()))
-		err = errors.Join(err, fmt.Errorf("%s", buf.String()))
-		return strings.TrimSpace(buf.String()), err
+		if _, ok := errors.AsType[*exec.ExitError](err); !ok {
+			//		wd, _ := os.Getwd()
+			slog.Error(fmt.Sprintf("got err running cmd from %s: %s", params.WorkingDir, buf.String()))
+			err = errors.Join(err, fmt.Errorf("%s", buf.String()))
+			return strings.TrimSpace(buf.String()), err
+		}
 	}
 
 	if strings.TrimSpace(buf.String()) == "" {
