@@ -11,6 +11,7 @@ import (
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/orchard/pkg/builtintools"
+	"github.com/aerth/orchard/pkg/compactor"
 )
 
 // AllTools helper is not used by orchard package, but may be used in main.
@@ -65,6 +66,8 @@ func Flags(sloglvl *slog.LevelVar) {
 		}
 		return nil
 	})
+	flag.IntVar(&compactor.CompactToolOutputLen, "compact-toolout-size", compactor.CompactToolOutputLen, "compact all tool outputs that are larger than n characters (0 disable)")
+	flag.IntVar(&compactor.CompactConvoAt, "compact", compactor.CompactConvoAt, "auto-compact convo after it grows to n messages (0 disable)")
 
 	flag.IntVar(&defaults.LimitHistory, "limit-history", defaults.LimitHistory, "limit history (convo) given to llm")
 	flag.IntVar(&defaults.LimitRounds, "limit-rounds", defaults.LimitRounds, "limit rounds (turns) in the loop (-1 infinite)")
