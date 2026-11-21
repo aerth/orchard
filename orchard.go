@@ -2,13 +2,20 @@
 package orchard
 
 import (
+	"bytes"
 	"context"
 	_ "embed"
+	"encoding/json"
+	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 	"uuid"
 
 	"github.com/aerth/mostly/mllm"
+	"github.com/aerth/mostly/stackerr"
+	"github.com/aerth/orchard/pkg/bashtooler"
+	"github.com/aerth/orchard/pkg/builtintools"
 	"gorm.io/gorm"
 )
 
@@ -163,13 +170,78 @@ func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm
 			toolouts, err = Custom.ToolRunnerFunc(ctx, cfg, caller, index)
 			convo = append(convo, toolouts...)
 			if err != nil {
-				return convo[startLen:], err
+				return convo[startLen:], stackerr.Errorf("%w", err)
 			}
-
+			name := convo.Top().ToolName
+			cmd, ok := Custom.PostToolHookCommands[name]
+			if !ok && index == len(calls)-1 {
+				cmd, ok = Custom.PostToolHookCommands["*"]
+			}
+			if ok {
+				convo, err = postToolHook(ctx, cfg, convo, cmd)
+				if err != nil {
+					return convo[startLen:], stackerr.Errorf("%w", err)
+				}
+			}
 		}
+
 	}
 
 	return convo[startLen:], nil
 }
 
 var sleepBetween time.Duration // for testing
+
+func postToolHook(ctx context.Context, cfg Config, convo mllm.ChatMessages, cmd string) (mllm.ChatMessages, error) {
+	// make a fake run_bash tool call
+	call := mllm.Call[map[string]any]{
+		ID:    "call_gm0bbxs7", // TODO: make new ID? seems to work..
+		Index: 0,
+		Type:  "function",
+		Function: mllm.Function[map[string]any]{
+			Name: builtintools.BashTool().GetName(),
+			Arguments: map[string]any{
+				"cmdline": cmd,
+			},
+		},
+	}.ToRaw() // ToRaw for double-encode
+
+	// run the command in bash
+	bashout, err := bashtooler.RunBashScript(ctx, bytes.NewReader([]byte(cmd)),
+		bashtooler.RunParams{
+			WorkingDir: ".",
+			Args:       []string{"/dev/stdin"},
+			AddEnviron: builtintools.OKENVA(),
+			RawOnly:    true, // empty = skip adding to convo
+		},
+	)
+	if err != nil { // not a non-zero exit
+		return convo, fmt.Errorf("post-tool hook %q: %w", cmd, err)
+	}
+	if len(strings.TrimSpace(bashout)) == 0 {
+		slog.Debug("toolhook no output ✅")
+		return convo, nil // minify
+	}
+	// add assistant-tool combo for parser
+	js, _ := json.Marshal(string(call.Function.Arguments))
+	call.Function.Arguments = js // double-encode args for /v1/ endpoint
+	callstring := call.ToJSON()
+	convo = append(convo,
+		*mllm.Message{Role: "assistant", ToolCalls: []json.RawMessage{callstring}}.
+			ToThreadMessage("auto", cfg.ThreadID),
+		*mllm.ReplyTool(call, bashout).
+			ToThreadMessage("auto", cfg.ThreadID),
+	)
+	if cfg.NonTextHook != nil { // TODO: use pretext hook and streamhandler? need test with TUI
+		if err := cfg.NonTextHook(convo[len(convo)-2].Message); err != nil {
+			return convo, err
+		}
+	}
+	if cfg.NonTextHook != nil {
+		if err := cfg.NonTextHook(convo[len(convo)-1].Message); err != nil {
+			return convo, err
+		}
+	}
+	slog.Info("added toolhook outputs", "top", convo.TopN(2))
+	return convo, nil
+}
