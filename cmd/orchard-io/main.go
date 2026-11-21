@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
@@ -66,7 +67,24 @@ func main() {
 
 var Errorf = stackerr.Errorf
 
+func isLocal(s string) bool {
+	if net.ParseIP(s).String() == s {
+		return true
+	}
+	if strings.Contains(s, ".home.arpa") {
+		return true
+	}
+	if strings.Contains(s, "localhost") {
+		return true
+	}
+	return false
+}
+
 func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
+	mllm.DefaultKeepAlive = -1
+	if !isLocal(client.Host.Host) {
+		mllm.DefaultKeepAlive = 0
+	}
 	if dir := os.Getenv("ORCHARD_TOOLS"); dir != "" {
 		if strings.HasPrefix(dir, "~/") {
 			dir = strings.Replace(dir, "~/", os.ExpandEnv("$HOME")+"/", 1)
