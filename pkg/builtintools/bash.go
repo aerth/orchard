@@ -82,6 +82,31 @@ func OKENV() []string {
 	return slices.Clone(okkeys)
 }
 
+func OKENVA() []string {
+	envmap := OKENVMAP()
+	eenv := make([]string, len(envmap))
+	i := 0
+	for k, v := range envmap {
+		eenv[i] = k + "=" + v
+		i++
+	}
+	return eenv
+}
+
+func OKENVMAP() map[string]string {
+	envmap := map[string]string{}
+	for _, v := range OKENV() {
+		if _, found := envmap[v]; !found { // allow dot env to override per-tool
+			e := os.Getenv(v)
+			if e != "" {
+				envmap[v] = e
+			}
+
+		}
+	}
+	return envmap
+}
+
 var bashguardprompt, _ = prompts.Get("bashguard")
 
 func AddGuardPrompt(lines string) {
