@@ -9,6 +9,22 @@ No telemetry or advertisements. Bring your own tools.
 Uses the lightweight [mllm](https://github.com/aerth/mostly/blob/master/mllm/) package for LLM client,
 and GORM (SQL) for optional persistence.
 
+## Examples
+
+Try `make run` after exporting the required LLM_MODEL and LLM_HOST env variables.
+
+```bash
+# example for ollama at localhost
+export LLM_HOST=http://127.0.0.1:11434
+export LLM_MODEL=gemma4:12b
+make run
+```
+
+- [orchard-tui](https://github.com/aerth/orchard-tui): TUI agent interface using bubbletea UI library
+- [orchard_test.go](./orchard_test.go): for example library usage.
+- [orchard-io](./cmd/orchard-io/): minimal example, read stdin, print to stdout
+- [orchard-tools](https://github.com/aerth/orchard-tools): a tool scripts repository
+
 ## Library
 
 Orchard is a very small **library** that provides `CreateConvo`, which runs a loop, calling tools until finished. Typically, after the loop finishes, a new user message might be added, and then `CreateConvo` is called again. Using Hook functions in `Config`, the application can customize the loop, providing real-time streaming to UI or confirmation of tool calls.
@@ -32,7 +48,7 @@ Environmental variables configure LLM endpoint/model at runtime (see [mllm](http
 
 Use `mllm.Flags()` and `orchard.Flags()` to add more runtime configuration via command-line flags.
 
-## Tools
+### Tools
 
 Tools are easy to implement, in either Go, Bash, or Python.
 
@@ -46,23 +62,7 @@ Dynamic toolboxes are collections of scripts and are scanned at runtime, using t
 
 For tools that use API keys or other secrets, dynamic toolboxes may contain `.env` files that will be used for tools in that toolbox.
 
-## Examples
-
-To get started quickly with no TUI, try `make run` after exporting the required LLM_MODEL and LLM_HOST env variables.
-
-```bash
-# example for ollama at localhost
-export LLM_HOST=http://127.0.0.1:11434
-export LLM_MODEL=gemma4:12b
-make run
-```
-
-- [orchard-tui](https://github.com/aerth/orchard-tui): TUI agent interface using bubbletea UI library
-- [orchard_test.go](./orchard_test.go): for example library usage.
-- [orchard-io](./cmd/orchard-io/): minimal example, read stdin, print to stdout
-- [orchard-tools](https://github.com/aerth/orchard-tools): a tool scripts repository
-
-## Hooks
+### Hooks
 
 - `PreTextHook`: Runs before generating the message (useful for UI to push a new message to the view).
 - `PreToolHook`: Can modify or deny tool arguments before execution.
