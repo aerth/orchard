@@ -42,7 +42,17 @@ var okkeys = []string{
 	"CUDA_PATH",
 	"NVCC_CCBIN",
 	"PYTHONPATH",
+	"VIRTUAL_ENV",
 	"NODE_ENV",
+}
+
+// RemoveOKEnv if app doesnt want certain environment in tool calls
+//
+// There is no Add. Adding is done by creating .env file in a ORCHARD_TOOLS dir.
+func RemoveOKEnv(names ...string) {
+	okkeys = slices.DeleteFunc(okkeys, func(v string) bool {
+		return slices.Contains(names, v)
+	})
 }
 
 // OKENVNAMES is list of env var names (K)

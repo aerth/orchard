@@ -14,7 +14,7 @@ import (
 	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/orchard/pkg/bashtooler"
-	"github.com/aerth/orchard/pkg/builtintools"
+	"github.com/aerth/orchard/pkg/orchardenv"
 )
 
 var Options = struct {
@@ -42,7 +42,7 @@ func getEnvironment(pyFilePath string) []string {
 			envmap, _ = godotenv.Read(envFilename) // toolboxes/boxname
 		}
 	}
-	for _, v := range builtintools.OKENV() {
+	for _, v := range orchardenv.OKENVNAMES() {
 		if _, found := envmap[v]; !found { // allow dot env to override per-tool
 			e := os.Getenv(v)
 			if e != "" {

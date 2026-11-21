@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 	"uuid"
@@ -41,9 +42,17 @@ func main() {
 	mllm.Flags()
 	orchard.Flags(&sloglvl)
 	//
+	var allowedToolNames []string
 	sleepDur := time.Second * 2
-	flag.DurationVar(&sleepDur, "slow", sleepDur, "sleep duration after tool response is created. set 0 to make quick. or 1s 2s 3s etc")
+	flag.DurationVar(&sleepDur, "toolslow", sleepDur, "sleep duration after tool response is created. set 0 to make quick. or 1s 2s 3s etc")
 	flag.StringVar(&prefix, "system", prefix, "for example, orchard-io -system 'explain this file, plaintext paragraph, no markdown' < README.md")
+	addToolWhitelist := func(toolName string) error {
+		toolName = strings.ReplaceAll(toolName, ",", " ")
+		allowedToolNames = append(allowedToolNames, strings.Fields(toolName)...)
+		return nil
+	}
+	flag.Func("tools", "add one or comma/space-separated list of tools to be allowed (whitelisted). may be used multiple times.", addToolWhitelist)
+	flag.Func("tool", "add one or comma/space-separated list of tools to be allowed (whitelisted). may be used multiple times.", addToolWhitelist)
 	flag.BoolVar(&dbflag, "db", dbflag, "this program explicity requires this db flag before using sqlite database if $ORCHARD_DB env is set")
 	flag.BoolFunc("no-bash", "remove bash tool, only use toolboxes", func(s string) error {
 		orchard.AllTools = nil
@@ -59,6 +68,30 @@ func main() {
 	}
 	if suffix != "" {
 		orchard.Custom.PromptSuffix = suffix
+	}
+
+	if dir := os.Getenv("ORCHARD_TOOLS"); dir != "" {
+		if strings.HasPrefix(dir, "~/") {
+			dir = strings.Replace(dir, "~/", os.ExpandEnv("$HOME")+"/", 1)
+		}
+		if _, err := os.Stat(filepath.Join(dir, "toolboxes")); err == nil {
+			dir = filepath.Join(dir, "toolboxes")
+		}
+		box, err := toolboxes.NewToolboxFS(dir)
+		if err != nil {
+			slog.Error("toolbox load", "err", err)
+			os.Exit(1)
+		}
+		client.Toolbox = box.AllTools()
+		client.Toolbox = append(client.Toolbox, orchard.AllTools...) // always bash tool here
+		//	for _, v := range client.Toolbox {
+		//		println("TOOL AVAILABLE:", v.GetName())
+		//	}
+	}
+	if len(allowedToolNames) != 0 {
+		client.Toolbox = slices.DeleteFunc(client.Toolbox, func(v mllm.Tool) bool {
+			return !slices.Contains(allowedToolNames, v.GetName())
+		})
 	}
 	if err := main2(client, dbflag, sleepDur); err != nil {
 		log.Fatalf("fatal: %+v", err)
@@ -85,28 +118,11 @@ func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	if !isLocal(client.Host.Host) {
 		mllm.DefaultKeepAlive = 0
 	}
-	if dir := os.Getenv("ORCHARD_TOOLS"); dir != "" {
-		if strings.HasPrefix(dir, "~/") {
-			dir = strings.Replace(dir, "~/", os.ExpandEnv("$HOME")+"/", 1)
-		}
-		if _, err := os.Stat(filepath.Join(dir, "toolboxes")); err == nil {
-			dir = filepath.Join(dir, "toolboxes")
-		}
-		box, err := toolboxes.NewToolboxFS(dir)
-		if err != nil {
-			return Errorf("%w", err)
-		}
-		client.Toolbox = box.AllTools()
-		client.Toolbox = append(client.Toolbox, orchard.AllTools...) // always bash tool here
-		//	for _, v := range client.Toolbox {
-		//		println("TOOL AVAILABLE:", v.GetName())
-		//	}
-	}
 	wd, _ := os.Getwd()
 	if mllm.DefaultThread == uuid.Nil() {
 		mllm.DefaultThread = mllm.ThreadHasher(wd) // TODO: config for filepath.Base option
 	}
-	client.PreTextHookEditV2 = compactor.V1
+	client.PreTextHookEditP1 = compactor.V1
 	client.NonTextHook = func(m mllm.Message) error {
 		if !mllm.HideTools {
 			// ugly, but , does not break 2> >(jq -c)

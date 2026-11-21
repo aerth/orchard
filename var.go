@@ -33,6 +33,13 @@ var defaults = Config{
 	Think:        nil,
 }
 
+// GetDefaults allows modifying LimitHistory, LimitRounds, Think
+//
+// Any modifying should be done **before** calling [Flags] or it will override the user command line
+func GetDefaults() *Config {
+	return &defaults
+}
+
 // Custom loop funcs to overhaul parts of the main orchard loop. Used by [CreateConvo] (and [Create])
 var Custom = struct {
 	// ToolRunnerFunc runs a [mllm.Tool.Exec] function, returning a message.
@@ -48,10 +55,13 @@ var Custom = struct {
 
 	// PostToolHookCommands are bash commandlines that are run after matching tools are ran. '*' for all
 	PostToolHookCommands map[string]string
+	// PostToolHookFunc runs the bash cmd, returns convo. func might add to convo if needed.
+	PostToolHookFunc func(ctx context.Context, cfg Config, convo mllm.ChatMessages, cmd string) (mllm.ChatMessages, error)
 }{
 	ToolRunnerFunc:       odefaults{}.ToolRunner,
 	GeneratorFunc:        odefaults{}.Generator,
 	PostToolHookCommands: map[string]string{},
+	PostToolHookFunc:     odefaults{}.PostToolHook,
 }
 
 // Flags are optional
@@ -71,10 +81,11 @@ func Flags(sloglvl *slog.LevelVar) {
 
 	flag.IntVar(&defaults.LimitHistory, "limit-history", defaults.LimitHistory, "limit history (convo) given to llm")
 	flag.IntVar(&defaults.LimitRounds, "limit-rounds", defaults.LimitRounds, "limit rounds (turns) in the loop (-1 infinite)")
+	flag.DurationVar(&sleepBetween, "slow", sleepBetween, "sleep between turns (default 0 disabled)")
 
 	flag.BoolVar(&mllm.HideThink, "hide-think", mllm.HideThink, "hide thinking when thinking is enabled")
 	flag.BoolVar(&mllm.HideTools, "hide-tools", mllm.HideTools, "hide tools, not recommended. prefer redirecting stderr")
-	flag.Func("toolhook", "add tool hook (can be used multiple times) in format name:command, for example: \"apply_patch_id:make lint\"", func(s string) error {
+	flag.Func("toolhook", "add tool hook, a shell cmdline for after running tool by name. (can be used multiple times) in format toolname:commandline. use quotes. for example: --toolhook \"apply_patch_id:make lint\" or --toolhook \"all:make lint\"", func(s string) error {
 		pre, post, ok := strings.Cut(s, ":")
 		if !ok || pre == "" || post == "" {
 			return fmt.Errorf("invalid format toolhook flag. shell quoting issue? try: --toolhook \"apply_patch_id:make lint\"")

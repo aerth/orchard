@@ -41,9 +41,9 @@ func (odefaults) Generator(ctx context.Context, cfg Config, convo mllm.ChatMessa
 		return mllm.ChatMessage{}, Errorf("SystemPrompt: %w", err)
 	}
 
-	// compaction V1
-	if cfg.PreTextHookEditV1 != nil {
-		if convo, err = cfg.PreTextHookEditV1(ctx, convo); err != nil {
+	// compaction P1 (entire convo pre-limit)
+	if cfg.PreTextHookEditP1 != nil {
+		if convo, err = cfg.PreTextHookEditP1(ctx, convo); err != nil {
 			return mllm.ChatMessage{}, Errorf("edit hook-1: %w", err)
 		}
 	}
@@ -60,9 +60,9 @@ func (odefaults) Generator(ctx context.Context, cfg Config, convo mllm.ChatMessa
 
 	// new slice with sticky
 	convox = append(mllm.ChatMessages{{Role: "system", Content: sprompt}}, convox...)
-	// compaction V2 (preferred)
-	if cfg.PreTextHookEditV2 != nil {
-		if convox, err = cfg.PreTextHookEditV2(ctx, convox); err != nil {
+	// compaction P2 (preferred, only the limited convo)
+	if cfg.PreTextHookEditP2 != nil {
+		if convox, err = cfg.PreTextHookEditP2(ctx, convox); err != nil {
 			return mllm.ChatMessage{}, Errorf("edit hook-2: %w", err)
 		}
 	}
