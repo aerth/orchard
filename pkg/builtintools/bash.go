@@ -1,3 +1,6 @@
+// Package builtintools the run_bash tool
+//
+// TOOD: read image tool, and other tools that are not able to be implemented as a tool script
 package builtintools
 
 import (
@@ -8,10 +11,10 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
-	"slices"
 	"strings"
 
 	"github.com/aerth/mostly/mllm"
+	"github.com/aerth/orchard/pkg/orchardenv"
 	"github.com/aerth/orchard/prompts"
 )
 
@@ -53,60 +56,6 @@ func BashTool() mllm.Tool {
 	}
 }
 
-var okkeys = []string{
-	"XDG_CONFIG_HOME",
-	"XDG_DATA_HOME",
-	"XDG_CACHE_HOME",
-	"XDG_RUNTIME_DIR",
-	"XDG_DATA_DIRS",
-	"XDG_CONFIG_DIRS",
-	"PATH",
-	"HOME",
-	"USER",
-	"PWD",
-	"SHELL",
-	"EDITOR",
-	"VISUAL",
-	"LANG",
-	"TERM",
-	"WAYLAND_DISPLAY",
-	"DISPLAY",
-	"DBUS_SESSION_BUS_ADDRESS",
-	"CUDA_PATH",
-	"NVCC_CCBIN",
-	"PYTHONPATH",
-	"NODE_ENV",
-}
-
-func OKENV() []string {
-	return slices.Clone(okkeys)
-}
-
-func OKENVA() []string {
-	envmap := OKENVMAP()
-	eenv := make([]string, len(envmap))
-	i := 0
-	for k, v := range envmap {
-		eenv[i] = k + "=" + v
-		i++
-	}
-	return eenv
-}
-
-func OKENVMAP() map[string]string {
-	envmap := map[string]string{}
-	for _, v := range OKENV() {
-		if _, found := envmap[v]; !found { // allow dot env to override per-tool
-			e := os.Getenv(v)
-			if e != "" {
-				envmap[v] = e
-			}
-
-		}
-	}
-	return envmap
-}
-
 var bashguardprompt, _ = prompts.Get("bashguard")
 
 func AddGuardPrompt(lines string) {
@@ -119,7 +68,7 @@ func AddGuardPrompt(lines string) {
 
 var pathenv = func() []string {
 	var envs []string
-	for _, key := range okkeys {
+	for _, key := range orchardenv.OKENVNAMES() {
 		val := os.Getenv(key)
 		if val != "" {
 			envs = append(envs, key+"="+val)
