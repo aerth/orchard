@@ -233,7 +233,7 @@ func (o OrchParamMap) Without(k ...string) OrchParamMap {
 	return o
 }
 
-func (o OrchParams) ToMap() map[string]OrchParam {
+func (o OrchParams) ToMap() OrchParamMap {
 	m := map[string]OrchParam{}
 	for i := range o {
 		m[o[i].Name] = o[i]
