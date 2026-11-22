@@ -16,8 +16,8 @@ import (
 //go:embed prompts/system.v1.md
 var systemprompttemplate string
 
-// SystemPrompt implements [SystemPrompter] and is used if no [Config.SystemPromptFunc].
-func (cfg Config) SystemPrompt() (string, error) {
+// DefaultSystemPrompt implements [SystemPrompter] and is used if no [Config.SystemPromptFunc].
+func (cfg Config) DefaultSystemPrompt(st StateConfig) (string, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		slog.Error("getwd", "err", err)
@@ -27,6 +27,7 @@ func (cfg Config) SystemPrompt() (string, error) {
 		WorkingDirectory: wd,
 		CurrentTime:      time.Now().Truncate(time.Second).UTC().Format(time.DateTime),
 		Tools:            unstable{}.Names(cfg.Toolbox),
+		StateConfig:      st,
 	})
 	if err != nil {
 		return "", err
@@ -39,6 +40,7 @@ type templateData struct {
 	CurrentTime      string
 	Tools            []string // for HasTool
 	Extra            string
+	StateConfig
 }
 
 func (t templateData) ToolsJSON() string {
