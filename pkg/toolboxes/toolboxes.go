@@ -450,7 +450,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			//		orchTool := MakeAPITool1(toolName, description, execFn, params...)
 			var specjs json.RawMessage
 			{
-				par := OrchParamsWrapper{Required: requiredParamNames, Properties: params.ToMap()}
+				par := OrchParamsWrapper{Required: requiredParamNames, Properties: params.ToMap().Without(features.Names())}
 				spec := ToolFunction{Name: toolName, Description: description, Parameters: par} // params, requiredParamNames}
 				specjs, _ = json.Marshal(spec)
 			}
