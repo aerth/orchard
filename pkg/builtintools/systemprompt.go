@@ -13,7 +13,7 @@ import (
 // It can append, prepend, or overwrite the persistent prompt file.
 func SystemPromptTool() mllm.Tool {
 	return mllm.Tool{
-		Spec(`{
+		Spec: mllm.Spec(`{
 	  "name": "modify_system_prompt",
 	  "description": "modifies the persistent sticky system prompt that the agent uses across sessions. Useful for setting long-term preferences or constraints.",
 	  "parameters": {
