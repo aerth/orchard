@@ -138,7 +138,7 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	for _, v := range s.features {
 		switch v.Name {
 		case "database":
-			argsmap["database"] = os.Getenv("ORCHARD_DB") // TODO: use other path
+			argsmap["database"] = os.Getenv("ORCHARD_DB") // TODO: use other path and move it after?
 		}
 	}
 	for i, param := range s.params {
