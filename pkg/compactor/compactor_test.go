@@ -36,7 +36,7 @@ func TestCompactor(t *testing.T) {
 		ctx := t.Context()
 		compactor.CompactConvoAtLength = 10
 		cfg.PreTextHookEditP1 = compactor.V1
-		cfg.Options.Debug = 2
+		cfg.E.Options.Debug = 2
 		ctx = mllm.WithClient(ctx, cfg.E)
 		got, err := compactor.V1(ctx, convo)
 		if err != nil {

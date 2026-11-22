@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log/slog"
@@ -18,14 +19,16 @@ import (
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/ncode"
+	"github.com/aerth/orchard"
 	"github.com/aerth/orchard/prompts"
 )
 
 var (
 	CompactToolOutputLen = 1000
-	CompactConvoAtLength = 10 // disabled by default
+	CompactConvoAtLength = 0 // disabled by default
 	//	CompactConvoAtTokens = 0 // not implemented yet
 	compactionPrompt = prompts.GetTemplate("compactor")
+	CompressorName   = "compressor"
 )
 
 func V1(ctx context.Context, entireConvo mllm.ChatMessages) (mllm.ChatMessages, error) {
@@ -34,6 +37,11 @@ func V1(ctx context.Context, entireConvo mllm.ChatMessages) (mllm.ChatMessages, 
 	}
 	if len(entireConvo) < CompactConvoAtLength {
 		return entireConvo, nil
+	}
+	for _, v := range entireConvo.TopN(3) {
+		if v.From == CompressorName { // TODO: prevent infinite some other way once we count token
+			return entireConvo, nil
+		}
 	}
 	l := len(entireConvo)
 	upper := l - 5
@@ -59,8 +67,8 @@ func V1(ctx context.Context, entireConvo mllm.ChatMessages) (mllm.ChatMessages, 
 		if err != nil {
 			return entireConvo, err
 		}
-		println("done compressing")
-		if testing.Testing() {
+		slog.Debug("done compressing", "from", l, "to", len(chunk))
+		if Debug || testing.Testing() {
 			println(
 				"\n\n-----\n\n",
 				ncode.JSONString(l),
@@ -80,7 +88,7 @@ func V1(ctx context.Context, entireConvo mllm.ChatMessages) (mllm.ChatMessages, 
 	return newconvo, nil
 }
 
-var Debug = testing.Testing()
+var Debug = testing.Testing() || os.Getenv("DEBUG_COMPRESSOR") == "1"
 
 func KeepMessageTool(k *K) mllm.Tool {
 	return mllm.Tool{
@@ -174,14 +182,23 @@ func E(tpl *template.Template, data templateData) string {
 	return buf.String()
 }
 
+func Flags() {
+	flag.IntVar(&CompactToolOutputLen, "compact-toolout-size", CompactToolOutputLen, "compact all tool outputs that are larger than n characters (0 disable)")
+	flag.IntVar(&CompactConvoAtLength, "compact", CompactConvoAtLength, "auto-compact convo after it grows to n messages (0 disable)")
+}
+
 func compactChunk(ctx context.Context, intro string, chunk mllm.ChatMessages, handlers ...mllm.StreamHandler) (mllm.ChatMessages, error) {
 	if len(chunk) < 3 {
 		return chunk, nil
 	}
-	llm2 := mllm.Default()
+	var llm2 mllm.E
 	if lm, ok := mllm.CtxClient(ctx); ok {
 		llm2 = lm
+	} else {
+		llm2 = mllm.Default()
 	}
+	cfg, _ := orchard.CtxConfig(ctx)
+	cfg.E = llm2
 	for i := range chunk { // should work anyways
 		if chunk[i].MessageID == uuid.Nil() {
 			chunk[i].MessageID = uuid.New()
@@ -208,6 +225,11 @@ func compactChunk(ctx context.Context, intro string, chunk mllm.ChatMessages, ha
 	}
 	hasTools := true
 	for i := 0; i < 10 && hasTools; i++ {
+		if cfg.PreTextHook != nil {
+			if err := cfg.PreTextHook(); err != nil {
+				return chunk, err
+			}
+		}
 		got, err := llm2.Get(ctx, compressionConvo, false)
 		if err != nil {
 			slog.Error("could not run compaction", "err", err)
@@ -231,14 +253,16 @@ func compactChunk(ctx context.Context, intro string, chunk mllm.ChatMessages, ha
 			}
 			toolout := mllm.ReplyTool(call, out)
 			compressionConvo = append(compressionConvo, toolout)
-			println("ADDED TOOL OUT", out)
+			if fn := cfg.NonTextHook; fn != nil {
+				fn(toolout)
+			}
 			time.Sleep(time.Second)
 		}
 	}
 	got := compressionConvo.Top()
 	got.Role = "user" // TODO: ??
 	got.Content = "[compressor]\n" + got.Content
-	chunk = append(keeper.Keepers(), mllm.ChatMessages{*got.ToThreadMessage("compactor", threadID)}...)
+	chunk = append(keeper.Keepers(), mllm.ChatMessages{*got.ToThreadMessage(CompressorName, threadID)}...)
 	return chunk, nil
 }
 
