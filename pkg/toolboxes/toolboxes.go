@@ -223,6 +223,16 @@ func (o OrchParams) Export() any {
 	}
 }
 
+type OrchParamMap map[string]OrchParam
+
+// Without deletes from map in place
+func (o OrchParamMap) Without(k ...string) OrchParamMap {
+	for _, v := range k {
+		delete(o, v)
+	}
+	return o
+}
+
 func (o OrchParams) ToMap() map[string]OrchParam {
 	m := map[string]OrchParam{}
 	for i := range o {
