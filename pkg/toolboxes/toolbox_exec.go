@@ -139,6 +139,8 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 		switch v.Name {
 		case "database":
 			argsmap["database"] = os.Getenv("ORCHARD_DB") // TODO: use other path and move it after?
+		case "thread_id":
+			argsmap["thread_id"] = mllm.Default().ThreadID[:]
 		}
 	}
 	for i, param := range s.params {
