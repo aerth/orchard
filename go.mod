@@ -1,6 +1,6 @@
 module github.com/aerth/orchard
 
-go 1.27.3
+go 1.27.4
 
 require (
 	github.com/aerth/mostly v0.4.16
