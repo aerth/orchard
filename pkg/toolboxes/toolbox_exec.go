@@ -135,6 +135,12 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	if err := json.Unmarshal(args, &argsmap); err != nil {
 		return nil, err
 	}
+	for _, v := range s.features {
+		switch v.Name {
+		case "database":
+			argsmap["database"] = os.Getenv("ORCHARD_DB") // TODO: use other path
+		}
+	}
 	for i, param := range s.params {
 		if param.Name == "" {
 			return nil, fmt.Errorf("param has no name")
