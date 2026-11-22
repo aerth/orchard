@@ -162,7 +162,6 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	}
 	var inputfilename string
 	pyFilePath := s.pyFilePath
-	eenv := getEnvironment(pyFilePath)
 	if inputFileContents != "" { // for when inputs are too big
 		file, err := os.CreateTemp("", "orchard_input_*")
 		if err != nil {
@@ -175,6 +174,9 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 			return nil, fmt.Errorf("invalid: %w", err)
 		}
 		inputfilename = file.Name()
+	}
+	eenv := getEnvironment(pyFilePath)
+	if inputfilename != "" {
 		eenv = append(eenv, "INPUT_FILE="+inputfilename)
 	}
 	var outputMessage string
