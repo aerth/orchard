@@ -11,7 +11,6 @@ import (
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/orchard/pkg/builtintools"
-	"github.com/aerth/orchard/pkg/compactor"
 )
 
 // AllTools helper is not used by orchard package, but may be used in main.
@@ -27,15 +26,17 @@ var Slog = mllm.Slog
 // By default, uses `stackerr` package for nice tracing ability
 var Errorf = stackerr.Errorf
 
+// default has ONLY: LimitHistory, LimitRounds, Think
+// if this changes, update [New]
 var defaults = Config{
 	LimitHistory: 20,
 	LimitRounds:  -1,
 	Think:        nil,
 }
 
-// GetDefaults allows modifying LimitHistory, LimitRounds, Think
-//
-// Any modifying should be done **before** calling [Flags] or it will override the user command line
+// GetDefaults allows modifying ONLY: LimitHistory, LimitRounds, Think
+// Modifying these 3 should be done **before** calling [Flags] to set defaults,
+// to avoid overriding the user command line
 func GetDefaults() *Config {
 	return &defaults
 }
@@ -46,7 +47,7 @@ var Custom = struct {
 	// Errors end the loop. ToolRunnerFunc should usually re-insert the error into a message to allow self-healing.
 	ToolRunnerFunc func(ctx context.Context, cfg Config, caller mllm.ChatMessage, index int) (mllm.ChatMessages, error)
 	// GeneratorFunc generates a [mllm.ChatMessage] from the convo.
-	GeneratorFunc func(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm.ChatMessage, error)
+	GeneratorFunc func(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm.ChatMessages, mllm.ChatMessage, error)
 
 	// PromptPrefix added to sticky system prompt
 	PromptPrefix string
@@ -76,12 +77,18 @@ func Flags(sloglvl *slog.LevelVar) {
 		}
 		return nil
 	})
-	flag.IntVar(&compactor.CompactToolOutputLen, "compact-toolout-size", compactor.CompactToolOutputLen, "compact all tool outputs that are larger than n characters (0 disable)")
-	flag.IntVar(&compactor.CompactConvoAt, "compact", compactor.CompactConvoAt, "auto-compact convo after it grows to n messages (0 disable)")
 
 	flag.IntVar(&defaults.LimitHistory, "limit-history", defaults.LimitHistory, "limit history (convo) given to llm")
 	flag.IntVar(&defaults.LimitRounds, "limit-rounds", defaults.LimitRounds, "limit rounds (turns) in the loop (-1 infinite)")
 	flag.DurationVar(&sleepBetween, "slow", sleepBetween, "sleep between turns (default 0 disabled)")
+	flag.Func("add-system", "add a file to the sticky system prompt", func(s string) error {
+		b, err := os.ReadFile(s)
+		if err != nil {
+			return stackerr.Errorf("opening file for add-system flag: %w", err)
+		}
+		Custom.PromptSuffix = string(b) + "\n" + Custom.PromptSuffix
+		return nil
+	})
 
 	flag.BoolVar(&mllm.HideThink, "hide-think", mllm.HideThink, "hide thinking when thinking is enabled")
 	flag.BoolVar(&mllm.HideTools, "hide-tools", mllm.HideTools, "hide tools, not recommended. prefer redirecting stderr")

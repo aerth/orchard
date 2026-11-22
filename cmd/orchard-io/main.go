@@ -40,6 +40,7 @@ func main() {
 	dbflag := false
 	//
 	mllm.Flags()
+	compactor.Flags()
 	orchard.Flags(&sloglvl)
 	//
 	var allowedToolNames []string
@@ -59,6 +60,11 @@ func main() {
 		return nil
 	})
 	flag.Parse()
+	if flag.NArg() != 0 {
+
+		flag.Usage()
+		os.Exit(1)
+	}
 	mllm.DefaultWriter = os.Stdout
 	_ = godotenv.Load(os.ExpandEnv("${XDG_CONFIG_HOME}/orchard/env"))
 	client.E = mllm.Default()
@@ -67,7 +73,7 @@ func main() {
 		orchard.Custom.PromptPrefix = prefix
 	}
 	if suffix != "" {
-		orchard.Custom.PromptSuffix = suffix
+		orchard.Custom.PromptSuffix = suffix + "\n" + orchard.Custom.PromptSuffix
 	}
 
 	if dir := os.Getenv("ORCHARD_TOOLS"); dir != "" {
@@ -115,7 +121,7 @@ func isLocal(s string) bool {
 
 func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	mllm.DefaultKeepAlive = -1
-	if !isLocal(client.Host.Host) {
+	if !isLocal(client.E.Host.Host) {
 		mllm.DefaultKeepAlive = 0
 	}
 	wd, _ := os.Getwd()
@@ -142,7 +148,7 @@ func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	}
 	ctx := context.Background()
 	//threadID := uuid.MustParse("7e0330fc-bb4a-48d7-aae5-bd666db0734a")
-	client.Writer = os.Stdout
+	client.E.Writer = os.Stdout
 
 	// one round
 	client.ThreadReader = func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error) {
@@ -181,10 +187,10 @@ func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	}
 
 	// run [orchard.Create] once
-	if client.ThreadID == uuid.Nil() {
-		client.ThreadID = mllm.DefaultThread
+	if client.E.ThreadID == uuid.Nil() {
+		client.E.ThreadID = mllm.DefaultThread
 	}
-	_, err := orchard.Create(ctx, client)
+	err := orchard.Create(ctx, client)
 	if err != nil {
 		return err
 	}

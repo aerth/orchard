@@ -5,7 +5,12 @@ import (
 	_ "embed"
 	"encoding/json"
 	"flag"
+	"fmt"
+	"log"
+	"log/slog"
 	"os"
+	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"uuid"
@@ -18,7 +23,7 @@ import (
 func TestFuncCheck(t *testing.T) {
 	type (
 		ToolRunnerFunc = func(ctx context.Context, cfg orchard.Config, caller mllm.ChatMessage, index int) (mllm.ChatMessages, error)
-		GeneratorFunc  = func(ctx context.Context, cfg orchard.Config, convo mllm.ChatMessages) (mllm.ChatMessage, error)
+		GeneratorFunc  = func(ctx context.Context, cfg orchard.Config, convo mllm.ChatMessages) (mllm.ChatMessages, mllm.ChatMessage, error)
 	)
 	// duplicated func signatures for vim completion, but test here that they do not change
 	var x ToolRunnerFunc
@@ -30,6 +35,18 @@ func TestFuncCheck(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	_ = orchard.Config{}.SystemPromptFunc // test that we can access the unexported embedded struct from outside the package
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+		Level:     slog.LevelDebug,
+		AddSource: true,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.SourceKey {
+				src := a.Value.Any().(*slog.Source)
+				a.Value = slog.StringValue(fmt.Sprintf("%s#%d (%s)", filepath.Base(src.File), src.Line, filepath.Base(src.Function)))
+				return a
+			}
+			return a
+		},
+	})))
 	mllm.Flags()
 	orchard.Flags(nil)
 	if !flag.Parsed() {
@@ -49,16 +66,29 @@ func Test03(t *testing.T) {
 		t.Fatal(err)
 	}
 	cfg := orchard.Config{Toolbox: toolbox, Think: false}
-	out, err := orchard.CreateConvo(ctx, cfg,
+
+	var out mllm.ChatMessages
+	cfg.FinishHook = func(fullconvo mllm.ChatMessages) {
+		println("finish hook")
+		out = slices.Clone(fullconvo)
+	}
+	err = orchard.CreateConvo(ctx, cfg,
 		mllm.ChatMessages{{
 			Role:    "user",
-			Content: "Sleep for 3 seconds",
+			Content: "Sleep for 2 seconds",
 		}})
 	if err != nil {
 		t.Fatal(err)
 	}
+	if len(out) < 2 {
+		t.Fatal("FinishHook was not called")
+	}
+	out = out[1:] // TODO: update this test since out is no longer the new additions
 	if len(out) == 0 || len(out[0].ToolCalls) != 1 {
-		t.Fatal("expected one tool call")
+		for i := range out {
+			log.Printf("%d: %s", i, must(t, out[i].MarshalJSON))
+		}
+		t.Fatalf("expected one tool call (%d out)", len(out))
 	}
 	caller := out[0]
 	v := caller.ToolCalls[0]
@@ -71,9 +101,9 @@ func Test03(t *testing.T) {
 	if call.Function.Name != "sleep" {
 		t.Fatalf("expected sleep func to be called, got %q", call.Function.Name)
 	}
-	if s := strings.ReplaceAll(string(call.Function.Arguments), " ", ""); s != `{"seconds":3}` {
+	if s := strings.ReplaceAll(string(call.Function.Arguments), " ", ""); s != `{"seconds":2}` {
 		println(s)
-		t.Fatal("expected 3 seconds")
+		t.Fatal("expected 2 seconds")
 	}
 	if len(out) != 3 { // [call,tool,text]
 		t.Fatalf("expected an tool output and after-tool message got %d", len(out))
@@ -86,6 +116,14 @@ func Test03(t *testing.T) {
 	}
 }
 
+func must[T any](t *testing.T, fn func() (v T, err error)) T {
+	v, err := fn()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return v
+}
+
 func Test04(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
@@ -95,7 +133,7 @@ func Test04(t *testing.T) {
 	cfg := orchard.Config{Toolbox: orchard.AllTools}
 	//cfg.PromptPrefix = "Always speak in pirate dialect."
 	//cfg.PromptSuffix = "Always speak in pirate dialect."
-	_, err := orchard.CreateConvo(ctx, cfg,
+	err := orchard.CreateConvo(ctx, cfg,
 		mllm.ChatMessages{{
 			Role:    "user",
 			Content: "Read and understand the main module ./*.go and tell me some important things that are missing from README.md that would be most helpful to add",
@@ -122,11 +160,17 @@ func TestO1(t *testing.T) {
 	think := "none"
 	mllm.DefaultOptions.Debug = 2
 	mllm.DefaultWriter = os.Stderr
-	add, err := orchard.Create(ctx, orchard.Config{
+	var add mllm.ChatMessages
+	e := mllm.Default()
+	e.ThreadID = threadID
+	err := orchard.Create(ctx, orchard.Config{
+		E: e,
+		FinishHook: func(x mllm.ChatMessages) {
+			add = x
+		},
 		ThreadReader: threadReader, Toolbox: tools,
 		Think:            think,
 		SystemPromptFunc: nil,
-		ThreadID:         threadID,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -158,11 +202,17 @@ func TestO2(t *testing.T) {
 	think := "none"
 	mllm.DefaultOptions.Debug = 2
 	mllm.DefaultWriter = os.Stderr
-	add, err := orchard.Create(ctx, orchard.Config{
+	var add mllm.ChatMessages
+
+	e := mllm.Default()
+	e.ThreadID = threadID
+	err = orchard.Create(ctx, orchard.Config{
+		FinishHook: func(convo mllm.ChatMessages) {
+			add = convo
+		},
 		ThreadReader: threadReader, Toolbox: tools,
 		Think: think,
-		// SystemPrompt: orchard.DefaultSystemPrompt,
-		ThreadID: threadID,
+		E:     e,
 	})
 	if err != nil {
 		t.Fatal(err)

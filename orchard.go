@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"testing"
 	"time"
 	"uuid"
 
@@ -20,9 +21,18 @@ import (
 	"gorm.io/gorm"
 )
 
+func New() Config {
+	e := mllm.Default()
+
+	return Config{
+		E:     e,
+		Think: defaults.Think,
+	}
+}
+
 // Config main orchard configuration. Required is: Toolbox.
 type Config struct {
-	mllm.E // llm client, created by env LLM_HOST,LLM_MODEL,LLM_API_KEY
+	E mllm.E // llm client, created by env LLM_HOST,LLM_MODEL,LLM_API_KEY
 
 	DB gorm.CreateInterface[mllm.ChatMessage] `json:"-"` // Optional, get with: gorm.G[mllm.ChatMessage](db)
 
@@ -37,6 +47,19 @@ type Config struct {
 	PromptSuffix string // copied from [Custom.PromptSuffix]
 
 	funcConfig `json:"-"` // hooks
+
+	StateConfig `json:"-"`
+
+	UserConfig `json:"-"`
+}
+type UserConfig struct {
+	UserName string // From for user messages
+}
+
+// StateConfig for sticky system prompt
+type StateConfig struct {
+	Role       string
+	SkillNames []string
 }
 
 type funcConfig struct {
@@ -45,22 +68,25 @@ type funcConfig struct {
 	ThreadReader func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error)
 
 	// SystemPromptFunc might even return a const string and ignore input, generally should be nil to use default.
-	SystemPromptFunc func() (string, error)
+	//
+	// Wrapper pseudocode: cfg.SystemPromptFunc = func(st){cfg.DefaultSystemPrompt(st)}
+	SystemPromptFunc func(StateConfig) (string, error)
 
 	PreTextHook func() error // UI hook (for example, insert new pending message to switch [mllm.StreamHandler] to)
 
 	PreTextHookEditP1 func(ctx context.Context, convo mllm.ChatMessages) (mllm.ChatMessages, error) // Edit Convo Hook EXPERIMENTAL (for example, compaction/compression)
 	PreTextHookEditP2 func(ctx context.Context, convo mllm.ChatMessages) (mllm.ChatMessages, error) // Edit Convo Hook EXPERIMENTAL (for example, compaction/compression)
+	AfterCompress     func(convo mllm.ChatMessages)
 
 	PreToolHook  func(ctx context.Context, name string, args map[string]any) error                           // Optional: can modify or deny toolcall
 	PostToolHook func(ctx context.Context, name string, args map[string]any, output *mllm.ChatMessage) error // Optional: can modify or deny toolout before DB, NOT FOR UI
 
-	NonTextHook func(mllm.Message) error // UI Hook: for rendering tool outputs after running tool, for UI.
-	FinishHook  func()                   // UI Hook: after [Create] is finished with all rounds
+	NonTextHook func(mllm.Message) error          // UI Hook: for rendering tool outputs after running tool, for UI.
+	FinishHook  func(fullconvo mllm.ChatMessages) // UI Hook: after [Create] is finished with all rounds
 }
 
-func (f funcConfig) SystemPrompt() (string, error) {
-	return f.SystemPromptFunc()
+func (f funcConfig) SystemPrompt(st StateConfig) (string, error) {
+	return f.SystemPromptFunc(st)
 }
 
 // GormThreadReader uses a sql database to read the conversation thread by threadID
@@ -76,22 +102,23 @@ func (cfg Config) GormThreadReader(ctx context.Context, threadID uuid.UUID) (con
 	if cfg.LimitHistory == 0 {
 		cfg.LimitHistory = 100
 	}
-	return unstable{}.GormThreadReader(ctx, cfg.DB, cfg.ThreadID, cfg.LimitHistory)
+	return unstable{}.GormThreadReader(ctx, cfg.DB, cfg.E.ThreadID, cfg.LimitHistory)
 }
 
 // Normalized config using defaults and [Custom]
 func (cfg *Config) Normalized() error {
-	if cfg.Tools != nil {
+	if cfg.E.Tools != nil {
 		return Errorf("tool spec should be nil")
 	}
-	if len(cfg.Toolbox) == 0 {
+	if len(cfg.Toolbox) == 0 && !testing.Testing() {
 		return Errorf("toolbox missing")
 	}
-	if cfg.ValidateConfig(false) != nil {
+	if err := cfg.E.ValidateConfig(false); err != nil {
+		slog.Warn("making new llm client because config was invalid", "err", err)
 		e := mllm.Default()
 		cfg.E = e
 	}
-	if err := cfg.ValidateConfig(cfg.Think); err != nil {
+	if err := cfg.E.ValidateConfig(cfg.Think); err != nil {
 		return err
 	}
 	if cfg.LimitHistory <= 0 {
@@ -105,45 +132,43 @@ func (cfg *Config) Normalized() error {
 
 // Create reads ThreadReader and calls [CreateConvo].
 //
-// Although it returns the new messages, they should be gathered using the hooks in [Config.PreTextHook]  [Config.NonTextHook]
-func Create(ctx context.Context, cfg Config) (mllm.ChatMessages, error) {
+// All output is managed by using hooks for example [Config.PreTextHook]  [Config.NonTextHook]
+func Create(ctx context.Context, cfg Config) error {
 	if err := cfg.Normalized(); err != nil {
-		return nil, err
+		return err
 	}
 	if cfg.ThreadReader == nil && cfg.DB != nil {
 		cfg.ThreadReader = cfg.GormThreadReader
 	}
 	if cfg.ThreadReader == nil {
-		return nil, Errorf("unconfigured threadreader or missing db")
+		return Errorf("unconfigured threadreader or missing db")
 	}
-	convo, err := cfg.ThreadReader(ctx, cfg.ThreadID)
+	convo, err := cfg.ThreadReader(ctx, cfg.E.ThreadID)
 	if err != nil {
-		return nil, Errorf("threadreader: %w", err)
+		return Errorf("threadreader: %w", err)
 	}
 	return CreateConvo(ctx, cfg, convo)
 }
 
 // CreateConvo runs the main orchard loop, using cfg [Config.Normalized].
 //
-// Although it returns the new messages when finished, they should be instead gathered in real-time using the hooks in [Config.PreTextHook]  [Config.NonTextHook]
-func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm.ChatMessages, error) {
+// All output is managed by using Hooks, for example [Config.PreTextHook]  [Config.NonTextHook]
+func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) error {
 	if err := cfg.Normalized(); err != nil {
-		return nil, err
+		return err
 	}
 	if len(cfg.Toolbox) != 0 {
-		cfg.Tools = cfg.Toolbox.ToJSON()
+		cfg.E.Tools = cfg.Toolbox.ToJSON()
 	}
-	defer func() {
-		if cfg.FinishHook != nil {
-			cfg.FinishHook()
-		}
-	}()
 	if len(convo) == 0 {
-		return nil, Errorf("threadreader: no convo for thread %s", cfg.ThreadID)
+		if cfg.FinishHook != nil {
+			cfg.FinishHook(convo)
+		}
+		return Errorf("threadreader: no convo for thread %s", cfg.E.ThreadID)
 	}
-	startLen := len(convo) // for system prompt
+	//startLen := len(convo) // for system prompt
 	var err error
-	slog.Info("starting orchard loop", "max", cfg.LimitRounds, "max_history", cfg.LimitHistory, "think", cfg.Think, "at", startLen)
+	slog.Info("starting orchard loop", "max", cfg.LimitRounds, "max_history", cfg.LimitHistory, "think", cfg.Think, "at", len(convo))
 	for nround := 0; cfg.LimitRounds < 0 || nround <= cfg.LimitRounds; nround++ {
 		// generate
 		var caller mllm.ChatMessage
@@ -153,19 +178,30 @@ func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm
 			case <-time.After(sleepBetween):
 				// ok
 			case <-ctx.Done():
-				return convo[startLen:], context.Cause(ctx)
+				if cfg.FinishHook != nil {
+					cfg.FinishHook(convo)
+				}
+				return context.Cause(ctx)
 			}
 		}
 		slog.Info("generating", "round", nround, "roles", convo.Roles(), "at", len(convo))
-		caller, err = Custom.GeneratorFunc(ctx, cfg, convo)
+		convo, caller, err = Custom.GeneratorFunc(ctx, cfg, convo)
 		if err != nil {
-			return convo[startLen:], Errorf("%w", err)
+			if cfg.FinishHook != nil {
+				cfg.FinishHook(convo)
+			}
+			return Errorf("%w", err)
 		}
 		convo = append(convo, caller)
+
+		// NORMAL DONE EXIT
 		if len(caller.ToolCalls) == 0 {
-			return convo[startLen:], nil
+			if cfg.FinishHook != nil {
+				cfg.FinishHook(convo)
+			}
+			return nil
 		}
-		// run tools
+		// RUN TOOLS
 		calls := caller.ToolCalls
 		if mllm.DebugLLM {
 			Slog().Info("running tools", "calls", len(calls), "convo_size", len(convo), "top", convo.Top())
@@ -176,7 +212,10 @@ func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm
 			toolouts, err = Custom.ToolRunnerFunc(ctx, cfg, caller, index)
 			convo = append(convo, toolouts...)
 			if err != nil {
-				return convo[startLen:], stackerr.Errorf("%w", err)
+				if cfg.FinishHook != nil {
+					cfg.FinishHook(convo)
+				}
+				return stackerr.Errorf("%w", err)
 			}
 			name := convo.Top().ToolName
 			cmd, hasToolHook := Custom.PostToolHookCommands[name]
@@ -186,14 +225,21 @@ func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm
 			if hasToolHook {
 				convo, err = Custom.PostToolHookFunc(ctx, cfg, convo, cmd)
 				if err != nil {
-					return convo[startLen:], stackerr.Errorf("%w", err)
+					if cfg.FinishHook != nil {
+						cfg.FinishHook(convo)
+					}
+					return stackerr.Errorf("%w", err)
 				}
 			}
 		}
 
 	}
 
-	return convo[startLen:], nil
+	// LIMIT WAS REACHED, YIELD
+	if cfg.FinishHook != nil {
+		cfg.FinishHook(convo)
+	}
+	return nil
 }
 
 var sleepBetween time.Duration // for testing
@@ -234,9 +280,9 @@ func (odefaults) PostToolHook(ctx context.Context, cfg Config, convo mllm.ChatMe
 	callstring := call.ToJSON()
 	convo = append(convo,
 		*mllm.Message{Role: "assistant", ToolCalls: []json.RawMessage{callstring}}.
-			ToThreadMessage("auto", cfg.ThreadID),
+			ToThreadMessage("auto", cfg.E.ThreadID),
 		*mllm.ReplyTool(call, bashout).
-			ToThreadMessage("auto", cfg.ThreadID),
+			ToThreadMessage("auto", cfg.E.ThreadID),
 	)
 	if cfg.NonTextHook != nil { // TODO: use pretext hook and streamhandler? need test with TUI
 		if err := cfg.NonTextHook(convo[len(convo)-2].Message); err != nil {
