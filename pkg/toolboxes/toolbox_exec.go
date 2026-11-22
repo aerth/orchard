@@ -93,6 +93,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any, error) {
 	caller1, _ := mllm.CtxCaller(ctx)
 	callIndex, _ := mllm.CtxCallIndex(ctx)
+	e, _ := mllm.CtxClient(ctx)
 	t1 := time.Now()
 	defer func() {
 		if d := time.Since(t1); d > time.Second {
@@ -140,7 +141,7 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 		case "database":
 			argsmap["database"] = JSON(os.Getenv("ORCHARD_DB")) // TODO: use other path and move it after?
 		case "thread_id":
-			argsmap["thread_id"] = JSON(mllm.DefaultThread.String())
+			argsmap["thread_id"] = JSON(e.ThreadID)
 		}
 	}
 	for i, param := range s.params {

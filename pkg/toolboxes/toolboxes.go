@@ -287,6 +287,17 @@ func parsePythonMetadata(filename string, content string) (description string, p
 		if debugToolGen {
 			slog.Info("Parsing metadata", "filename", filename, "line", line)
 		}
+		if after, ok := strings.CutPrefix(line, "Feature:"); ok {
+			after = strings.TrimSpace(after)
+			arg1, arg2, _ := strings.Cut(after, " ")
+			arg1 = strings.TrimSpace(arg1)
+			arg2 = strings.TrimSpace(arg2)
+			features = append(features, Feature{
+				Name: arg1,
+				Args: arg2,
+			})
+			continue
+		}
 		if after, ok := strings.CutPrefix(line, "Description:"); ok {
 			if description != "" {
 				description += "\n"
