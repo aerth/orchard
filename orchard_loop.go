@@ -128,7 +128,9 @@ func (odefaults) ToolRunner(ctx context.Context, cfg Config, caller mllm.ChatMes
 	ctx2 = mllm.WithCall(ctx2, call)
 	ctx2 = mllm.WithCallIndex(ctx2, index)
 	ctx2 = mllm.WithClient(ctx2, cfg.E)
+	/* orchard config and convo */
 	ctx2 = WithConfig(ctx2, cfg)
+	ctx2 = WithConvo(ctx2, slices.Clone(convo))
 	mp := call.Function.ArgsToMap()
 
 	// call it
@@ -166,7 +168,10 @@ func (odefaults) ToolRunner(ctx context.Context, cfg Config, caller mllm.ChatMes
 	return convo, nil
 }
 
-var cfgctxk ctxkey = "foo"
+var (
+	cfgctxk   ctxkey = "orchardcfg"
+	convoctxk ctxkey = "orchardconvo"
+)
 
 type ctxkey string
 
@@ -177,4 +182,13 @@ func CtxConfig(ctx context.Context) (Config, bool) {
 
 func WithConfig(ctx2 context.Context, cfg Config) context.Context {
 	return context.WithValue(ctx2, cfgctxk, cfg)
+}
+
+func CtxConvo(ctx context.Context) (mllm.ChatMessages, bool) {
+	convo, ok := ctx.Value(convoctxk).(mllm.ChatMessages)
+	return convo, ok
+}
+
+func WithConvo(ctx2 context.Context, convo mllm.ChatMessages) context.Context {
+	return context.WithValue(ctx2, convoctxk, convo)
 }
