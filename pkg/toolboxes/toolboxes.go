@@ -323,7 +323,7 @@ func parsePythonMetadata(filename string, content string) (description string, p
 			})
 		}
 	}
-	return description, params, requiredParamNames
+	return description, params, requiredParamNames, features
 }
 
 // NewToolboxFS scans the filesystem under the base path and dynamically constructs Toolboxes.
