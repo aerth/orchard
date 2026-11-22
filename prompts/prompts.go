@@ -5,6 +5,8 @@ import (
 	"embed"
 	_ "embed"
 	"log/slog"
+	"strings"
+	"text/template"
 )
 
 //go:embed role.bashguard.txt
@@ -35,4 +37,16 @@ func Get(name string) (string, bool) {
 		return "", false
 	}
 	return string(b), true
+}
+
+func GetTemplate(name string) *template.Template {
+	if !strings.Contains(name, ".") {
+		name += ".txt"
+		name = "role." + name
+	}
+	t, err := template.ParseFS(FS, name)
+	if err != nil {
+		panic(err.Error())
+	}
+	return t
 }
