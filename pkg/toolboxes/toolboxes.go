@@ -417,7 +417,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 				continue
 			}
 
-			description, params, requiredParamNames := parsePythonMetadata(pyFilePath, string(contentBytes))
+			description, params, requiredParamNames, features := parsePythonMetadata(pyFilePath, string(contentBytes))
 			if description == "" {
 				description = "Executes " + toolName
 			}
