@@ -243,8 +243,8 @@ func (o OrchParams) ToMap() map[string]OrchParam {
 var debugToolGen = os.Getenv("DEBUG_TOOL_GEN") == "1"
 
 type Feature struct {
-	Name string
-	Args string
+	Name string // Features: foo:bar baz => foo
+	Args string // Features: foo:bar baz => bar baz
 }
 
 func parsePythonMetadata(filename string, content string) (description string, params OrchParams, requiredParamNames []string, features []Feature) {
