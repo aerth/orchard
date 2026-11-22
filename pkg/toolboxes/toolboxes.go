@@ -242,7 +242,7 @@ func (o OrchParams) ToMap() map[string]OrchParam {
 */
 var debugToolGen = os.Getenv("DEBUG_TOOL_GEN") == "1"
 
-func parsePythonMetadata(filename string, content string) (description string, params OrchParams, requiredParamNames []string) {
+func parsePythonMetadata(filename string, content string) (description string, params OrchParams, requiredParamNames []string, features *Features) {
 	lines := strings.SplitSeq(content, "\n")
 	for line := range lines {
 		line = strings.TrimSpace(line)
