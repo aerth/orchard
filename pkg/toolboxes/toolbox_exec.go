@@ -76,7 +76,7 @@ type (
 	}
 )
 
-// makeExecFn for [orchard.Tool.Exec]
+// makeExecFn for [mllm.Tool.Exec]
 func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile func(string) ([]byte, error), pyFilePath string, features []Feature) ExecFunc {
 	_ = toolName
 	var required []string
@@ -89,7 +89,7 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 	return s.ExecV1
 }
 
-// ExecV1 for [orchard.Tool.Exec]
+// ExecV1 for [mllm.Tool.Exec]
 func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any, error) {
 	caller1, _ := mllm.CtxCaller(ctx)
 	callIndex, _ := mllm.CtxCallIndex(ctx)
