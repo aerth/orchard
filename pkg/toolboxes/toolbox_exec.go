@@ -207,6 +207,14 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	return outputMessage, nil
 }
 
+func JSON(v any) json.RawMessage {
+	b, err := json.Marshal(v)
+	if err != nil {
+		panic(err.Error())
+	}
+	return b
+}
+
 func shortish(full string) string {
 	dir := filepath.Base(filepath.Dir(full))
 	base := filepath.Base(full)
