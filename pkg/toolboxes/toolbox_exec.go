@@ -76,7 +76,7 @@ type (
 )
 
 // makeExecFn for [orchard.Tool.Exec]
-func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile func(string) ([]byte, error), pyFilePath string) ExecFunc {
+func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile func(string) ([]byte, error), pyFilePath string, features []Feature) ExecFunc {
 	_ = toolName
 	var required []string
 	for i := range params {
