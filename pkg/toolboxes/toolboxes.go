@@ -313,7 +313,7 @@ func parsePythonMetadata(filename string, content string) (string, OrchParams, [
 				}
 				if rem != "" {
 					paramDesc += rem
-					slog.Warn("TOOLBOX: assuming param is [string] -- add [string] to end of param description to hide this log message", "param", paramName, "remainder", rem, "full_description", paramDesc)
+					slog.Warn("TOOLBOX: assuming param is [string] -- add [string] to end of param description to hide this log message", "param", paramName, "remainder", rem, "full_description", paramDesc, "file", filename)
 				}
 			}
 			if isRequired {
