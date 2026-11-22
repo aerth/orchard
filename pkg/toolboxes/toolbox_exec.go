@@ -125,7 +125,7 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	if mllm.DebugLLM {
 		slog.Info("RUN TOOL", "function", caller.Function.Name, "args", caller.Function.Arguments)
 	}
-	var execArgs []string
+	var execArgs []string // positional
 	var inputFileContents string
 	if len(s.params) == 0 && len(args) > 4 {
 		slog.Warn("no params for this func but args given", "nargs", len(args))
