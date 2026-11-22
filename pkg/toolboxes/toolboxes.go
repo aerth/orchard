@@ -256,8 +256,20 @@ type Feature struct {
 	Name string // Features: foo:bar baz => foo
 	Args string // Features: foo:bar baz => bar baz
 }
+type Features []Feature
 
-func parsePythonMetadata(filename string, content string) (description string, params OrchParams, requiredParamNames []string, features []Feature) {
+func (f Features) Names() []string {
+	if len(f) == 0 {
+		return nil
+	}
+	a := make([]string, len(f))
+	for i := range f {
+		a[i] = f[i].Name
+	}
+	return a
+}
+
+func parsePythonMetadata(filename string, content string) (description string, params OrchParams, requiredParamNames []string, features Features) {
 	lines := strings.SplitSeq(content, "\n")
 	for line := range lines {
 		line = strings.TrimSpace(line)
@@ -450,7 +462,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			//		orchTool := MakeAPITool1(toolName, description, execFn, params...)
 			var specjs json.RawMessage
 			{
-				par := OrchParamsWrapper{Required: requiredParamNames, Properties: params.ToMap().Without(features.Names())}
+				par := OrchParamsWrapper{Required: requiredParamNames, Properties: params.ToMap().Without(features.Names()...)}
 				spec := ToolFunction{Name: toolName, Description: description, Parameters: par} // params, requiredParamNames}
 				specjs, _ = json.Marshal(spec)
 			}
