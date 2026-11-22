@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/aerth/mostly/mllm"
 )
@@ -14,7 +13,7 @@ import (
 // It can append, prepend, or overwrite the persistent prompt file.
 func SystemPromptTool() mllm.Tool {
 	return mllm.Tool{
-		 truckers.Spec: mllm.Spec(`{
+		truckers.Spec: mllm.Spec(`{
 	  "name": "modify_system_prompt",
 	  "description": "modifies the persistent sticky system prompt that the agent uses across sessions. Useful for setting long-term preferences or constraints.",
 	  "parameters": {
@@ -46,11 +45,11 @@ func SystemPromptTool() mllm.Tool {
 			home, _ := os.UserHomeDir()
 			path := filepath.Join(home, ".orchard", "sticky_prompt.md")
 
-			if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 				return nil, fmt.Errorf("failed to create directory: %w", err)
 			}
 
-			var currentContent string
+			var currentContent []byte
 			if _, err := os.Stat(path); err == nil {
 				currentContent, _ = os.ReadFile(path)
 			}
@@ -67,7 +66,7 @@ func SystemPromptTool() mllm.Tool {
 				return nil, fmt.Errorf("invalid action: %s", action)
 			}
 
-			if err := os.WriteFile(path, []byte(newContent), 0644); err != nil {
+			if err := os.WriteFile(path, []byte(newContent), 0o644); err != nil {
 				return nil, fmt.Errorf("failed to write sticky prompt: %w", err)
 			}
 
