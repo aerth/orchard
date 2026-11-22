@@ -186,6 +186,7 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	} else if strings.HasSuffix(pyFilePath, ".bash") {
 		slog.Info("executing bash for toolbox tool", "file", filepath.Base(pyFilePath), "args", execArgs)
 		outputMessage, err = bashtooler.RunBash(ctx, ".", eenv, s.readFile, pyFilePath, execArgs...)
+		// TODO: add node,others?
 	} else {
 		slog.Warn("wtf?", "path", pyFilePath)
 		outputMessage = "wtf tool was that? dunno"
