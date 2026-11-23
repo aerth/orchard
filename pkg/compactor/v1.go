@@ -317,7 +317,7 @@ func formatConvo(chatMessages mllm.ChatMessages, keepers []string) string {
 		if keeping {
 			x = "Keeping this message, do not include in summary"
 		}
-		fmt.Fprintf(w, "\n---\nID=%s (%s)\n", m.MessageID, x)
+			fmt.Fprintf(w, "\n---\nID=%s (%s)\n", m.MessageID, x)
 		if m.Role == "tool" {
 			if len(m.Content) > CompactToolOutputLen && !keeping {
 				m.Content = "(tool output omitted for compaction process, do not keep)"
