@@ -45,11 +45,15 @@ func (odefaults) Generator(ctx context.Context, cfg Config, convo mllm.ChatMessa
 
 	// compaction P1 (entire convo pre-limit)
 	if cfg.PreTextHookEditP1 != nil {
-		if convo, err = cfg.PreTextHookEditP1(ctx, convo); err != nil {
+		if convo2, err := cfg.PreTextHookEditP1(ctx, convo); err != nil {
 			return convo, mllm.ChatMessage{}, Errorf("edit hook-1: %w", err)
-		}
-		if cfg.AfterCompress != nil {
-			cfg.AfterCompress(convo) // replace convo elsewhere if P1 doesnt
+		} else if !slices.EqualFunc(convo, convo2, func(e1, e2 mllm.ChatMessage) bool {
+			return e1.MessageID.Compare(e2.MessageID) == 0 && e1.Equal(e2.Message)
+		}) {
+			convo = convo2
+			if cfg.AfterCompress != nil {
+				cfg.AfterCompress(convo) // replace convo elsewhere if P1 doesnt
+			}
 		}
 	}
 
