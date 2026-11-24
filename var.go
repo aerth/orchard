@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
+	"uuid"
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/stackerr"
@@ -65,6 +67,58 @@ var Custom = struct {
 	PostToolHookFunc:     odefaults{}.PostToolHook,
 }
 
+var (
+	UseFns = false
+	Fns    []func(cfg *Config) error // may modify config
+)
+
+func ExtendedFlags() {
+	flag.Func("rename-thread", "rename current auto-thread to new uuid/name", func(newName string) error {
+		if !UseFns {
+			return Errorf("this flag is disabled")
+		}
+		curwd, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		oldID := mllm.ThreadHasher(curwd)
+		{ // peek --thread flag
+			i := slices.IndexFunc(os.Args, func(argv string) bool {
+				return argv == "-thread" || argv == "--thread"
+			})
+			if i >= 0 {
+				id, err := uuid.Parse(os.Args[i+1]) // TODO: should not panic? flag parse?
+				if err != nil {
+					return Errorf("parsing arg %d: %v", i+1, err)
+				}
+				oldID = id
+
+			}
+		}
+		newID, _ := uuid.Parse(newName)
+		if newID.String() != newName {
+			newID = mllm.ThreadHasher(newName)
+		}
+		Fns = append(Fns, func(cfg *Config) error {
+			db := cfg.DB
+			if db == nil {
+				return Errorf("only db was nil")
+			}
+			n, err := db.Where("thread = ?", oldID).Update(context.TODO(), "thread", newID)
+			if err != nil {
+				return err
+			}
+			if n == 0 {
+				return Errorf("no matches found to update db: old=%s new=%s", oldID, newID)
+			}
+
+			slog.Info(fmt.Sprintf("database migration completed: %d records updated. restart the program", n))
+			return nil
+		})
+		return nil
+	})
+}
+
 // Flags are optional
 func Flags(sloglvl *slog.LevelVar) {
 	flag.Func("think", "think value, such as 'low' or 'none', this is **not checked** before sending to llm", func(s string) error {
@@ -95,7 +149,7 @@ func Flags(sloglvl *slog.LevelVar) {
 	flag.Func("toolhook", "add tool hook, a shell cmdline for after running tool by name. (can be used multiple times) in format toolname:commandline. use quotes. for example: --toolhook \"apply_patch_id:make lint\" or --toolhook \"all:make lint\"", func(s string) error {
 		pre, post, ok := strings.Cut(s, ":")
 		if !ok || pre == "" || post == "" {
-			return fmt.Errorf("invalid format toolhook flag. shell quoting issue? try: --toolhook \"apply_patch_id:make lint\"")
+			return Errorf("invalid format toolhook flag. shell quoting issue? try: --toolhook \"apply_patch_id:make lint\"")
 		}
 		if pre == "all" {
 			pre = "*"
