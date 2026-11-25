@@ -3,8 +3,8 @@ package compactor_test
 import (
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
 	"os"
 	"testing"
 
@@ -28,8 +28,12 @@ func TestCompactor(t *testing.T) {
 	var convo mllm.ChatMessages
 	testconvo, err := os.ReadFile("test.convo.big.json")
 	if err != nil {
-		log.Printf("Skipping compression test: %v", err)
-		t.SkipNow()
+		if errors.Is(err, os.ErrNotExist) {
+			t.Skip("skipping compression test: test.convo.big.json not found")
+			return
+		}
+		t.Fatal(err)
+		return
 	}
 	err = json.Unmarshal([]byte(testconvo), &convo)
 	if err != nil {
