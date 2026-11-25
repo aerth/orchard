@@ -14,11 +14,11 @@ import (
 	"sync"
 	"testing"
 	"text/template"
-	"time"
 	"uuid"
 
 	"github.com/aerth/mostly/mllm"
 	"github.com/aerth/mostly/ncode"
+	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/orchard"
 	"github.com/aerth/orchard/prompts"
 )
@@ -184,7 +184,7 @@ func E(tpl *template.Template, data templateData) string {
 
 func Flags() {
 	flag.IntVar(&CompactToolOutputLen, "compact-toolout-size", CompactToolOutputLen, "compact all tool outputs that are larger than n characters (0 disable)")
-	flag.IntVar(&CompactConvoAtLength, "compact", CompactConvoAtLength, "auto-compact convo after it grows to n messages (0 disable)")
+	flag.IntVar(&CompactConvoAtLength, "compact-at-length", CompactConvoAtLength, "compress conversation after it grows to n messages (0 disable)")
 }
 
 func compactChunk(ctx context.Context, intro string, chunk mllm.ChatMessages, handlers ...mllm.StreamHandler) (mllm.ChatMessages, error) {
@@ -245,18 +245,20 @@ func compactChunk(ctx context.Context, intro string, chunk mllm.ChatMessages, ha
 			var call mllm.Call[map[string]any]
 			err = json.Unmarshal(got.Message.ToolCalls[i], &call)
 			if err != nil {
-				return chunk, err
+				return chunk, Errorf("unmarshal tool call %d: %w", i, err)
 			}
 			out, err := keeper.keepExec(ctx, call.Function.Arguments)
 			if err != nil {
-				return chunk, err
+				return chunk, Errorf("keepExec: %w", err)
 			}
 			toolout := mllm.ReplyTool(call, out)
 			compressionConvo = append(compressionConvo, toolout)
 			if fn := cfg.NonTextHook; fn != nil {
-				fn(toolout)
+				err = fn(toolout)
+				if err != nil {
+					return chunk, Errorf("NonTextHook: %w", err)
+				}
 			}
-			time.Sleep(time.Second)
 		}
 	}
 	got := compressionConvo.Top()
@@ -265,6 +267,8 @@ func compactChunk(ctx context.Context, intro string, chunk mllm.ChatMessages, ha
 	chunk = append(keeper.Keepers(), mllm.ChatMessages{*got.ToThreadMessage(CompressorName, threadID)}...)
 	return chunk, nil
 }
+
+var Errorf = stackerr.Errorf
 
 /* OLD:
 slog.Info("begin compaction", "size", len(convo))
@@ -317,20 +321,20 @@ func formatConvo(chatMessages mllm.ChatMessages, keepers []string) string {
 		if keeping {
 			x = "Keeping this message, do not include in summary"
 		}
-			fmt.Fprintf(w, "\n---\nID=%s (%s)\n", m.MessageID, x)
+		_, _ = fmt.Fprintf(w, "\n---\nID=%s (%s)\n", m.MessageID, x)
 		if m.Role == "tool" {
 			if len(m.Content) > CompactToolOutputLen && !keeping {
 				m.Content = "(tool output omitted for compaction process, do not keep)"
 			}
-			fmt.Fprintf(w, "%s (%s): %s\n", m.Role, m.ToolName, m.Content)
+			_, _ = fmt.Fprintf(w, "%s (%s): %s\n", m.Role, m.ToolName, m.Content)
 			continue
 		}
 		if len(m.ToolCalls) != 0 {
 			toolCalls, _ := json.Marshal(m.ToolCalls)
-			fmt.Fprintf(w, "%s tool_call: %s %s\n", m.Role, m.Content, string(toolCalls))
+			_, _ = fmt.Fprintf(w, "%s tool_call: %s %s\n", m.Role, m.Content, string(toolCalls))
 			continue
 		}
-		fmt.Fprintf(w, "%s: %s\n", m.Role, m.Content)
+		_, _ = fmt.Fprintf(w, "%s: %s\n", m.Role, m.Content)
 	}
 	return buf.String()
 }
