@@ -21,6 +21,10 @@ func TestCompactor(t *testing.T) {
 		E: mllm.Default(),
 		//	mllm.Tools: nil,
 	}
+	if err := cfg.E.ValidateConfig(false); err != nil {
+		t.Skip(err)
+		return
+	}
 	var convo mllm.ChatMessages
 	testconvo, err := os.ReadFile("test.convo.big.json")
 	if err != nil {

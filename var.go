@@ -73,50 +73,94 @@ var (
 )
 
 func ExtendedFlags() {
-	flag.Func("rename-thread", "rename current auto-thread to new uuid/name", func(newName string) error {
-		if !UseFns {
-			return Errorf("this flag is disabled")
-		}
-		curwd, err := os.Getwd()
-		if err != nil {
-			return err
-		}
-		oldID := mllm.ThreadHasher(curwd)
-		{ // peek --thread flag
-			i := slices.IndexFunc(os.Args, func(argv string) bool {
-				return argv == "-thread" || argv == "--thread"
-			})
-			if i >= 0 {
-				id, err := uuid.Parse(os.Args[i+1]) // TODO: should not panic? flag parse?
-				if err != nil {
-					return Errorf("parsing arg %d: %v", i+1, err)
-				}
-				oldID = id
-
+	if UseFns {
+		flag.Func("delete-thread", "rename current auto-thread to new uuid/name", func(x string) error {
+			if !UseFns {
+				return Errorf("this flag is disabled")
 			}
-		}
-		newID, _ := uuid.Parse(newName)
-		if newID.String() != newName {
-			newID = mllm.ThreadHasher(newName)
-		}
-		Fns = append(Fns, func(cfg *Config) error {
-			db := cfg.DB
-			if db == nil {
-				return Errorf("only db was nil")
-			}
-			n, err := db.Where("thread = ?", oldID).Update(context.TODO(), "thread", newID)
+			curwd, err := os.Getwd() // TODO: support -C too
 			if err != nil {
 				return err
 			}
-			if n == 0 {
-				return Errorf("no matches found to update db: old=%s new=%s", oldID, newID)
-			}
+			id := mllm.ThreadHasher(curwd)
+			{ // peek --thread flag
+				i := slices.IndexFunc(os.Args, func(argv string) bool {
+					return argv == "-thread" || argv == "--thread"
+				})
+				if i >= 0 {
+					parsed, err := uuid.Parse(os.Args[i+1]) // TODO: should not panic? flag parse?
+					if err != nil {
+						return Errorf("parsing arg %d: %v", i+1, err)
+					}
+					id = parsed
 
-			slog.Info(fmt.Sprintf("database migration completed: %d records updated. restart the program", n))
+				}
+			}
+			if x != "confirm" {
+				return fmt.Errorf("use --delete-thread confirm to delete thread %s", id.String())
+			}
+			Fns = append(Fns, func(cfg *Config) error {
+				db := cfg.DB
+				if db == nil {
+					return Errorf("only db was nil")
+				}
+				n, err := db.Where("thread = ?", id).Delete(context.TODO())
+				if err != nil {
+					return err
+				}
+				if n == 0 {
+					return Errorf("no matches found to update db: thread=%s", id)
+				}
+				slog.Info(fmt.Sprintf("database migration completed: %d records removed. restart the program", n))
+				return nil
+			})
 			return nil
 		})
-		return nil
-	})
+		flag.Func("rename-thread", "rename current auto-thread to new uuid/name", func(newName string) error {
+			if !UseFns {
+				return Errorf("this flag is disabled")
+			}
+			curwd, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			oldID := mllm.ThreadHasher(curwd)
+			{ // peek --thread flag
+				i := slices.IndexFunc(os.Args, func(argv string) bool {
+					return argv == "-thread" || argv == "--thread"
+				})
+				if i >= 0 {
+					id, err := uuid.Parse(os.Args[i+1]) // TODO: should not panic? flag parse?
+					if err != nil {
+						return Errorf("parsing arg %d: %v", i+1, err)
+					}
+					oldID = id
+
+				}
+			}
+			newID, _ := uuid.Parse(newName)
+			if newID.String() != newName {
+				newID = mllm.ThreadHasher(newName)
+			}
+			Fns = append(Fns, func(cfg *Config) error {
+				db := cfg.DB
+				if db == nil {
+					return Errorf("only db was nil")
+				}
+				n, err := db.Where("thread = ?", oldID).Update(context.TODO(), "thread", newID)
+				if err != nil {
+					return err
+				}
+				if n == 0 {
+					return Errorf("no matches found to update db: old=%s new=%s", oldID, newID)
+				}
+
+				slog.Info(fmt.Sprintf("database migration completed: %d records updated. restart the program", n))
+				return nil
+			})
+			return nil
+		})
+	}
 }
 
 // Flags are optional
