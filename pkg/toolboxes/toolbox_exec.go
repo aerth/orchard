@@ -9,9 +9,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
-	"sync"
 	"time"
-	"uuid"
 
 	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/mllm"
@@ -24,34 +22,6 @@ var Options = struct {
 }{
 	ToolDirEnv: true,
 }
-
-type jobst struct {
-	m  map[uuid.UUID]any
-	mu sync.Mutex
-}
-
-func PeekJob(id uuid.UUID) (any, bool) {
-	jobs.mu.Lock()
-	defer jobs.mu.Unlock()
-	a, ok := jobs.m[id]
-	return a, ok
-}
-
-func ConsumeJob(id uuid.UUID) (any, bool) {
-	jobs.mu.Lock()
-	defer jobs.mu.Unlock()
-	a, ok := jobs.m[id]
-	delete(jobs.m, id)
-	return a, ok
-}
-
-func (j *jobst) RegisterJob(id uuid.UUID, v any) {
-	j.mu.Lock()
-	defer j.mu.Unlock()
-	j.m[id] = v
-}
-
-var jobs jobst
 
 func getEnvironment(pyFilePath string) []string {
 	if _, err := os.Stat(pyFilePath); err != nil {
@@ -102,7 +72,7 @@ type (
 		doInputEnv bool
 		required   []string
 		pyFilePath string
-		features   []Feature
+		features   Features
 	}
 )
 
@@ -116,7 +86,16 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 		}
 	}
 	s := StaticExecFuncFS{Name: toolName, readFile: readFile, required: required, doInputEnv: doInputEnv, pyFilePath: pyFilePath, params: params, features: features}
-	return s.ExecV1
+	return s.ExecV2
+}
+
+func (s StaticExecFuncFS) ExecV2(ctx context.Context, args json.RawMessage) (any, error) {
+	execFn := s.ExecV1
+	features := s.features
+	if features.Contains("job_id") && !features.Contains("wait") {
+		execFn = BackgroundToolWrapFunc(execFn)
+	}
+	return execFn(ctx, args)
 }
 
 // ExecV1 for [mllm.Tool.Exec]
@@ -125,7 +104,6 @@ func makeExecFn(toolName string, params OrchParams, doInputEnv bool, readFile fu
 func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any, error) {
 	caller1, _ := mllm.CtxCaller(ctx)
 	callIndex, _ := mllm.CtxCallIndex(ctx)
-	e, _ := mllm.CtxClient(ctx)
 	t1 := time.Now()
 	defer func() {
 		if d := time.Since(t1); d > time.Second {
@@ -172,24 +150,8 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 		slog.Info("running with features", "features", s.features)
 	}
 	for _, v := range s.features {
-		if v.Name == "" {
-			slog.Warn("broken feature")
-			continue
-		}
-		if _, ok := argsmap[v.Name]; ok {
-			return nil, fmt.Errorf("already had arg: %s", v.Name)
-		}
-		// if this parameter matches the feature name
-		// add the feature as if the llm called with these args
-		switch v.Name {
-		case "database":
-			argsmap["database"] = JSON(os.Getenv("ORCHARD_DB")) // TODO: use other path and move it after?
-		case "thread_id":
-			argsmap["thread_id"] = JSON(e.ThreadID)
-		case "job_id":
-			jobID := uuid.New()
-			jobs.RegisterJob(jobID, caller1) // TODO: add ctx for info?
-			argsmap["thread_id"] = JSON(jobID.String())
+		if err := processFeature(ctx, argsmap, v); err != nil {
+			return nil, err
 		}
 	}
 	for i, param := range s.params {

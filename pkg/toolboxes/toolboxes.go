@@ -86,12 +86,12 @@ func (t *Toolboxes) Add(t2 ...Toolbox) Toolboxes {
 }
 
 type (
-	Tools           = mllm.Tools
-	Tool            = mllm.Tool
-	ToolFunctionRaw struct {
-		Name, Description string
-		Parameters        any
-	}
+	Tools = mllm.Tools
+	Tool  = mllm.Tool
+	//ToolFunctionRaw struct {
+	//	Name, Description string
+	//	Parameters        any
+	//}
 )
 
 type ToolFunction struct {
@@ -227,8 +227,16 @@ type OrchParamMap map[string]OrchParam
 
 // Without deletes from map in place
 func (o OrchParamMap) Without(k ...string) OrchParamMap {
+	if len(k) == 0 {
+		return o
+	}
+	ok := false
 	for _, v := range k {
+		ok = true
 		delete(o, v)
+	}
+	if !ok {
+		slog.Error("did not remove any...")
 	}
 	return o
 }
@@ -251,23 +259,6 @@ func (o OrchParams) ToMap() OrchParamMap {
 	}
 */
 var debugToolGen = os.Getenv("DEBUG_TOOL_GEN") == "1"
-
-type Feature struct {
-	Name string // Features: foo:bar baz => foo
-	Args string // Features: foo:bar baz => bar baz
-}
-type Features []Feature
-
-func (f Features) Names() []string {
-	if len(f) == 0 {
-		return nil
-	}
-	a := make([]string, len(f))
-	for i := range f {
-		a[i] = f[i].Name
-	}
-	return a
-}
 
 func parsePythonMetadata(filename string, content string) (description string, params OrchParams, requiredParamNames []string, features Features) {
 	lines := strings.SplitSeq(content, "\n")
@@ -473,7 +464,11 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			//		orchTool := MakeAPITool1(toolName, description, execFn, params...)
 			var specjs json.RawMessage
 			{
-				par := OrchParamsWrapper{Required: requiredParamNames, Properties: params.ToMap().Without(features.Names()...)}
+				par := OrchParamsWrapper{
+					Required:   requiredParamNames,
+					Properties: params.ToMap().Without(features.NamesForWithout()...),
+					Type:       "object",
+				}
 				spec := ToolFunction{Name: toolName, Description: description, Parameters: par} // params, requiredParamNames}
 				specjs, _ = json.Marshal(spec)
 			}
@@ -517,6 +512,14 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 		tb = &tbs[0]
 	}
 	return &ToolboxManager{Toolboxes: tbs, dir: basepath, Toolbox: tb}, nil
+}
+
+// BackgroundToolWrapFunc for job_id feature
+var BackgroundToolWrapFunc = wrapBackground
+
+func wrapBackground(execFn ExecFunc) ExecFunc {
+	slog.Warn("background not implemented in this program, will wait for completion")
+	return execFn
 }
 
 // Exec opens a toolbox, assigning t.Toolbox
