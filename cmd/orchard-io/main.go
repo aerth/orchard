@@ -52,10 +52,9 @@ func main() {
 		allowedToolNames = append(allowedToolNames, strings.Fields(toolName)...)
 		return nil
 	}
-	flag.Func("tools", "add one or comma/space-separated list of tools to be allowed (whitelisted). may be used multiple times.", addToolWhitelist)
 	flag.Func("tool", "add one or comma/space-separated list of tools to be allowed (whitelisted). may be used multiple times.", addToolWhitelist)
 	flag.BoolVar(&dbflag, "db", dbflag, "this program explicity requires this db flag before using sqlite database if $ORCHARD_DB env is set")
-	flag.BoolFunc("no-bash", "remove bash tool, only use toolboxes", func(s string) error {
+	flag.BoolFunc("no-bash", "remove bash tool, only use toolboxes, alternatively select whitelist with -tool foo -tool bar -tool foo,bar", func(s string) error {
 		orchard.AllTools = nil
 		return nil
 	})
@@ -98,6 +97,11 @@ func main() {
 		client.Toolbox = slices.DeleteFunc(client.Toolbox, func(v mllm.Tool) bool {
 			return !slices.Contains(allowedToolNames, v.GetName())
 		})
+		if slices.Contains(allowedToolNames, "none") {
+			client.Toolbox = nil
+			orchard.AllTools = nil
+			client.E.Tools = nil
+		}
 	}
 	if err := main2(client, dbflag, sleepDur); err != nil {
 		log.Fatalf("fatal: %+v", err)

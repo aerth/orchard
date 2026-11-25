@@ -110,7 +110,7 @@ func (cfg *Config) Normalized() error {
 	if cfg.E.Tools != nil {
 		return Errorf("tool spec should be nil")
 	}
-	if len(cfg.Toolbox) == 0 && !testing.Testing() {
+	if len(cfg.Toolbox) == 0 && !testing.Testing() && (cfg.E.Tools != nil) {
 		return Errorf("toolbox missing")
 	}
 	if err := cfg.E.ValidateConfig(false); err != nil {
