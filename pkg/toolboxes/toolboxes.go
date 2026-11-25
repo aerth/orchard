@@ -574,7 +574,7 @@ func (t *ToolboxManager) ToolSpec() Tool {
 
 	expo := params.Export()
 	spec := map[string]any{
-		"name": t.GetDescription(), "description": t.GetDescription(),
+		"name": t.GetName(), "description": t.GetDescription(),
 		"parameters": expo,
 	}
 	specjs, err := json.MarshalIndent(spec, "", " ")
