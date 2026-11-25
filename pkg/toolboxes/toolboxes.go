@@ -570,7 +570,12 @@ func (t *ToolboxManager) ToolSpec() Tool {
 		Type: []string{"string"},
 		Enum: t.Toolboxes.NamesAny(),
 	}
-	params := OrchParams{{Name: "name", Description: "name of toolbox to open", Type: yoke.PropertyType{"string"}, Properties: &props}}
+	params := OrchParams{{
+		Name:        "name",
+		Description: "name of toolbox to open",
+		Type:        yoke.PropertyType{"string"},
+		Properties:  &props,
+	}}
 
 	expo := params.Export()
 	spec := map[string]any{
