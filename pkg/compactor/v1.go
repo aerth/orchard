@@ -262,7 +262,7 @@ func compactChunk(ctx context.Context, intro string, chunk mllm.ChatMessages, ha
 		}
 	}
 	got := compressionConvo.Top()
-	got.Role = "user" // TODO: ??
+	got.Role = "assistant" // TODO: ??
 	got.Content = "[compressor]\n" + got.Content
 	chunk = append(keeper.Keepers(), mllm.ChatMessages{*got.ToThreadMessage(CompressorName, threadID)}...)
 	return chunk, nil
