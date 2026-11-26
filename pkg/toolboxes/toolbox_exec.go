@@ -200,17 +200,17 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	}
 	var outputMessage string
 	var err error
-	if strings.HasSuffix(pyFilePath, ".py") {
-		slog.Info("executing python for toolbox tool", "file", filepath.Base(pyFilePath), "args", execArgs)
+	ext := filepath.Ext(pyFilePath)
+	mllm.Slog().Info("toolbox tool script running", "file", filepath.Base(pyFilePath), "args", execArgs)
+	switch ext {
+	default: // TODO: add js,lua,others?
+		return nil, stackerr.Errorf("unknown extension: %q", ext)
+	case ".py":
 		//		return nil, fmt.Errorf("uhoh, we disabled python")
 		outputMessage, err = bashtooler.RunPy(ctx, ".", eenv, s.readFile, pyFilePath, execArgs...)
-	} else if strings.HasSuffix(pyFilePath, ".bash") {
-		slog.Info("executing bash for toolbox tool", "file", filepath.Base(pyFilePath), "args", execArgs)
+	case ".bash":
+		mllm.Slog().Info("executing bash for toolbox tool", "file", filepath.Base(pyFilePath), "args", execArgs)
 		outputMessage, err = bashtooler.RunBash(ctx, ".", eenv, s.readFile, pyFilePath, execArgs...)
-		// TODO: add node,others?
-	} else {
-		slog.Warn("wtf?", "path", pyFilePath)
-		outputMessage = "wtf tool was that? dunno"
 	}
 	if err != nil {
 		outputMessage += fmt.Sprintf("Error running tool script %q: %s", shortish(pyFilePath), err.Error())
