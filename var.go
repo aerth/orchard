@@ -47,6 +47,8 @@ func GetDefaults() *Config {
 var Custom = struct {
 	// ToolRunnerFunc runs a [mllm.Tool.Exec] function, returning a message.
 	// Errors end the loop. ToolRunnerFunc should usually re-insert the error into a message to allow self-healing.
+	//
+	// If a tool is not found by name, this should return a message or error
 	ToolRunnerFunc func(ctx context.Context, cfg Config, caller mllm.ChatMessage, index int) (mllm.ChatMessages, error)
 	// GeneratorFunc generates a [mllm.ChatMessage] from the convo.
 	GeneratorFunc func(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm.ChatMessages, mllm.ChatMessage, error)
@@ -189,7 +191,7 @@ func Flags(sloglvl *slog.LevelVar) {
 	})
 
 	flag.BoolVar(&mllm.HideThink, "hide-think", mllm.HideThink, "hide thinking when thinking is enabled")
-	flag.BoolVar(&mllm.HideTools, "hide-tools", mllm.HideTools, "hide tools, not recommended. prefer redirecting stderr")
+	flag.IntVar(&mllm.TruncateLogToolOutChars, "hide-tools", mllm.TruncateLogToolOutChars, "for printing, truncate tool output to this many chars. negative = infinite, zero = hidden")
 	flag.Func("toolhook", "add tool hook, a shell cmdline for after running tool by name. (can be used multiple times) in format toolname:commandline. use quotes. for example: --toolhook \"apply_patch_id:make lint\" or --toolhook \"all:make lint\"", func(s string) error {
 		pre, post, ok := strings.Cut(s, ":")
 		if !ok || pre == "" || post == "" {
