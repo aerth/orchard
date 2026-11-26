@@ -15,7 +15,7 @@ import (
 func AttachImages(v string, m *mllm.Message) error {
 	paths := rege.FindImagePaths(v)
 	if len(paths) == 0 {
-		slog.Debug("no images found")
+		//	slog.Debug("no images found")
 		return nil
 	}
 	return AttachImagesPaths(paths, m)
