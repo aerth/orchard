@@ -35,7 +35,7 @@ func main() {
 		//orchard.AllTools = append(orchard.AllTools, box...) // append for keeping bash tool
 	}
 
-	// run with defaults
+	// run with default options (temperature, rounds-limit, convo-limit)
 	err := orchard.New().Run(ctx, mllm.ChatMessages{{Role: "user", Content: prompt}})
 	if err != nil {
 		println("Error:", err.Error())
