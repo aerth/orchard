@@ -314,7 +314,7 @@ func parsePythonMetadata(filename string, content string) (description string, p
 			paramType := "string"
 			isRequired := true
 
-			if len(splparts) > 1 {
+			if len(splparts) > 1 { // split by -
 				rem := strings.TrimSpace(strings.Join(splparts[1:], " "))
 				// Extract type and optional/required indicators if specified
 				if strings.Contains(rem, "[") { // eg: [string] [optional]
@@ -325,18 +325,18 @@ func parsePythonMetadata(filename string, content string) (description string, p
 					bracketContent := rem[idx:]
 					if strings.Contains(bracketContent, "optional") {
 						isRequired = false
-					}
-					if strings.Contains(bracketContent, "required") {
+					} else if strings.Contains(bracketContent, "required") {
 						isRequired = true
-					}
-					if strings.Contains(bracketContent, "int") {
+					} else if strings.Contains(bracketContent, "int") {
 						paramType = "integer"
 					} else if strings.Contains(bracketContent, "bool") {
 						paramType = "boolean"
+					} else if bracketContent == "string" {
+						// already
+					} else {
+						mllm.Slog().Warn("unhandled bracket word", "v", bracketContent)
 					}
-					rem = ""
-				}
-				if rem != "" {
+				} else if rem != "" {
 					paramDesc += rem
 					slog.Warn("TOOLBOX: assuming param is [string] -- add [string] to end of param description to hide this log message", "param", paramName, "remainder", rem, "full_description", paramDesc, "file", filename)
 				}
