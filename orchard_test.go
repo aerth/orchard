@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -36,7 +37,7 @@ func TestFuncCheck(t *testing.T) {
 func TestMain(m *testing.M) {
 	_ = orchard.Config{}.SystemPromptFunc // test that we can access the unexported embedded struct from outside the package
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
-		Level:     slog.LevelDebug,
+		Level:     slog.LevelWarn,
 		AddSource: true,
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
 			if a.Key == slog.SourceKey {
@@ -72,7 +73,7 @@ func Test03(t *testing.T) {
 		println("finish hook")
 		out = slices.Clone(fullconvo)
 	}
-	err = orchard.CreateConvo(ctx, cfg,
+	err = cfg.Run(ctx,
 		mllm.ChatMessages{{
 			Role:    "user",
 			Content: "Sleep for 2 seconds",
@@ -133,7 +134,7 @@ func Test04(t *testing.T) {
 	cfg := orchard.Config{Toolbox: orchard.AllTools}
 	//cfg.PromptPrefix = "Always speak in pirate dialect."
 	//cfg.PromptSuffix = "Always speak in pirate dialect."
-	err := orchard.CreateConvo(ctx, cfg,
+	err := cfg.Run(ctx,
 		mllm.ChatMessages{{
 			Role:    "user",
 			Content: "Read and understand the main module ./*.go and tell me some important things that are missing from README.md that would be most helpful to add",
@@ -185,14 +186,17 @@ func TestO2(t *testing.T) {
 		t.SkipNow()
 		return
 	}
-	threadReader := func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error) {
-		return mllm.ChatMessages{{
-			Role:    "user",
-			Content: "explain the current dir repo, what does it do? examine the main files, not the test files",
-		}}, nil
-	}
+	convo := mllm.ChatMessages{{
+		Role:    "user",
+		Content: "explain the current dir repo, what does it do? examine the main files, not the test files",
+	}}
+
 	tooldir := "../otools/"
 	toolbox, err := toolboxes.NewToolboxFS(tooldir)
+	if errors.Is(err, os.ErrNotExist) {
+		t.Skip("../otools/ not found, skipping")
+		return
+	}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -206,18 +210,68 @@ func TestO2(t *testing.T) {
 
 	e := mllm.Default()
 	e.ThreadID = threadID
-	err = orchard.Create(ctx, orchard.Config{
+	err = orchard.Config{
 		FinishHook: func(convo mllm.ChatMessages) {
 			add = convo
 		},
-		ThreadReader: threadReader, Toolbox: tools,
-		Think: think,
-		E:     e,
-	})
+		Toolbox: tools,
+		Think:   think,
+		E:       e,
+	}.Run(ctx, convo)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(add) < 2 {
 		t.Fatal("did not")
+	}
+}
+
+func TestEmpty(t *testing.T) {
+	ctx := t.Context()
+	cfg := orchard.New()
+	for _, thinkVal := range []any{false, "low", nil} {
+		t.Run("empty-"+fmt.Sprint(thinkVal), func(t *testing.T) {
+			if err := cfg.E.ValidateConfig(false); err != nil {
+				t.Skip(err)
+				return
+			}
+
+			if len(cfg.Toolbox)+len(cfg.E.Tools) != 0 {
+				t.Fatal("found tools")
+			}
+			convo := mllm.ChatMessages{
+				{Role: "user", Content: "what is 3+2+1"},
+			}
+			// should output to stdout (i.e. not to nowhere)
+			cfg.Think = thinkVal
+			for range 2 {
+				var capture mllm.ChatMessage
+				cfg.E.Handlers = []mllm.StreamHandler{capture.HandleChat}
+				err := cfg.Run(ctx, convo)
+				if err != nil {
+					t.Fatal("run failed:", err)
+				}
+				capture.Reasoning = ""
+				convo = append(convo, capture)
+				if true { // fun
+					Flip(convo)
+					cfg.Toolbox = nil
+					cfg.SystemPromptFunc = func(sc orchard.StateConfig) (string, error) {
+						return "", nil
+					}
+				}
+			}
+		})
+	}
+}
+
+func Flip(a mllm.ChatMessages) {
+	for i := range a {
+		switch a[i].Role {
+		case "user":
+			a[i].Role = "assistant"
+		case "assistant":
+			a[i].Role = "user"
+		}
 	}
 }
