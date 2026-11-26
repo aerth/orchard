@@ -41,6 +41,7 @@ type templateData struct {
 	Tools            []string // for HasTool
 	Extra            string
 	StateConfig
+	PromptPrefix string
 }
 
 func (t templateData) ToolsJSON() string {
