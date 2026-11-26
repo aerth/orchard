@@ -67,7 +67,7 @@ func V1(ctx context.Context, entireConvo mllm.ChatMessages) (mllm.ChatMessages, 
 		if err != nil {
 			return entireConvo, err
 		}
-		slog.Debug("done compressing", "from", l, "to", len(chunk))
+		mllm.Slog().Debug("done compressing", "from", l, "to", len(chunk))
 		if Debug || testing.Testing() {
 			println(
 				"\n\n-----\n\n",
