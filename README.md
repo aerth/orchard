@@ -21,22 +21,35 @@ make run
 ```
 
 - [orchard-tui](https://github.com/aerth/orchard-tui): TUI agent interface using bubbletea UI library
+- [orchard-io](./cmd/orchard-io/): simple example, read stdin, print to stdout (persistence,dynamic tools)
+- [orchard-lite](./cmd/orchard-lite/): minimal example, read command line, print to stdout (dynamic tools, no persistence)
 - [orchard_test.go](./orchard_test.go): for example library usage.
-- [orchard-io](./cmd/orchard-io/): minimal example, read stdin, print to stdout
 - [orchard-tools](https://github.com/aerth/orchard-tools): a tool scripts repository
 
 ## Library
 
-Orchard is a very small **library** that provides `CreateConvo`, which runs a loop, calling tools until finished. Typically, after the loop finishes, a new user message might be added, and then `CreateConvo` is called again. Using Hook functions in `Config`, the application can customize the loop, providing real-time streaming to UI or confirmation of tool calls.
+Orchard is a very small **library** that provides `New() Config`,  has `err := cfg.Run(ctx, convo)` method, which begins loop, calling tools until finished.
 
-Start with a `Config` and call `Create(ctx,cfg)` (or `CreateConvo(ctx, cfg, convo)`).
+Typically, after the loop finishes, a new user message might be added to the `convo`, and then `Run` is called again.
+
+Using Hook functions in `Config`, the application can customize the loop, providing real-time streaming to UI or confirmation of tool calls.
+
+For further customization, the `Generator` and `ToolRunner` can be customized by mo
+
+Minimal Example (bash tool only), LLM_HOST and LLM_MODEL are required environmental variables:
+
+```go
+	// unconfigured it streams to stdout, logs json to stderr
+	err := orchard.New().Run(ctx, mllm.ChatMessages{{Role: "user", Content: prompt}})
+```
 
 By default, streams to `stdout`, logs to default `slog` logger. This can be customized for each application.
 
-Minimal complete example. (from test file, `go test -v -run Test04`)
+Adding native tools is easy:
 
 ```go
-	cfg := orchard.Config{Toolbox: orchard.AllTools}
+	cfg := orchard.New()
+	cfg.Toolbox = []mllm.Tools{foo, bar}
 	err := cfg.Run(ctx, mllm.ChatMessages{
 	  {Role: "user", Content: "explain this repo"},
 	})
