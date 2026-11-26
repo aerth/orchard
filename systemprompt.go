@@ -5,11 +5,11 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"log/slog"
 	"os"
 	"slices"
 	"strings"
+	"text/template"
 	"time"
 )
 
