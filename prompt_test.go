@@ -19,4 +19,7 @@ func TestPrompt(t *testing.T) {
 	if err := tpl.Execute(os.Stdout, templateData{Tools: []string{"rm", "dd"}}); err != nil {
 		t.Fatal(err)
 	}
+	if err := tpl.Execute(os.Stdout, templateData{Tools: []string{}}); err != nil {
+		t.Fatal(err)
+	}
 }
