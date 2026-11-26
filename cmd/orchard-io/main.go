@@ -58,6 +58,7 @@ func main() {
 		orchard.AllTools = nil
 		return nil
 	})
+	// TODO: better control for output
 	flag.BoolFunc("qqq", "disable slog, hide thinking/toolcalls/toolouts, only printing content to stdout", func(s string) error {
 		mllm.HideThink = true
 		mllm.HideToolCalls = true
@@ -73,7 +74,7 @@ func main() {
 		orchard.Slog = mllm.Slog
 		return nil
 	})
-	flag.BoolFunc("qq", "hide thinking/toolcalls/toolouts, only printing content to stdout", func(s string) error {
+	flag.BoolFunc("qq", "hide thinking/toolcalls/toolouts, only printing content to stdout, see also -qqq", func(s string) error {
 		mllm.HideThink = true
 		mllm.HideToolCalls = true
 		sloglvl.Set(slog.LevelWarn)
