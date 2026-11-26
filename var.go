@@ -43,7 +43,7 @@ func GetDefaults() *Config {
 	return &defaults
 }
 
-// Custom loop funcs to overhaul parts of the main orchard loop. Used by [CreateConvo] (and [Create])
+// Custom loop funcs to overhaul parts of the main orchard loop. Used by [runConvo] (and [Create])
 var Custom = struct {
 	// ToolRunnerFunc runs a [mllm.Tool.Exec] function, returning a message.
 	// Errors end the loop. ToolRunnerFunc should usually re-insert the error into a message to allow self-healing.
@@ -70,10 +70,12 @@ var Custom = struct {
 }
 
 var (
-	UseFns = false
-	Fns    []func(cfg *Config) error // may modify config
+	UseFns = false // set by application to signal deferred flag functions are supported, see [ExtendedFlags]
+
+	Fns []func(cfg *Config) error // deferred flag functions handled by application. may modify config, see [ExtendedFlags]
 )
 
+// ExtendedFlags (see [UseFns], [Fns])
 func ExtendedFlags() {
 	if UseFns {
 		flag.Func("delete-thread", "rename current auto-thread to new uuid/name", func(x string) error {
