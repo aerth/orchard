@@ -1,6 +1,6 @@
 # [orchard ai](https://github.com/aerth/orchard)
 
-**tiny ai agent library** (tool orchestration, agentic harness)
+## **tiny ai agent library** (tool orchestration, agentic harness)
 
 Made for local LLM, such as **ollama** or **llama.cpp**.
 
@@ -37,18 +37,18 @@ Minimal complete example. (from test file, `go test -v -run Test04`)
 
 ```go
 	cfg := orchard.Config{Toolbox: orchard.AllTools}
-	_, err := orchard.CreateConvo(ctx, cfg, mllm.ChatMessages{
+	err := cfg.Run(ctx, mllm.ChatMessages{
 	  {Role: "user", Content: "explain this repo"},
 	})
 ```
 
-### Runtime Configuration
+## Runtime Configuration
 
 Environmental variables configure LLM endpoint/model at runtime (see [mllm](https://github.com/aerth/mostly) package).
 
 Use `mllm.Flags()` and `orchard.Flags()` to add more runtime configuration via command-line flags.
 
-### Tools
+## Tools
 
 Tools are easy to implement, in either Go, Bash, or Python.
 
@@ -62,7 +62,45 @@ Dynamic toolboxes are collections of scripts and are scanned at runtime, using t
 
 For tools that use API keys or other secrets, dynamic toolboxes may contain `.env` files that will be used for tools in that toolbox.
 
-### Hooks
+## ORCHARD_TOOLS directory structure
+
+```bash
+# example file tree
+${ORCHARD_TOOLS}/toolboxes/files/grep.bash
+${ORCHARD_TOOLS}/toolboxes/web/web_search.bash
+```
+
+For now, env files in a toolbox is only used for scripts in that toolbox,
+If no .env file exists in the inner toolbox, the main toolbox .env is used
+
+```bash
+# optional env files
+# used for 'web' toolbox
+${ORCHARD_TOOLS}/toolboxes/web/.env
+# used for any toolbox without their own .env file
+${ORCHARD_TOOLS}/.env
+```
+
+The tool spec is created from the comments at the top of the script.
+
+For now, the toolbox subdirectories are for organization only and all toolboxes are combined into one for LLM.
+
+```bash
+# Description: Use grep (ripgrep) to find line-numbers and filenames for keywords..
+# Param: phrase - The text to search for [string] [required]
+# Param: path - Path to the file (if omitted, all subdirectories) [string] [optional]
+# Param: case_insensitive - Add -i flag if we arent sure about spelling. Causes more false positives! [boolean] [optional]
+flags=(--line-number --word-regexp)
+if [[ "$3" == "true" ]]; then
+	flags+=("--ignore-case")
+fi
+rg "${flags[@]}" "${1}" "${2:-.}"
+```
+
+If the script spec is formatted correctly, the tool will be available to use.
+The tool calling is fully abstracted, isolating the llm from the execution logic and tool implementation.
+
+## Hooks
 
 - `PreTextHook`: Runs before generating the message (useful for UI to push a new message to the view).
 - `PreToolHook`: Can modify or deny tool arguments before execution.
@@ -81,6 +119,7 @@ Many components have not made it into this source tree yet. These include:
 
 This package, like [mllm](https://github.com/aerth/mostly), will remain lightweight and versatile.
 
-For Documentation, refer to source code or [pkg.go.dev](https://pkg.go.dev/github.com/aerth/orchard)
+## More Info
 
+For Documentation, refer to source code or [pkg.go.dev](https://pkg.go.dev/github.com/aerth/orchard)
 [Latest source](https://github.com/aerth/orchard)
