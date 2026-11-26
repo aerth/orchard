@@ -7,7 +7,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"log/slog"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -21,13 +21,27 @@ import (
 	"gorm.io/gorm"
 )
 
+// New creates a config. Add Tools, Hooks and call Run.
 func New() Config {
 	e := mllm.Default()
-
-	return Config{
-		E:     e,
-		Think: defaults.Think,
+	x := Config{
+		E:            e,
+		Think:        defaults.Think,
+		LimitHistory: defaults.LimitHistory,
+		LimitRounds:  defaults.LimitRounds,
+		Toolbox:      AllTools,
 	}
+	return x
+}
+
+func (cfg Config) WithTools(tools mllm.Tools) Config {
+	cfg.Toolbox = tools
+	return cfg
+}
+
+// Run a new multi-turn agentic run
+func (cfg Config) Run(ctx context.Context, convo mllm.ChatMessages) error {
+	return runConvo(ctx, cfg, convo)
 }
 
 // Config main orchard configuration. Required is: Toolbox.
@@ -40,8 +54,8 @@ type Config struct {
 
 	Think any // probably false or "low" or "none". If nil, is not sent, and will use model default.
 
-	LimitHistory int // loop option, infinite < 0
-	LimitRounds  int // loop option, infinite < 0
+	LimitHistory int // loop option, infinite less than 0 (default 20)
+	LimitRounds  int // loop option, infinite less than 0 (default -1)
 
 	PromptPrefix string // copied from [Custom.PromptPrefix]
 	PromptSuffix string // copied from [Custom.PromptSuffix]
@@ -63,8 +77,10 @@ type StateConfig struct {
 }
 
 type funcConfig struct {
-	// ThreadReader only REQUIRED if using [Create]. loads the history ONCE per [Create] run. see [NewStaticThreadReader]
+	// ThreadReader ... if using [Create]. loads the history ONCE per [Create] run. see [NewStaticThreadReader]
 	// If static, this config should not be re-used and [Create] should be called ONLY once.
+	//
+	// Deprecated: bring your own convo somehow
 	ThreadReader func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error)
 
 	// SystemPromptFunc might even return a const string and ignore input, generally should be nil to use default.
@@ -100,12 +116,12 @@ func (cfg Config) GormThreadReader(ctx context.Context, threadID uuid.UUID) (con
 		cfg.LimitHistory = defaults.LimitHistory
 	}
 	if cfg.LimitHistory == 0 {
-		cfg.LimitHistory = 100
+		cfg.LimitHistory = 100 // use limit for gorm
 	}
 	return unstable{}.GormThreadReader(ctx, cfg.DB, cfg.E.ThreadID, cfg.LimitHistory)
 }
 
-// Normalized config using defaults and [Custom]
+// Normalized config using var.go's [defaults] and [Custom]
 func (cfg *Config) Normalized() error {
 	if cfg.E.Tools != nil {
 		return Errorf("tool spec should be nil")
@@ -113,26 +129,24 @@ func (cfg *Config) Normalized() error {
 	if len(cfg.Toolbox) == 0 && !testing.Testing() && (cfg.E.Tools != nil) {
 		return Errorf("toolbox missing")
 	}
-	if err := cfg.E.ValidateConfig(false); err != nil {
-		slog.Warn("making new llm client because config was invalid", "err", err)
-		e := mllm.Default()
-		cfg.E = e
-	}
 	if err := cfg.E.ValidateConfig(cfg.Think); err != nil {
 		return err
 	}
-	if cfg.LimitHistory <= 0 {
-		cfg.LimitHistory = defaults.LimitHistory
+	_ = defaults.LimitHistory
+	if cfg.LimitHistory == 0 {
+		return fmt.Errorf("should set history limit in Config")
 	}
-	if cfg.LimitRounds <= 0 {
-		cfg.LimitRounds = defaults.LimitRounds
+	if cfg.LimitRounds == 0 {
+		return fmt.Errorf("should set rounds limit in Config")
 	}
 	return nil
 }
 
-// Create reads ThreadReader and calls [CreateConvo].
+// Create reads ThreadReader and calls [runConvo].
 //
 // All output is managed by using hooks for example [Config.PreTextHook]  [Config.NonTextHook]
+//
+// Deprecated: use [Config.Run] and bring convo
 func Create(ctx context.Context, cfg Config) error {
 	if err := cfg.Normalized(); err != nil {
 		return err
@@ -147,13 +161,14 @@ func Create(ctx context.Context, cfg Config) error {
 	if err != nil {
 		return Errorf("threadreader: %w", err)
 	}
-	return CreateConvo(ctx, cfg, convo)
+	Slog().Debug("thread_reader read convo", "len", len(convo))
+	return runConvo(ctx, cfg, convo)
 }
 
-// CreateConvo runs the main orchard loop, using cfg [Config.Normalized].
+// runConvo runs the main orchard loop, using cfg [Config.Normalized].
 //
 // All output is managed by using Hooks, for example [Config.PreTextHook]  [Config.NonTextHook]
-func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) error {
+func runConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) error {
 	if err := cfg.Normalized(); err != nil {
 		return err
 	}
@@ -168,12 +183,12 @@ func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) error
 	}
 	//startLen := len(convo) // for system prompt
 	var err error
-	slog.Info("starting orchard loop", "max", cfg.LimitRounds, "max_history", cfg.LimitHistory, "think", cfg.Think, "at", len(convo))
+	Slog().Debug("starting orchard loop", "max", cfg.LimitRounds, "max_history", cfg.LimitHistory, "think", cfg.Think, "at", len(convo))
+	t1 := time.Now()
 	for nround := 0; cfg.LimitRounds < 0 || nround <= cfg.LimitRounds; nround++ {
-		// generate
-		var caller mllm.ChatMessage
-		if sleepBetween != 0 {
-			slog.Debug("sleep", "dur", sleepBetween.String(), "round", nround, "roles", convo.Roles(), "at", len(convo))
+		// sleep
+		if nround != 0 && sleepBetween != 0 {
+			Slog().Debug("sleep", "dur", sleepBetween.String(), "round", nround, "roles", convo.Roles(), "at", len(convo))
 			select {
 			case <-time.After(sleepBetween):
 				// ok
@@ -184,20 +199,28 @@ func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) error
 				return context.Cause(ctx)
 			}
 		}
-		slog.Info("generating", "round", nround, "roles", convo.Roles(), "at", len(convo))
+		// generate
+		Slog().Debug("generating", "round", nround, "roles", convo.Roles(), "at", len(convo), "since", time.Since(t1).String())
+		if convo.Top().Role == "assistant" {
+			return Errorf("top is assistant")
+		}
+		var caller mllm.ChatMessage
+		t2 := time.Now()
+		// generate, running all [mllm.StreamHandler] funcs
 		convo, caller, err = Custom.GeneratorFunc(ctx, cfg, convo)
 		if err != nil {
 			if cfg.FinishHook != nil {
-				cfg.FinishHook(convo)
+				cfg.FinishHook(convo) // no caller at top
 			}
 			return Errorf("%w", err)
 		}
 		convo = append(convo, caller)
+		Slog().Debug("stream complete", "convo_size", len(convo), "top_id", convo.Top().MessageID, "d", time.Since(t2), "since", time.Since(t1).String())
 
 		// NORMAL DONE EXIT
 		if len(caller.ToolCalls) == 0 {
 			if cfg.FinishHook != nil {
-				cfg.FinishHook(convo)
+				cfg.FinishHook(convo) // with caller at top
 			}
 			return nil
 		}
@@ -208,9 +231,13 @@ func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) error
 		}
 		for index := range calls { // might be multiple calls in one message
 			var toolouts mllm.ChatMessages
+			// add convo to toolrunner context
+			ctx2 := WithConvo(ctx, slices.Clone(convo))
 			// run the tool call
-			toolouts, err = Custom.ToolRunnerFunc(ctx, cfg, caller, index)
+			toolouts, err = Custom.ToolRunnerFunc(ctx2, cfg, caller, index)
 			convo = append(convo, toolouts...)
+			Slog().Debug(fmt.Sprintf("tool call %d/%d complete, convo is now", index+1, len(calls)),
+				"size", len(convo), "top_id", convo.Top().MessageID)
 			if err != nil {
 				if cfg.FinishHook != nil {
 					cfg.FinishHook(convo)
@@ -219,11 +246,11 @@ func CreateConvo(ctx context.Context, cfg Config, convo mllm.ChatMessages) error
 			}
 			name := convo.Top().ToolName
 			cmd, hasToolHook := Custom.PostToolHookCommands[name]
-			if !hasToolHook && index == len(calls)-1 { // TODO: multi tool call
+			if !hasToolHook && index == len(calls)-1 { // TODO: skip multi hook with multi tool call?
 				cmd, hasToolHook = Custom.PostToolHookCommands["*"]
 			}
-			if hasToolHook {
-				convo, err = Custom.PostToolHookFunc(ctx, cfg, convo, cmd)
+			if hasToolHook { // run linter/etc
+				convo, err = Custom.PostToolHookFunc(ctx, cfg, convo, cmd) // TODO: ctx2 here?
 				if err != nil {
 					if cfg.FinishHook != nil {
 						cfg.FinishHook(convo)
@@ -271,7 +298,7 @@ func (odefaults) PostToolHook(ctx context.Context, cfg Config, convo mllm.ChatMe
 		return convo, fmt.Errorf("post-tool hook %q: %w", cmd, err)
 	}
 	if len(strings.TrimSpace(bashout)) == 0 {
-		slog.Debug("toolhook no output ✅")
+		Slog().Debug("toolhook no output ✅")
 		return convo, nil // minify
 	}
 	// add assistant-tool combo for parser
@@ -294,6 +321,6 @@ func (odefaults) PostToolHook(ctx context.Context, cfg Config, convo mllm.ChatMe
 			return convo, err
 		}
 	}
-	slog.Info("added toolhook outputs", "top", convo.TopN(2))
+	Slog().Info("added toolhook outputs", "top", convo.TopN(2))
 	return convo, nil
 }
