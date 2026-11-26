@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"log/slog"
@@ -34,7 +35,6 @@ func main() {
 		AddSource: false,
 		Level:     &sloglvl,
 	})))
-	orchard.Slog = mllm.Slog // get -q -v flags
 	prefix := ""
 	suffix := ""
 	dbflag := false
@@ -58,15 +58,48 @@ func main() {
 		orchard.AllTools = nil
 		return nil
 	})
+	flag.BoolFunc("qqq", "disable slog, hide thinking/toolcalls/toolouts, only printing content to stdout", func(s string) error {
+		mllm.HideThink = true
+		mllm.HideToolCalls = true
+		mllm.ToolWriterOut = io.Discard
+		sloglvl.Set(slog.LevelWarn)
+		def := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+			Level:     slog.LevelWarn,
+			AddSource: true,
+		}))
+		mllm.Slog = func() *slog.Logger {
+			return def
+		}
+		orchard.Slog = mllm.Slog
+		return nil
+	})
+	flag.BoolFunc("qq", "hide thinking/toolcalls/toolouts, only printing content to stdout", func(s string) error {
+		mllm.HideThink = true
+		mllm.HideToolCalls = true
+		sloglvl.Set(slog.LevelWarn)
+		mllm.ToolWriterOut = io.Discard
+		return nil
+	})
 	flag.Parse()
+	orchard.Slog = mllm.Slog // get -q -v flags
 	if flag.NArg() != 0 {
 
 		flag.Usage()
 		os.Exit(1)
 	}
+
+	if os.Getenv("TERM") != "" && os.Getenv("NO_COLOR") == "" {
+		mllm.DefaultThinkPre = colors.Dim + mllm.DefaultThinkPre
+		mllm.DefaultThinkPost += colors.Reset
+	}
 	mllm.DefaultWriter = os.Stdout
-	_ = godotenv.Load(os.ExpandEnv("${XDG_CONFIG_HOME}/orchard/env"))
-	client.E = mllm.Default()
+	mllm.TruncateLogToolOutChars = 500
+	if err := godotenv.Load(os.ExpandEnv("${XDG_CONFIG_HOME}/orchard/env")); err != nil {
+		println("error loading env", err.Error())
+		///} else {
+		//	println("loaded env")
+	}
+	client = orchard.New()
 	client.Toolbox = orchard.AllTools
 	if prefix != "" {
 		orchard.Custom.PromptPrefix = prefix
@@ -77,7 +110,7 @@ func main() {
 
 	if dir := os.Getenv("ORCHARD_TOOLS"); dir != "" {
 		if strings.HasPrefix(dir, "~/") {
-			dir = strings.Replace(dir, "~/", os.ExpandEnv("$HOME")+"/", 1)
+			dir = strings.Replace(dir, "~/", os.ExpandEnv("$HOME")+"/", 1) // TODO: more tilde + expand env elsewhere
 		}
 		if _, err := os.Stat(filepath.Join(dir, "toolboxes")); err == nil {
 			dir = filepath.Join(dir, "toolboxes")
@@ -104,6 +137,7 @@ func main() {
 		}
 	}
 	if err := main2(client, dbflag, sleepDur); err != nil {
+		fmt.Println("Error:", err)
 		log.Fatalf("fatal: %+v", err)
 	}
 }
@@ -123,6 +157,25 @@ func isLocal(s string) bool {
 	return false
 }
 
+var colors = struct {
+	Reset string
+	Dim   string
+}{
+	Reset: "\033[0m",
+	Dim:   "\033[2m",
+	/*Red:         "\033[31m",
+	Green:       "\033[32m",
+	Yellow:      "\033[33m",
+	Blue:        "\033[34m",
+	Magenta:     "\033[35m",
+	Cyan:        "\033[36m",
+	White:       "\033[37m",
+	BlueBold:    "\033[34;1m",
+	MagentaBold: "\033[35;1m",
+	RedBold:     "\033[31;1m",
+	YellowBold:  "\033[33;1m",*/
+}
+
 func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	mllm.DefaultKeepAlive = -1
 	if !isLocal(client.E.Host.Host) {
@@ -130,13 +183,18 @@ func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	}
 	wd, _ := os.Getwd()
 	if mllm.DefaultThread == uuid.Nil() {
-		mllm.DefaultThread = mllm.ThreadHasher(wd) // TODO: config for filepath.Base option
+		mllm.DefaultThread = mllm.ThreadHasher(wd)
 	}
 	client.PreTextHookEditP1 = compactor.V1
 	client.NonTextHook = func(m mllm.Message) error {
-		if !mllm.HideTools {
+		if n := mllm.TruncateLogToolOutChars; n != 0 {
+			s := m.Content
+			l := len(s)
+			if n > 3 && l > n {
+				s = s[:n-3] + "..."
+			}
 			// ugly, but , does not break 2> >(jq -c)
-			slog.Info("tool output", "name", m.ToolName, "content", m.Content)
+			slog.Info("tool output", "name", m.ToolName, "content", s)
 		}
 		if sleepDur != 0 {
 			time.Sleep(sleepDur)
@@ -154,51 +212,59 @@ func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	//threadID := uuid.MustParse("7e0330fc-bb4a-48d7-aae5-bd666db0734a")
 	client.E.Writer = os.Stdout
 
-	// one round
-	client.ThreadReader = func(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error) {
-		input, err := io.ReadAll(os.Stdin)
-		if err != nil {
-			return nil, err
-		}
-		x := mllm.ChatMessage{
-			Role:    "user",
-			Content: string(input),
-		}
-
-		if client.DB != nil {
-			// get previous
-			var a mllm.ChatMessages
-			a, err = client.GormThreadReader(ctx, threadID)
-			if err != nil {
-				return nil, err
-			}
-			if len(a) != 0 {
-				slog.Info("thread from db", "len", len(a), "roles_5", Roles(a.TopN(5)))
-			}
-			// add this one
-			if err := client.DB.Create(ctx, &x); err != nil {
-				return nil, err
-			}
-			slog.Info("got thread")
-			return append(a, x), nil
-		}
-		slog.Debug("single message", "prompt", x.Content)
-
-		if err := visions.AttachImages(x.Content, &x.Message); err != nil {
-			slog.Warn("could not attach image", "err", err)
-		}
-		return mllm.ChatMessages{x}, nil
-	}
-
-	// run [orchard.Create] once
 	if client.E.ThreadID == uuid.Nil() {
 		client.E.ThreadID = mllm.DefaultThread
 	}
-	err := orchard.Create(ctx, client)
+	client.E.StreamWriter.Writer = os.Stdout
+
+	convo, err := readMessageStdin(ctx, client.E.ThreadID)
+	if err != nil {
+		return err
+	}
+	err = client.Run(ctx, convo)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+// using db maybe, get single message from stdin.
+//
+// attaches image if found
+func readMessageStdin(ctx context.Context, threadID uuid.UUID) (mllm.ChatMessages, error) {
+	input, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return nil, err
+	}
+	x := mllm.ChatMessage{
+		Role:      "user",
+		Content:   string(input),
+		MessageID: uuid.New(),
+		CreatedAt: time.Now(),
+		Thread:    threadID,
+	}
+
+	if client.DB != nil {
+		// get previous
+		var a mllm.ChatMessages
+		a, err = client.GormThreadReader(ctx, threadID)
+		if err != nil {
+			return nil, err
+		}
+		if len(a) != 0 {
+			slog.Info("thread from db", "len", len(a), "roles_5", Roles(a.TopN(5)))
+		}
+		// add this one
+		if err := client.DB.Create(ctx, &x); err != nil {
+			return nil, err
+		}
+		return append(a, x), nil
+	}
+	//	slog.Debug("single message", "prompt", x.Content)
+	if err := visions.AttachImages(x.Content, &x.Message); err != nil {
+		slog.Warn("could not attach image", "err", err)
+	}
+	return mllm.ChatMessages{x}, nil
 }
 
 func CloseDB(db *gorm.DB) {
