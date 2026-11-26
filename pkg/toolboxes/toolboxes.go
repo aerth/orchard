@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"iter"
 	"log"
-	"log/slog"
 	"maps"
 	"os"
 	"path/filepath"
@@ -133,7 +132,7 @@ func (t Toolboxes) MustByName(name string) *Toolbox {
 func (t Toolboxes) ByName(name string) (*Toolbox, bool) {
 	for i := range t {
 		if t[i].Name == name {
-			//		slog.Warn("byname", "want", name, "checking", t[i].Name)
+			//		mllm.Slog().Warn("byname", "want", name, "checking", t[i].Name)
 			return &t[i], true
 		}
 	}
@@ -236,7 +235,7 @@ func (o OrchParamMap) Without(k ...string) OrchParamMap {
 		delete(o, v)
 	}
 	if !ok {
-		slog.Error("did not remove any...")
+		mllm.Slog().Error("did not remove any...")
 	}
 	return o
 }
@@ -265,18 +264,23 @@ func parsePythonMetadata(filename string, content string) (description string, p
 	for line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" || !strings.HasPrefix(line, "#") {
-			break
+			if description != "" {
+				//			mllm.Slog().Warn("stopparse", "line", line)
+				break
+			}
+			//		mllm.Slog().Warn("skipping", "line", line)
+			continue
 		}
 		if strings.HasPrefix(line, "#!") {
 			continue
 		}
-		line = strings.TrimPrefix(line, "#")
+		line = strings.TrimPrefix(line, "#") // eg: Foo: bar
 		line = strings.TrimSpace(line)
 		if line == "" {
 			continue
 		}
 		if debugToolGen {
-			slog.Info("Parsing metadata", "filename", filename, "line", line)
+			mllm.Slog().Info("Parsing metadata", "filename", filepath.Base(filename), "line", line)
 		}
 		if after, ok := strings.CutPrefix(line, "Feature:"); ok {
 			after = strings.TrimSpace(after)
@@ -301,12 +305,12 @@ func parsePythonMetadata(filename string, content string) (description string, p
 			// Format: name - description [type] [optional/required]
 			splparts := strings.SplitN(paramStr, " - ", 2)
 			if len(splparts) == 0 {
-				slog.Warn("no param args")
+				mllm.Slog().Warn("no param args")
 				continue
 			}
 			paramName := strings.TrimSpace(splparts[0])
 			if paramName == "" {
-				slog.Warn("no param name split")
+				mllm.Slog().Warn("no param name split")
 				continue
 			}
 
@@ -338,7 +342,7 @@ func parsePythonMetadata(filename string, content string) (description string, p
 					}
 				} else if rem != "" {
 					paramDesc += rem
-					slog.Warn("TOOLBOX: assuming param is [string] -- add [string] to end of param description to hide this log message", "param", paramName, "remainder", rem, "full_description", paramDesc, "file", filename)
+					mllm.Slog().Warn("TOOLBOX: assuming param is [string] -- add [string] to end of param description to hide this log message", "param", paramName, "remainder", rem, "full_description", paramDesc, "file", filename)
 				}
 			}
 			if isRequired {
@@ -356,10 +360,10 @@ func parsePythonMetadata(filename string, content string) (description string, p
 }
 
 // NewToolboxFS scans the filesystem under the base path and dynamically constructs Toolboxes.
-// It ignores non-python files, empty directories, and python files directly in the base directory.
+// It ignores non-tool files, empty directories, and python files directly in the base directory.
 func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	if debugToolGen {
-		slog.Info("NewToolboxFS Reading filesystem", "basepath", basepath)
+		mllm.Slog().Info("NewToolboxFS Reading filesystem", "basepath", basepath)
 	}
 	if _, err := os.Stat(filepath.Join(basepath, "toolboxes")); err == nil {
 		basepath = filepath.Join(basepath, "toolboxes")
@@ -376,7 +380,7 @@ func NewToolboxFS(basepath string) (*ToolboxManager, error) {
 	})
 	if debugToolGen {
 		for i := range entries {
-			slog.Info("found entry filesystem toolbox", "e", entries[i])
+			mllm.Slog().Info("found entry filesystem toolbox", "e", entries[i])
 		}
 	}
 	return NewToolboxEntries(os.ReadDir, os.ReadFile, basepath, entries)
@@ -395,7 +399,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			continue
 		}
 		if !entry.IsDir() { // should not be here
-			slog.Warn("skipping toolbox nonbox", "e", entry.Name())
+			mllm.Slog().Warn("skipping toolbox nonbox", "e", entry.Name())
 			continue
 		}
 		subDirName := entry.Name()
@@ -404,18 +408,18 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 		}
 		// Ignore hidden directories like .git
 		if strings.HasPrefix(subDirName, ".") {
-			slog.Error("skipping dotfile", "name", subDirName)
+			mllm.Slog().Error("skipping dotfile", "name", subDirName)
 			continue
 		}
 
-		//	slog.Info("testing dir", "entry", entry.Name(), "en", entry)
+		//	mllm.Slog().Info("testing dir", "entry", entry.Name(), "en", entry)
 		subDirPath := filepath.Join(basepath, subDirName)
 		subEntries, err := readDir(subDirPath)
 		if err != nil {
 			subDirPath := filepath.Join(basepath, subDirName)
 			_, e := readDir(subDirPath)
 			if e == nil {
-				slog.Warn("found other though")
+				mllm.Slog().Warn("found other though")
 			}
 			return nil, fmt.Errorf("subdir readdir: %w", err)
 		}
@@ -433,11 +437,11 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			toolName = strings.TrimSuffix(toolName, ".bash")
 			pyFilePath := filepath.Join(subDirPath, scriptFilename)
 			if debugToolGen {
-				slog.Info("creating toolbox tool", "box", subDirName, "name", toolName, "file", pyFilePath, "name", scriptFilename)
+				mllm.Slog().Info("creating toolbox tool", "box", subDirName, "name", toolName, "file", pyFilePath, "name", scriptFilename)
 			}
 			contentBytes, err := readFile(pyFilePath)
 			if err != nil {
-				slog.Warn("could not read file", "path", pyFilePath, "err", err)
+				mllm.Slog().Warn("could not read file", "path", pyFilePath, "err", err)
 				continue
 			}
 
@@ -456,7 +460,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 				envs, err = GetBashFileEnvironKeys(contentBytes)
 			}
 			if err != nil {
-				slog.Error("env detect", "err", err)
+				mllm.Slog().Error("env detect", "err", err)
 			}
 			// doInputEnv
 			doInputEnv := slices.Contains(envs, "INPUT_FILE")
@@ -481,12 +485,12 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 			}
 			alphabeticalToolnames = append(alphabeticalToolnames, toolName)
 			if debugToolGen {
-				slog.Info("added tool", "box", subDirName, "tool", toolName)
+				mllm.Slog().Info("added tool", "box", subDirName, "tool", toolName)
 			}
 		}
 
 		if len(toolsMap) == 0 {
-			slog.Warn("no tools in map", "box", subDirName)
+			mllm.Slog().Warn("no tools in map", "box", subDirName)
 			continue
 		}
 		mllm.Slog().Debug("adding toolbox", "box", subDirName, "tools", len(toolsMap), "available", alphabeticalToolnames)
@@ -518,7 +522,7 @@ func NewToolboxEntries(readDir func(name string) ([]fs.DirEntry, error), readFil
 var BackgroundToolWrapFunc = wrapBackground
 
 func wrapBackground(execFn ExecFunc) ExecFunc {
-	slog.Warn("background not implemented in this program, will wait for completion")
+	mllm.Slog().Warn("background not implemented in this program, will wait for completion")
 	return execFn
 }
 
@@ -527,12 +531,12 @@ func (t *ToolboxManager) Exec(ctx context.Context, caller mllm.Message, callInde
 	var call Call
 	err := json.Unmarshal(caller.ToolCalls[callIndex], &call)
 	if err != nil {
-		slog.Error("toolbox manager Exec called", "err", err)
+		mllm.Slog().Error("toolbox manager Exec called", "err", err)
 		return nil, err
 	}
 	args := call.Function.Arguments
 	isToolNotMan := call.Function.Name != ToolboxManagerName
-	slog.Info("executing toolbox manager", "isManagerTool", !isToolNotMan, "tool", call.Function.Name, "args", args)
+	mllm.Slog().Info("executing toolbox manager", "isManagerTool", !isToolNotMan, "tool", call.Function.Name, "args", args)
 	toolboxName, ok := args.ArgString("name")
 	if !ok {
 		return nil, fmt.Errorf("need toolbox name to open (available: %q)", t.Toolboxes.Names())

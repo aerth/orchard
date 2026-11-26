@@ -8,11 +8,11 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/aerth/mostly/godotenv"
 	"github.com/aerth/mostly/mllm"
+	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/orchard/pkg/bashtooler"
 	"github.com/aerth/orchard/pkg/orchardenv"
 )
@@ -107,7 +107,7 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	t1 := time.Now()
 	defer func() {
 		if d := time.Since(t1); d > time.Second {
-			slog.Info("done running tool", "function", s.Name, "duration", d.String())
+			mllm.Slog().Info("done running tool", "function", s.Name, "duration", d.String())
 		}
 	}()
 	if ctx.Err() != nil {
@@ -134,7 +134,7 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	}
 
 	if mllm.DebugLLM {
-		slog.Info("RUN TOOL", "function", caller.Function.Name, "args", caller.Function.Arguments)
+		mllm.Slog().Info("RUN TOOL", "function", caller.Function.Name, "args", caller.Function.Arguments)
 	}
 	var execArgs []string // positional
 	var inputFileContents string
@@ -147,7 +147,7 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 		return nil, err
 	}
 	if len(s.features) != 0 {
-		slog.Info("running with features", "features", s.features)
+		mllm.Slog().Info("running with features", "features", s.features)
 	}
 	for _, v := range s.features {
 		if err := processFeature(ctx, argsmap, v); err != nil {
@@ -186,7 +186,7 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 		if err != nil {
 			return nil, fmt.Errorf("invalid: %w", err)
 		}
-		slog.Info("creating input file...", "size", len(inputFileContents), "name", file.Name())
+		mllm.Slog().Info("creating input file...", "size", len(inputFileContents), "name", file.Name())
 		_, err = file.WriteString(inputFileContents)
 		_ = file.Close()
 		if err != nil {
