@@ -57,7 +57,7 @@ func TestMain(m *testing.M) {
 }
 
 func Test03(t *testing.T) {
-	if testing.Short() {
+	if testing.Short() || skipLLM() {
 		t.SkipNow()
 		return
 	}
@@ -126,7 +126,7 @@ func must[T any](t *testing.T, fn func() (v T, err error)) T {
 }
 
 func Test04(t *testing.T) {
-	if testing.Short() {
+	if testing.Short() || skipLLM() {
 		t.SkipNow()
 		return
 	}
@@ -144,8 +144,16 @@ func Test04(t *testing.T) {
 	}
 }
 
+func skipLLM() bool {
+	cfg := mllm.Default()
+	if err := cfg.ValidateConfig(false); err != nil {
+		return true
+	}
+	return false
+}
+
 func TestO1(t *testing.T) {
-	if testing.Short() {
+	if testing.Short() || skipLLM() {
 		t.SkipNow()
 		return
 	}
@@ -182,7 +190,7 @@ func TestO1(t *testing.T) {
 }
 
 func TestO2(t *testing.T) {
-	if testing.Short() {
+	if testing.Short() || skipLLM() {
 		t.SkipNow()
 		return
 	}
@@ -227,6 +235,9 @@ func TestO2(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
+	if testing.Short() || skipLLM() {
+		t.SkipNow()
+	}
 	ctx := t.Context()
 	cfg := orchard.New()
 	for _, thinkVal := range []any{false, "low", nil} {
