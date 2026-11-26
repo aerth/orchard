@@ -2,12 +2,11 @@
 
 ## **tiny ai agent library** (tool orchestration, agentic harness)
 
-Made for local LLM, such as **ollama** or **llama.cpp**.
+Made for local LLM, such as **ollama** or **llama.cpp**, but should work for any `/v1/chat/completions` endpoint.
 
 No telemetry or advertisements. Bring your own tools.
 
-Uses the lightweight [mllm](https://github.com/aerth/mostly/blob/master/mllm/) package for LLM client,
-and GORM (SQL) for optional persistence.
+Uses the lightweight [mllm](https://github.com/aerth/mostly/blob/master/mllm/) package for LLM client, and GORM (SQL) for optional persistence.
 
 ## Examples
 
@@ -73,7 +72,7 @@ The examples use a simple [bash tool](https://github.com/aerth/orchard/blob/mast
 
 Dynamic toolboxes are collections of scripts and are scanned at runtime, using the list of paths in `ORCHARD_TOOLS` env (separated by `:` similar to how `$PATH` works).
 
-For tools that use API keys or other secrets, dynamic toolboxes may contain `.env` files that will be used for tools in that toolbox.
+For tools that use API keys or other secrets, the dynamic toolbox directory may contain `.env` files that will be used for tools in that particular toolbox.
 
 ## ORCHARD_TOOLS directory structure
 
@@ -83,8 +82,8 @@ ${ORCHARD_TOOLS}/toolboxes/files/grep.bash
 ${ORCHARD_TOOLS}/toolboxes/web/web_search.bash
 ```
 
-For now, env files in a toolbox is only used for scripts in that toolbox,
-If no .env file exists in the inner toolbox, the main toolbox .env is used
+For now, env files in a toolbox (`web/.env`) is only used for scripts in that toolbox (`web/`),
+If no .env file exists in the inner toolbox, the main toolbox .env is used (`${ORCHARD_TOOLS}/.env`)
 
 ```bash
 # optional env files
@@ -94,11 +93,12 @@ ${ORCHARD_TOOLS}/toolboxes/web/.env
 ${ORCHARD_TOOLS}/.env
 ```
 
-The tool spec is created from the comments at the top of the script.
+The tool spec is created from the comments at the top of the script (`# Description:`, `# Param:`, `# Feature:`)
 
-For now, the toolbox subdirectories are for organization only and all toolboxes are combined into one for LLM.
+For now, in the example programs, the toolbox subdirectories are for organization only and all toolboxes are combined into one for LLM.
 
 ```bash
+#!/bin/bash
 # Description: Use grep (ripgrep) to find line-numbers and filenames for keywords..
 # Param: phrase - The text to search for [string] [required]
 # Param: path - Path to the file (if omitted, all subdirectories) [string] [optional]
@@ -115,11 +115,13 @@ The tool calling is fully abstracted, isolating the llm from the execution logic
 
 ## Hooks
 
-- `PreTextHook`: Runs before generating the message (useful for UI to push a new message to the view).
+- `PreTextHook`: Runs before generating the message (useful for UI to push a new empty message to the view for streaming into).
 - `PreToolHook`: Can modify or deny tool arguments before execution.
 - `PostToolHook`: Can modify or deny tool outputs.
-- `NonTextHook`: A UI-specific hook for tool outputs.
-- `FinishHook`: Runs after the entire loop is finished.
+- `NonTextHook`: A UI-specific hook for tool output messages to pop into the view.
+- `FinishHook`: Runs after the entire loop is finished (either: hit rounds limit or final message contained no tool calls).
+- `PreTextHookEditP1`: Able to modify the entire conversation before generation (compression hook)
+- `PreTextHookEditP2`: Able to modify the truncated conversation before generation
 
 ## Work In Progress
 
