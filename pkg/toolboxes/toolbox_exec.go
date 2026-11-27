@@ -201,15 +201,13 @@ func (s StaticExecFuncFS) ExecV1(ctx context.Context, args json.RawMessage) (any
 	var outputMessage string
 	var err error
 	ext := filepath.Ext(pyFilePath)
-	mllm.Slog().Info("toolbox tool script running", "file", filepath.Base(pyFilePath), "args", execArgs)
+	mllm.Slog().Info("toolbox tool script running", "file", filepath.Base(pyFilePath), "args", execArgs, "ext", ext)
 	switch ext {
 	default: // TODO: add js,lua,others?
 		return nil, stackerr.Errorf("unknown extension: %q", ext)
 	case ".py":
-		//		return nil, fmt.Errorf("uhoh, we disabled python")
 		outputMessage, err = bashtooler.RunPy(ctx, ".", eenv, s.readFile, pyFilePath, execArgs...)
 	case ".bash":
-		mllm.Slog().Info("executing bash for toolbox tool", "file", filepath.Base(pyFilePath), "args", execArgs)
 		outputMessage, err = bashtooler.RunBash(ctx, ".", eenv, s.readFile, pyFilePath, execArgs...)
 	}
 	if err != nil {
