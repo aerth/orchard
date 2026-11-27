@@ -4,6 +4,7 @@ go 1.27.4
 
 require (
 	github.com/aerth/mostly v0.4.20
+	github.com/goccy/go-yaml v1.19.2
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.2
 )
