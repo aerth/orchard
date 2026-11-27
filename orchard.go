@@ -60,7 +60,7 @@ type Config struct {
 	PromptPrefix string // copied from [Custom.PromptPrefix]
 	PromptSuffix string // copied from [Custom.PromptSuffix]
 
-	funcConfig `json:"-"` // hooks
+	Hooks `json:"-"` // hooks
 
 	StateConfig `json:"-"`
 
@@ -76,7 +76,7 @@ type StateConfig struct {
 	SkillNames []string
 }
 
-type funcConfig struct {
+type Hooks struct {
 	// ThreadReader ... if using [Create]. loads the history ONCE per [Create] run. see [NewStaticThreadReader]
 	// If static, this config should not be re-used and [Create] should be called ONLY once.
 	//
@@ -86,22 +86,31 @@ type funcConfig struct {
 	// SystemPromptFunc might even return a const string and ignore input, generally should be nil to use default.
 	//
 	// Wrapper pseudocode: cfg.SystemPromptFunc = func(st){cfg.DefaultSystemPrompt(st)}
+	//
+	// Deprecated: not stable interface, use at your own risk
 	SystemPromptFunc func(StateConfig) (string, error)
 
 	PreTextHook func() error // UI hook (for example, insert new pending message to switch [mllm.StreamHandler] to)
 
-	PreTextHookEditP1 func(ctx context.Context, convo mllm.ChatMessages) (mllm.ChatMessages, error) // Edit Convo Hook EXPERIMENTAL (for example, compaction/compression)
-	PreTextHookEditP2 func(ctx context.Context, convo mllm.ChatMessages) (mllm.ChatMessages, error) // Edit Convo Hook EXPERIMENTAL (for example, compaction/compression)
-	AfterCompress     func(convo mllm.ChatMessages)
+	// Edit full Convo Hook EXPERIMENTAL (for example, compaction/compression)
+	PreTextHookEditP1 func(ctx context.Context, convo mllm.ChatMessages) (mllm.ChatMessages, error)
+	// AfterCompress is called after PreTextHookEditP1 is called, not necessarily if compression actually occured.
+	AfterCompress func(convo mllm.ChatMessages)
 
-	PreToolHook  func(ctx context.Context, name string, args map[string]any) error                           // Optional: can modify or deny toolcall
-	PostToolHook func(ctx context.Context, name string, args map[string]any, output *mllm.ChatMessage) error // Optional: can modify or deny toolout before DB, NOT FOR UI
+	// Edit post-truncated Convo Hook EXPERIMENTAL (for example, compaction/compression)
+	PreTextHookEditP2 func(ctx context.Context, convo mllm.ChatMessages) (mllm.ChatMessages, error)
 
-	NonTextHook func(mllm.Message) error          // UI Hook: for rendering tool outputs after running tool, for UI.
-	FinishHook  func(fullconvo mllm.ChatMessages) // UI Hook: after [Create] is finished with all rounds
+	// Optional: can modify or deny toolcall
+	PreToolHook func(ctx context.Context, name string, args map[string]any) error
+	// Optional: can modify or deny toolout before DB, NOT FOR UI
+	PostToolHook func(ctx context.Context, name string, args map[string]any, output *mllm.ChatMessage) error
+
+	NonTextHook func(mllm.Message) error // UI Hook: for rendering tool outputs after running tool
+
+	FinishHook func(fullconvo mllm.ChatMessages) // UI Hook: after [Create] is finished with all rounds
 }
 
-func (f funcConfig) SystemPrompt(st StateConfig) (string, error) {
+func (f Hooks) SystemPrompt(st StateConfig) (string, error) {
 	return f.SystemPromptFunc(st)
 }
 
