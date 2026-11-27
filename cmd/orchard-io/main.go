@@ -20,6 +20,7 @@ import (
 	"github.com/aerth/mostly/stackerr"
 	"github.com/aerth/orchard"
 	"github.com/aerth/orchard/pkg/compactor"
+	"github.com/aerth/orchard/pkg/orchardyml"
 	"github.com/aerth/orchard/pkg/toolboxes"
 	"github.com/aerth/orchard/pkg/visions"
 	"gorm.io/gorm"
@@ -30,7 +31,7 @@ var client orchard.Config
 var sloglvl slog.LevelVar
 
 func main() {
-	sloglvl.Set(slog.LevelDebug)
+	sloglvl.Set(slog.LevelInfo)
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
 		AddSource: false,
 		Level:     &sloglvl,
@@ -39,6 +40,10 @@ func main() {
 	suffix := ""
 	dbflag := false
 	//
+	if err := orchardyml.Load(); err != nil {
+		println(err.Error())
+		os.Exit(1)
+	}
 	mllm.Flags()
 	compactor.Flags()
 	orchard.Flags(&sloglvl)

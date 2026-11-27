@@ -1,0 +1,10 @@
+# orchard config (orchard.yml)
+# if found in current directory, provides useful customization options
+toolhooks:
+  apply_patch_id: make lint
+  notify_send: echo
+  all: |
+    notify-send "ToolCall: $TOOL_NAME" "Arguments: $TOOL_ARGS"
+args: [--no-bash]
+env:
+  DEBUG_LLM: 2

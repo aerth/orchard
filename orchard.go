@@ -284,13 +284,31 @@ func (odefaults) PostToolHook(ctx context.Context, cfg Config, convo mllm.ChatMe
 			},
 		},
 	}.ToRaw() // ToRaw for double-encode
-
+	hooktoolenv := orchardenv.OKENVA()
+	{ // get extended hook env available
+		top2 := convo.TopN(2)
+		if len(top2) != 2 {
+			return convo, fmt.Errorf("not enough messages woops")
+		}
+		caller := top2[0]
+		if len(caller.ToolCalls) == 0 {
+			return convo, fmt.Errorf("didnt find calls woops")
+		}
+		toolcall := caller.ToolCalls[0] // TODO: multi, might need change sig
+		var realcall mllm.Call[json.RawMessage]
+		if err := json.Unmarshal(toolcall, &realcall); err != nil {
+			return convo, err
+		}
+		toolname := realcall.Function.Name
+		toolargs := string(realcall.Function.Arguments)
+		hooktoolenv = append(hooktoolenv, "TOOL_NAME="+toolname, "TOOL_ARGS="+toolargs) // TODO: more env
+	}
 	// run the command in bash
 	bashout, err := bashtooler.RunBashScript(ctx, bytes.NewReader([]byte(cmd)),
 		bashtooler.RunParams{
 			WorkingDir: ".",
 			Args:       []string{"/dev/stdin"},
-			AddEnviron: orchardenv.OKENVA(),
+			AddEnviron: hooktoolenv,
 			RawOnly:    true, // empty = skip adding to convo
 		},
 	)
