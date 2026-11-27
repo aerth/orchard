@@ -191,6 +191,7 @@ func main2(client orchard.Config, dbflag bool, sleepDur time.Duration) error {
 	if mllm.DefaultThread == uuid.Nil() {
 		mllm.DefaultThread = mllm.ThreadHasher(wd)
 	}
+	mllm.DefaultOptions.StreamOptions = map[string]any{"include_usage": true}
 	client.PreTextHookEditP1 = compactor.V1
 	client.NonTextHook = func(m mllm.Message) error {
 		if n := mllm.TruncateLogToolOutChars; n != 0 {
