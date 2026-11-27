@@ -295,13 +295,14 @@ func (odefaults) PostToolHook(ctx context.Context, cfg Config, convo mllm.ChatMe
 	}.ToRaw() // ToRaw for double-encode
 	hooktoolenv := orchardenv.OKENVA()
 	{ // get extended hook env available
-		top2 := convo.TopN(2)
-		if len(top2) != 2 {
+		at := convo.TopRoleIndex("assistant")
+		if at < 0 {
 			return convo, fmt.Errorf("not enough messages woops")
 		}
+		top2 := convo[at:]
 		caller := top2[0]
 		if len(caller.ToolCalls) == 0 {
-			return convo, fmt.Errorf("didnt find calls woops")
+			return convo, fmt.Errorf("didnt find calls, woops: %q from %v", top2.Roles(), caller)
 		}
 		toolcall := caller.ToolCalls[0] // TODO: multi, might need change sig
 		var realcall mllm.Call[json.RawMessage]
