@@ -15,14 +15,16 @@ Try `make run` after exporting the required LLM_MODEL and LLM_HOST env variables
 ```bash
 # example for ollama at localhost
 export LLM_HOST=http://127.0.0.1:11434
+# choose your model (E2B is much smaller) 
 export LLM_MODEL=gemma-4-12B-it-qat-GGUF:UD-Q4_K_XL
+export LLM_MODEL=gemma-4-E2B-it-Q4_K_M
 make
 bin/orchard-io <<<"what can i build with this library?" 2> >(jq -c)
 ```
 
-- [orchard-tui](https://github.com/aerth/orchard-tui): TUI agent interface using bubbletea UI library
-- [orchard-io](./cmd/orchard-io/): simple example, read stdin, print to stdout (persistence,dynamic tools)
-- [orchard-lite](./cmd/orchard-lite/): minimal example, read command line, print to stdout (dynamic tools, no persistence)
+- [orchard-io](./cmd/orchard-io/): simple but useful demo. read stdin, print to stdout (persistence,dynamic tools)
+- [orchard-lite](./cmd/orchard-lite/): minimal example. read command line, print to stdout (dynamic tools, no persistence)
+- [orchard-tui](https://github.com/aerth/orchard-tui): full-featured TUI agent interface using bubbletea UI library
 - [orchard_test.go](./orchard_test.go): for example library usage.
 - [orchard-tools](https://github.com/aerth/orchard-tools): a tool scripts repository
 
@@ -55,7 +57,7 @@ Adding native tools is easy:
 
 ## Runtime Configuration
 
-Environmental variables configure LLM endpoint/model at runtime (see [mllm](https://github.com/aerth/mostly) package).
+Environmental variables configure LLM endpoint/model at runtime (see [mllm](https://github.com/aerth/mostly/blob/master/mllm/) package).
 
 Use `mllm.Flags()` and `orchard.Flags()` to add more runtime configuration via command-line flags.
 
