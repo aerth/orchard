@@ -15,8 +15,9 @@ Try `make run` after exporting the required LLM_MODEL and LLM_HOST env variables
 ```bash
 # example for ollama at localhost
 export LLM_HOST=http://127.0.0.1:11434
-export LLM_MODEL=gemma4:12b
-make run
+export LLM_MODEL=gemma-4-12B-it-qat-GGUF:UD-Q4_K_XL
+make
+bin/orchard-io <<<"what can i build with this library?" 2> >(jq -c)
 ```
 
 - [orchard-tui](https://github.com/aerth/orchard-tui): TUI agent interface using bubbletea UI library
@@ -27,13 +28,11 @@ make run
 
 ## Library
 
-Orchard is a very small **library** that provides `New() Config`,  has `err := cfg.Run(ctx, convo)` method, which begins loop, calling tools until finished.
+Orchard is a very small **library** that provides `New() Config`. The config provides ways to customize how the loop runs, where the stream is printed, what tools are available, and more.
+
+Use the `err := cfg.Run(ctx, convo)` which begins loop, calling tools until finished.
 
 Typically, after the loop finishes, a new user message might be added to the `convo`, and then `Run` is called again.
-
-Using Hook functions in `Config`, the application can customize the loop, providing real-time streaming to UI or confirmation of tool calls.
-
-For further customization, the `Generator` and `ToolRunner` can be customized by mo
 
 Minimal Example (bash tool only), LLM_HOST and LLM_MODEL are required environmental variables:
 
@@ -60,6 +59,10 @@ Environmental variables configure LLM endpoint/model at runtime (see [mllm](http
 
 Use `mllm.Flags()` and `orchard.Flags()` to add more runtime configuration via command-line flags.
 
+### orchard.yml
+
+Adds env, flags, or tool hooks per-project. See example [orchard.yml](./orchard.yml).
+
 ## Tools
 
 Tools are easy to implement, in either Go, Bash, or Python.
@@ -74,7 +77,17 @@ Dynamic toolboxes are collections of scripts and are scanned at runtime, using t
 
 For tools that use API keys or other secrets, the dynamic toolbox directory may contain `.env` files that will be used for tools in that particular toolbox.
 
-## ORCHARD_TOOLS directory structure
+## Dynamic Tools
+
+For now, Dynamic toolboxes are read from the filesystem, normally once when the program starts. In the future, we will also be able to load read-only tools from a zip file or embedded into custom builds.
+
+*Tip: The scripts themselves are not cached, but they are parsed and the `Spec` *is* cached, so, editing tool Description and Param while the program is running, will require reloading the toolbox. A program may provide this reloading as a feature.*
+
+The tool spec is created by [parsing the comments](./pkg/toolboxes/toolboxes.go) at the top of the script (`# Description:`, `# Param:`, `# Feature:`)
+
+For now, in the example programs, the toolbox subdirectories ("basic","web") are for organization only and all toolboxes are combined into one for LLM. 
+
+### ORCHARD_TOOLS directory structure
 
 ```bash
 # example file tree
@@ -82,6 +95,9 @@ ${ORCHARD_TOOLS}/toolboxes/files/grep.bash
 ${ORCHARD_TOOLS}/toolboxes/web/web_search.bash
 ```
 
+### Tool Env Vars
+
+Some tools will inevitably require secrets of some kind (for example, `SEARCH_API_KEY`).
 For now, env files in a toolbox (`web/.env`) is only used for scripts in that toolbox (`web/`),
 If no .env file exists in the inner toolbox, the main toolbox .env is used (`${ORCHARD_TOOLS}/.env`)
 
@@ -93,16 +109,16 @@ ${ORCHARD_TOOLS}/toolboxes/web/.env
 ${ORCHARD_TOOLS}/.env
 ```
 
-The tool spec is created from the comments at the top of the script (`# Description:`, `# Param:`, `# Feature:`)
+### Example Tool Script
 
-For now, in the example programs, the toolbox subdirectories are for organization only and all toolboxes are combined into one for LLM.
+This may be named `grep.bash` and will be seen by the LLM as a tool function named `grep` with 3 parameters (1 required). The command's stderr and stdout streams are combined and added to the conversation as a "tool" message.
 
 ```bash
 #!/bin/bash
 # Description: Use grep (ripgrep) to find line-numbers and filenames for keywords..
 # Param: phrase - The text to search for [string] [required]
 # Param: path - Path to the file (if omitted, all subdirectories) [string] [optional]
-# Param: case_insensitive - Add -i flag if we arent sure about spelling. Causes more false positives! [boolean] [optional]
+# Param: case_insensitive - Add -i flag if we aren't sure about spelling. Causes more false positives! [boolean] [optional]
 flags=(--line-number --word-regexp)
 if [[ "$3" == "true" ]]; then
 	flags+=("--ignore-case")
@@ -115,6 +131,12 @@ The tool calling is fully abstracted, isolating the llm from the execution logic
 
 ## Hooks
 
+Using Hook functions in `Config`, the application can customize the loop, providing real-time streaming to UI or confirmation of tool calls.
+
+For further customization, main components such as the `Generator` and `ToolRunner` can be replaced by modifying the `Custom` container.
+
+### Config hooks (purely optional)
+
 - `PreTextHook`: Runs before generating the message (useful for UI to push a new empty message to the view for streaming into).
 - `PreToolHook`: Can modify or deny tool arguments before execution.
 - `PostToolHook`: Can modify or deny tool outputs.
@@ -123,14 +145,18 @@ The tool calling is fully abstracted, isolating the llm from the execution logic
 - `PreTextHookEditP1`: Able to modify the entire conversation before generation (compression hook)
 - `PreTextHookEditP2`: Able to modify the truncated conversation before generation
 
+### Custom (**advanced**, to overload main loop components)
+
+*(Warning: these signatures in `Custom` may change in the future)*
+
+-  **GeneratorFunc**: `func(ctx context.Context, cfg Config, convo mllm.ChatMessages) (mllm.ChatMessages, mllm.ChatMessage, error)`
+    - Generates a `[mllm.ChatMessage]` from the conversation.
+-  **ToolRunnerFunc**: `func(ctx context.Context, cfg Config, caller mllm.ChatMessage, index int) (mllm.ChatMessages, error)`
+    - Runs a `[mllm.Tool.Exec]` function, returning a message. Errors end the loop.
+
 ## Work In Progress
 
-Many components have not made it into this source tree yet. These include:
-
-- Confirmation (yes/no/cancel)
-- Source tree in sticky system message
-- conversation compression
-- reading SKILLS or other runtime prompts
+Contributions are welcome, preferably small patches that are easily auditable.
 
 This package, like [mllm](https://github.com/aerth/mostly), will remain lightweight and versatile.
 
